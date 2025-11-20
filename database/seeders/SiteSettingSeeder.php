@@ -11,8 +11,8 @@ class SiteSettingSeeder extends Seeder
   {
     SiteSetting::create([
       'site_title'        => 'Kahadhr HRM',
-      'logo'              => 'jpeg',
-      'favicon'           => 'jpeg',
+      'logo'              => 'png',
+      'favicon'           => 'png',
       'hero_image'        => 'webp',
       'site_phone_number' => '+8801877556633',
       'site_email'             => 'info@kahadhr.com',

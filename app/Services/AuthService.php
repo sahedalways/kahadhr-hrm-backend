@@ -18,7 +18,7 @@ class AuthService
     return Auth::attempt([
       'email'     => $email,
       'password'  => $password,
-      'user_type' => 'admin',
+      'user_type' => 'superAdmin',
     ]);
   }
 }

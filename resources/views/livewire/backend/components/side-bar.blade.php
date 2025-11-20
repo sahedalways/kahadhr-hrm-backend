@@ -45,7 +45,7 @@
                             <!-- Site Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('admin/settings/site') ? 'active' : '' }}"
-                                    href="{{ route('admin.settings.site') }}">
+                                    href="{{ route('super-admin.settings.site') }}">
                                     <i class="fas fa-cog sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Site Settings </span>
                                 </a>
@@ -54,7 +54,7 @@
                             <!-- Mail Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('admin/settings/mail') ? 'active' : '' }}"
-                                    href="{{ route('admin.settings.mail') }}">
+                                    href="{{ route('super-admin.settings.mail') }}">
                                     <i class="fas fa-envelope sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Mail Settings </span>
                                 </a>
@@ -63,7 +63,7 @@
                             <!-- Payment Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('admin/settings/payment') ? 'active' : '' }}"
-                                    href="{{ route('admin.settings.payment') }}">
+                                    href="{{ route('super-admin.settings.payment') }}">
                                     <i class="fas fa-credit-card sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Payment Settings </span>
                                 </a>
@@ -73,7 +73,7 @@
 
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('admin/settings/social') ? 'active' : '' }}"
-                                    href="{{ route('admin.settings.social') }}">
+                                    href="{{ route('super-admin.settings.social') }}">
                                     <i class="fab fa-facebook-f sidenav-mini-icon side-bar-inner"></i>
 
                                     <span class="sidenav-normal side-bar-inner"> Social Settings </span>
@@ -85,7 +85,7 @@
                             <!-- Password Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('admin/settings/password') ? 'active' : '' }}"
-                                    href="{{ route('admin.settings.password') }}">
+                                    href="{{ route('super-admin.settings.password') }}">
                                     <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Password Settings </span>
                                 </a>

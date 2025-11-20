@@ -4,7 +4,7 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href="{{ route('admin.dashboard') }}">
+        <a class="navbar-brand m-0" href="{{ route('super-admin.dashboard') }}">
             <img src="{{ asset(siteSetting()->logo_url) }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
             <span class="ms-2 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
 
@@ -17,7 +17,7 @@
             @if (app('authUser')->user_type == 'superAdmin')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/dashboard*') ? 'active' : '' }}"
-                        href="{{ route('admin.dashboard') }}">
+                        href="{{ route('super-admin.dashboard') }}">
                         <div
                             class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>

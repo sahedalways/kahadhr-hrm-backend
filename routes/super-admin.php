@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 
 // for super admin
-Route::group(['prefix' => 'super-admin', 'middleware' => ['auth', 'super-admin'], 'as' => 'super-admin.'], function () {
+Route::group(['prefix' => 'super-admin', 'middleware' => ['auth', 'superAdmin'], 'as' => 'super-admin.'], function () {
   /* Admin Dashboard */
   Route::get('dashboard', Dashboard::class)->name('dashboard');
 

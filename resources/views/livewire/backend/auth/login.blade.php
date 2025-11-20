@@ -9,7 +9,7 @@
                             <div class="card-header bg-transparent text-center">
                                 <div class="d-flex flex-column align-items-center justify-content-center mt-4 mb-4">
                                     <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <img src="{{ siteSetting()->logo_url }}" alt="Logo" class="login-logo mb-4"
+                                        <img src="{{ siteSetting()->logo_url }}" alt="Logo" class="login-logo mb-2"
                                             style="width: 100px; height: auto;">
                                     </div>
 

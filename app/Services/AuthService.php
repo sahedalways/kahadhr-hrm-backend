@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendOtpSmsJob;
 use App\Models\User;
 
 
@@ -49,7 +50,7 @@ class AuthService
   public function sendOtpSms($phone, $otp)
   {
     // Example: Twilio or other SMS provider code here
-    // SmsService::send($phone, "Your login OTP is: $otp");
+    SendOtpSmsJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
 
     \Log::info("OTP Sent to {$phone}: {$otp}");
   }

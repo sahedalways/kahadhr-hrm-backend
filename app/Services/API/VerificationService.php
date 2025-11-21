@@ -3,6 +3,7 @@
 namespace App\Services\API;
 
 use App\Jobs\SendOtpEmailJob;
+use App\Jobs\SendOtpSmsForVerifyJob;
 use App\Repositories\API\VerificationRepository;
 
 
@@ -31,7 +32,7 @@ class VerificationService
     }
 
     if ($phone) {
-      // Add SMS sending logic here
+      SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
     }
 
     return true;

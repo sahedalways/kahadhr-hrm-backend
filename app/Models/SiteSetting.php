@@ -56,17 +56,19 @@ class SiteSetting extends Model
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
-            if (!auth()->check()) {
+            $user = auth()->check() ? app('authUser') : null;
+
+            if (!$user) {
+                // Guest: show SuperAdmin items only
+                $builder->whereNull('company_id');
                 return;
             }
-
-            $user = app('authUser');
 
             if ($user->user_type === 'superAdmin') {
                 $builder->whereNull('company_id');
             } elseif ($user->user_type === 'company') {
                 $builder->where('company_id', $user->company->id ?? 0);
-            } elseif ($user->user_type === 'employee' || $user->user_type === 'teamLead') {
+            } elseif (in_array($user->user_type, ['employee', 'teamLead'])) {
                 $builder->whereHas('company.employees', function (Builder $query) use ($user) {
                     $query->where('id', $user->id);
                 });

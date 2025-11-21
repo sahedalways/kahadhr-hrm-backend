@@ -63,7 +63,7 @@ class Login extends BaseComponent
 
         Auth::login($user, $this->rememberMe);
 
-        return redirect()->intended('super-admin/dashboard');
+        return redirect()->intended('dashboard/');
     }
 
 
@@ -99,7 +99,7 @@ class Login extends BaseComponent
             session()->forget(['otp', 'otp_user_id']);
             $this->toast('OTP verified successfully!', 'success');
 
-            return redirect()->intended('super-admin/dashboard');
+            return redirect()->intended('dashboard/');
         }
 
         $this->toast('Invalid OTP', 'error');
@@ -113,7 +113,7 @@ class Login extends BaseComponent
     {
         if (app('authUser')) {
             if (app('authUser')->user_type == 'superAdmin') {
-                return redirect()->route('super-admin.dashboard');
+                return redirect()->route('super-admin.home');
             }
         }
     }

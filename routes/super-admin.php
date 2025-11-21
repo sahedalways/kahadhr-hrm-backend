@@ -10,17 +10,18 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// for super admin
-Route::group(['prefix' => 'super-admin', 'middleware' => ['auth', 'superAdmin'], 'as' => 'super-admin.'], function () {
-  /* Admin Dashboard */
-  Route::get('dashboard', Dashboard::class)->name('dashboard');
+// Super Admin routes under admin.demo.com
+Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middleware(['auth', 'superAdmin'])->name('super-admin.')->group(function () {
 
-  // for settings group routes
-  Route::prefix('/settings')->name('settings.')->group(function () {
-    Route::get('/site', SiteSettings::class)->name('site');
-    Route::get('/mail', MailSettings::class)->name('mail');
-    Route::get('/payment', PaymentSettings::class)->name('payment');
-    Route::get('/password', PasswordSettings::class)->name('password');
-    Route::get('/social', SocialSettings::class)->name('social');
+  // Dashboard
+  Route::get('/', Dashboard::class)->name('home');
+
+  // Settings routes
+  Route::prefix('settings')->name('settings.')->group(function () {
+    Route::get('site', SiteSettings::class)->name('site');
+    Route::get('mail', MailSettings::class)->name('mail');
+    Route::get('payment', PaymentSettings::class)->name('payment');
+    Route::get('password', PasswordSettings::class)->name('password');
+    Route::get('social', SocialSettings::class)->name('social');
   });
 });

@@ -16,15 +16,15 @@ class AuthRepository
     $this->authService = $authService;
   }
 
-  /**
-   * Attempt login for admin
-   *
-   * @param string $email
-   * @param string $password
-   * @return bool
-   */
-  public function loginAdmin(string $email, string $password): bool
+
+  public function loginAdmin(string $email, string $password)
   {
     return $this->authService->loginAdmin($email, $password);
+  }
+
+
+  public function sendOtpSms($phone, $otp)
+  {
+    $this->authService->sendOtpSms($phone, $otp);
   }
 }

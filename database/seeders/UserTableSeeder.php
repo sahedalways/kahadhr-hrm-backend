@@ -18,7 +18,7 @@ class UserTableSeeder extends Seeder
     User::create(attributes: [
       'f_name' => 'Super',
       'l_name' => 'Admin',
-      'email' => 'super@admin.com',
+      'email' => 'admin@admin.com',
       'phone_no' => '0177xxxxxxx',
       'password' => 12345678,
       'user_type' => 'superAdmin',

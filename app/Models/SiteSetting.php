@@ -34,4 +34,13 @@ class SiteSetting extends Model
             ? getFileUrl('image/settings/favicon.' . $this->favicon)
             : asset('assets/img/default-favicon.ico');
     }
+
+
+    public function getHeroImageUrlAttribute()
+    {
+        return getFileUrl(
+            $this->hero_image ? 'image/settings/hero.' . $this->hero_image : null,
+            'assets/img/default-hero.jpg'
+        );
+    }
 }

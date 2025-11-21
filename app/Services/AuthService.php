@@ -2,23 +2,32 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 
 class AuthService
 {
-  /**
-   * Admin login logic
-   *
-   * @param string $email
-   * @param string $password
-   * @return bool
-   */
-  public function loginAdmin(string $email, string $password): bool
+
+  public function loginAdmin(string $email, string $password)
   {
-    return Auth::attempt([
-      'email'     => $email,
-      'password'  => $password,
-      'user_type' => 'superAdmin',
-    ]);
+    $user = User::where('email', $email)->first();
+
+    if (!$user) {
+      return false;
+    }
+
+    if (!password_verify($password, $user->password)) {
+      return false;
+    }
+
+    return $user;
+  }
+
+  public function sendOtpSms($phone, $otp)
+  {
+    // Example: Twilio or other SMS provider code here
+    // SmsService::send($phone, "Your login OTP is: $otp");
+
+    \Log::info("OTP Sent to {$phone}: {$otp}");
   }
 }

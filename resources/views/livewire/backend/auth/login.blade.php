@@ -24,7 +24,7 @@
                                     <div class="text-muted mb-4">
                                         <small>Login to Continue</small>
                                     </div>
-                                    <form role="form" class="text-start">
+                                    <form role="form" class="text-start" wire:submit.prevent="login">
                                         <div class="mb-3">
                                             <input type="email" class="form-control" placeholder="Email"
                                                 wire:model="email">
@@ -46,12 +46,21 @@
                                         @endif
 
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe"
+                                                wire:model="rememberMe">
                                             <label class="form-check-label" for="rememberMe">Remember me</label>
                                         </div>
+
                                         <div class="text-center">
-                                            <button type="button" wire:click="login"
-                                                class="btn btn-primary w-100 my-4 mb-4">Login</button>
+                                            <button type="submit" class="btn btn-primary w-100 my-4 mb-4"
+                                                wire:loading.attr="disabled" wire:target="login">
+                                                <span wire:loading wire:target="login">
+                                                    <i class="fas fa-spinner fa-spin me-2"></i> Logging In ...
+                                                </span>
+                                                <span wire:loading.remove wire:target="login">
+                                                    Login
+                                                </span>
+                                            </button>
                                         </div>
 
                                         <div class="mb-2 position-relative text-center">
@@ -71,5 +80,66 @@
                 </div>
             </div>
         </div>
+
+        @if ($showOtpModal)
+            <form role="form" class="text-start" wire:submit.prevent="verifyOtp">
+                <div class="modal fade show d-block" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">Enter OTP</h5>
+                            </div>
+
+                            <div class="modal-body d-flex justify-content-between">
+                                @for ($i = 0; $i < 6; $i++)
+                                    <input type="text" wire:model="otp.{{ $i }}"
+                                        class="form-control text-center mx-1 otp-field" maxlength="1"
+                                        style="width: 50px; font-size: 1.5rem;" oninput="handleOtpInput(this)"
+                                        onkeydown="handleOtpBackspace(event, this)">
+                                @endfor
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary w-25 my-4 mb-4"
+                                    wire:loading.attr="disabled" wire:target="verifyOtp">
+                                    <span wire:loading wire:target="verifyOtp">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Verifying ...
+                                    </span>
+                                    <span wire:loading.remove wire:target="verifyOtp">
+                                        Verify OTP
+                                    </span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-backdrop fade show"></div>
+        @endif
     </main>
+
+
 </div>
+
+<script>
+    function handleOtpInput(el) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        if (el.value) {
+            const next = el.nextElementSibling;
+            if (next && next.classList.contains('otp-field')) {
+                next.focus();
+            }
+        }
+    }
+
+    function handleOtpBackspace(e, el) {
+        if (e.key === 'Backspace' && !el.value) {
+            const prev = el.previousElementSibling;
+            if (prev && prev.classList.contains('otp-field')) {
+                prev.focus();
+            }
+        }
+    }
+</script>

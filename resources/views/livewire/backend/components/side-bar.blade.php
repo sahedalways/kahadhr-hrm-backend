@@ -16,7 +16,7 @@
         <ul class="navbar-nav">
             @if (app('authUser')->user_type == 'superAdmin')
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/dashboard*') ? 'active' : '' }}"
+                    <a class="nav-link {{ Request::is('super-admin/dashboard*') ? 'active' : '' }}"
                         href="{{ route('super-admin.dashboard') }}">
                         <div
                             class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
@@ -31,20 +31,20 @@
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#settings"
-                        class="nav-link {{ Request::is('admin/settings*') ? 'active' : '' }}" aria-controls="settings"
-                        role="button" aria-expanded="false">
+                        class="nav-link {{ Request::is('super-admin/settings*') ? 'active' : '' }}"
+                        aria-controls="settings" role="button" aria-expanded="false">
                         <div
                             class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
                             <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Settings</span>
                     </a>
-                    <div class="collapse {{ Request::is('admin/settings*') ? 'show' : '' }}" id="settings">
+                    <div class="collapse {{ Request::is('super-admin/settings*') ? 'show' : '' }}" id="settings">
                         <ul class="nav ms-4">
 
                             <!-- Site Settings -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('admin/settings/site') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('super-admin/settings/site') ? 'active' : '' }}"
                                     href="{{ route('super-admin.settings.site') }}">
                                     <i class="fas fa-cog sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Site Settings </span>
@@ -53,7 +53,7 @@
 
                             <!-- Mail Settings -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('admin/settings/mail') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('super-admin/settings/mail') ? 'active' : '' }}"
                                     href="{{ route('super-admin.settings.mail') }}">
                                     <i class="fas fa-envelope sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Mail Settings </span>
@@ -61,18 +61,18 @@
                             </li>
 
                             <!-- Payment Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('admin/settings/payment') ? 'active' : '' }}"
+                            {{-- <li class="nav-item">
+                                <a class="nav-link {{ Request::is('super-admin/settings/payment') ? 'active' : '' }}"
                                     href="{{ route('super-admin.settings.payment') }}">
                                     <i class="fas fa-credit-card sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Payment Settings </span>
                                 </a>
-                            </li>
+                            </li> --}}
 
 
 
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('admin/settings/social') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('super-admin/settings/social') ? 'active' : '' }}"
                                     href="{{ route('super-admin.settings.social') }}">
                                     <i class="fab fa-facebook-f sidenav-mini-icon side-bar-inner"></i>
 
@@ -84,7 +84,7 @@
 
                             <!-- Password Settings -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('admin/settings/password') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('super-admin/settings/password') ? 'active' : '' }}"
                                     href="{{ route('super-admin.settings.password') }}">
                                     <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Password Settings </span>

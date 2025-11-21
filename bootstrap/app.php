@@ -16,8 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'superAdmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'companyAdmin' => \App\Http\Middleware\CompanyMiddleware::class,
             'cors' => \App\Http\Middleware\Cors::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'guest' => \App\Http\Middleware\RedirectIfCompanyAuthenticated::class,
+            'companySubdomain' => \App\Http\Middleware\CompanySubdomainMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -1,10 +1,39 @@
 <?php
 
+
+use App\Livewire\Backend\Company\Auth\CompanyLogin;
+use App\Livewire\Backend\Company\Auth\CompanyRegister;
 use App\Livewire\Backend\Company\Dashboard;
 use Illuminate\Support\Facades\Route;
 
 
+/*
+|--------------------------------------------------------------------------
+| Public routes for company (no auth required)
+|--------------------------------------------------------------------------
+*/
 
-Route::domain('{company}.' . config('app.base_domain'))->middleware(['auth', 'companyAdmin'])->name('company.')->group(function () {
-  Route::get('dashboard', Dashboard::class)->name('dashboard');
-});
+Route::domain('{company}.' . config('app.base_domain'))
+  ->middleware('guest')
+  ->name('company.auth.')
+  ->group(function () {
+    Route::get('login', CompanyLogin::class)->name('login');
+  });
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated company dashboard routes
+|--------------------------------------------------------------------------
+*/
+Route::domain('{company}.' . config('app.base_domain'))
+  ->prefix('dashboard')
+  ->middleware(['auth', 'companyAdmin', 'companySubdomain'])
+  ->name('company.dashboard.')
+  ->group(function () {
+    // Dashboard home
+    Route::get('/', Dashboard::class)->name('home');
+
+    // Example: other dashboard pages
+    // Route::get('profile', Profile::class)->name('profile');
+    // Route::get('employees', Employees::class)->name('employees');
+  });

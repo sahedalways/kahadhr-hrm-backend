@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Livewire\Backend\Auth;
+namespace App\Livewire\Backend\Company\Auth;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Auth;
 
-class Login extends BaseComponent
+class CompanyLogin extends BaseComponent
 {
     public $email, $password, $success = false;
     public $otp = [], $generatedOtp, $showOtpModal = false;
@@ -23,7 +23,7 @@ class Login extends BaseComponent
     //Render Page
     public function render()
     {
-        return view('livewire.backend.auth.login')->extends('components.layouts.login_layout')->section('content');
+        return view('livewire.backend.company.auth.company_login')->extends('components.layouts.login_layout')->section('content');
     }
 
 
@@ -34,7 +34,7 @@ class Login extends BaseComponent
     {
         $this->validate();
 
-        $user = $authRepository->loginAdmin($this->email, $this->password);
+        $user = $authRepository->loginCompany($this->email, $this->password);
 
         if (!$user) {
             $this->toast('Invalid Email or Password', 'error');
@@ -46,7 +46,7 @@ class Login extends BaseComponent
         $phone    = $user->phone_no;
 
 
-        if ($userType === 'superAdmin' || $userType === 'company') {
+        if ($userType === 'company') {
 
             // $this->generatedOtp = rand(100000, 999999);
             $this->generatedOtp = 123456;
@@ -112,8 +112,8 @@ class Login extends BaseComponent
     public function mount()
     {
         if (app('authUser')) {
-            if (app('authUser')->user_type == 'superAdmin') {
-                return redirect()->route('super-admin.home');
+            if (app('authUser')->user_type == 'company') {
+                return redirect()->route('company.home');
             }
         }
     }

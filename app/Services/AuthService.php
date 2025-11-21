@@ -10,7 +10,9 @@ class AuthService
 
   public function loginAdmin(string $email, string $password)
   {
-    $user = User::where('email', $email)->first();
+    $user = User::where('email', $email)
+      ->where('user_type', 'superAdmin')
+      ->first();
 
     if (!$user) {
       return false;
@@ -22,6 +24,27 @@ class AuthService
 
     return $user;
   }
+
+
+
+  public function loginCompany(string $email, string $password)
+  {
+    $user = User::where('email', $email)
+      ->where('user_type', 'company')
+      ->first();
+
+    if (!$user) {
+      return false;
+    }
+
+    if (!password_verify($password, $user->password)) {
+      return false;
+    }
+
+    return $user;
+  }
+
+
 
   public function sendOtpSms($phone, $otp)
   {

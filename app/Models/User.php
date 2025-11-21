@@ -46,6 +46,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -54,5 +55,13 @@ class User extends Authenticatable
     public function getFullNameAttribute()
     {
         return $this->f_name . ' ' . $this->l_name;
+    }
+
+
+
+    // One User → One Company
+    public function company()
+    {
+        return $this->hasOne(Company::class);
     }
 }

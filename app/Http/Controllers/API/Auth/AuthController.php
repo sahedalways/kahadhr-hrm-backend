@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\API\BaseController;
-
+use App\Http\Requests\API\RegisterUserRequest as APIRegisterUserRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\MatchPincodeRequest;
 use App\Http\Requests\Profile\ChangePasswordRequest;
 use App\Http\Requests\RegisterEmailConfirmOTPRequest;
-use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResendOtpRequest;
 use App\Models\User;
 use App\Services\API\EmailVerificationService;
-use App\Services\API\ForgotPasswordService;
 use App\Services\API\FrontAuthService;
 use Illuminate\Http\Request;
 
@@ -22,38 +20,34 @@ use Illuminate\Http\Request;
 class AuthController extends BaseController
 {
     protected FrontAuthService $authService;
-    protected ForgotPasswordService $forgotPasswordService;
     protected EmailVerificationService $emailVerificationService;
 
 
-    public function __construct(ForgotPasswordService $ForgotPasswordService, FrontAuthService $authService, EmailVerificationService $emailVerificationService)
+    public function __construct(FrontAuthService $authService, EmailVerificationService $emailVerificationService)
     {
-        $this->forgotPasswordService = $ForgotPasswordService;
         $this->authService = $authService;
         $this->emailVerificationService = $emailVerificationService;
     }
 
-    public function register(RegisterUserRequest $request)
+    public function register(APIRegisterUserRequest $request)
     {
         $request->validated();
 
         // ✅ Call Service Layer
         $user = $this->authService->registerUserByAPI($request->only([
-            'f_name',
-            'l_name',
-            'email',
-            'phone_no',
-            'password'
+            'company_name',
+            'company_house_number',
+            'company_mobile',
+            'company_email',
+            'password',
+
+            'bank_name',
+            'card_number',
+            'expiry_date',
+            'cvv',
         ]));
 
-        $name = $user->f_name . ' ' . $user->l_name;
 
-        $sent = $this->emailVerificationService->sendOtp($user->email, $name);
-
-        if (!$sent) {
-            $user->delete();
-            return $this->sendError('Unable to send verification email. Please try again later.');
-        }
 
         return $this->sendResponse([
             'email'     => $user->email,

@@ -32,7 +32,7 @@ class VerificationService
     }
 
     if ($phone) {
-      SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
+      // SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
     }
 
     return true;

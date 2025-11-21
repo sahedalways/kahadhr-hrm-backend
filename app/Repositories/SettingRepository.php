@@ -2,100 +2,66 @@
 
 namespace App\Repositories;
 
-use App\Models\ContactInfoSettings;
 use App\Models\EmailSetting;
-use App\Models\PaymentSetting;
 use App\Models\SiteSetting;
+use App\Models\SmsSetting;
 use App\Models\SocialInfoSettings;
 use Illuminate\Http\UploadedFile;
 use Intervention\Image\Laravel\Facades\Image;
 
 
 class SettingRepository
+
 {
   /**
-   * Get or create site settings (id = 1).
-   *
-   * @return \App\Models\SiteSetting
+   * --------------------------
+   * Get Settings
+   * --------------------------
    */
-  public function getSiteSettings(): SiteSetting
+
+  public function getSiteSettings(?int $companyId = null): SiteSetting
   {
-    return SiteSetting::firstOrNew(['id' => 1]);
+    return SiteSetting::firstOrNew(['company_id' => $companyId]);
+  }
+
+  public function getMailSettings(?int $companyId = null): EmailSetting
+  {
+    return EmailSetting::firstOrNew(['company_id' => $companyId]);
+  }
+
+  public function getSmsSettings(?int $companyId = null): SmsSetting
+  {
+    return SmsSetting::firstOrNew(['company_id' => $companyId]);
+  }
+
+  public function getSocialSettings(?int $companyId = null): SocialInfoSettings
+  {
+    return SocialInfoSettings::firstOrNew(['company_id' => $companyId]);
   }
 
 
   /**
-   * Get or create payment settings (id = 1).
-   *
-   * @return \App\Models\PaymentSetting
+   * --------------------------
+   * Save Settings
+   * --------------------------
    */
-  public function getPaymentSettings(): PaymentSetting
+
+  public function saveSiteSettings(array $data, ?int $companyId = null): SiteSetting
   {
-    return PaymentSetting::firstOrNew(['id' => 1]);
-  }
-
-
-
-  /**
-   * Get or create mail settings (id = 1).
-   *
-   * @return \App\Models\EmailSetting
-   */
-  public function getMailSettings(): EmailSetting
-  {
-    return EmailSetting::firstOrNew(['id' => 1]);
-  }
-
-
-
-
-  /**
-   * Get or create social settings (id = 1).
-   *
-   * @return \App\Models\SocialInfoSettings
-   */
-  public function getSocialSettings(): SocialInfoSettings
-  {
-    return SocialInfoSettings::firstOrNew(['id' => 1]);
-  }
-
-
-
-  /**
-   * Get or create contact settings (id = 1).
-   *
-   * @return \App\Models\ContactInfoSettings
-   */
-  public function getContactInfoSettings(): ContactInfoSettings
-  {
-    return ContactInfoSettings::firstOrNew(['id' => 1]);
-  }
-
-
-  /**
-   * Save or update site settings
-   *
-   * @param array $data
-   * @return SiteSetting
-   */
-  public function saveSiteSettings(array $data): SiteSetting
-
-  {
-    $settings = $this->getSiteSettings();
-
+    $settings = $this->getSiteSettings($companyId);
+    $settings->company_id        = $companyId;
     $settings->site_title        = $data['site_title'] ?? $settings->site_title;
     $settings->site_phone_number = $data['site_phone_number'] ?? $settings->site_phone_number;
     $settings->site_email        = $data['site_email'] ?? $settings->site_email;
     $settings->copyright_text    = $data['copyright_text'] ?? $settings->copyright_text;
 
-    // Handle Logo
+    // Handle logo, favicon, hero_image uploads
     if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
       $ext = $data['logo']->getClientOriginalExtension();
       $data['logo']->storeAs('image/settings', 'logo.' . $ext, 'public');
       $settings->logo = $ext;
     }
 
-    // Handle Favicon
     if (isset($data['favicon']) && $data['favicon'] instanceof UploadedFile) {
       $ext = $data['favicon']->getClientOriginalExtension();
       $data['favicon']->storeAs('image/settings', 'favicon.' . $ext, 'public');
@@ -103,101 +69,63 @@ class SettingRepository
     }
 
     if (isset($data['hero_image']) && $data['hero_image'] instanceof UploadedFile) {
-      $image = $data['hero_image'];
-
-      $img = Image::read($image);
-
+      $img = Image::read($data['hero_image']);
       $filename = 'hero.webp';
-      $path = storage_path('app/public/image/settings/' . $filename);
-      $img->save($path);
-
+      $img->save(storage_path('app/public/image/settings/' . $filename));
       $settings->hero_image = 'webp';
     }
 
     $settings->save();
 
-
-    // Clear cache
-    cache()->forget('site_settings');
-
-    return $settings;
-  }
-
-
-
-  /**
-   * Save or update mail settings
-   *
-   * @param array $data
-   * @return EmailSetting
-   */
-  public function saveMailSettings(array $data): EmailSetting
-  {
-    $settings = $this->getMailSettings();
-
-    $settings->mail_mailer       = $data['mail_mailer'] ?? null;
-    $settings->mail_host         = $data['mail_host'] ?? null;
-    $settings->mail_port         = $data['mail_port'] ?? null;
-    $settings->mail_username     = $data['mail_username'] ?? null;
-    $settings->mail_password     = $data['mail_password'] ?? null;
-    $settings->mail_encryption   = $data['mail_encryption'] ?? null;
-    $settings->mail_from_address = $data['mail_from_address'] ?? null;
-    $settings->mail_from_name    = $data['mail_from_name'] ?? null;
-
-    $settings->save();
+    // Cache
+    cache()->forget("site_settings_{$companyId}");
 
     return $settings;
   }
 
-
-  public function savePaymentSettings(array $data): PaymentSetting
+  public function saveMailSettings(array $data, ?int $companyId = null): EmailSetting
   {
-    $settings = $this->getPaymentSettings();
-
-    $settings->gateway    = $data['gateway'] ?? 'bkash';
-    $settings->app_key    = $data['app_key'] ?? null;
-    $settings->app_secret = $data['app_secret'] ?? null;
-    $settings->username   = $data['username'] ?? null;
-    $settings->password   = $data['password'] ?? null;
-    $settings->base_url   = $data['base_url'] ?? null;
-    $settings->is_active  = $data['is_active'] ?? false;
-
+    $settings = $this->getMailSettings($companyId);
+    $settings->company_id        = $companyId;
+    $settings->mail_mailer       = $data['mail_mailer'] ?? $settings->mail_mailer;
+    $settings->mail_host         = $data['mail_host'] ?? $settings->mail_host;
+    $settings->mail_port         = $data['mail_port'] ?? $settings->mail_port;
+    $settings->mail_username     = $data['mail_username'] ?? $settings->mail_username;
+    $settings->mail_password     = $data['mail_password'] ?? $settings->mail_password;
+    $settings->mail_encryption   = $data['mail_encryption'] ?? $settings->mail_encryption;
+    $settings->mail_from_address = $data['mail_from_address'] ?? $settings->mail_from_address;
+    $settings->mail_from_name    = $data['mail_from_name'] ?? $settings->mail_from_name;
     $settings->save();
 
+    cache()->forget("mail_settings_{$companyId}");
     return $settings;
   }
 
-
-
-  public function saveSocialSettings(array $data): SocialInfoSettings
+  public function saveSmsSettings(array $data, ?int $companyId = null): SmsSetting
   {
-    $settings = $this->getSocialSettings();
-
-    $settings->facebook  = $data['facebook']  ?? null;
-    $settings->twitter   = $data['twitter']   ?? null;
-    $settings->instagram = $data['instagram'] ?? null;
-    $settings->linkedin  = $data['linkedin']  ?? null;
-    $settings->youtube   = $data['youtube']   ?? null;
-
+    $settings = $this->getSmsSettings($companyId);
+    $settings->company_id        = $companyId;
+    $settings->twilio_sid        = $data['twilio_sid'] ?? $settings->twilio_sid;
+    $settings->twilio_auth_token = $data['twilio_auth_token'] ?? $settings->twilio_auth_token;
+    $settings->twilio_from       = $data['twilio_from'] ?? $settings->twilio_from;
     $settings->save();
 
+    cache()->forget("sms_settings_{$companyId}");
     return $settings;
   }
 
-
-
-
-  public function saveContactInfoSettings(array $data): ContactInfoSettings
+  public function saveSocialSettings(array $data, ?int $companyId = null): SocialInfoSettings
   {
-    $settings = $this->getContactInfoSettings();
-
-    $settings->email                 = $data['email']                  ?? null;
-    $settings->phone                 = $data['phone']                  ?? null;
-    $settings->dhaka_office_address  = $data['dhaka_office_address']   ?? null;
-    $settings->gazipur_office_address = $data['gazipur_office_address'] ?? null;
-
+    $settings = $this->getSocialSettings($companyId);
+    $settings->company_id = $companyId;
+    $settings->facebook   = $data['facebook'] ?? $settings->facebook;
+    $settings->twitter    = $data['twitter'] ?? $settings->twitter;
+    $settings->instagram  = $data['instagram'] ?? $settings->instagram;
+    $settings->linkedin   = $data['linkedin'] ?? $settings->linkedin;
+    $settings->youtube    = $data['youtube'] ?? $settings->youtube;
     $settings->save();
 
+    cache()->forget("social_settings_{$companyId}");
     return $settings;
   }
 }

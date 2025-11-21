@@ -60,14 +60,17 @@
                                 </a>
                             </li>
 
-                            <!-- Payment Settings -->
-                            {{-- <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/payment') ? 'active' : '' }}"
-                                    href="{{ route('super-admin.settings.payment') }}">
-                                    <i class="fas fa-credit-card sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Payment Settings </span>
+
+
+                            <!-- SMS Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/sms') ? 'active' : '' }}"
+                                    href="{{ route('super-admin.settings.sms') }}">
+                                    <i class="fas fa-comment-alt sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> SMS Settings </span>
                                 </a>
-                            </li> --}}
+                            </li>
+
 
 
 

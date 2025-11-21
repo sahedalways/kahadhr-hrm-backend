@@ -43,13 +43,15 @@ class SocialSettings extends BaseComponent
     {
         $this->validate();
 
+        $companyId = app('authUser')->company?->id ?? null;
+
         $service->saveSocialSettings([
             'facebook'  => $this->facebook,
             'twitter'   => $this->twitter,
             'instagram' => $this->instagram,
             'linkedin'  => $this->linkedin,
             'youtube'   => $this->youtube,
-        ]);
+        ], $companyId);
 
         $this->toast('Social Settings Updated Successfully!', 'success');
     }

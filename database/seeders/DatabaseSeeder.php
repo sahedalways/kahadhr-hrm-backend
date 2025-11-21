@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             UserTableSeeder::class,
             SiteSettingSeeder::class,
             EmailSettingSeeder::class,
+            SmsSettingSeeder::class,
             SocialSettingSeeder::class,
         ]);
     }

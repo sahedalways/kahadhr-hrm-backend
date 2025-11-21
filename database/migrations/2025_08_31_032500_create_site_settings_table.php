@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('site_settings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('site_title')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();

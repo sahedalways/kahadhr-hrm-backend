@@ -40,6 +40,8 @@ class MailSettings extends BaseComponent
     {
         $this->validate();
 
+        $companyId = app('authUser')->company?->id ?? null;
+
         // Prepare mail settings array
         $mailSettings = [
             'mail_mailer'       => $this->mail_mailer,
@@ -53,34 +55,7 @@ class MailSettings extends BaseComponent
         ];
 
         // Save in database
-        $service->saveMailSettings($mailSettings);
-
-        // Update .env file
-        $envPath = base_path('.env');
-
-        foreach ($mailSettings as $key => $value) {
-            $envKey = strtoupper($key);
-            $escapedValue = trim($value);
-
-            if (file_exists($envPath)) {
-                $envContent = file_get_contents($envPath);
-
-                // Check if key already exists — replace it; otherwise, append it
-                if (preg_match("/^{$envKey}=.*/m", $envContent)) {
-                    $envContent = preg_replace(
-                        "/^{$envKey}=.*/m",
-                        "{$envKey}={$escapedValue}",
-                        $envContent
-                    );
-                } else {
-                    $envContent .= "\n{$envKey}={$escapedValue}";
-                }
-
-                file_put_contents($envPath, $envContent);
-            }
-        }
-
-
+        $service->saveMailSettings($mailSettings, $companyId);
 
 
         $this->toast('Mail settings updated successfully!', 'success');

@@ -59,6 +59,7 @@ class SiteSettings extends BaseComponent
 
         $this->validate();
 
+        $companyId = app('authUser')->company?->id ?? null;
 
 
         $service->saveSiteSettings([
@@ -69,7 +70,7 @@ class SiteSettings extends BaseComponent
             'logo'              => $this->logo,
             'favicon'           => $this->favicon,
             'hero_image'        => $this->hero_image,
-        ]);
+        ], $companyId);
 
         $this->toast('Site Settings Updated Successfully!', 'success');
     }

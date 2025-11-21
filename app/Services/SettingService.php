@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\EmailSetting;
 use App\Models\PaymentSetting;
 use App\Models\SiteSetting;
+use App\Models\SmsSetting;
+use App\Models\SocialInfoSettings;
 use App\Repositories\SettingRepository;
 
 
@@ -22,60 +24,47 @@ class SettingService
    * Save site settings
    *
    * @param array $data
+   * @param int|null $companyId
    * @return SiteSetting
    */
-  public function saveSiteSettings(array $data): SiteSetting
+  public function saveSiteSettings(array $data, ?int $companyId = null): SiteSetting
   {
-
-    return $this->repository->saveSiteSettings($data);
+    return $this->repository->saveSiteSettings($data, $companyId);
   }
-
-
 
   /**
    * Save mail settings
    *
    * @param array $data
+   * @param int|null $companyId
    * @return EmailSetting
    */
-  public function saveMailSettings(array $data): EmailSetting
+  public function saveMailSettings(array $data, ?int $companyId = null): EmailSetting
   {
-
-    return $this->repository->saveMailSettings($data);
+    return $this->repository->saveMailSettings($data, $companyId);
   }
 
-
   /**
-   * Save or update payment settings
+   * Save SMS settings
    *
    * @param array $data
-   * @return void
+   * @param int|null $companyId
+   * @return SmsSetting
    */
-  public function savePaymentSettings(array $data): void
+  public function saveSmsSettings(array $data, ?int $companyId = null): SmsSetting
   {
-    $this->repository->savePaymentSettings($data);
+    return $this->repository->saveSmsSettings($data, $companyId);
   }
 
   /**
    * Save or update social settings
    *
    * @param array $data
-   * @return void
+   * @param int|null $companyId
+   * @return SocialInfoSettings
    */
-  public function saveSocialSettings(array $data): void
+  public function saveSocialSettings(array $data, ?int $companyId = null): SocialInfoSettings
   {
-    $this->repository->saveSocialSettings($data);
-  }
-
-
-  /**
-   * Save or update contact info settings
-   *
-   * @param array $data
-   * @return void
-   */
-  public function saveContactInfoSettings(array $data): void
-  {
-    $this->repository->saveContactInfoSettings($data);
+    return $this->repository->saveSocialSettings($data, $companyId);
   }
 }

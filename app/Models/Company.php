@@ -25,4 +25,11 @@ class Company extends Model
     {
         return $this->hasMany(CompanyBankInfo::class);
     }
+
+
+    // One Company → Many Employees
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

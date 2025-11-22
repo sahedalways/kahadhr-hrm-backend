@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::domain('{company}.' . config('app.base_domain'))
+Route::domain('company.' . config('app.base_domain'))
   ->middleware('guest')
   ->name('company.auth.')
   ->group(function () {
@@ -25,9 +25,9 @@ Route::domain('{company}.' . config('app.base_domain'))
 | Authenticated company dashboard routes
 |--------------------------------------------------------------------------
 */
-Route::domain('{company}.' . config('app.base_domain'))
+Route::domain('company.' . config('app.base_domain'))
   ->prefix('dashboard')
-  ->middleware(['auth', 'companyAdmin', 'companySubdomain'])
+  ->middleware(['auth', 'companyAdmin'])
   ->name('company.dashboard.')
   ->group(function () {
     // Dashboard home

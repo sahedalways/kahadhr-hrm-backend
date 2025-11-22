@@ -44,9 +44,9 @@ class AuthController extends BaseController
             'cvv',
         ]));
 
-        $companySlug = Str::slug($user->company->company_name);
+
         $baseDomain = config('app.base_domain');
-        $subdomain = "{$companySlug}.{$baseDomain}";
+        $subdomain = "company.{$baseDomain}";
 
 
         return $this->sendResponse([

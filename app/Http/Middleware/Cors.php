@@ -9,7 +9,7 @@ class Cors
 {
     public function handle(Request $request, Closure $next)
     {
-        $allowedOrigin = 'https://bookingxpert.org';
+        $allowedOrigin = 'https://kahadhr.vercel.app';
         if (
             isset($_SERVER['HTTP_HOST']) &&
             (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '127.0.0.1'))

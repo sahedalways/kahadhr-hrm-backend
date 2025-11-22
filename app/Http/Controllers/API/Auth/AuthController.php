@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\API\BaseController;
 use App\Http\Requests\API\RegisterUserRequest as APIRegisterUserRequest;
-use App\Http\Requests\SendOtpRequest;
+use App\Http\Requests\API\SendOtpRequest;
 use App\Services\API\VerificationService;
 use App\Services\API\FrontAuthService;
 
@@ -49,18 +49,17 @@ class AuthController extends BaseController
 
 
 
-    public function sendOtp(SendOtpRequest $request)
+    public function sendEmailOtp(SendOtpRequest $request)
     {
         // validated data
         $data = $request->validated();
 
         // email or phone
-        $email = $data['email'] ?? null;
-        $phone = $data['phone'] ?? null;
-        $companyName = $data['company_name'] ?? null;
+        $email = $data['company_email'];
+        $companyName = $data['company_name'];
 
         // call service
-        $sent = $this->verificationService->sendOtp($email, $phone, $companyName);
+        $sent = $this->verificationService->sendEmailOtp($email, $companyName);
 
         if ($sent) {
             return $this->sendResponse([], 'OTP sent successfully.');

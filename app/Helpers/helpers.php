@@ -10,4 +10,13 @@ if (!function_exists('siteSetting')) {
 
     return $settings;
   }
+
+
+  if (!function_exists('getSiteEmail')) {
+    function getSiteEmail()
+    {
+      $settings = siteSetting();
+      return $settings?->site_email ?? null;
+    }
+  }
 }

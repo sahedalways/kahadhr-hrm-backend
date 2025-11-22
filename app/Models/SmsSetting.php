@@ -28,7 +28,7 @@ class SmsSetting extends Model
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
-            $user = app('authUser');
+            $user = auth()->user();
 
 
             if (!$user) {

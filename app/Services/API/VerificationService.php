@@ -16,14 +16,13 @@ class VerificationService
     $this->repository = $repository;
   }
 
-  public function sendOtp(?string $email = null, ?string $phone = null, string $companyName): bool
+  public function sendEmailOtp(?string $email = null,  string $companyName): bool
   {
     // $otp = rand(100000, 999999);
     $otp = 123456;
 
     $this->repository->updateOrInsert([
       'email' => $email,
-      'phone' => $phone,
       'otp' => $otp,
     ]);
 
@@ -31,9 +30,9 @@ class VerificationService
       SendOtpEmailJob::dispatch($email, $otp, $companyName)->onConnection('sync')->onQueue('urgent');
     }
 
-    if ($phone) {
-      // SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
-    }
+    // if ($phone) {
+    //   // SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
+    // }
 
     return true;
   }

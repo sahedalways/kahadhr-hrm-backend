@@ -2,16 +2,27 @@
 
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\ContactController;
+use App\Http\Controllers\API\HomeController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['cors'])->group(function () {
-  Route::controller(AuthController::class)->group(function () {
 
-    // for authentication routes
-    Route::post('register', 'register')->middleware();
+
+  Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    // Registration route
+    Route::post('register', 'register');
+
+    // Send OTP route
+    Route::post('send-email-otp', 'sendEmailOtp');
   });
 
+
+
+  // get home data api
+  Route::controller(HomeController::class)->group(function () {
+    Route::get('home-data', 'getHomeData');
+  });
 
 
   // for contact us route

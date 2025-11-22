@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,18 +14,25 @@ class SendOtpRequest extends FormRequest
     public function rules()
     {
         return [
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'company_name' => 'required|string',
+            'company_name' => 'required|string|unique:companies,company_name',
+            'company_email'        => 'nullable|email|unique:companies,company_email',
+            'company_mobile'        => 'required|string|unique:companies,company_mobile',
         ];
     }
 
     public function messages()
     {
         return [
-            'email.email' => 'Please enter a valid email address.',
             'company_name.required' => 'Company name is required.',
-            'company_name.string' => 'Company name must be a valid string.',
+            'company_name.string'   => 'Company name must be a valid string.',
+            'company_name.unique'   => 'Company name already exists.',
+
+            'company_email.email'           => 'Please enter a valid email address.',
+            'company_email.unique'          => 'Email already exists.',
+
+            'company_mobile.required'        => 'Phone number is required.',
+            'company_mobile.string'          => 'Phone number must be valid.',
+            'company_mobile.unique'          => 'Phone number already exists.',
         ];
     }
 }

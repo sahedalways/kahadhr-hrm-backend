@@ -30,7 +30,7 @@ class EmailSetting extends Model
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
-            $user = app('authUser');
+            $user = auth()->user();
 
             // If no user, return superAdmin item
             if (!$user) {

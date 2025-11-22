@@ -4,7 +4,7 @@ namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendOtpRequest extends FormRequest
+class SendEmailOtpRequest extends FormRequest
 {
     public function authorize()
     {
@@ -15,7 +15,7 @@ class SendOtpRequest extends FormRequest
     {
         return [
             'company_name' => 'required|string|unique:companies,company_name',
-            'company_email'        => 'nullable|email|unique:companies,company_email',
+            'company_email'        => 'required|email|unique:companies,company_email',
             'company_mobile'        => 'required|string|unique:companies,company_mobile',
         ];
     }
@@ -24,6 +24,7 @@ class SendOtpRequest extends FormRequest
     {
         return [
             'company_name.required' => 'Company name is required.',
+            'company_email.required' => 'Company email is required.',
             'company_name.string'   => 'Company name must be a valid string.',
             'company_name.unique'   => 'Company name already exists.',
 

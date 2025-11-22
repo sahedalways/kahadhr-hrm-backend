@@ -11,15 +11,24 @@ class VerificationRepository
   public function updateOrInsert(array $data): OtpVerification
   {
     // Delete previous OTPs for same email or phone
-    OtpVerification::where('email', $data['email'] ?? null)
-      ->orWhere('phone', $data['phone'] ?? null)
-      ->delete();
+    $query = OtpVerification::query();
+
+    if (!empty($data['email'])) {
+      $query->where('email', $data['email']);
+    }
+
+    if (!empty($data['phone'])) {
+      $query->orWhere('phone', $data['phone']);
+    }
+
+    $query->delete();
 
     return OtpVerification::create([
       'email' => $data['email'] ?? null,
       'phone' => $data['phone'] ?? null,
       'otp' => $data['otp'],
       'expires_at' => now()->addMinutes(2),
+      'created_at' => Carbon::now()
     ]);
   }
 
@@ -30,7 +39,6 @@ class VerificationRepository
         ->orWhere('phone', $emailOrPhone);
     })
       ->where('otp', $otp)
-      ->where('expires_at', '>', now())
       ->first();
   }
 

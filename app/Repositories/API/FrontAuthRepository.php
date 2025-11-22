@@ -22,6 +22,8 @@ class FrontAuthRepository
         'phone_no' => $data['company_mobile'],
         'password' => $data['password'],
         'user_type' => 'company',
+        'phone_verified_at'  => now(),
+        'email_verified_at'  => now(),
       ]);
 
       // 2️⃣ Create Company

@@ -5,7 +5,7 @@ namespace App\Services\API;
 use App\Jobs\SendOtpEmailJob;
 use App\Jobs\SendOtpSmsForVerifyJob;
 use App\Repositories\API\VerificationRepository;
-
+use Carbon\Carbon;
 
 class VerificationService
 {
@@ -37,10 +37,44 @@ class VerificationService
     return true;
   }
 
+
+
+  public function sendPhoneOtp(string $phoneNo,  string $companyName): bool
+  {
+    // $otp = rand(100000, 999999);
+    $otp = 123456;
+
+    $this->repository->updateOrInsert([
+      'phone' => $phoneNo,
+      'otp' => $otp,
+    ]);
+
+
+    // if ($phoneNo) {
+    //   SendOtpSmsForVerifyJob::dispatch($phoneNo, $otp)->onConnection('sync')->onQueue('urgent');
+    // }
+
+    return true;
+  }
+
+
+
+
+
+
+
   public function verifyOtp(string $emailOrPhone, string $otp): bool
   {
     $record = $this->repository->findValidOtp($emailOrPhone, $otp);
-    if (!$record) return false;
+
+
+    if (!$record) {
+      throw new \Exception('Invalid OTP!');
+    }
+
+    if (Carbon::parse($record->created_at)->diffInMinutes(now()) > 2) {
+      throw new \Exception('OTP expired!');
+    }
 
     $this->repository->deleteOtp($record);
 

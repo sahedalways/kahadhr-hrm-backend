@@ -15,6 +15,13 @@ Route::middleware(['cors'])->group(function () {
 
     // Send OTP route
     Route::post('send-email-otp', 'sendEmailOtp');
+    Route::post('send-phone-otp', 'sendPhoneOtp');
+
+    // resend email OTP route
+    Route::post('resend-email-otp', 'resendEmailOtp');
+
+    // verify otp
+    Route::post('verify-otp', 'verifyOtp');
   });
 
 

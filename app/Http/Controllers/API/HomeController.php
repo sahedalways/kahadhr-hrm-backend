@@ -23,7 +23,7 @@ class HomeController extends BaseController
                     $siteInfo->created_at,
                     $siteInfo->updated_at,
                     $siteInfo->id,
-                    $siteInfo->site_title,
+                    $siteInfo->favicon_url,
                     $siteInfo->favicon_url,
                     $siteInfo->logo_url,
                     $siteInfo->company_id

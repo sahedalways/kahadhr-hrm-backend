@@ -10,6 +10,7 @@ Route::middleware(['cors'])->group(function () {
 
 
   Route::prefix('auth')->controller(AuthController::class)->group(function () {
+
     // Registration route
     Route::post('register', 'register');
 

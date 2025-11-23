@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ $data['title'] ?? 'Verify Your Email Address' }}</title>
+    <title>New Contact Message</title>
+
     <style>
         body {
             font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -14,7 +15,7 @@
         }
 
         .email-wrapper {
-            max-width: 480px;
+            max-width: 520px;
             background-color: #ffffff;
             margin: 0 auto;
             border-radius: 10px;
@@ -26,8 +27,8 @@
             background: linear-gradient(90deg, #164f84 0%, #0083bb 100%);
             color: #ffffff;
             text-align: center;
-            padding: 20px;
-            font-size: 1.1rem;
+            padding: 25px;
+            font-size: 1.2rem;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
@@ -38,37 +39,32 @@
         }
 
         h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
             text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 8px;
         }
 
         p {
-            line-height: 1.6;
+            line-height: 1.65;
             font-size: 0.95rem;
             color: #555555;
             margin-bottom: 14px;
         }
 
-        .otp-box {
+        .details-box {
             background-color: #f0f4f8;
             border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin: 25px 0;
+            padding: 18px 20px;
+            margin: 20px 0;
         }
 
-        .otp-label {
-            color: #555555;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
+        .details-row {
+            margin-bottom: 10px;
         }
 
-        .otp-code {
-            font-size: 2rem;
-            font-weight: bold;
+        .label {
+            font-weight: 600;
             color: #164f84;
-            letter-spacing: 4px;
         }
 
         .footer {
@@ -92,50 +88,78 @@
 </head>
 
 <body>
+
     <div class="email-wrapper">
+
+        <!-- Header -->
         <div class="email-header">
-            Email Verification – {{ siteSetting()->site_title ?? 'Kahadhr' }}
+            New Contact Message – {{ siteSetting()->site_title ?? 'Kahadhr' }}
         </div>
 
+        <!-- Body -->
         <div class="email-body">
-            <h2>Hello {{ $data['companyName'] ?? 'User' }},</h2>
+            <h2>You've Received a New Contact Message</h2>
+
             <p>
-                Thank you for joining
-                <strong>{{ siteSetting()->site_title ?? 'Kahadhr' }}</strong>!
-            </p>
-            <p>
-                {{ $data['body'] ?? 'Please use the following verification code to confirm your email address:' }}
+                Someone has submitted a message through the contact form on
+                <strong>{{ siteSetting()->site_title ?? 'Kahadhr' }}</strong>.
             </p>
 
-            <div class="otp-box">
-                <p class="otp-label">Your 6-digit verification code:</p>
-                <div class="otp-code">{{ $data['otp'] ?? '******' }}</div>
+            <!-- Contact Details -->
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="label">Name:</span>
+                    {{ $contact->first_name }} {{ $contact->last_name }}
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Email:</span>
+                    {{ $contact->email }}
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Phone:</span>
+                    {{ $contact->phone ?? 'N/A' }}
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Topic:</span>
+                    {{ $contact->topic }}
+                </div>
+
+                <div class="details-row">
+                    <span class="label">Message:</span><br>
+                    {{ $contact->description }}
+                </div>
             </div>
 
             <p>
-                For your security, this code will expire in
-                <strong>2 minutes</strong>. If you didn’t request this, please ignore
-                this message.
+                Please reply to the user if support is needed.
             </p>
         </div>
 
+        <!-- Footer -->
         <div class="footer">
             <p>
-                Need help? Contact us at
+                Need system help? Contact support:
                 <a href="mailto:{{ getSiteEmail() ?? 'support@kahadhr.com' }}">
-                    {{ getSiteEmail() ?? 'support@Kahadhr.com' }}
+                    {{ getSiteEmail() ?? 'support@kahadhr.com' }}
                 </a>
             </p>
+
             <p>
                 &copy; {{ date('Y') }}
-                <strong>{{ siteSetting()->site_title ?? 'Kahadhr HRM' }}</strong>. All
-                rights reserved.
+                <strong>{{ siteSetting()->site_title ?? 'Kahadhr HRM' }}</strong>.
+                All rights reserved.
             </p>
+
             <p>
-                <a href="https://www.Kahadhr.com" target="_blank">www.Kahadhr.com</a>
+                <a href="https://www.kahadhr.com" target="_blank">www.kahadhr.com</a>
             </p>
         </div>
+
     </div>
+
 </body>
 
 </html>

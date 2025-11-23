@@ -34,7 +34,7 @@ Route::middleware(['cors'])->group(function () {
 
 
   // for contact us route
-  Route::post('/save-contact', [ContactController::class, 'store'])->middleware('throttle:2,1');
+  Route::post('/contact/submit', [ContactController::class, 'store'])->middleware('throttle:2,1');
 });
 
 

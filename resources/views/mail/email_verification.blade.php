@@ -148,9 +148,7 @@
             </p>
 
             <p>
-                &copy; {{ date('Y') }}
-                <strong>{{ siteSetting()->site_title ?? 'Kahadhr HRM' }}</strong>.
-                All rights reserved.
+                {{ siteSetting()->copyright_text }}
             </p>
 
             <p>

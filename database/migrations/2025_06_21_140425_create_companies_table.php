@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('company_house_number');
             $table->string('company_mobile');
             $table->string('company_email');
+            $table->string('business_type')->nullable();
+            $table->text('address_contact_info')->nullable();
+            $table->string('company_logo')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });
     }

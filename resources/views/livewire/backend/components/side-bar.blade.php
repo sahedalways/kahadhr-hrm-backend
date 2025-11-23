@@ -27,6 +27,84 @@
                 </li>
 
 
+
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#companiesMenu"
+                        class="nav-link {{ Request::is('dashboard/companies*') ? 'active' : '' }}"
+                        aria-controls="companiesMenu" role="button"
+                        aria-expanded="{{ Request::is('dashboard/companies*') ? 'true' : 'false' }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-building text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Manage Companies</span>
+                        <i class="fas fa-chevron-down text-sm ms-auto"></i>
+                    </a>
+
+                    <div class="collapse {{ Request::is('dashboard/companies*') ? 'show' : '' }}" id="companiesMenu">
+                        <ul class="nav ms-4">
+
+                            <!-- Companies -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/companies') ? 'active' : '' }}"
+                                    href="{{ route('super-admin.companies') }}">
+                                    <i class="fas fa-building sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> Companies </span>
+                                </a>
+                            </li>
+
+                            <!-- Employees -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/companies/employees') ? 'active' : '' }}"
+                                    href="{{ route('super-admin.employees') }}">
+                                    <i class="fas fa-user-friends sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> Employees </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/billing*') ? 'active' : '' }}"
+                        href="{{ route('super-admin.billing') }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-credit-card text-success text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Billing & Payments</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
+                        href="{{ route('super-admin.reports') }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-chart-line text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Reports</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"
+                        href="{{ route('super-admin.support') }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-life-ring text-danger text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Support Tickets</span>
+                    </a>
+                </li>
+
+
+
+
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/contact-info*') ? 'active' : '' }}"
                         href="{{ route('super-admin.contact-info.index') }}">
@@ -55,7 +133,7 @@
                             class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
                             <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Settings</span>
+                        <span class="nav-link-text ms-1">System Settings</span>
                     </a>
                     <div class="collapse {{ Request::is('dashboard/settings*') ? 'show' : '' }}" id="settings">
                         <ul class="nav ms-4">

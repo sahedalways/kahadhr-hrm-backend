@@ -1,7 +1,12 @@
 <?php
 
 use App\Livewire\Backend\Admin\Auth\AdminLogin;
+use App\Livewire\Backend\Admin\BillingPayments;
 use App\Livewire\Backend\Admin\Dashboard;
+use App\Livewire\Backend\Admin\ManageCompanies;
+use App\Livewire\Backend\Admin\ManageEmployees;
+use App\Livewire\Backend\Admin\Reports;
+use App\Livewire\Backend\Admin\SupportTickets;
 use App\Livewire\Backend\ContactInfo;
 use App\Livewire\Backend\Settings\ChargeSettings;
 use App\Livewire\Backend\Settings\MailSettings;
@@ -19,6 +24,26 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
 
   // Dashboard
   Route::get('/', Dashboard::class)->name('home');
+
+
+  // Manage Companies
+  Route::prefix('companies')->group(function () {
+    Route::get('/', ManageCompanies::class)->name('companies');
+    Route::get('/employees', ManageEmployees::class)->name('employees');
+  });
+
+  // Billing & Payments
+  Route::get('/billing-payments', BillingPayments::class)
+    ->name('billing');
+
+  // Reports
+  Route::get('/reports', Reports::class)
+    ->name('reports');
+
+  // Support Tickets
+  Route::get('/support-tickets', SupportTickets::class)
+    ->name('support');
+
 
   // Settings routes
   Route::prefix('settings')->name('settings.')->group(function () {

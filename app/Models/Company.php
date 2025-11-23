@@ -68,6 +68,8 @@ class Company extends Model
     // Accessor for logo URL
     public function getCompanyLogoUrlAttribute()
     {
-        return $this->company_logo ? Storage::url($this->company_logo) : null;
+        return $this->company_logo
+            ? Storage::url($this->company_logo)
+            : asset('assets/img/default-image.jpg');
     }
 }

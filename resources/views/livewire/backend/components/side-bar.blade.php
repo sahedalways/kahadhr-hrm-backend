@@ -39,7 +39,7 @@
                             <i class="fas fa-building text-primary text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Manage Companies</span>
-                        <i class="fas fa-chevron-down text-sm ms-auto"></i>
+
                     </a>
 
                     <div class="collapse {{ Request::is('dashboard/companies*') ? 'show' : '' }}" id="companiesMenu">

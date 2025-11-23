@@ -137,7 +137,24 @@
                                                 wire:click="edit({{ $row->id }})" class="badge badge-warning">
                                                 Edit
                                             </a>
-                                            {{-- Add Delete or other actions here if needed --}}
+
+
+
+
+                                            <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
+                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                                Delete
+                                            </a>
+
+
+                                            <a href="{{ route('super-admin.company.details.show', $row->id) }}"
+                                                class="badge badge-xs fw-600 text-xs"
+                                                style="background-color: #5acaa3; color: #000; text-decoration: none; transition: 0.3s;"
+                                                onmouseover="this.style.backgroundColor='#3aa57a'; this.style.color='#fff';"
+                                                onmouseout="this.style.backgroundColor='#5acaa3'; this.style.color='#000';">
+                                                View Details
+                                            </a>
+
                                         </td>
                                     </tr>
                                 @empty

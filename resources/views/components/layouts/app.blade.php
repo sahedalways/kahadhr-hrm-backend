@@ -9,6 +9,8 @@
     <title>@yield('title', siteSetting()->site_title)</title>
 
     <link rel="icon" type="image/png" href="{{ siteSetting()->favicon_url }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
     <link href="{{ asset('assets/css/poppinsfont.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />

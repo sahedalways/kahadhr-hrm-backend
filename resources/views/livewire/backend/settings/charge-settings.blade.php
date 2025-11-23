@@ -20,20 +20,21 @@
                             @error('rate')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
+                            <div class="col-12 d-flex align-items-center justify-content-end mt-3">
+                                <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                                    wire:target="save">
+                                    <span wire:loading wire:target="save">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                                    </span>
+                                    <span wire:loading.remove wire:target="save">
+                                        Save
+                                    </span>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Submit Button -->
-                        <div class="col-12 d-flex align-items-center justify-content-end mt-3">
-                            <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                                wire:target="save">
-                                <span wire:loading wire:target="save">
-                                    <i class="fas fa-spinner fa-spin me-2"></i> Saving...
-                                </span>
-                                <span wire:loading.remove wire:target="save">
-                                    Save
-                                </span>
-                            </button>
-                        </div>
+
 
                     </form>
                 </div>

@@ -2,10 +2,10 @@
 
 use App\Livewire\Backend\Admin\Auth\AdminLogin;
 use App\Livewire\Backend\Admin\Dashboard;
+use App\Livewire\Backend\ContactInfo;
 use App\Livewire\Backend\Settings\ChargeSettings;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\PasswordSettings;
-use App\Livewire\Backend\Settings\PaymentSettings;
 use App\Livewire\Backend\Settings\SiteSettings;
 use App\Livewire\Backend\Settings\SmsSettings;
 use App\Livewire\Backend\Settings\SocialSettings;
@@ -28,5 +28,11 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
     Route::get('password', PasswordSettings::class)->name('password');
     Route::get('social', SocialSettings::class)->name('social');
     Route::get('charge', ChargeSettings::class)->name('charge');
+  });
+
+
+  // for contact info
+  Route::prefix('/contact-info')->name('contact-info.')->group(function () {
+    Route::get('/', ContactInfo::class)->name('index');
   });
 });

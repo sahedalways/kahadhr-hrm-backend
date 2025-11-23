@@ -16,6 +16,7 @@ class ManageCompanies extends BaseComponent
 
     public $companies, $company, $company_id, $company_name, $business_type, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview;
     public $perPage = 10;
+    public $sortOrder = 'desc';
     public $loaded;
     public $lastId = null;
     public $hasMore = true;
@@ -24,7 +25,9 @@ class ManageCompanies extends BaseComponent
 
     protected $companyService;
 
-    protected $listeners = ['deleteCompany'];
+    protected $listeners = ['deleteCompany', 'sortUpdated'   => 'handleSort'];
+
+
 
     public function boot(CompanyService $companyService)
     {
@@ -141,17 +144,24 @@ class ManageCompanies extends BaseComponent
 
         if ($this->search && $this->search != '') {
             $searchTerm = '%' . $this->search . '%';
-            $query->where('company_name', 'like', $searchTerm)
-                ->orWhere('business_type', 'like', $searchTerm)
-                ->orWhere('company_email', 'like', $searchTerm)
-                ->orWhere('company_mobile', 'like', $searchTerm);
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('company_name', 'like', $searchTerm)
+                    ->orWhere('business_type', 'like', $searchTerm)
+                    ->orWhere('company_email', 'like', $searchTerm)
+                    ->orWhere('company_mobile', 'like', $searchTerm);
+            });
         }
+
 
         if ($this->lastId) {
-            $query->where('id', '<', $this->lastId);
+            if ($this->sortOrder === 'desc') {
+                $query->where('id', '<', $this->lastId);
+            } else {
+                $query->where('id', '>', $this->lastId);
+            }
         }
 
-        $items = $query->orderBy('id', 'desc')
+        $items = $query->orderBy('id', $this->sortOrder)
             ->limit($this->perPage)
             ->get();
 
@@ -164,9 +174,10 @@ class ManageCompanies extends BaseComponent
             $this->hasMore = false;
         }
 
-        $this->lastId = $items->last()->id;
+        $this->lastId = $this->sortOrder === 'desc' ? $items->last()->id : $items->first()->id;
         $this->loaded = $this->loaded->merge($items);
     }
+
 
     /* Reset loaded */
     private function resetLoaded()
@@ -188,7 +199,7 @@ class ManageCompanies extends BaseComponent
 
     public function exportCompanies($type)
     {
-        $data = Company::all();
+        $data = $this->loaded;
 
 
         $columns = [
@@ -222,10 +233,25 @@ class ManageCompanies extends BaseComponent
             'companies',
             'exports.generic-table-pdf',
             [
-                'title' => 'Company List',
+                'title' => siteSetting()->site_title . ' - Company List',
                 'columns' => $columns,
                 'keys' => $keys
             ]
         );
+    }
+
+    public function updatedSearch()
+    {
+
+        $this->resetLoaded();
+    }
+
+
+
+
+    public function handleSort($value)
+    {
+        $this->sortOrder = $value;
+        $this->resetLoaded();
     }
 }

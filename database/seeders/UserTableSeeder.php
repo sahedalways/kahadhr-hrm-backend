@@ -79,5 +79,49 @@ class UserTableSeeder extends Seeder
       'expiry_date' => '11/28',
       'cvv'         => '321',
     ]);
+
+
+
+    /**
+     * ============================
+     *  Create Another Company User
+     * ============================
+     */
+    $companyUser2 = User::create([
+      'f_name'            => 'ABC',
+      'l_name'            => 'Tech Ltd.',
+      'email'             => 'abc@company.com',
+      'phone_no'          => '01712345678',
+      'password'          => Hash::make('12345678'),
+      'user_type'         => 'company',
+      'email_verified_at' => Carbon::now(),
+      'phone_verified_at' => Carbon::now(),
+    ]);
+
+    /**
+     * ============================
+     *  Create Another Company (for the above user)
+     * ============================
+     */
+    $company2 = Company::create([
+      'user_id'               => $companyUser2->id,
+      'company_name'          => 'ABC Tech Solutions Ltd.',
+      'company_house_number'  => 'House 34, Road 12',
+      'company_mobile'        => '01712345678',
+      'company_email'         => 'info@abc.com',
+    ]);
+
+    /**
+     * ============================
+     *  Create Another Company Bank Info
+     * ============================
+     */
+    CompanyBankInfo::create([
+      'company_id'  => $company2->id,
+      'bank_name'   => 'Dutch-Bangla Bank',
+      'card_number' => '5500000000000005',
+      'expiry_date' => '09/27',
+      'cvv'         => '123',
+    ]);
   }
 }

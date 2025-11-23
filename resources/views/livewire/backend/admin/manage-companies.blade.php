@@ -52,6 +52,14 @@
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
                                 </select>
+
+
+                                <select class="form-select form-select-lg"
+                                    wire:change="handleFilter($event.target.value)">
+                                    <option value="">All Status</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
                             </div>
 
                         </div>
@@ -61,7 +69,7 @@
                             <p class="text-muted small mb-0">
                                 Showing results for: <strong>{{ $search ?: 'All Companies' }}</strong>
                             </p>
-                            <div wire:loading>
+                            <div wire:loading wire:target="search">
                                 <span class="spinner-border spinner-border-sm text-primary" role="status"
                                     aria-hidden="true"></span>
                                 <span class="text-primary small">Searching...</span>
@@ -121,7 +129,9 @@
                                                 N/A
                                             @endif
                                         </td>
-                                        <td>{!! statusBadge($row->status) !!}</td>
+                                        <td> <a href="#" wire:click.prevent="toggleStatus({{ $row->id }})">
+                                                {!! statusBadge($row->status) !!}
+                                            </a></td>
                                         <td>
                                             <a data-bs-toggle="modal" data-bs-target="#editCompany"
                                                 wire:click="edit({{ $row->id }})" class="badge badge-warning">

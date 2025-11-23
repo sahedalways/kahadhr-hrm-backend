@@ -17,6 +17,8 @@ class ManageCompanies extends BaseComponent
     public $companies, $company, $company_id, $company_name, $business_type, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview;
     public $perPage = 10;
     public $sortOrder = 'desc';
+    public $statusFilter = '';
+
     public $loaded;
     public $lastId = null;
     public $hasMore = true;
@@ -25,7 +27,8 @@ class ManageCompanies extends BaseComponent
 
     protected $companyService;
 
-    protected $listeners = ['deleteCompany', 'sortUpdated'   => 'handleSort'];
+    protected $listeners = ['deleteCompany', 'sortUpdated' => 'handleSort'];
+
 
 
 
@@ -153,6 +156,11 @@ class ManageCompanies extends BaseComponent
         }
 
 
+        if ($this->statusFilter !== '') {
+            $query->where('status', $this->statusFilter);
+        }
+
+
         if ($this->lastId) {
             if ($this->sortOrder === 'desc') {
                 $query->where('id', '<', $this->lastId);
@@ -252,6 +260,33 @@ class ManageCompanies extends BaseComponent
     public function handleSort($value)
     {
         $this->sortOrder = $value;
+        $this->resetLoaded();
+    }
+
+
+    public function handleFilter($value)
+    {
+        $this->statusFilter = $value;
+        $this->resetLoaded();
+    }
+
+
+
+    public function toggleStatus($id)
+    {
+        $company = Company::find($id);
+
+        if (!$company) {
+            $this->toast('Company not found!', 'error');
+            return;
+        }
+
+        $company->status = $company->status == 'Active' ? "Inactive" : "Active";
+        $company->save();
+
+        $this->toast('Status updated successfully!', 'success');
+
+
         $this->resetLoaded();
     }
 }

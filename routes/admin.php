@@ -2,6 +2,7 @@
 
 use App\Livewire\Backend\Admin\Auth\AdminLogin;
 use App\Livewire\Backend\Admin\Dashboard;
+use App\Livewire\Backend\Settings\ChargeSettings;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use App\Livewire\Backend\Settings\PaymentSettings;
@@ -26,5 +27,6 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
     Route::get('sms', SmsSettings::class)->name('sms');
     Route::get('password', PasswordSettings::class)->name('password');
     Route::get('social', SocialSettings::class)->name('social');
+    Route::get('charge', ChargeSettings::class)->name('charge');
   });
 });

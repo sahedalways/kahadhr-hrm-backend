@@ -94,7 +94,7 @@
                             <div class="modal-body d-flex justify-content-between">
                                 @for ($i = 0; $i < 6; $i++)
                                     <input type="text" wire:model="otp.{{ $i }}"
-                                        class="form-control text-center mx-1 otp-field" maxlength="1"
+                                        class="form-control text-center mx-1 otp-field" maxlength="1" placeholder="-"
                                         style="width: 50px; font-size: 1.5rem;" oninput="handleOtpInput(this)"
                                         onkeydown="handleOtpBackspace(event, this)">
                                 @endfor

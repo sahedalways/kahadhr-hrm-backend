@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\CompanyChargeRate;
 use App\Models\SiteSetting;
 use App\Models\SocialInfoSettings;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 class HomeController extends BaseController
 {
 
-    public function getHomeData(Request $request)
+    public function getHomeData()
     {
         try {
             $siteInfo = SiteSetting::first();
@@ -46,6 +47,40 @@ class HomeController extends BaseController
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch home data',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+
+
+    public function getChargeRate()
+    {
+        try {
+            $data = CompanyChargeRate::first();
+
+
+            if ($data) {
+                unset(
+                    $data->created_at,
+                    $data->updated_at,
+                    $data->id,
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Rate data fetched successfully',
+                'data' => [
+                    'rate_info' => $data->rate,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch rate data',
                 'error' => $e->getMessage(),
             ], 500);
         }

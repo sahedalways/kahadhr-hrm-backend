@@ -30,6 +30,7 @@ Route::middleware(['cors'])->group(function () {
   // get home data api
   Route::controller(HomeController::class)->group(function () {
     Route::get('home-data', 'getHomeData');
+    Route::get('charge-rate', 'getChargeRate');
   });
 
 

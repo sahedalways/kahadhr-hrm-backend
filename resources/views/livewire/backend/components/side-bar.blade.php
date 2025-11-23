@@ -85,6 +85,17 @@
 
 
 
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/charge') ? 'active' : '' }}"
+                                    href="{{ route('super-admin.settings.charge') }}">
+                                    <i class="fas fa-pound-sign sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner">Charge Settings</span>
+                                </a>
+                            </li>
+
+
+
+
                             <!-- Password Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/settings/password') ? 'active' : '' }}"

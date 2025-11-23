@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             EmailSettingSeeder::class,
             SmsSettingSeeder::class,
             SocialSettingSeeder::class,
+            CompanyChargeSeeder::class,
         ]);
     }
 }

@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('password');
             $table->enum('user_type', ['superAdmin', 'company', 'teamLead', 'employee'])->default('company');
             $table->boolean('is_active')->default(true);
+            $table->boolean('profile_completed')->default(false);
+            $table->json('permissions')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

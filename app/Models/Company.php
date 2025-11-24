@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 
 class Company extends Model
 {
+
     protected $fillable = [
         'user_id',
         'company_name',
@@ -17,6 +18,12 @@ class Company extends Model
         'business_type',
         'address_contact_info',
         'company_logo',
+        'registered_domain',
+        'calendar_year',
+        'billing_plan_id',
+        'subscription_status',
+        'subscription_start',
+        'subscription_end',
         'status'
     ];
 
@@ -39,6 +46,20 @@ class Company extends Model
         return $this->hasMany(Employee::class);
     }
 
+    // Company belongs to a billing plan
+    public function billingPlan()
+    {
+        return $this->belongsTo(BillingPlan::class);
+    }
+
+
+    // Company Invoices
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+
 
     protected static function booted()
     {
@@ -50,6 +71,12 @@ class Company extends Model
                     $user->f_name = $company->company_name;
                     $user->save();
                 }
+            }
+        });
+
+        static::deleted(function ($company) {
+            if ($company->company_logo && Storage::disk('public')->exists($company->company_logo)) {
+                Storage::disk('public')->delete($company->company_logo);
             }
         });
     }

@@ -24,6 +24,8 @@ class User extends Authenticatable
         'phone_no',
         'email',
         'password',
+        'permissions',
+        'profile_completed',
         'email_verified_at',
         'phone_verified_at'
     ];
@@ -50,8 +52,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'permissions' => 'array',
+            'profile_completed' => 'boolean'
         ];
     }
+
+
 
     // Full Name Accessor
     public function getFullNameAttribute()
@@ -65,5 +71,11 @@ class User extends Authenticatable
     public function company()
     {
         return $this->hasOne(Company::class);
+    }
+
+
+    public function employeeProfile()
+    {
+        return $this->hasOne(Employee::class);
     }
 }

@@ -105,7 +105,7 @@
                                                 onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                 onmouseout="this.style.backgroundColor='transparent';"
                                                 style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                title="Click to copy">
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
                                                 {{ $row->company_email ?? 'N/A' }}
                                             </span>
                                         </td>
@@ -114,7 +114,7 @@
                                                 onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                 onmouseout="this.style.backgroundColor='transparent';"
                                                 style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                title="Click to copy">
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
                                                 {{ $row->company_mobile ?? 'N/A' }}
                                             </span>
                                         </td>
@@ -129,23 +129,17 @@
                                                 N/A
                                             @endif
                                         </td>
-                                        <td> <a href="#" wire:click.prevent="toggleStatus({{ $row->id }})">
-                                                {!! statusBadge($row->status) !!}
-                                            </a></td>
                                         <td>
-                                            <a data-bs-toggle="modal" data-bs-target="#editCompany"
-                                                wire:click="edit({{ $row->id }})" class="badge badge-warning">
-                                                Edit
+                                            <a href="#" wire:click.prevent="toggleStatus({{ $row->id }})"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Click to change status">
+
+                                                {!! statusBadge($row->status) !!}
                                             </a>
+                                        </td>
 
 
-
-
-                                            <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
-                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
-                                                Delete
-                                            </a>
-
+                                        <td>
 
                                             <a href="{{ route('super-admin.company.details.show', $row->id) }}"
                                                 class="badge badge-xs fw-600 text-xs"
@@ -153,6 +147,28 @@
                                                 onmouseover="this.style.backgroundColor='#3aa57a'; this.style.color='#fff';"
                                                 onmouseout="this.style.backgroundColor='#5acaa3'; this.style.color='#000';">
                                                 View Details
+                                            </a>
+
+
+                                            <a data-bs-toggle="modal" data-bs-target="#manageCompanyProfile"
+                                                wire:click="edit({{ $row->id }})"
+                                                class="badge badge-info badge-xs fw-600 text-xs"
+                                                style="background-color: #4ba3f7; color: #fff; text-decoration:none; transition:0.3s;"
+                                                onmouseover="this.style.backgroundColor='#1d74d8';"
+                                                onmouseout="this.style.backgroundColor='#4ba3f7';">
+                                                Manage Profile
+                                            </a>
+
+
+                                            <a data-bs-toggle="modal" data-bs-target="#editCompany"
+                                                wire:click="edit({{ $row->id }})" class="badge badge-warning">
+                                                Edit
+                                            </a>
+
+
+                                            <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
+                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                                Delete
                                             </a>
 
                                         </td>
@@ -180,140 +196,7 @@
         </div>
     </div>
 
-    <!-- Add Company Modal -->
-    {{-- <div wire:ignore.self class="modal fade" id="addCompany" tabindex="-1" role="dialog" aria-labelledby="addCompany"
-        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title fw-600" id="addCompany">Add Company</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                        <i class="fas fa-times" style="color:black;"></i>
-                    </button>
-                </div>
 
-                <form wire:submit.prevent="store">
-                    <div class="modal-body">
-                        <div class="row g-2">
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" required class="form-control" placeholder="Enter Company Name"
-                                    wire:model="company_name">
-                                @error('company_name')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Business Type</label>
-                                <input type="text" class="form-control" placeholder="Enter Business Type"
-                                    wire:model="business_type">
-                                @error('business_type')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Address & Contact Info</label>
-                                <textarea class="form-control" placeholder="Enter Address & Contact Info" wire:model="address_contact_info"></textarea>
-                                @error('address_contact_info')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Company Logo</label>
-                                <input type="file" class="form-control" wire:model="company_logo">
-                                @error('company_logo')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled">
-                            <span wire:loading>
-                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
-                            </span>
-                            <span wire:loading.remove>Save</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Company Modal -->
-    <div wire:ignore.self class="modal fade" id="editCompany" tabindex="-1" role="dialog"
-        aria-labelledby="editCompany" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title fw-600" id="editCompany">Edit Company</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                        <i class="fas fa-times" style="color:black;"></i>
-                    </button>
-                </div>
-
-                <form wire:submit.prevent="update">
-                    <div class="modal-body">
-                        <div class="row g-2">
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="company_name">
-                                @error('company_name')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Business Type</label>
-                                <input type="text" class="form-control" wire:model="business_type">
-                                @error('business_type')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Address & Contact Info</label>
-                                <textarea class="form-control" wire:model="address_contact_info"></textarea>
-                                @error('address_contact_info')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Company Logo</label>
-                                <input type="file" class="form-control" wire:model="company_logo">
-                                @error('company_logo')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                                @if ($company_logo_preview)
-                                    <img src="{{ $company_logo_preview }}" class="mt-2" style="width:50px;">
-                                @endif
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled">
-                            <span wire:loading>
-                                <i class="fas fa-spinner fa-spin me-2"></i> Updating...
-                            </span>
-                            <span wire:loading.remove>Update</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> --}}
 </div>
 
 <script>

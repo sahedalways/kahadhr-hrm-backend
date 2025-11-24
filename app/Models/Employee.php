@@ -41,4 +41,15 @@ class Employee extends Model
     {
         return $this->f_name . ' ' . $this->l_name;
     }
+
+
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
 }

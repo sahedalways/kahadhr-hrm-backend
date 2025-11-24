@@ -19,10 +19,19 @@ return new class extends Migration
             // Employee info
             $table->string('f_name');
             $table->string('l_name');
-            $table->string('title')->nullable();
 
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'teamLead'])->default('employee');
+
+            $table->string('job_title')->nullable();
+            $table->foreignId('department_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('team_id')->nullable()->constrained()->onDelete('set null');
+            $table->decimal('contract_hours', 5, 2)->nullable();
+            $table->enum('salary_type', ['hourly', 'monthly'])->nullable();
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+
+
             $table->timestamps();
         });
     }

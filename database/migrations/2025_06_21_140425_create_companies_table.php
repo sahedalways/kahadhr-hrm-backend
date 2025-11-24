@@ -21,6 +21,17 @@ return new class extends Migration
             $table->string('business_type')->nullable();
             $table->text('address_contact_info')->nullable();
             $table->string('company_logo')->nullable();
+            $table->string('registered_domain')->nullable();
+            $table->enum('calendar_year', ['english', 'hmrc'])
+                ->default('english');
+            $table->foreignId('billing_plan_id')
+                ->nullable()
+                ->constrained('billing_plans')
+                ->onDelete('set null');
+            $table->enum('subscription_status', ['active', 'trial', 'expired'])
+                ->default('trial');
+            $table->date('subscription_start')->nullable();
+            $table->date('subscription_end')->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });

@@ -27,6 +27,7 @@ class UserTableSeeder extends Seeder
       'l_name'            => 'Admin',
       'email'             => 'admin@admin.com',
       'phone_no'          => '0177xxxxxxx',
+      'profile_completed'          => true,
       'password'          => Hash::make('12345678'),
       'user_type'         => 'superAdmin',
       'email_verified_at' => Carbon::now(),

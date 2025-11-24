@@ -18,7 +18,10 @@ use App\Livewire\Backend\Settings\SocialSettings;
 use Illuminate\Support\Facades\Route;
 
 // login route
-Route::get('/', [AdminLogin::class, '__invoke'])->name('login');
+Route::domain('admin.' . config('app.base_domain'))
+  ->group(function () {
+    Route::get('/', [AdminLogin::class, '__invoke'])->name('login');
+  });
 
 // Super Admin routes under admin.demo.com
 Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middleware(['auth', 'superAdmin'])->name('super-admin.')->group(function () {

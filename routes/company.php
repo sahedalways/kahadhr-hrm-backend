@@ -2,7 +2,6 @@
 
 
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
-use App\Livewire\Backend\Company\Auth\CompanyRegister;
 use App\Livewire\Backend\Company\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -13,11 +12,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::domain('company.' . config('app.base_domain'))
-  ->middleware('guest')
+Route::domain('{company}.' . config('app.base_domain'))
+  ->middleware(['guest', 'checkCompanySubdomain'])
   ->name('company.auth.')
   ->group(function () {
-    Route::get('login', CompanyLogin::class)->name('login');
+    Route::get('/', CompanyLogin::class)->name('login');
   });
 
 /*
@@ -25,7 +24,7 @@ Route::domain('company.' . config('app.base_domain'))
 | Authenticated company dashboard routes
 |--------------------------------------------------------------------------
 */
-Route::domain('company.' . config('app.base_domain'))
+Route::domain('{company}.' . config('app.base_domain'))
   ->prefix('dashboard')
   ->middleware(['auth', 'companyAdmin'])
   ->name('company.dashboard.')

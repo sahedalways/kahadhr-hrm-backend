@@ -14,6 +14,7 @@ class Company extends Model
     protected $fillable = [
         'user_id',
         'company_name',
+        'sub_domain',
         'company_house_number',
         'company_mobile',
         'company_email',
@@ -78,20 +79,35 @@ class Company extends Model
 
     protected static function booted()
     {
-        static::updated(function ($company) {
+
+
+        static::deleted(function ($company) {
+            if ($company->company_logo && Storage::disk('public')->exists($company->company_logo)) {
+                Storage::disk('public')->delete($company->company_logo);
+            }
+        });
+
+
+
+        static::creating(function ($company) {
+            if (empty($company->sub_domain) && !empty($company->company_name)) {
+
+                $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $company->company_name);
+                $company->sub_domain = Str::slug($cleanName);
+            }
+        });
+
+        static::updating(function ($company) {
             if ($company->isDirty('company_name')) {
+
+                $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $company->company_name);
+                $company->sub_domain = Str::slug($cleanName);
 
                 $user = $company->user;
                 if ($user) {
                     $user->f_name = $company->company_name;
                     $user->save();
                 }
-            }
-        });
-
-        static::deleted(function ($company) {
-            if ($company->company_logo && Storage::disk('public')->exists($company->company_logo)) {
-                Storage::disk('public')->delete($company->company_logo);
             }
         });
     }

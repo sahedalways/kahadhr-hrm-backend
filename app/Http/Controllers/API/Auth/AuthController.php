@@ -37,11 +37,6 @@ class AuthController extends BaseController
             'company_mobile',
             'company_email',
             'password',
-
-            'bank_name',
-            'card_number',
-            'expiry_date',
-            'cvv',
         ]));
 
 

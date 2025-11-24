@@ -63,6 +63,9 @@ class UserTableSeeder extends Seeder
       'company_house_number'  => 'House 12, Road 8',
       'company_mobile'        => '016165238944',
       'company_email'         => 'info@xyz.com',
+      'subscription_status'  => 'trial',
+      'subscription_start'   => now(),
+      'subscription_end'     => now()->addDays(14),
     ]);
 
 
@@ -110,6 +113,9 @@ class UserTableSeeder extends Seeder
       'company_house_number'  => 'House 34, Road 12',
       'company_mobile'        => '01712345678',
       'company_email'         => 'info@abc.com',
+      'subscription_status'  => 'trial',
+      'subscription_start'   => now(),
+      'subscription_end'     => now()->addDays(14),
     ]);
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -82,21 +83,12 @@ class Company extends Model
     }
 
 
-    // Automatically store uploaded logo
-    public function setCompanyLogoAttribute($value)
-    {
-        if ($value) {
-
-            $filename = Str::random(10) . '.' . $value->getClientOriginalExtension();
-            $this->attributes['company_logo'] = $value->storeAs('company/logo', $filename, 'public');
-        }
-    }
 
     // Accessor for logo URL
     public function getCompanyLogoUrlAttribute()
     {
         return $this->company_logo
-            ? Storage::url($this->company_logo)
+            ? asset('storage/' . $this->company_logo)
             : asset('assets/img/default-image.jpg');
     }
 }

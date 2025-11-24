@@ -151,19 +151,15 @@
 
 
                                             <a data-bs-toggle="modal" data-bs-target="#manageCompanyProfile"
-                                                wire:click="edit({{ $row->id }})"
+                                                wire:click="manageCompanyProfile({{ $row->id }})"
                                                 class="badge badge-info badge-xs fw-600 text-xs"
-                                                style="background-color: #4ba3f7; color: #fff; text-decoration:none; transition:0.3s;"
+                                                style="background-color: #4ba3f7; color: #fff; text-decoration:none; transition:0.3s; cursor: pointer;"
                                                 onmouseover="this.style.backgroundColor='#1d74d8';"
                                                 onmouseout="this.style.backgroundColor='#4ba3f7';">
                                                 Manage Profile
                                             </a>
 
 
-                                            <a data-bs-toggle="modal" data-bs-target="#editCompany"
-                                                wire:click="edit({{ $row->id }})" class="badge badge-warning">
-                                                Edit
-                                            </a>
 
 
                                             <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
@@ -192,6 +188,153 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div wire:ignore.self class="modal fade" id="manageCompanyProfile" tabindex="-1" role="dialog"
+        aria-labelledby="manageCompanyProfile" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">Manage Company Info</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times" style="color:black;"></i>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="update">
+                    <div class="modal-body">
+                        <div class="row g-2">
+
+                            {{-- Company Name --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" wire:model="company_name" required>
+                                @error('company_name')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- House Number --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">House Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" wire:model="company_house_number">
+                                @error('company_house_number')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Email --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" wire:model="company_email">
+                                @error('company_email')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Mobile --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" wire:model="company_mobile">
+                                @error('company_mobile')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Business Type --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Business Type</label>
+                                <input type="text" class="form-control" wire:model="business_type">
+                                @error('business_type')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Contact Address --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Contact Address</label>
+                                <textarea class="form-control" rows="2" wire:model="address_contact_info"></textarea>
+                                @error('address_contact_info')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Registered Domain --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Registered Domain</label>
+                                <input type="text" class="form-control" wire:model="registered_domain">
+                            </div>
+
+                            {{-- Calendar Year --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Calendar Year</label>
+                                <select class="form-control" wire:model="calendar_year">
+                                    <option value="english">English</option>
+                                    <option value="hmrc">HMRC</option>
+                                </select>
+                            </div>
+
+
+
+                            {{-- Subscription Status --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Subscription Status</label>
+                                <select class="form-control" wire:model="subscription_status">
+                                    <option value="active">Active</option>
+                                    <option value="trial">Trial</option>
+                                    <option value="expired">Expired</option>
+                                </select>
+                            </div>
+
+                            {{-- Subscription Start --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Subscription Start</label>
+                                <input type="date" class="form-control" wire:model="subscription_start">
+                            </div>
+
+                            {{-- Subscription End --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Subscription End</label>
+                                <input type="date" class="form-control" wire:model="subscription_end">
+                            </div>
+
+                            {{-- Company Logo --}}
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label">Company Logo</label>
+                                <input type="file" class="form-control" wire:model="company_logo">
+
+
+                                @if ($company_logo)
+                                    <img src="{{ $company_logo->temporaryUrl() }}" class="img-thumbnail mt-2"
+                                        width="80">
+
+                                    <div wire:loading wire:target="company_logo">
+                                        <span class="text-muted">Uploading...</span>
+                                    </div>
+                                @elseif ($company_logo_preview)
+                                    <img src="{{ $company_logo_preview }}" class="img-thumbnail mt-2"
+                                        width="80">
+                                @endif
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="update">
+                            <span wire:loading wire:target="update">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                            </span>
+                            <span wire:loading.remove wire:target="update">Save</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Company;
 use App\Services\CompanyService;
 use App\Traits\Exportable;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 
@@ -14,7 +15,9 @@ class ManageCompanies extends BaseComponent
     use WithFileUploads;
     use Exportable;
 
-    public $companies, $company, $company_id, $company_name, $business_type, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview;
+    public $companies, $company, $company_id, $company_name, $business_type, $company_house_number, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview, $registered_domain, $calendar_year, $billing_plan_id, $subscription_status, $subscription_start, $subscription_end, $status;
+
+    public $billingPlans;
     public $perPage = 10;
     public $sortOrder = 'desc';
     public $statusFilter = '';
@@ -67,8 +70,7 @@ class ManageCompanies extends BaseComponent
 
 
 
-    /* Edit company */
-    public function edit($id)
+    public function manageCompanyProfile($id)
     {
         $this->editMode = true;
         $this->company = $this->companyService->getCompany($id);
@@ -79,14 +81,32 @@ class ManageCompanies extends BaseComponent
         }
 
         $this->company_name = $this->company->company_name;
-        $this->business_type = $this->company->business_type;
-        $this->address_contact_info = $this->company->address_contact_info;
+        $this->company_house_number = $this->company->company_house_number;
         $this->company_email = $this->company->company_email;
         $this->company_mobile = $this->company->company_mobile;
+        $this->business_type = $this->company->business_type;
+        $this->address_contact_info = $this->company->address_contact_info;
+        $this->registered_domain = $this->company->registered_domain;
+        $this->calendar_year = $this->company->calendar_year;
+        // $this->billing_plan_id = $this->company->billing_plan_id;
+        $this->subscription_status = $this->company->subscription_status;
+        $this->subscription_start = $this->company->subscription_start
+            ? Carbon::parse($this->company->subscription_start)->format('Y-m-d')
+            : null;
+
+        $this->subscription_end = $this->company->subscription_end
+            ? Carbon::parse($this->company->subscription_end)->format('Y-m-d')
+            : null;
+        $this->status = $this->company->status == 'Active';
         $this->company_logo_preview = $this->company->company_logo_url;
+
+        // Load billing plans
+        // $this->billingPlans = BillingPlan::all();
     }
 
-    /* Update company */
+
+
+
     public function update()
     {
         if (!$this->company) {
@@ -94,35 +114,50 @@ class ManageCompanies extends BaseComponent
             return;
         }
 
+
         $this->validate([
             'company_name' => 'required|string|max:255',
+            'company_house_number' => 'required|string|max:255',
+            'company_email' => ['required', 'email', Rule::unique('companies', 'company_email')->ignore($this->company->id)],
+            'company_mobile' => ['required', 'string', 'max:20', Rule::unique('companies', 'company_mobile')->ignore($this->company->id)],
             'business_type' => 'nullable|string|max:255',
             'address_contact_info' => 'nullable|string|max:500',
-            'company_email' => [
-                'nullable',
-                'email',
-                Rule::unique('companies', 'company_email')->ignore($this->company->id),
-            ],
-            'company_mobile' => [
+            'registered_domain' => [
                 'nullable',
                 'string',
-                'max:20',
-                Rule::unique('companies', 'company_mobile')->ignore($this->company->id),
+                'max:255',
+                Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
-            'company_logo' => 'nullable|mimes:jpeg,jpg,png,webp,heic,heif|max:2048',
+            'calendar_year' => 'required|in:english,hmrc',
+            // 'billing_plan_id' => 'nullable|exists:billing_plans,id',
+            'subscription_status' => 'required|in:active,trial,expired',
+            'subscription_start' => 'nullable|date',
+            'subscription_end' => 'nullable|date',
+            'company_logo' => 'nullable|image|max:2048',
         ]);
+
+
 
         $data = [
             'company_name' => $this->company_name,
-            'business_type' => $this->business_type,
-            'address_contact_info' => $this->address_contact_info,
+            'company_house_number' => $this->company_house_number,
             'company_email' => $this->company_email,
             'company_mobile' => $this->company_mobile,
+            'business_type' => $this->business_type,
+            'address_contact_info' => $this->address_contact_info,
+            'registered_domain' => $this->registered_domain,
+            'calendar_year' => $this->calendar_year,
+            // 'billing_plan_id' => $this->billing_plan_id,
+            'subscription_status' => $this->subscription_status,
+            'subscription_start' => $this->subscription_start,
+            'subscription_end' => $this->subscription_end,
+            'status' => $this->status ? 'Active' : 'Inactive',
         ];
 
         if ($this->company_logo) {
             $data['company_logo'] = $this->company_logo;
         }
+
         $this->companyService->updateCompany($this->company, $data);
 
         $this->resetInputFields();
@@ -131,6 +166,8 @@ class ManageCompanies extends BaseComponent
         $this->toast('Company updated successfully!', 'success');
         $this->resetLoaded();
     }
+
+
 
     /* Search companies */
     public function searchCompanies()

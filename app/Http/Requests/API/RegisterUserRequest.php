@@ -41,14 +41,7 @@ class RegisterUserRequest extends FormRequest
             'password' => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required|string|min:8',
 
-            // Bank Info
-            'bank_name'   => 'required|string|max:255',
-            'card_number' => 'required|digits_between:12,19',
-            'expiry_date' => [
-                'required',
-                'regex:/^\d{2}\/\d{2}$/',
-            ],
-            'cvv'         => 'required|digits_between:3,4',
+
         ];
     }
 
@@ -83,19 +76,7 @@ class RegisterUserRequest extends FormRequest
             'password_confirmation.required' => 'Password confirmation is required.',
             'password_confirmation.min'     => 'Password confirmation must be at least 8 characters.',
 
-            // Bank Messages
-            'bank_name.required'            => 'Bank name is required.',
-            'bank_name.string'              => 'Bank name must be a valid string.',
-            'bank_name.max'                 => 'Bank name cannot exceed 255 characters.',
 
-            'card_number.required'          => 'Card number is required.',
-            'card_number.digits_between'    => 'Card number must be between 12 and 19 digits.',
-
-            'expiry_date.required'          => 'Expiry date is required.',
-            'expiry_date.date_format'       => 'Expiry date must be in MM/YY format.',
-
-            'cvv.required'                  => 'CVV is required.',
-            'cvv.digits_between'            => 'CVV must be 3 or 4 digits.',
         ];
     }
 }

@@ -27,22 +27,18 @@ class FrontAuthRepository
       ]);
 
       // 2️⃣ Create Company
-      $company = Company::create([
+      Company::create([
         'user_id'              => $user->id,
         'company_name'         => $data['company_name'],
         'company_house_number' => $data['company_house_number'],
         'company_mobile'       => $data['company_mobile'],
         'company_email'        => $data['company_email'],
+        'subscription_start'   => now(),
+        'subscription_end'     => now()->addDays(14),
+        'subscription_status'  => 'trial',
       ]);
 
-      // 3️⃣ Create Company Bank Info
-      CompanyBankInfo::create([
-        'company_id'  => $company->id,
-        'bank_name'   => $data['bank_name'],
-        'card_number' => $data['card_number'],
-        'expiry_date' => $data['expiry_date'],
-        'cvv'         => $data['cvv'],
-      ]);
+
 
       return $user;
     });

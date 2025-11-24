@@ -25,6 +25,8 @@ class Company extends Model
         'subscription_status',
         'subscription_start',
         'subscription_end',
+        'payment_failed_count',
+        'payment_status',
         'status'
     ];
 
@@ -90,5 +92,28 @@ class Company extends Model
         return $this->company_logo
             ? asset('storage/' . $this->company_logo)
             : asset('assets/img/default-image.jpg');
+    }
+
+
+    /**
+     * Get per-employee charge rate for this company
+     *
+     * @return float
+     */
+    public function perEmployeeCharge(): float
+    {
+        $chargeRate = CompanyChargeRate::first();
+        return $chargeRate ? $chargeRate->rate : 0;
+    }
+
+    /**
+     * Calculate monthly amount for this company
+     *
+     * @return float
+     */
+    public function monthlyAmount(): float
+    {
+        $employeeCount = $this->employees()->count();
+        return $employeeCount * $this->perEmployeeCharge();
     }
 }

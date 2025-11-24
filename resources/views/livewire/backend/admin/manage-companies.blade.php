@@ -284,6 +284,7 @@
                                     <option value="active">Active</option>
                                     <option value="trial">Trial</option>
                                     <option value="expired">Expired</option>
+                                    <option value="suspended">Suspended</option>
                                 </select>
                             </div>
 

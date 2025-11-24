@@ -28,8 +28,10 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('billing_plans')
                 ->onDelete('set null');
-            $table->enum('subscription_status', ['active', 'trial', 'expired'])
+            $table->enum('subscription_status', ['active', 'trial', 'expired', 'suspended'])
                 ->default('trial');
+            $table->integer('payment_failed_count')->default(0);
+            $table->enum('payment_status', ['paid', 'unpaid', 'pending'])->default('pending');
             $table->date('subscription_start')->nullable();
             $table->date('subscription_end')->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');

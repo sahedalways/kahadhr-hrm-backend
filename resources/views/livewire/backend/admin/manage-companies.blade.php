@@ -236,11 +236,13 @@
                             {{-- Mobile --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Mobile <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="company_mobile">
+                                <input type="text" class="form-control" wire:model="company_mobile"
+                                    pattern="\d*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 @error('company_mobile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+
 
                             {{-- Business Type --}}
                             <div class="col-md-6 mb-2">
@@ -263,8 +265,15 @@
                             {{-- Registered Domain --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Registered Domain</label>
-                                <input type="text" class="form-control" wire:model="registered_domain">
+                                <input type="text" class="form-control" wire:model="registered_domain"
+                                    pattern="^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,11}?$"
+                                    title="Enter a valid domain, e.g., example.com"
+                                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9\.\-]/g,'')">
+                                @error('registered_domain')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
+
 
                             {{-- Calendar Year --}}
                             <div class="col-md-6 mb-2">
@@ -273,6 +282,10 @@
                                     <option value="english">English</option>
                                     <option value="hmrc">HMRC</option>
                                 </select>
+
+                                @error('calendar_year')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
 
@@ -286,18 +299,28 @@
                                     <option value="expired">Expired</option>
                                     <option value="suspended">Suspended</option>
                                 </select>
+
+                                @error('subscription_status')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             {{-- Subscription Start --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Subscription Start</label>
                                 <input type="date" class="form-control" wire:model="subscription_start">
+                                @error('subscription_start')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             {{-- Subscription End --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Subscription End</label>
                                 <input type="date" class="form-control" wire:model="subscription_end">
+                                @error('subscription_end')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
                             {{-- Company Logo --}}
@@ -317,6 +340,10 @@
                                     <img src="{{ $company_logo_preview }}" class="img-thumbnail mt-2"
                                         width="80">
                                 @endif
+
+                                @error('company_logo')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
 
 

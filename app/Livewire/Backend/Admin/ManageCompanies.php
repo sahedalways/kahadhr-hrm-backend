@@ -133,7 +133,7 @@ class ManageCompanies extends BaseComponent
             // 'billing_plan_id' => 'nullable|exists:billing_plans,id',
             'subscription_status' => 'required|in:active,trial,expired,suspended',
             'subscription_start' => 'nullable|date',
-            'subscription_end' => 'nullable|date',
+            'subscription_end' => 'nullable|date|after:subscription_start',
             'company_logo' => 'nullable|image|max:2048',
         ]);
 

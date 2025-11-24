@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +30,17 @@ class Company extends Model
         'payment_status',
         'status'
     ];
+
+
+    public function getSubscriptionStartAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
+    }
+
+    public function getSubscriptionEndAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
+    }
 
     // Company belongs to a User
     public function user()

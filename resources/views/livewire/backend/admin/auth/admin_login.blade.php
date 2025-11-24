@@ -54,14 +54,19 @@
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary w-100 my-4 mb-4"
                                                 wire:loading.attr="disabled" wire:target="login">
+
+
                                                 <span wire:loading wire:target="login">
                                                     <i class="fas fa-spinner fa-spin me-2"></i> Logging In ...
                                                 </span>
+
+
                                                 <span wire:loading.remove wire:target="login">
                                                     Login
                                                 </span>
                                             </button>
                                         </div>
+
 
                                         <div class="mb-2 position-relative text-center">
                                             <p
@@ -103,14 +108,19 @@
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary w-25 my-4 mb-4"
                                     wire:loading.attr="disabled" wire:target="verifyOtp">
+
+
                                     <span wire:loading wire:target="verifyOtp">
                                         <i class="fas fa-spinner fa-spin me-2"></i> Verifying ...
                                     </span>
+
+
                                     <span wire:loading.remove wire:target="verifyOtp">
                                         Verify OTP
                                     </span>
                                 </button>
                             </div>
+
 
                         </div>
                     </div>

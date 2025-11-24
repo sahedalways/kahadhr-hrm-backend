@@ -79,7 +79,16 @@ class Company extends Model
 
     protected static function booted()
     {
-
+        static::created(function ($company) {
+            SiteSetting::create([
+                'company_id'        => $company->id,
+                'site_title'        => $company->company_name,
+                'logo'              => 'png',
+                'favicon'           => 'png',
+                'site_phone_number' => $company->company_mobile ?? null,
+                'site_email'        => $company->company_email ?? null,
+            ]);
+        });
 
         static::deleted(function ($company) {
             if ($company->company_logo && Storage::disk('public')->exists($company->company_logo)) {
@@ -91,17 +100,13 @@ class Company extends Model
 
         static::creating(function ($company) {
             if (empty($company->sub_domain) && !empty($company->company_name)) {
-
-                $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $company->company_name);
-                $company->sub_domain = Str::slug($cleanName);
+                $company->sub_domain = self::generateUniqueSubdomain($company->company_name);
             }
         });
 
         static::updating(function ($company) {
             if ($company->isDirty('company_name')) {
-
-                $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $company->company_name);
-                $company->sub_domain = Str::slug($cleanName);
+                $company->sub_domain = self::generateUniqueSubdomain($company->company_name);
 
                 $user = $company->user;
                 if ($user) {
@@ -110,6 +115,36 @@ class Company extends Model
                 }
             }
         });
+    }
+
+
+
+    /**
+     * Generate unique subdomain based on company name
+     */
+    protected static function generateUniqueSubdomain($companyName)
+    {
+
+        $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $companyName);
+
+        $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $cleanName);
+
+        $cleanName = preg_replace('/\s+/', ' ', $cleanName);
+
+
+        $cleanName = trim($cleanName);
+        $baseSlug = Str::slug($cleanName);
+
+        $slug = $baseSlug;
+        $count = 1;
+
+
+        while (self::where('sub_domain', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
     }
 
 

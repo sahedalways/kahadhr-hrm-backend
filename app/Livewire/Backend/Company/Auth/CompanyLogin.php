@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Company\Auth;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class CompanyLogin extends BaseComponent
 {
@@ -38,6 +39,17 @@ class CompanyLogin extends BaseComponent
 
         if (!$user) {
             $this->toast('Invalid Email or Password', 'error');
+            return;
+        }
+
+
+        $currentHost = request()->getHost();
+        $baseDomain = config('app.base_domain');
+
+        $currentSubdomain = str_replace('.' . $baseDomain, '', $currentHost);
+
+        if ($user->company->sub_domain !== $currentSubdomain) {
+            $this->toast('Invalid subdomain for this account.', 'error');
             return;
         }
 
@@ -113,7 +125,7 @@ class CompanyLogin extends BaseComponent
     {
         if (app('authUser')) {
             if (app('authUser')->user_type == 'company') {
-                return redirect()->route('company.home');
+                return redirect()->route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]);
             }
         }
     }

@@ -12,7 +12,7 @@ class RedirectIfCompanyAuthenticated
     {
         // Check if company admin is logged in
         if (Auth::guard($guard)->check()) {
-            return redirect()->route('company.home');
+            return redirect()->route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]);
         }
 
         return $next($request);

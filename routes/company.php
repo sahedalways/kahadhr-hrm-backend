@@ -3,6 +3,11 @@
 
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Dashboard;
+use App\Livewire\Backend\Settings\MailSettings;
+use App\Livewire\Backend\Settings\PasswordSettings;
+use App\Livewire\Backend\Settings\SiteSettings;
+use App\Livewire\Backend\Settings\SmsSettings;
+use App\Livewire\Backend\Settings\SocialSettings;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,9 +35,13 @@ Route::domain('{company}.' . config('app.base_domain'))
   ->name('company.dashboard.')
   ->group(function () {
     // Dashboard home
-    Route::get('/', Dashboard::class)->name('home');
+    Route::get('/', Dashboard::class)->name('index');
 
-    // Example: other dashboard pages
-    // Route::get('profile', Profile::class)->name('profile');
-    // Route::get('employees', Employees::class)->name('employees');
+    // Settings routes
+    Route::prefix('settings')->name('settings.')->group(function () {
+      Route::get('mail', MailSettings::class)->name('mail');
+      Route::get('sms', SmsSettings::class)->name('sms');
+      Route::get('password', PasswordSettings::class)->name('password');
+      Route::get('social', SocialSettings::class)->name('social');
+    });
   });

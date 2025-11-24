@@ -27,6 +27,17 @@
 </head>
 
 <body class="g-sidenav-show">
+
+
+    <div id="preloader" class="preloader">
+        <div class="hr-line-loader">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </div>
+
+
     <div class="min-height-300 bg-primary position-absolute w-100"></div>
     @livewire('backend.components.side-bar')
     <main class="main-content position-relative border-radius-lg ">
@@ -98,6 +109,20 @@
     </script>
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const loader = document.getElementById("preloader");
+
+
+            window.onload = () => {
+                loader.classList.add("hidden");
+            };
+        });
+
+        window.addEventListener("beforeunload", function() {
+            document.getElementById("preloader").classList.remove("hidden");
+        });
+    </script>
 
 
 

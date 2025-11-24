@@ -32,6 +32,55 @@
 }
 
 
+.preloader {
+    background: rgba(10, 10, 10, 0.9);
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hr-line-loader {
+    display: flex;
+    gap: 8px;
+}
+
+.hr-line-loader .line {
+    width: 6px;
+    height: 40px;
+    background: #0d6efd;  /* corporate blue */
+    border-radius: 4px;
+    animation: hrLine 0.8s infinite ease-in-out;
+}
+
+.hr-line-loader .line:nth-child(2) {
+    animation-delay: 0.15s;
+}
+.hr-line-loader .line:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes hrLine {
+    0% { height: 12px; opacity: 0.5; }
+    50% { height: 40px; opacity: 1; }
+    100% { height: 12px; opacity: 0.5; }
+}
+
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hide by default after load */
+.preloader.hidden {
+    display: none;
+}
+
+
+
 span.icon-position {
     position: absolute;
     top: 50%;

@@ -15,7 +15,7 @@
                             <label class="form-label">Old Password <span class="text-danger">*</span></label>
 
                             <div class="position-relative">
-                                <input type="password" class="form-control extra-padding"
+                                <input type="password" class="form-control extra-padding shadow-sm"
                                     wire:model.defer="old_password" id="old_password">
                                 <span class="icon-position" style="cursor:pointer;"
                                     onclick="togglePassword('old_password', this)">
@@ -33,7 +33,7 @@
                             <label class="form-label">New Password <span class="text-danger">*</span></label>
 
                             <div class="position-relative">
-                                <input type="password" class="form-control extra-padding"
+                                <input type="password" class="form-control extra-padding shadow-sm"
                                     wire:model.defer="new_password" id="new_password">
                                 <span class="icon-position" style="cursor:pointer;"
                                     onclick="togglePassword('new_password', this)">
@@ -52,7 +52,7 @@
                             <div class="position-relative">
 
 
-                                <input type="password" class="form-control extra-padding"
+                                <input type="password" class="form-control extra-padding shadow-sm"
                                     wire:model.defer="confirm_new_password" id="confirm_new_password">
                                 <span class="icon-position" style="cursor:pointer;"
                                     onclick="togglePassword('confirm_new_password', this)">

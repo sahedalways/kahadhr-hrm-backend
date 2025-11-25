@@ -338,6 +338,31 @@
                         <ul class="nav ms-4">
 
 
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/profile') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-user sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Profile Settings </span>
+                                </a>
+                            </li>
+
+                            <!-- Bank Info Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/bank-info') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-university sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Bank Info Settings </span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/verification-center') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.verification-center', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-shield-alt sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Verification Center </span>
+                                </a>
+                            </li>
+
 
                             <!-- Mail Settings -->
                             <li class="nav-item">
@@ -371,22 +396,7 @@
                             </li>
 
 
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/profile') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-user sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Profile Settings </span>
-                                </a>
-                            </li>
 
-                            <!-- Bank Info Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/bank-info') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-university sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Bank Info Settings </span>
-                                </a>
-                            </li>
                         </ul>
                     </div>
 

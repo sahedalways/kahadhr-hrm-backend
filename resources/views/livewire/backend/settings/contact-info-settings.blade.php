@@ -20,7 +20,7 @@
                         <!-- Phone -->
                         <div class="col-md-6">
                             <label class="form-label">Phone Number</label>
-                            <input type="text" class="form-control" placeholder="Enter Phone Number"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter Phone Number"
                                 wire:model="phone">
                         </div>
 

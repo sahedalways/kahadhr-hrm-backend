@@ -14,35 +14,35 @@
                         <!-- Facebook -->
                         <div class="col-md-4">
                             <label class="form-label">Facebook URL</label>
-                            <input type="text" class="form-control" placeholder="Enter Facebook URL"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter Facebook URL"
                                 wire:model="facebook">
                         </div>
 
                         <!-- Twitter -->
                         <div class="col-md-4">
                             <label class="form-label">Twitter URL</label>
-                            <input type="text" class="form-control" placeholder="Enter Twitter URL"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter Twitter URL"
                                 wire:model="twitter">
                         </div>
 
                         <!-- Instagram -->
                         <div class="col-md-4">
                             <label class="form-label">Instagram URL</label>
-                            <input type="text" class="form-control" placeholder="Enter Instagram URL"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter Instagram URL"
                                 wire:model="instagram">
                         </div>
 
                         <!-- LinkedIn -->
                         <div class="col-md-4">
                             <label class="form-label">LinkedIn URL</label>
-                            <input type="text" class="form-control" placeholder="Enter LinkedIn URL"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter LinkedIn URL"
                                 wire:model="linkedin">
                         </div>
 
                         <!-- YouTube -->
                         <div class="col-md-4">
                             <label class="form-label">YouTube URL</label>
-                            <input type="text" class="form-control" placeholder="Enter YouTube URL"
+                            <input type="text" class="form-control shadow-sm" placeholder="Enter YouTube URL"
                                 wire:model="youtube">
                         </div>
 

@@ -20,31 +20,8 @@ class ProfileSettings extends BaseComponent
     public $address_contact_info, $registered_domain, $calendar_year;
     public $company_logo, $old_company_logo;
 
-    public $new_email;
-    public $new_mobile;
-
-    public $code_sent = false;
-    public $otpCooldown = 0;
-    public $otp = [];
-
-
-    public $verification_code;
-
-    public $updating_field;
 
     public $company;
-
-
-
-    protected $listeners = ['openModal', 'tick'];
-
-    public function openModal($field)
-    {
-        $this->resetVerificationFields();
-        $this->updating_field = $field;
-        $this->code_sent = false;
-        $this->verification_code = null;
-    }
 
 
 
@@ -60,7 +37,6 @@ class ProfileSettings extends BaseComponent
         $this->company_name          = $this->company->company_name;
         $this->sub_domain            = $this->company->sub_domain;
         $this->company_house_number  = $this->company->company_house_number;
-        $this->company_mobile        = $this->company->company_mobile;
         $this->company_email         = $this->company->company_email;
         $this->business_type         = $this->company->business_type;
         $this->address_contact_info  = $this->company->address_contact_info;
@@ -81,7 +57,6 @@ class ProfileSettings extends BaseComponent
                 Rule::unique('companies', 'company_name')->ignore($this->company->id),
             ],
             'company_house_number' => 'required|string|max:255',
-            'company_mobile' => ['required', 'string', 'max:20', Rule::unique('companies', 'company_mobile')->ignore($this->company->id)],
             'business_type' => 'nullable|string|max:255',
             'address_contact_info' => 'nullable|string',
             'registered_domain' => [
@@ -129,7 +104,7 @@ class ProfileSettings extends BaseComponent
             'registered_domain'     => $this->registered_domain,
             'calendar_year'         => $this->calendar_year,
             'company_logo'          => $company->company_logo,
-            'company_mobile'          => $this->company_mobile,
+
         ]);
 
 
@@ -153,108 +128,5 @@ class ProfileSettings extends BaseComponent
 
 
         $this->toast('Company Profile Updated Successfully!', 'success');
-    }
-
-
-
-    public function requestVerification($field, VerificationService $verificationService)
-    {
-        $this->updating_field = $field;
-
-        if ($field === 'email') {
-            $this->validate(['new_email' => 'required|email|max:255']);
-            $target = $this->new_email;
-        } else {
-            $this->validate(['new_mobile' => 'required|min:10|max:20']);
-            $target = $this->new_mobile;
-        }
-
-
-
-        $sent = false;
-        if ($field === 'email') {
-            $sent = $verificationService->sendEmailOtp($target, $this->company_name);
-        } else {
-            $sent = $verificationService->sendPhoneOtp($target, $this->company_name);
-        }
-
-        if ($sent) {
-            $this->toast("Verification code sent to your {$field}.", 'info');
-
-            $this->code_sent = true;
-            $this->startOtpCooldown();
-        } else {
-            $this->toast("Failed to send OTP", 'error');
-        }
-    }
-
-
-    public function startOtpCooldown()
-    {
-        $this->otpCooldown = 120;
-
-        $this->dispatch('start-otp-countdown');
-    }
-
-
-    public function canResendOtp()
-    {
-        return $this->otpCooldown <= 0;
-    }
-
-    public function tick()
-    {
-        if ($this->otpCooldown > 0) {
-            $this->otpCooldown--;
-        }
-    }
-
-
-    public function verifyAndUpdate(VerificationService $verificationService)
-    {
-
-        $code = implode('', $this->otp);
-        $this->verification_code = $code;
-
-
-        $this->validate([
-            'verification_code' => 'required|digits:6',
-        ]);
-
-        $target = $this->updating_field === 'email' ? $this->new_email : $this->new_mobile;
-
-        try {
-
-            $verificationService->verifyOtp($target, $this->verification_code);
-
-
-            if ($this->updating_field === 'email') {
-                $this->company_email = $this->new_email;
-            } else {
-                $this->company_mobile = $this->new_mobile;
-            }
-
-            $this->toast("{$this->updating_field} updated successfully!", 'success');
-
-
-            $this->resetVerificationFields();
-            $this->dispatch('closemodal');
-        } catch (\Exception $e) {
-
-            $this->toast("OTP does not match.", 'error');
-        }
-    }
-
-
-    public function resetVerificationFields()
-    {
-        $this->new_email = null;
-        $this->new_mobile = null;
-        $this->otp = [];
-        $this->verification_code = null;
-
-        $this->updating_field = null;
-        $this->code_sent = false;
-        $this->otpCooldown = 0;
     }
 }

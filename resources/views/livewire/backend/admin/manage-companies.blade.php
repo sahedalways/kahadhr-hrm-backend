@@ -39,7 +39,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i
                                             class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control form-control-lg border-start-0"
+                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
                                         placeholder="Search by company name, email, or phone" wire:model="search"
                                         wire:keyup="set('search', $event.target.value)" />
                                 </div>
@@ -211,7 +211,8 @@
                             {{-- Company Name --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="company_name" required>
+                                <input type="text" class="form-control shadow-sm" wire:model="company_name"
+                                    required>
                                 @error('company_name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -220,7 +221,8 @@
                             {{-- House Number --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">House Number <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="company_house_number">
+                                <input type="text" class="form-control shadow-sm"
+                                    wire:model="company_house_number">
                                 @error('company_house_number')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -238,7 +240,7 @@
                             {{-- Mobile --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Mobile <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="company_mobile"
+                                <input type="text" class="form-control shadow-sm" wire:model="company_mobile"
                                     pattern="\d*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 @error('company_mobile')
                                     <span class="text-danger">{{ $message }}</span>
@@ -249,7 +251,7 @@
                             {{-- Business Type --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Business Type</label>
-                                <input type="text" class="form-control" wire:model="business_type">
+                                <input type="text" class="form-control shadow-sm" wire:model="business_type">
                                 @error('business_type')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -267,7 +269,7 @@
                             {{-- Registered Domain --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Registered Domain</label>
-                                <input type="text" class="form-control" wire:model="registered_domain"
+                                <input type="text" class="form-control shadow-sm" wire:model="registered_domain"
                                     pattern="^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,11}?$"
                                     title="Enter a valid domain, e.g., example.com"
                                     oninput="this.value = this.value.replace(/[^a-zA-Z0-9\.\-]/g,'')">

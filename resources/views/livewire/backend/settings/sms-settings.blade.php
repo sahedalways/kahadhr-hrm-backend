@@ -14,7 +14,7 @@
                         <!-- Twilio SID -->
                         <div class="col-md-4">
                             <label class="form-label">Twilio SID <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="twilio_sid"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="twilio_sid"
                                 placeholder="Your Twilio SID">
                             @error('twilio_sid')
                                 <span class="text-danger">{{ $message }}</span>
@@ -25,7 +25,7 @@
                         <div class="col-md-4 position-relative">
                             <label class="form-label">Twilio Auth Token <span class="text-danger">*</span></label>
                             <div class="position-relative">
-                                <input type="password" class="form-control extra-padding"
+                                <input type="password" class="form-control extra-padding shadow-sm"
                                     wire:model.defer="twilio_auth_token" id="twilio_auth_token"
                                     placeholder="Your Twilio Auth Token">
                                 <span class="icon-position" style="cursor:pointer;"
@@ -41,7 +41,7 @@
                         <!-- Twilio From -->
                         <div class="col-md-4">
                             <label class="form-label">Twilio From <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="twilio_from"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="twilio_from"
                                 placeholder="Twilio sender number">
                             @error('twilio_from')
                                 <span class="text-danger">{{ $message }}</span>

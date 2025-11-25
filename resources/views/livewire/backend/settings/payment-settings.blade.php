@@ -25,7 +25,7 @@
                         <!-- App Key -->
                         <div class="col-md-4">
                             <label class="form-label">App Key <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="app_key">
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="app_key">
                             @error('app_key')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -34,7 +34,7 @@
                         <!-- App Secret -->
                         <div class="col-md-4">
                             <label class="form-label">App Secret <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="app_secret">
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="app_secret">
                             @error('app_secret')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -43,7 +43,7 @@
                         <!-- Username -->
                         <div class="col-md-4">
                             <label class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="username">
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="username">
                             @error('username')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -68,7 +68,7 @@
                         <!-- Base URL -->
                         <div class="col-md-4">
                             <label class="form-label">Base URL <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="base_url">
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="base_url">
                             @error('base_url')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

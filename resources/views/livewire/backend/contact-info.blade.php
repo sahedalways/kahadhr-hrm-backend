@@ -11,7 +11,7 @@
                 <div class="card-header p-4">
                     <div class="row">
                         <div class="col-md-12" wire:ignore>
-                            <input type="text" class="form-control" placeholder="Search contacts..."
+                            <input type="text" class="form-control shadow-sm" placeholder="Search contacts..."
                                 wire:model="search" />
                             <button type="button" wire:click="searchContact" class="btn btn-primary mt-2">
                                 Search

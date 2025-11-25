@@ -14,7 +14,7 @@
                         <!-- Mailer -->
                         <div class="col-md-4">
                             <label class="form-label">Mailer <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_mailer"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_mailer"
                                 placeholder="e.g. smtp">
                             @error('mail_mailer')
                                 <span class="text-danger">{{ $message }}</span>
@@ -24,7 +24,7 @@
                         <!-- Host -->
                         <div class="col-md-4">
                             <label class="form-label">Mail Host <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_host"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_host"
                                 placeholder="e.g. smtp.mailtrap.io">
                             @error('mail_host')
                                 <span class="text-danger">{{ $message }}</span>
@@ -34,7 +34,8 @@
                         <!-- Port -->
                         <div class="col-md-4">
                             <label class="form-label">Mail Port <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_port" placeholder="587">
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_port"
+                                placeholder="587">
                             @error('mail_port')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -43,7 +44,7 @@
                         <!-- Username -->
                         <div class="col-md-4">
                             <label class="form-label">Mail Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_username"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_username"
                                 placeholder="Your mail username">
                             @error('mail_username')
                                 <span class="text-danger">{{ $message }}</span>
@@ -54,7 +55,7 @@
                         <div class="col-md-4 position-relative">
                             <label class="form-label">Mail Password <span class="text-danger">*</span></label>
                             <div class="position-relative">
-                                <input type="password" class="form-control extra-padding"
+                                <input type="password" class="form-control extra-padding shadow-sm"
                                     wire:model.defer="mail_password" id="mail_password"
                                     placeholder="Your mail password">
                                 <span class="icon-position" style="cursor:pointer;"
@@ -71,7 +72,7 @@
                         <!-- Encryption -->
                         <div class="col-md-4">
                             <label class="form-label">Mail Encryption <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_encryption"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_encryption"
                                 placeholder="tls/ssl">
                             @error('mail_encryption')
                                 <span class="text-danger">{{ $message }}</span>
@@ -81,7 +82,7 @@
                         <!-- From Address -->
                         <div class="col-md-6">
                             <label class="form-label">From Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" wire:model.defer="mail_from_address"
+                            <input type="email" class="form-control shadow-sm" wire:model.defer="mail_from_address"
                                 placeholder="noreply@example.com">
                             @error('mail_from_address')
                                 <span class="text-danger">{{ $message }}</span>
@@ -91,7 +92,7 @@
                         <!-- From Name -->
                         <div class="col-md-6">
                             <label class="form-label">From Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model.defer="mail_from_name"
+                            <input type="text" class="form-control shadow-sm" wire:model.defer="mail_from_name"
                                 placeholder="App Name">
                             @error('mail_from_name')
                                 <span class="text-danger">{{ $message }}</span>

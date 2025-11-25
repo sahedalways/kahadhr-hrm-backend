@@ -254,6 +254,15 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/departments*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.departments.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-building"></i>
+                        <span class="nav-link-text ms-1">Departments</span>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/chat*') ? 'active' : '' }}"
                         href="{{ route('company.dashboard.chat.index', ['company' => app('authUser')->company->sub_domain]) }}">
                         <i class="fas fa-comments"></i>

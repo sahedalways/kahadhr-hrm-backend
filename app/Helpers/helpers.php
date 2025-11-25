@@ -39,4 +39,12 @@ if (!function_exists('siteSetting')) {
       }
     }
   }
+
+  if (!function_exists('getCopyrightText')) {
+    function getCopyrightText()
+    {
+      $settings = siteSetting();
+      return $settings?->copyright_text ?? null;
+    }
+  }
 }

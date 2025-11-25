@@ -52,6 +52,8 @@ class SiteSetting extends Model
     }
 
 
+
+
     // Global Scope based on user type
     protected static function booted()
     {
@@ -72,6 +74,14 @@ class SiteSetting extends Model
                 $builder->whereHas('company.employees', function (Builder $query) use ($user) {
                     $query->where('id', $user->id);
                 });
+            }
+        });
+
+
+        static::updated(function ($setting) {
+            if ($setting->company_id === 0 && $setting->wasChanged('copyright_text')) {
+                self::where('company_id', '>', 0)
+                    ->update(['copyright_text' => $setting->copyright_text]);
             }
         });
     }

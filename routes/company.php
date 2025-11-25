@@ -7,6 +7,7 @@ use App\Livewire\Backend\Company\Dashboard;
 use App\Livewire\Backend\Company\Documents\DocumentsIndex;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
+use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\ReportsIndex;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
@@ -92,5 +93,10 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     Route::prefix('reports')->name('reports.')->group(function () {
       Route::get('/', ReportsIndex::class)->name('index');
+    });
+
+
+    Route::prefix('departments')->name('departments.')->group(function () {
+      Route::get('/', ManageDepartments::class)->name('index');
     });
   });

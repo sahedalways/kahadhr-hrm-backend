@@ -47,7 +47,7 @@ if (!function_exists('siteSetting')) {
       if ($status == 1) {
         return '<span class="badge bg-success">Active</span>';
       } else {
-        return '<span class="badge bg-danger">Inactive</span>';
+        return '<span class="badge bg-danger">Former</span>';
       }
     }
   }

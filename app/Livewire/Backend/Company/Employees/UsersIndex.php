@@ -2,19 +2,24 @@
 
 namespace App\Livewire\Backend\Company\Employees;
 
+use App\Jobs\SendEmployeeInvitation;
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\Company;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Team;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Str;
 
 class UsersIndex extends BaseComponent
 {
     use WithFileUploads;
 
     public $employees, $employee, $employee_id;
-    public $f_name, $l_name, $email, $job_title, $department_id, $team_id, $role, $contract_hours, $is_active;
+    public $f_name, $l_name, $email, $job_title, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type;
 
     public $perPage = 10;
     public $sortOrder = 'desc';
@@ -83,6 +88,72 @@ class UsersIndex extends BaseComponent
         $this->is_active = $this->employee->is_active;
     }
 
+
+
+
+    public function submitEmployee()
+    {
+        // Validation rules
+        $rules = [
+            'email' => ['required', 'email', function ($attribute, $value, $fail) {
+                if (User::where('email', $value)->exists()) {
+                    $fail('This email is already used.');
+                } elseif (Company::where('company_email', $value)->exists()) {
+                    $fail('This email is already used.');
+                }
+            }],
+
+
+            'job_title' => ['nullable', 'string', 'max:255'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'team_id' => ['nullable', 'exists:teams,id'],
+            'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
+            'salary_type' => ['required', 'in:hourly,monthly'],
+        ];
+
+        // Contract hours only required if hourly
+        if ($this->salary_type === 'hourly') {
+            $rules['contract_hours'] = ['required', 'numeric', 'min:0'];
+        }
+
+        $validatedData = $this->validate($rules);
+
+
+
+        // Save employee
+        $employee = Employee::create([
+            'company_id' => auth()->user()->company->id,
+            'email' => $this->email,
+            'job_title' => $this->job_title,
+            'department_id' => $this->department_id,
+            'team_id' => $this->team_id,
+            'role' => $this->role,
+            'salary_type' => $this->salary_type,
+            'contract_hours' => $this->salary_type === 'hourly' ? $this->contract_hours : null,
+            'invite_token' => Str::random(64),
+            'invite_token_expires_at' => Carbon::now()->addHours(48),
+
+        ]);
+
+        $inviteUrl = route('employee.set-password', ['token' => $employee->invite_token]);
+
+        // Dispatch queued job
+        // SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl)->onConnection('sync')->onQueue('urgent');
+
+
+        // Reset form
+        $this->reset(['email', 'job_title', 'department_id', 'team_id', 'role', 'salary_type', 'contract_hours']);
+
+        // Emit events / toast message
+        $this->dispatch('close-modal');
+        $this->toast('Employee updated successfully!', 'success');
+    }
+
+
+
+
+
     /* Update employee */
     public function updateEmployee()
     {
@@ -134,10 +205,12 @@ class UsersIndex extends BaseComponent
         if ($this->search && $this->search != '') {
             $searchTerm = '%' . $this->search . '%';
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('f_name', 'like', $searchTerm)
-                    ->orWhere('l_name', 'like', $searchTerm)
-                    ->orWhere('email', 'like', $searchTerm)
-                    ->orWhere('job_title', 'like', $searchTerm);
+                $q->where('f_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('l_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('job_title', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($q2) use ($searchTerm) {
+                        $q2->where('email', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 

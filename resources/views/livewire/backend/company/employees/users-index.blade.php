@@ -1,4 +1,4 @@
-{{-- <div>
+<div>
     <div class="row align-items-center justify-content-between mb-4">
 
         <!-- LEFT: Title -->
@@ -19,12 +19,14 @@
             </button>
 
 
-            <div class="col-auto">
-                <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
-                    class="btn btn-icon btn-3 btn-white text-primary mb-0">
-                    <i class="fa fa-plus me-2"></i> Add New Employee
-                </a>
-            </div>
+
+        </div>
+
+        <div class="col-auto">
+            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
+                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+                <i class="fa fa-plus me-2"></i> Add New Employee
+            </a>
         </div>
 
     </div>
@@ -74,9 +76,9 @@
                                     <td>{{ $employee->f_name }}</td>
                                     <td>{{ $employee->l_name }}</td>
                                     <td>
-                                        <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
+                                        <span onclick="copyToClipboard('{{ $employee->user->email ?? '' }}')"
                                             style="cursor:pointer; padding:2px 4px; border-radius:4px;">
-                                            {{ $employee->email ?? 'N/A' }}
+                                            {{ $employee->user->email ?? 'N/A' }}
                                         </span>
                                     </td>
                                     <td>{{ $employee->job_title ?? 'N/A' }}</td>
@@ -88,9 +90,14 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ route('company.dashboard.employee.details', $employee->id) }}"
-                                            class="badge badge-xs text-white" style="background-color:#5acaa3;">View
-                                            Details</a>
+                                        <a href="{{ route('company.dashboard.employee.details', [
+                                            'company' => app('authUser')->company->sub_domain,
+                                            'id' => $employee->id,
+                                        ]) }}"
+                                            class="badge badge-xs text-white" style="background-color:#5acaa3;">
+                                            View Details
+                                        </a>
+
 
                                         <a data-bs-toggle="modal" data-bs-target="#editProfile"
                                             wire:click="editProfile({{ $employee->id }})"
@@ -126,8 +133,135 @@
         </div>
     </div>
 
-    {{-- Manage Employee Modal --}}
-{{-- <div wire:ignore.self class="modal fade" id="editEmployee" tabindex="-1" data-bs-backdrop="static">
+
+
+    <div wire:ignore.self class="modal fade" id="add" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Add Employee</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form wire:submit.prevent="submitEmployee">
+                    <div class="modal-body row g-2">
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" wire:model="email" required>
+
+                            @error('email')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Job Title -->
+                        <div class="col-md-6">
+                            <label class="form-label">Job Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" wire:model="job_title">
+
+                            @error('job_title')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Department -->
+                        <div class="col-md-6">
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="department_id">
+                                <option value="">Select Department</option>
+                                @foreach ($departments as $dep)
+                                    <option value="{{ $dep->id }}">{{ $dep->name }}</option>
+                                @endforeach
+                            </select>
+
+                            @error('department_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Team -->
+                        <div class="col-md-6">
+                            <label class="form-label">Team <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="team_id">
+                                <option value="">Select Team</option>
+                                @foreach ($teams as $team)
+                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                @endforeach
+                            </select>
+
+
+                            @error('team_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Role -->
+                        <div class="col-md-6">
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="role">
+                                <option value="" selected disabled>Select a role</option>
+                                @foreach (config('roles') as $role)
+                                    <option value="{{ $role }}">
+                                        {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}</option>
+                                @endforeach
+                            </select>
+
+                            @error('role')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Salary Type -->
+                        <div class="col-md-6">
+                            <label class="form-label">Salary Type <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="salary_type">
+                                <option value="" selected disabled>Select Salary Type</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+
+
+                            @error('salary_type')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Contract Hours (show only if hourly) -->
+                        @if ($salary_type === 'hourly')
+                            <div class="col-md-6">
+                                <label class="form-label">Contract Hours <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control"
+                                    wire:model="contract_hours">
+                            </div>
+
+                            @error('contract_hours')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        @endif
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="submitEmployee">
+                            <span wire:loading wire:target="submitEmployee">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                            </span>
+                            <span wire:loading.remove wire:target="submitEmployee">Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    {{-- edit Employee Modal --}}
+    {{-- <div wire:ignore.self class="modal fade" id="editEmployee" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -177,7 +311,7 @@
                             <select class="form-select" wire:model="role">
                                 <option value="" selected disabled>Select a role</option>
                                 @foreach (config('roles') as $role)
-                                    <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                                    <option value="{{ $role }}">{{ ucfirst($role) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -198,7 +332,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </div>
 
@@ -217,4 +351,4 @@
             });
         }
     });
-</script>  --}}
+</script>

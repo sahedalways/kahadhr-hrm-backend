@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
 
             // Employee info
-            $table->string('f_name');
-            $table->string('l_name');
+            $table->string('f_name')->nullable();
+            $table->string('l_name')->nullable();
 
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'teamLead'])->default('employee');
@@ -28,8 +28,11 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('contract_hours', 5, 2)->nullable();
             $table->enum('salary_type', ['hourly', 'monthly'])->nullable();
-            $table->date('start_date');
+            $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+
+            $table->string('invite_token')->nullable()->unique();
+            $table->timestamp('invite_token_expires_at')->nullable();
 
 
             $table->timestamps();

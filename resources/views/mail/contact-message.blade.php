@@ -157,7 +157,7 @@
             </p>
 
             <p>
-                <a href="https://www.kahadhr.com" target="_blank">www.kahadhr.com</a>
+                <a href="{{ config('app.url') }}" target="_blank">{{ config('app.url') }}</a>
             </p>
         </div>
 

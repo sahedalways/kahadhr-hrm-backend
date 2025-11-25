@@ -14,6 +14,15 @@ class Employee extends Model
         'title',
         'is_active',
         'role',
+        'invite_token',
+        'invite_token_expires_at',
+        'end_date',
+        'start_date',
+        'salary_type',
+        'contract_hours',
+        'team_id',
+        'department_id',
+        'job_title'
     ];
 
     protected $casts = [

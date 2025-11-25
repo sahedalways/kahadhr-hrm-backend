@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Contact Message</title>
+    <title>Employee Invitation</title>
 
     <style>
         body {
@@ -67,6 +67,17 @@
             color: #164f84;
         }
 
+        .btn-link {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 15px 0;
+            background-color: #164f84;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
         .footer {
             background-color: #f9fafc;
             text-align: center;
@@ -93,62 +104,42 @@
 
         <!-- Header -->
         <div class="email-header">
-            New Contact Message – {{ siteSetting()->site_title ?? 'Kahadhr' }}
+            Welcome to {{ siteSetting()->site_title ?? 'Our Company' }}
         </div>
 
         <!-- Body -->
         <div class="email-body">
-            <h2>You've Received a New Contact Message</h2>
+            <h2>Hello {{ $employee->email }},</h2>
 
             <p>
-                Someone has submitted a message through the contact form on
-                <strong>{{ siteSetting()->site_title ?? 'Kahadhr' }}</strong>.
+                You have been added as an employee at <strong>{{ siteSetting()->site_title ?? 'Our Company' }}</strong>.
             </p>
 
-            <!-- Contact Details -->
-            <div class="details-box">
-                <div class="details-row">
-                    <span class="label">Name:</span>
-                    {{ $contact->first_name }} {{ $contact->last_name }}
-                </div>
+            <p>
+                To get started, please set your account password by clicking the button below:
+            </p>
 
-                <div class="details-row">
-                    <span class="label">Email:</span>
-                    {{ $contact->email }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Phone:</span>
-                    {{ $contact->phone ?? 'N/A' }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Topic:</span>
-                    {{ $contact->topic }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Message:</span><br>
-                    {{ $contact->description }}
-                </div>
+            <!-- Invitation Link -->
+            <div class="details-box" style="text-align: center;">
+                <a href="{{ $inviteUrl }}" class="btn-link" target="_blank">Set Your Password</a>
             </div>
 
             <p>
-                Please reply to the user if support is needed.
+                This link will expire in 48 hours. If you did not expect this email, please ignore it.
             </p>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <p>
-                Need system help? Contact support:
-                <a href="mailto:{{ getSiteEmail() ?? 'support@kahadhr.com' }}">
-                    {{ getSiteEmail() ?? 'support@kahadhr.com' }}
+                Need help? Contact support:
+                <a href="mailto:{{ getSiteEmail() ?? 'support@company.com' }}">
+                    {{ getSiteEmail() ?? 'support@company.com' }}
                 </a>
             </p>
 
             <p>
-                {{ siteSetting()->copyright_text }}
+                {{ siteSetting()->copyright_text ?? '' }}
             </p>
 
             <p>

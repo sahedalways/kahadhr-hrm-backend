@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\Company\EmployeeController;
+use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Dashboard;
@@ -67,7 +68,7 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     Route::name('employee.')->controller(EmployeeController::class)->group(function () {
 
-      Route::get('/details/{id}', 'details')->name('details.show');
+      Route::get('/details/{id}', 'details')->name('details');
 
       Route::post('/change-password/{id}', 'changeEmployeePassword')->name('changePassword');
     });
@@ -114,3 +115,9 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', ManageTeams::class)->name('index');
     });
   });
+
+
+Route::name('employee.')->controller(SetPasswordController::class)->group(function () {
+  Route::get('employee/set-password/{token}', 'showForm')->name('set-password');
+  Route::post('employee/set-password/{token}',  'setPassword')->name('auth.set-password');
+});

@@ -4,12 +4,16 @@
             <span class="mask bg-gradient-dark opacity-6"></span>
             <div class="container">
                 <div class="row justify-content-center">
+
+
+
+
                     <div class="col-lg-4 col-md-7">
                         <div class="card border-0 mb-0">
                             <div class="card-header bg-transparent text-center">
                                 <div class="d-flex flex-column align-items-center justify-content-center mt-2 mb-4">
                                     <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <img src="{{ siteSetting()->logo_url }}" alt="Logo" class="login-logo mb-2"
+                                        <img src="{{ getCompanyLogoUrl() }}" alt="Logo" class="login-logo mb-2"
                                             style="width: 100px; height: auto;">
                                     </div>
 
@@ -152,4 +156,22 @@
             }
         }
     }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        const type = urlParams.get('type') || 'info';
+
+        if (message) {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-center",
+                timeOut: 5000
+            };
+            toastr[type](message);
+        }
+    });
 </script>

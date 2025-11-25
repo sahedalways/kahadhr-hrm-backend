@@ -48,11 +48,11 @@ class CompanyLogin extends BaseComponent
 
         $currentSubdomain = str_replace('.' . $baseDomain, '', $currentHost);
 
-        if ($user->company->sub_domain !== $currentSubdomain) {
+
+        if (!str_contains($currentSubdomain, $user->company->sub_domain)) {
             $this->toast('Invalid subdomain for this account.', 'error');
             return;
         }
-
         // user type from DB
         $userType = $user->user_type;
         $phone    = $user->phone_no;

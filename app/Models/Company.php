@@ -111,7 +111,25 @@ class Company extends Model
                 $user = $company->user;
                 if ($user) {
                     $user->f_name = $company->company_name;
+                    $user->l_name = "company";
                     $user->save();
+                }
+            }
+        });
+
+
+        static::updated(function ($company) {
+            // Check if any of the important fields changed
+            if ($company->isDirty(['company_name', 'company_email', 'company_phone'])) {
+
+                $siteSettings = SiteSetting::where('company_id', $company->id)->first();
+
+                if ($siteSettings) {
+                    $siteSettings->update([
+                        'site_title' => $company->company_name,
+                        'site_email' => $company->company_email,
+                        'site_phone_number' => $company->company_phone,
+                    ]);
                 }
             }
         });

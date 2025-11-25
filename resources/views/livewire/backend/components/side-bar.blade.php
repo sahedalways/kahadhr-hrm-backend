@@ -4,13 +4,24 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href="{{ route('super-admin.home') }}">
-            <img src="{{ asset(siteSetting()->logo_url) }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
+
+        @php
+            $authUser = app('authUser');
+            $logoHref =
+                $authUser->user_type === 'company'
+                    ? route('company.dashboard.index', ['company' => $authUser->company->sub_domain])
+                    : route('super-admin.home');
+
+            $logoUrl = $authUser->user_type === 'company' ? getCompanyLogoUrl() : asset(siteSetting()->logo_url);
+        @endphp
+
+        <a class="navbar-brand m-0" href="{{ $logoHref }}">
+            <img src="{{ $logoUrl }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
             <span class="ms-2 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
-
         </a>
-
     </div>
+
+
     <hr class="horizontal mt-0">
     <div class="collapse navbar-collapse w-auto h-auto h-100" id="sidenav-collapse-main">
         <ul class="navbar-nav">
@@ -234,6 +245,80 @@
                 </li>
 
 
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/employees*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-users"></i>
+                        <span class="nav-link-text ms-1">Employees</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/chat*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.chat.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-comments"></i>
+                        <span class="nav-link-text ms-1">Group / Chat</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/timesheet*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.timesheet.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-clock"></i>
+                        <span class="nav-link-text ms-1">Timesheet</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/schedule*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.schedule.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="nav-link-text ms-1">Schedule</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/leaves*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.leaves.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-plane-departure"></i>
+                        <span class="nav-link-text ms-1">Leaves</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/documents*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.documents.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="nav-link-text ms-1">Documents</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/training*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.training.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text ms-1">Training</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/onboarding*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.onboarding.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="nav-link-text ms-1">Onboarding</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.reports.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-link-text ms-1">Reports</span>
+                    </a>
+                </li>
+
+
+
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#settings"
@@ -243,8 +328,12 @@
                             class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
                             <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">System Settings</span>
+                        <span class="nav-link-text ms-1">Settings</span>
                     </a>
+
+
+
+
                     <div class="collapse {{ Request::is('dashboard/settings*') ? 'show' : '' }}" id="settings">
                         <ul class="nav ms-4">
 
@@ -278,6 +367,24 @@
                                     href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
                                     <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Password Settings </span>
+                                </a>
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/profile') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-user sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Profile Settings </span>
+                                </a>
+                            </li>
+
+                            <!-- Bank Info Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/bank-info') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-university sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Bank Info Settings </span>
                                 </a>
                             </li>
                         </ul>

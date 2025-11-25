@@ -88,7 +88,6 @@ class ManageCompanies extends BaseComponent
         $this->address_contact_info = $this->company->address_contact_info;
         $this->registered_domain = $this->company->registered_domain;
         $this->calendar_year = $this->company->calendar_year;
-        // $this->billing_plan_id = $this->company->billing_plan_id;
         $this->subscription_status = $this->company->subscription_status;
         $this->subscription_start = $this->company->subscription_start
             ? Carbon::parse($this->company->subscription_start)->format('Y-m-d')
@@ -99,9 +98,6 @@ class ManageCompanies extends BaseComponent
             : null;
         $this->status = $this->company->status == 'Active';
         $this->company_logo_preview = $this->company->company_logo_url;
-
-        // Load billing plans
-        // $this->billingPlans = BillingPlan::all();
     }
 
 
@@ -116,7 +112,12 @@ class ManageCompanies extends BaseComponent
 
 
         $this->validate([
-            'company_name' => 'required|string|max:255',
+            'company_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('companies', 'company_name')->ignore($this->company->id),
+            ],
             'company_house_number' => 'required|string|max:255',
             'company_email' => ['required', 'email', Rule::unique('companies', 'company_email')->ignore($this->company->id)],
             'company_mobile' => ['required', 'string', 'max:20', Rule::unique('companies', 'company_mobile')->ignore($this->company->id)],
@@ -130,7 +131,6 @@ class ManageCompanies extends BaseComponent
                 Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
             'calendar_year' => 'required|in:english,hmrc',
-            // 'billing_plan_id' => 'nullable|exists:billing_plans,id',
             'subscription_status' => 'required|in:active,trial,expired,suspended',
             'subscription_start' => 'nullable|date',
             'subscription_end' => 'nullable|date|after:subscription_start',
@@ -148,7 +148,6 @@ class ManageCompanies extends BaseComponent
             'address_contact_info' => $this->address_contact_info,
             'registered_domain' => $this->registered_domain,
             'calendar_year' => $this->calendar_year,
-            // 'billing_plan_id' => $this->billing_plan_id,
             'subscription_status' => $this->subscription_status,
             'subscription_start' => $this->subscription_start,
             'subscription_end' => $this->subscription_end,

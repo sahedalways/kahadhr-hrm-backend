@@ -41,8 +41,8 @@ class UserTableSeeder extends Seeder
      * ============================
      */
     $companyUser = User::create([
-      'f_name'            => 'XYZ',
-      'l_name'            => 'LTD.',
+      'f_name'            => 'XYZ LTD',
+      'l_name'            => 'Company.',
       'email'             => 'company@company.com',
       'phone_no'          => '016165238944',
       'password'          => Hash::make('12345678'),
@@ -92,8 +92,8 @@ class UserTableSeeder extends Seeder
      * ============================
      */
     $companyUser2 = User::create([
-      'f_name'            => 'ABC',
-      'l_name'            => 'Tech Ltd.',
+      'f_name'            => 'ABC Tech Ltd',
+      'l_name'            => 'Company.',
       'email'             => 'abc@company.com',
       'phone_no'          => '01712345678',
       'password'          => Hash::make('12345678'),

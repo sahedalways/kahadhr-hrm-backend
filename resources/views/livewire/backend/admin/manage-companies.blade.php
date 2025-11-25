@@ -191,6 +191,8 @@
             </div>
         </div>
     </div>
+
+
     <div wire:ignore.self class="modal fade" id="manageCompanyProfile" tabindex="-1" role="dialog"
         aria-labelledby="manageCompanyProfile" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">

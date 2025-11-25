@@ -3,7 +3,7 @@
 namespace App\Services\API;
 
 use App\Jobs\SendOtpEmailJob;
-use App\Jobs\SendOtpSmsForVerifyJob;
+
 use App\Repositories\API\VerificationRepository;
 use Carbon\Carbon;
 

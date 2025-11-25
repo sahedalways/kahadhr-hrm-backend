@@ -5,7 +5,7 @@ namespace App\Livewire\Backend\Company\Auth;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+
 
 class CompanyLogin extends BaseComponent
 {

@@ -5,14 +5,12 @@ namespace App\Http\Controllers\API\Auth;
 use App\Http\Controllers\API\BaseController;
 use App\Http\Requests\API\RegisterUserRequest as APIRegisterUserRequest;
 use App\Http\Requests\API\ResendEmailOtpRequest;
-use App\Http\Requests\API\ResendOtpRequest;
 use App\Http\Requests\API\SendEmailOtpRequest;
-use App\Http\Requests\API\SendOtpRequest;
 use App\Http\Requests\API\SendPhoneOtpRequest;
 use App\Http\Requests\API\VerifyOtpRequest;
 use App\Services\API\VerificationService;
 use App\Services\API\FrontAuthService;
-use Illuminate\Support\Str;
+
 
 class AuthController extends BaseController
 {

@@ -40,8 +40,8 @@ class UsersIndex extends BaseComponent
 
     public function render()
     {
-        return view('livewire.backend.admin.manage-employees', [
-            'employees' => $this->loaded
+        return view('livewire.backend.company.employees.users-index', [
+            'infos' => $this->loaded
         ]);
     }
 

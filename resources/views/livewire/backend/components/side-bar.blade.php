@@ -263,6 +263,15 @@
 
 
                 <li class="nav-item">
+                    <a class="nav-link {{ Request::is('dashboard/teams*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.teams.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-users"></i>
+                        <span class="nav-link-text ms-1">Teams</span>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/chat*') ? 'active' : '' }}"
                         href="{{ route('company.dashboard.chat.index', ['company' => app('authUser')->company->sub_domain]) }}">
                         <i class="fas fa-comments"></i>

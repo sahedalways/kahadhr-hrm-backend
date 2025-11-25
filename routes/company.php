@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\Company\EmployeeController;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Dashboard;
@@ -8,6 +9,7 @@ use App\Livewire\Backend\Company\Documents\DocumentsIndex;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
+use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\ReportsIndex;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
@@ -63,6 +65,13 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', UsersIndex::class)->name('index');
     });
 
+    Route::name('employee.')->controller(EmployeeController::class)->group(function () {
+
+      Route::get('/details/{id}', 'details')->name('details.show');
+
+      Route::post('/change-password/{id}', 'changeEmployeePassword')->name('changePassword');
+    });
+
     Route::prefix('chat')->name('chat.')->group(function () {
       Route::get('/', ChatIndex::class)->name('index');
     });
@@ -98,5 +107,10 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     Route::prefix('departments')->name('departments.')->group(function () {
       Route::get('/', ManageDepartments::class)->name('index');
+    });
+
+
+    Route::prefix('teams')->name('teams.')->group(function () {
+      Route::get('/', ManageTeams::class)->name('index');
     });
   });

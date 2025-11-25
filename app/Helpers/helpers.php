@@ -40,6 +40,18 @@ if (!function_exists('siteSetting')) {
     }
   }
 
+
+  if (!function_exists('statusBadgeTwo')) {
+    function statusBadgeTwo($status)
+    {
+      if ($status == 1) {
+        return '<span class="badge bg-success">Active</span>';
+      } else {
+        return '<span class="badge bg-danger">Inactive</span>';
+      }
+    }
+  }
+
   if (!function_exists('getCopyrightText')) {
     function getCopyrightText()
     {

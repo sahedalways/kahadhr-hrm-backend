@@ -1,4 +1,4 @@
-<div>
+{{-- <div>
     <div class="row align-items-center justify-content-between mb-4">
 
         <!-- LEFT: Title -->
@@ -17,6 +17,14 @@
             <button wire:click="exportEmployees('csv')" class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
+
+
+            <div class="col-auto">
+                <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
+                    class="btn btn-icon btn-3 btn-white text-primary mb-0">
+                    <i class="fa fa-plus me-2"></i> Add New Employee
+                </a>
+            </div>
         </div>
 
     </div>
@@ -24,7 +32,7 @@
     <div class="row mb-3">
         <div class="col-md-8">
             <input type="text" class="form-control shadow-sm" placeholder="Search by name, email, job title"
-                wire:model="search">
+                wire:model="search" wire:keyup="set('search', $event.target.value)">
         </div>
 
         <div class="col-md-4 d-flex gap-2">
@@ -60,7 +68,7 @@
                         </thead>
                         <tbody>
                             @php $i = 1; @endphp
-                            @forelse($employees as $employee)
+                            @forelse($infos as $employee)
                                 <tr>
                                     <td>{{ $i++ }}</td>
                                     <td>{{ $employee->f_name }}</td>
@@ -76,18 +84,18 @@
                                     <td>{{ $employee->team->name ?? 'N/A' }}</td>
                                     <td>
                                         <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})">
-                                            {!! statusBadge($employee->is_active) !!}
+                                            {!! statusBadgeTwo($employee->is_active) !!}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.employee.details', $employee->id) }}"
+                                        <a href="{{ route('company.dashboard.employee.details', $employee->id) }}"
                                             class="badge badge-xs text-white" style="background-color:#5acaa3;">View
                                             Details</a>
 
-                                        <a data-bs-toggle="modal" data-bs-target="#manageEmployeeModal"
-                                            wire:click="editEmployee({{ $employee->id }})"
+                                        <a data-bs-toggle="modal" data-bs-target="#editProfile"
+                                            wire:click="editProfile({{ $employee->id }})"
                                             class="badge badge-info badge-xs text-white"
-                                            style="background-color:#4ba3f7;">Manage Profile</a>
+                                            style="background-color:#4ba3f7;">Edit Profile</a>
 
                                         <a href="#" class="badge badge-danger badge-xs"
                                             wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
@@ -119,11 +127,11 @@
     </div>
 
     {{-- Manage Employee Modal --}}
-    <div wire:ignore.self class="modal fade" id="manageEmployeeModal" tabindex="-1" data-bs-backdrop="static">
+{{-- <div wire:ignore.self class="modal fade" id="editEmployee" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h6 class="modal-title">Manage Employee</h6>
+                    <h6 class="modal-title">Edit Employee</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form wire:submit.prevent="updateEmployee">
@@ -166,21 +174,21 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Role</label>
-                            <input type="text" class="form-control" wire:model="role">
+                            <select class="form-select" wire:model="role">
+                                <option value="" selected disabled>Select a role</option>
+                                @foreach (config('roles') as $role)
+                                    <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                                @endforeach
+                            </select>
                         </div>
+
 
                         <div class="col-md-6">
                             <label class="form-label">Contract Hours</label>
                             <input type="number" class="form-control" wire:model="contract_hours">
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" wire:model="is_active">
-                                <option value="1">Active</option>
-                                <option value="0">Former</option>
-                            </select>
-                        </div>
+
 
                     </div>
                     <div class="modal-footer">
@@ -209,4 +217,4 @@
             });
         }
     });
-</script>
+</script>  --}}

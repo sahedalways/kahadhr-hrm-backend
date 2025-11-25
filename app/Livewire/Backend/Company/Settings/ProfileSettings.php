@@ -29,8 +29,6 @@ class ProfileSettings extends BaseComponent
 
 
     public $verification_code;
-    public $generated_code;
-
 
     public $updating_field;
 
@@ -171,7 +169,7 @@ class ProfileSettings extends BaseComponent
             $target = $this->new_mobile;
         }
 
-        $this->generated_code = rand(100000, 999999);
+
 
         $sent = false;
         if ($field === 'email') {
@@ -254,7 +252,7 @@ class ProfileSettings extends BaseComponent
         $this->new_mobile = null;
         $this->otp = [];
         $this->verification_code = null;
-        $this->generated_code = null;
+
         $this->updating_field = null;
         $this->code_sent = false;
         $this->otpCooldown = 0;

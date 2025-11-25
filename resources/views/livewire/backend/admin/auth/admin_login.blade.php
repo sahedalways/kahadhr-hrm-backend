@@ -87,46 +87,110 @@
         </div>
 
         @if ($showOtpModal)
-            <form role="form" class="text-start" wire:submit.prevent="verifyOtp">
-                <div class="modal fade show d-block" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
+            <div class="modal fade show d-block" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered"> <!-- Centered -->
+                    <div class="modal-content">
 
-                            <div class="modal-header">
-                                <h5 class="modal-title">Enter OTP</h5>
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title">Enter OTP</h5>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <form role="form" class="text-start" wire:submit.prevent="verifyOtp">
+                            <div class="modal-body">
+
+                                <!-- OTP Fields -->
+                                <div class="d-flex justify-content-between gap-2 mb-3">
+                                    @for ($i = 0; $i < 6; $i++)
+                                        <input type="text" wire:model="otp.{{ $i }}"
+                                            class="form-control text-center otp-field" maxlength="1" placeholder="-"
+                                            style="width: 50px; font-size: 1.5rem; height: 50px;"
+                                            oninput="handleOtpInput(this, {{ $i }})"
+                                            onkeydown="handleOtpBackspace(event, {{ $i }})"
+                                            inputmode="numeric" autocomplete="one-time-code">
+                                    @endfor
+                                </div>
+
+                                <!-- Countdown Polling -->
+                                @if ($otpCooldown > 0)
+                                    <div wire:poll.1000ms="tick"></div>
+                                @endif
                             </div>
 
-                            <div class="modal-body d-flex justify-content-between">
-                                @for ($i = 0; $i < 6; $i++)
-                                    <input type="text" wire:model="otp.{{ $i }}"
-                                        class="form-control text-center mx-1 otp-field" maxlength="1" placeholder="-"
-                                        style="width: 50px; font-size: 1.5rem;" oninput="handleOtpInput(this)"
-                                        onkeydown="handleOtpBackspace(event, this)">
-                                @endfor
-                            </div>
+                            <!-- Modal Footer -->
+                            <div class="modal-footer justify-content-between">
 
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary w-25 my-4 mb-4"
-                                    wire:loading.attr="disabled" wire:target="verifyOtp">
-
-
-                                    <span wire:loading wire:target="verifyOtp">
-                                        <i class="fas fa-spinner fa-spin me-2"></i> Verifying ...
+                                <!-- Send/Resend OTP Button -->
+                                <button type="button"
+                                    class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                    wire:click.prevent.stop="login('{{ $updating_field }}')"
+                                    wire:loading.attr="disabled" wire:target="login"
+                                    style="height: 38px; min-width: 120px;"
+                                    @if ($otpCooldown > 0) disabled @endif>
+                                    <span wire:loading wire:target="login">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Sending...
                                     </span>
-
-
-                                    <span wire:loading.remove wire:target="verifyOtp">
-                                        Verify OTP
+                                    <span wire:loading.remove wire:target="login">
+                                        @if ($otpCooldown > 0)
+                                            Resend In
+                                            {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                        @elseif($code_sent)
+                                            Resend OTP
+                                        @else
+                                            Send OTP
+                                        @endif
                                     </span>
                                 </button>
+
+                                <!-- Verify Button -->
+                                @if ($code_sent)
+                                    <div class="ms-auto d-flex gap-2">
+                                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                                            wire:target="verifyOtp">
+                                            <span wire:loading wire:target="verifyOtp">
+                                                <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
+                                            </span>
+                                            <span wire:loading.remove wire:target="verifyOtp">Verify</span>
+                                        </button>
+                                    </div>
+                                @endif
                             </div>
+                        </form>
 
-
-                        </div>
                     </div>
                 </div>
-            </form>
-            <div class="modal-backdrop fade show"></div>
+            </div>
+
+            <!-- Dark + Blur Backdrop -->
+            <div class="modal-backdrop-custom fade show"></div>
+
+            <style>
+                /* Custom Dark + Blur Backdrop */
+                .modal-backdrop-custom {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    /* Darker */
+                    backdrop-filter: blur(5px);
+                    /* Blur effect */
+                    -webkit-backdrop-filter: blur(5px);
+                    /* Safari support */
+                    z-index: 1040;
+                    /* Same as Bootstrap modal backdrop */
+                }
+
+                /* Optional: Ensure modal is perfectly centered on all screen sizes */
+                .modal-dialog {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                }
+            </style>
         @endif
     </main>
 
@@ -134,22 +198,33 @@
 </div>
 
 <script>
-    function handleOtpInput(el) {
+    function handleOtpInput(el, index) {
+        // Allow only numbers
         el.value = el.value.replace(/[^0-9]/g, '');
-        if (el.value) {
-            const next = el.nextElementSibling;
-            if (next && next.classList.contains('otp-field')) {
-                next.focus();
-            }
+
+        // Move to next field if input exists
+        if (el.value.length === 1 && index < 5) {
+            const nextField = document.querySelector(`[wire\\:model="otp.${index + 1}"]`);
+            if (nextField) nextField.focus();
         }
     }
 
-    function handleOtpBackspace(e, el) {
-        if (e.key === 'Backspace' && !el.value) {
-            const prev = el.previousElementSibling;
-            if (prev && prev.classList.contains('otp-field')) {
-                prev.focus();
+    function handleOtpBackspace(event, index) {
+        const el = event.target;
+
+        // If backspace pressed and current field is empty, move to previous
+        if (event.key === 'Backspace') {
+            if (el.value === '' && index > 0) {
+                const prevField = document.querySelector(`[wire\\:model="otp.${index - 1}"]`);
+                if (prevField) {
+                    prevField.focus();
+                    prevField.value = ''; // Clear previous field
+                }
+            } else {
+                // Clear current field
+                el.value = '';
             }
+            event.preventDefault(); // Prevent default behavior
         }
     }
 </script>

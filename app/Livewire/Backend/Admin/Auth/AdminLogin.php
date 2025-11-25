@@ -4,12 +4,16 @@ namespace App\Livewire\Backend\Admin\Auth;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
+use App\Services\API\VerificationService;
 use Illuminate\Support\Facades\Auth;
 
 class AdminLogin extends BaseComponent
 {
-    public $email, $password, $success = false;
+    public $email, $phone_no, $userId, $password, $success = false;
     public $otp = [], $generatedOtp, $showOtpModal = false;
+    public $updating_field;
+    public $code_sent = false;
+    public $otpCooldown = 0;
     public $rememberMe = false;
 
 
@@ -30,7 +34,7 @@ class AdminLogin extends BaseComponent
 
 
     //Process Login
-    public function login(AuthRepository $authRepository)
+    public function login(AuthRepository $authRepository, VerificationService $verificationService)
     {
         $this->validate();
 
@@ -44,31 +48,34 @@ class AdminLogin extends BaseComponent
         // user type from DB
         $userType = $user->user_type;
         $phone    = $user->phone_no;
+        $this->phone_no    = $phone;
+        $this->userId    = $user->id;
 
 
         if ($userType === 'superAdmin') {
 
-            // $this->generatedOtp = rand(100000, 999999);
-            $this->generatedOtp = 123456;
-            session(['otp' => $this->generatedOtp, 'otp_user_id' => $user->id]);
+            $sent = $verificationService->sendPhoneOtp($phone, $user->f_name . ' ' . $user->l_name);
 
-            $authRepository->sendOtpSms($phone, $this->generatedOtp);
 
-            $this->showOtpModal = true;
+            if ($sent) {
 
-            $this->toast('OTP sent to your phone number', 'success');
-            return;
+                $this->showOtpModal = true;
+                $this->code_sent = true;
+                $this->startOtpCooldown();
+                $this->toast('OTP sent to your phone number', 'success');
+
+
+                return;
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
         }
-
-
-        Auth::login($user, $this->rememberMe);
-
-        return redirect()->intended('dashboard/');
     }
 
 
 
-    public function verifyOtp()
+    public function verifyOtp(VerificationService $verificationService)
     {
         try {
             $this->validate([
@@ -89,21 +96,48 @@ class AdminLogin extends BaseComponent
 
         $otpString = implode('', $this->otp);
 
-        if ($otpString == session('otp')) {
-            $remember = session('otp_remember', false);
+        try {
 
-            Auth::loginUsingId(session('otp_user_id'), $remember);
+            $verificationService->verifyOtp($this->phone_no, $otpString);
+
+            $this->dispatch('closemodal');
+
+
+
+            Auth::loginUsingId($this->userId, $this->rememberMe);
 
             // Clear OTP session
-            session()->forget(['otp', 'otp_user_id', 'otp_remember']);
-            session()->forget(['otp', 'otp_user_id']);
             $this->toast('OTP verified successfully!', 'success');
 
             return redirect()->intended('dashboard/');
-        }
+        } catch (\Exception $e) {
 
-        $this->toast('Invalid OTP', 'error');
+            $this->toast('Invalid OTP', 'error');
+        }
     }
+
+
+
+    public function startOtpCooldown()
+    {
+        $this->otpCooldown = 120;
+
+        $this->dispatch('start-otp-countdown');
+    }
+
+
+    public function canResendOtp()
+    {
+        return $this->otpCooldown <= 0;
+    }
+
+    public function tick()
+    {
+        if ($this->otpCooldown > 0) {
+            $this->otpCooldown--;
+        }
+    }
+
 
 
 

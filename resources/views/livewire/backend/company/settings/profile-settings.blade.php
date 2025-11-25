@@ -301,13 +301,12 @@
                     <!-- Modal Footer -->
                     <div class="modal-footer">
                         @if ($code_sent)
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                                wire:target="verifyAndUpdate">
-                                <span wire:loading wire:target="verifyAndUpdate">
+                                wire:target="verifyOtp">
+                                <span wire:loading wire:target="verifyOtp">
                                     <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
                                 </span>
-                                <span wire:loading.remove wire:target="verifyAndUpdate">Verify</span>
+                                <span wire:loading.remove wire:target="verifyOtp">Verify</span>
                             </button>
                         @endif
 

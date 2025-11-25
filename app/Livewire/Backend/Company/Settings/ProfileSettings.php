@@ -3,7 +3,6 @@
 namespace App\Livewire\Backend\Company\Settings;
 
 use App\Livewire\Backend\Components\BaseComponent;
-use App\Services\API\VerificationService;
 use Livewire\WithFileUploads;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;

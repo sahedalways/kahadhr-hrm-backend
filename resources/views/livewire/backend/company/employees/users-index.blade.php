@@ -79,6 +79,9 @@
                                     <td>
                                         <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
                                             style="cursor:pointer; padding:2px 4px; border-radius:4px;"
+                                            onmouseover="this.style.backgroundColor='#f0f0f0';"
+                                            onmouseout="this.style.backgroundColor='transparent';"
+                                            style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
                                             {{ $employee->email ?? 'N/A' }}
                                         </span>
@@ -90,6 +93,9 @@
 
                                     <td>
                                         <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})"
+                                            onmouseover="this.style.backgroundColor='#f0f0f0';"
+                                            onmouseout="this.style.backgroundColor='transparent';"
+                                            style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Click to change status">
                                             {!! statusBadgeTwo($employee->is_active) !!}

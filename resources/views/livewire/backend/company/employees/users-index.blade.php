@@ -73,10 +73,10 @@
                             @forelse($infos as $employee)
                                 <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td>{{ $employee->f_name }}</td>
-                                    <td>{{ $employee->l_name }}</td>
+                                    <td>{{ $employee->f_name ?? 'N/A' }}</td>
+                                    <td>{{ $employee->l_name ?? 'N/A' }}</td>
                                     <td>
-                                        <span onclick="copyToClipboard('{{ $employee->user->email ?? '' }}')"
+                                        <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
                                             style="cursor:pointer; padding:2px 4px; border-radius:4px;">
                                             {{ $employee->user->email ?? 'N/A' }}
                                         </span>
@@ -215,30 +215,30 @@
                         <!-- Salary Type -->
                         <div class="col-md-6">
                             <label class="form-label">Salary Type <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="salary_type">
+
+                            <select class="form-select" wire:model="salary_type" wire:key="salary_type">
                                 <option value="" selected disabled>Select Salary Type</option>
                                 <option value="hourly">Hourly</option>
                                 <option value="monthly">Monthly</option>
                             </select>
-
 
                             @error('salary_type')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <!-- Contract Hours (show only if hourly) -->
                         @if ($salary_type === 'hourly')
-                            <div class="col-md-6">
+                            <div class="col-md-6" wire:key="contract-hours-field">
                                 <label class="form-label">Contract Hours <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control"
                                     wire:model="contract_hours">
-                            </div>
 
-                            @error('contract_hours')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                @error('contract_hours')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         @endif
+
 
                     </div>
                     <div class="modal-footer">

@@ -19,7 +19,7 @@ class UsersIndex extends BaseComponent
     use WithFileUploads;
 
     public $employees, $employee, $employee_id;
-    public $f_name, $l_name, $email, $job_title, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type;
+    public $f_name, $l_name, $email, $job_title, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
     public $perPage = 10;
     public $sortOrder = 'desc';

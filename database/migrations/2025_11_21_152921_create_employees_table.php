@@ -19,6 +19,7 @@ return new class extends Migration
             // Employee info
             $table->string('f_name')->nullable();
             $table->string('l_name')->nullable();
+            $table->string('email')->unique();
 
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'teamLead'])->default('employee');

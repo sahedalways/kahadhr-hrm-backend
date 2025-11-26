@@ -25,7 +25,11 @@
                                 </div>
 
                                 <div class="card-body px-lg-5 pt-0" x-transition.fade>
-                                    <form method="POST" action="{{ route('employee.auth.set-password', $token) }}">
+                                    <form method="POST"
+                                        action="{{ route('company.auth.employee.set-password', [
+                                            'company' => app('authUser')->company->sub_domain,
+                                            'token' => $token,
+                                        ]) }}">
                                         @csrf
 
                                         <div class="mb-3">

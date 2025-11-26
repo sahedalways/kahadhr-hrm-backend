@@ -28,13 +28,15 @@ class SendEmployeeInvitation implements ShouldQueue
     public function handle()
     {
         $settings = EmailSetting::first();
+        \Log::info("Employee Invitation Link for {$this->employee->email}: {$this->inviteUrl}");
+
 
         if (!$settings) {
             \Log::error("No Email settings found. Cannot send OTP.");
             return;
         }
 
-        \Log::info("Employee Invitation Link for {$this->employee->email}: {$this->inviteUrl}");
+
 
         // Dynamic mail config
         Config::set('mail.mailers.smtp.transport', 'smtp');

@@ -235,7 +235,7 @@ class ManageDepartments extends BaseComponent
         $keys = [
             'id',
             'name',
-            'company.company_name',
+            'company_name',
             'created_at',
             'updated_at',
         ];

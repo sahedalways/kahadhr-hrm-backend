@@ -304,12 +304,42 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/documents*') ? 'active' : '' }}"
-                        href="{{ route('company.dashboard.documents.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                        <i class="fas fa-file-alt"></i>
+                    <a data-bs-toggle="collapse" href="#documents"
+                        class="nav-link {{ Request::is('dashboard/document-types*') || Request::is('dashboard/document-manage*') ? 'active' : '' }}"
+                        aria-controls="documents" role="button"
+                        aria-expanded="{{ Request::is('dashboard/document-types*') || Request::is('dashboard/document-manage*') ? 'true' : 'false' }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-file-alt text-primary text-sm opacity-10"></i>
+                        </div>
                         <span class="nav-link-text ms-1">Documents</span>
                     </a>
-                </li>
+
+                    <div class="collapse {{ Request::is('dashboard/document-types*') || Request::is('dashboard/document-manage*') ? 'show' : '' }}"
+                        id="documents">
+                        <ul class="nav ms-4">
+
+                            <!-- Document Types -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/document-types*') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.document-types.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-th-list sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Document Types </span>
+                                </a>
+                            </li>
+
+                            <!-- Manage Documents -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/document-manage*') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.document-manage.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-folder-open sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Manage Documents </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+
 
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/training*') ? 'active' : '' }}"

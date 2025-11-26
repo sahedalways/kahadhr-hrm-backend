@@ -10,20 +10,25 @@ use Illuminate\Support\Str;
 class SetPasswordController extends Controller
 {
     public function showForm($company, $token)
+
     {
+
         $employee = Employee::where('invite_token', $token)
             ->where('invite_token_expires_at', '>=', now())
             ->firstOrFail();
 
+
+
         return view('auth.set-password', [
             'employee' => $employee,
             'token' => $token,
+
         ]);
     }
 
 
 
-    public function setPassword(Request $request, $token)
+    public function setPassword(Request $request, $company, $token)
     {
         $employee = Employee::where('invite_token', $token)
             ->where('invite_token_expires_at', '>=', now())

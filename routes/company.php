@@ -6,7 +6,8 @@ use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Dashboard;
-use App\Livewire\Backend\Company\Documents\DocumentsIndex;
+use App\Livewire\Backend\Company\DocumentManage\DocumentManageIndex;
+use App\Livewire\Backend\Company\DocumentType\DocumentTypesIndex;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
@@ -39,8 +40,8 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::get('/', CompanyLogin::class)->name('login');
     Route::get('/employee-login', EmployeeLogin::class)->name('empLogin');
     Route::name('employee.')->controller(SetPasswordController::class)->group(function () {
-        Route::get('employee/set-password/{token}', 'showForm')->name('set-password');
-        Route::post('employee/set-password/{token}',  'setPassword')->name('auth.set-password');
+      Route::get('employee/set-password/{token}', 'showForm')->name('set-password');
+      Route::post('employee/set-password/{token}',  'setPassword')->name('auth.set-password');
     });
   });
 
@@ -97,9 +98,6 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', LeavesIndex::class)->name('index');
     });
 
-    Route::prefix('documents')->name('documents.')->group(function () {
-      Route::get('/', DocumentsIndex::class)->name('index');
-    });
 
     Route::prefix('training')->name('training.')->group(function () {
       Route::get('/', TrainingIndex::class)->name('index');
@@ -122,6 +120,14 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::prefix('teams')->name('teams.')->group(function () {
       Route::get('/', ManageTeams::class)->name('index');
     });
+
+
+    Route::prefix('document-types')->name('document-types.')->group(function () {
+      Route::get('/', DocumentTypesIndex::class)->name('index');
+    });
+
+
+    Route::prefix('document-manage')->name('document-manage.')->group(function () {
+      Route::get('/', DocumentManageIndex::class)->name('index');
+    });
   });
-
-

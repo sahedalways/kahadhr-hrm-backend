@@ -95,6 +95,7 @@ class UsersIndex extends BaseComponent
         $this->avatar_preview = '';
         $this->avatar = '';
         $this->is_active = 1;
+
         $this->resetErrorBag();
     }
 
@@ -188,9 +189,43 @@ class UsersIndex extends BaseComponent
         $this->is_active = $this->employee->is_active;
         $this->start_date = $this->employee->start_date;
         $this->end_date = $this->employee->end_date;
-        $this->phone_no = $this->employee->user->phone_no;
+        $this->phone_no = $this->employee->user->phone_no ?? null;
         $this->avatar_preview = $this->employee->avatar_url;
     }
+
+    public function sendVerificationLink($employeeId)
+    {
+        // Find the employee
+        $employee = Employee::find($employeeId);
+
+        if (!$employee) {
+            $this->toast('Employee not found!', 'error');
+            return;
+        }
+
+
+        if ($employee->user) {
+            $this->toast('Employee already has an account!', 'info');
+            return;
+        }
+
+
+        $employee->invite_token = Str::random(64);
+        $employee->invite_token_expires_at = Carbon::now()->addHours(48);
+        $employee->save();
+
+
+        $inviteUrl = route('employee.set-password', ['token' => $employee->invite_token]);
+
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl)
+            ->onConnection('sync')
+            ->onQueue('urgent');
+
+        $this->toast('Verification link sent successfully!', 'success');
+
+        $this->resetLoaded();
+    }
+
 
 
 
@@ -318,14 +353,24 @@ class UsersIndex extends BaseComponent
     public function deleteEmployee($id)
     {
         $employee = Employee::find($id);
+
         if ($employee) {
+
+            if ($employee->user) {
+                $employee->user->delete();
+            }
+
+
             $employee->delete();
+
             $this->toast('Employee deleted successfully!', 'success');
+            $this->resetInputFields();
             $this->resetLoaded();
         } else {
             $this->toast('Employee not found!', 'error');
         }
     }
+
 
     /* Toggle status active/former */
     public function toggleStatus($id)
@@ -598,58 +643,59 @@ class UsersIndex extends BaseComponent
 
         $file = $this->csv_file->getRealPath();
 
-        // ফাইল থেকে সব লাইন পড়া
-        if (($handle = fopen($file, "r")) !== false) {
-            $header = null;
-            $rows = [];
+        $rows = array_map('str_getcsv', file($file));
 
-            while (($data = fgetcsv($handle, 0, ",")) !== false) {
-                // প্রথম লাইন header হিসেবে ধরে নাও
-                if (!$header) {
-                    $header = array_map('trim', $data);
-                    continue;
-                }
+        if (empty($rows)) {
+            $this->toast("CSV file is empty", 'error');
+            return;
+        }
 
-                // ভ্যালু খালি হলে null ধরা
-                $rows[] = array_map(function ($val) {
-                    return $val === "" ? null : trim($val);
-                }, $data);
-            }
-            fclose($handle);
+
+        $header = array_map('trim', array_shift($rows));
+        if (empty($header)) {
+            $this->toast("CSV file has no header", 'error');
+            return;
         }
 
         foreach ($rows as $index => $row) {
-            // Header এবং row মিলিয়ে অ্যারে তৈরি
-            $row = array_combine($header, $row);
 
-            if (!$row) {
-                $this->toast("Row " . ($index + 2) . ": Invalid row", 'error');
+            $row = array_map('trim', $row);
+
+
+            if (count(array_filter($row)) === 0) {
                 continue;
             }
 
-            // Email ভ্যালিডেশন
-            if (empty($row['email']) || !filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+
+            $rowAssoc = array_combine($header, $row);
+
+            // Skip rows with empty email
+            if (empty($rowAssoc['email'])) {
+                continue;
+            }
+
+
+            if (!filter_var($rowAssoc['email'], FILTER_VALIDATE_EMAIL)) {
                 $this->toast("Row " . ($index + 2) . ": Invalid email", 'error');
                 continue;
             }
 
-            // Email এক্সিস্টেন্স চেক
-            if (Employee::where('email', $row['email'])->exists() || User::where('email', $row['email'])->exists()) {
+            // Skip if email exists
+            if (Employee::where('email', $rowAssoc['email'])->exists() || User::where('email', $rowAssoc['email'])->exists()) {
                 $this->toast("Row " . ($index + 2) . ": Email already exists", 'error');
                 continue;
             }
 
-            // Department খোঁজা
-            $department = Department::where('name', $row['department'] ?? '')->first();
+            $department = Department::where('name', $rowAssoc['department'] ?? '')->first();
 
             try {
                 Employee::create([
                     'company_id' => auth()->user()->company->id,
-                    'email' => $row['email'],
-                    'f_name' => $row['f_name'] ?? null,
-                    'l_name' => $row['l_name'] ?? null,
+                    'email' => $rowAssoc['email'],
+                    'f_name' => $rowAssoc['f_name'] ?? null,
+                    'l_name' => $rowAssoc['l_name'] ?? null,
                     'department_id' => $department?->id,
-                    'role' => in_array($row['role'], config('roles')) ? $row['role'] : 'employee',
+                    'role' => in_array($rowAssoc['role'] ?? '', config('roles')) ? $rowAssoc['role'] : 'employee',
                 ]);
             } catch (\Exception $e) {
                 $this->toast("Row " . ($index + 2) . ": " . $e->getMessage(), 'error');
@@ -657,9 +703,11 @@ class UsersIndex extends BaseComponent
             }
         }
 
-        $this->toast("CSV Import finished!", 'success');
+        $this->toast("CSV import finished!", 'success');
         $this->reset(['csv_file']);
         $this->resetLoaded();
+        $this->addMethod = 'manual';
+        $this->csv_file = '';
         $this->dispatch('closemodal');
     }
 }

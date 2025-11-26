@@ -89,7 +89,21 @@ class CompanyRepository
    */
   public function delete(Company $company): bool
   {
-    return $company->delete();
+    try {
+      foreach ($company->employees as $employee) {
+        if ($employee->user) {
+          $employee->user->delete();
+        }
+      }
+
+
+      $company->employees()->delete();
+
+      return $company->delete();
+    } catch (\Exception $e) {
+
+      return false;
+    }
   }
 
   /**

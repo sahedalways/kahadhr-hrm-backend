@@ -53,6 +53,7 @@ class SetPasswordController extends Controller
         $employee->invite_token = null;
         $employee->invite_token_expires_at = null;
         $employee->user_id  = $user->id;
+        $employee->verified  = true;
         $employee->start_date  = now();
         $employee->save();
 

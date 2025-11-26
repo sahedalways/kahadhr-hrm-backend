@@ -65,6 +65,7 @@
                                 <th>Department</th>
                                 <th>Team</th>
                                 <th>Status</th>
+                                <th>Is Verified</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -85,6 +86,8 @@
                                     <td>{{ $employee->job_title ?? 'N/A' }}</td>
                                     <td>{{ $employee->department->name ?? 'N/A' }}</td>
                                     <td>{{ $employee->team->name ?? 'N/A' }}</td>
+
+
                                     <td>
                                         <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})"
                                             data-bs-toggle="tooltip" data-bs-placement="top"
@@ -93,6 +96,34 @@
                                         </a>
                                     </td>
                                     <td>
+                                        @if (!$employee->verified && !$employee->invite_token)
+                                            <button class="badge badge-primary badge-xs"
+                                                wire:click="sendVerificationLink({{ $employee->id }})"
+                                                wire:loading.attr="disabled"
+                                                wire:target="sendVerificationLink({{ $employee->id }})">
+                                                <span wire:loading.remove
+                                                    wire:target="sendVerificationLink({{ $employee->id }})">
+                                                    Send Verification Link
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="sendVerificationLink({{ $employee->id }})">
+                                                    Sending...
+                                                </span>
+                                            </button>
+                                        @elseif (!$employee->verified && $employee->invite_token)
+                                            <span class="badge badge-warning badge-xs">Link Sent</span>
+                                        @else
+                                            <span class="badge badge-success badge-xs">Verified</span>
+                                        @endif
+                                    </td>
+
+
+
+                                    <td>
+
+
+
+
                                         <a href="{{ route('company.dashboard.employees.details', [
                                             'company' => app('authUser')->company->sub_domain,
                                             'id' => $employee->id,

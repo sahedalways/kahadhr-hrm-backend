@@ -11,13 +11,11 @@ use App\Traits\ToastTrait;
 class EmployeeController extends Controller
 {
     use ToastTrait;
-    public function empDetails($id)
-    {
-        $details = Employee::findOrFail($id);
-
-
-        return view('livewire.backend.company.employees.employee-details', compact('details'));
-    }
+        public function empDetails($company, $id)
+        {
+            $details = Employee::findOrFail($id);
+            return view('livewire.backend.company.employees.employee-details', compact('details'));
+        }
 
 
     public function changePassword(Request $request, $id)

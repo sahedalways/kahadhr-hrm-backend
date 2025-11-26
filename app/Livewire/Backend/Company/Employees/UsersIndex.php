@@ -149,7 +149,14 @@ class UsersIndex extends BaseComponent
 
         ]);
 
-        $inviteUrl = route('employee.set-password', ['token' => $employee->invite_token]);
+        $inviteUrl = route(
+            'company.auth.employee.set-password',
+            [
+                'company' => app('authUser')->company->sub_domain,
+                'token' => $employee->invite_token,
+            ]
+        );
+
 
         // Dispatch queued job
         // SendEmployeeInvitation::dispatch($employee, $inviteUrl);
@@ -215,7 +222,14 @@ class UsersIndex extends BaseComponent
         $employee->save();
 
 
-        $inviteUrl = route('employee.set-password', ['token' => $employee->invite_token]);
+        $inviteUrl = route(
+            'company.auth.employee.set-password',
+            [
+                'company' => app('authUser')->company->sub_domain,
+                'token' => $employee->invite_token,
+            ]
+        );
+
 
         SendEmployeeInvitation::dispatch($employee, $inviteUrl)
             ->onConnection('sync')

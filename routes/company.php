@@ -38,6 +38,10 @@ Route::domain('{company}.' . config('app.base_domain'))
   ->group(function () {
     Route::get('/', CompanyLogin::class)->name('login');
     Route::get('/employee-login', EmployeeLogin::class)->name('empLogin');
+    Route::name('employee.')->controller(SetPasswordController::class)->group(function () {
+        Route::get('employee/set-password/{token}', 'showForm')->name('set-password');
+        Route::post('employee/set-password/{token}',  'setPassword')->name('auth.set-password');
+    });
   });
 
 /*
@@ -121,7 +125,3 @@ Route::domain('{company}.' . config('app.base_domain'))
   });
 
 
-Route::name('employee.')->controller(SetPasswordController::class)->group(function () {
-  Route::get('employee/set-password/{token}', 'showForm')->name('set-password');
-  Route::post('employee/set-password/{token}',  'setPassword')->name('auth.set-password');
-});

@@ -37,25 +37,25 @@ trait Exportable
         }
 
         // Excel / CSV export
+        // Excel / CSV export
         if (in_array($type, ['excel', 'csv'])) {
 
-            if (in_array($type, ['excel', 'csv'])) {
+            $extraHeadings = [
+                [siteSetting()->site_title ?? 'My Site'],
+                ['Email: ' . (siteSetting()->site_email ?? '') . ' | Phone: ' . (siteSetting()->site_phone_number ?? '')],
+                ['Print Date: ' . now()->format('d M Y, H:i')],
+                [$filename],
+                []
+            ];
 
-                $extraHeadings = [
-                    [siteSetting()->site_title ?? 'My Site'],
-                    ['Email: ' . (siteSetting()->site_email ?? '') . ' | Phone: ' . (siteSetting()->site_phone_number ?? '')],
-                    ['Print Date: ' . now()->format('d M Y, H:i')],
-                    [$filename],
-                    []
-                ];
-
-                return Excel::download(
-                    new GenericExport($data, $extraHeadings),
-                    $filename . '.' . ($type === 'excel' ? 'xlsx' : 'csv'),
-                    $type === 'excel' ? ExcelType::XLSX : ExcelType::CSV
-                );
-            }
+            // Pass $columns as third argument
+            return Excel::download(
+                new GenericExport($data, $extraHeadings, $pdfData['columns'] ?? []),
+                $filename . '.' . ($type === 'excel' ? 'xlsx' : 'csv'),
+                $type === 'excel' ? ExcelType::XLSX : ExcelType::CSV
+            );
         }
+
 
         throw new \Exception("Invalid export type: {$type}");
     }

@@ -34,32 +34,51 @@ class GenericExport implements FromCollection, WithHeadings, WithEvents
      */
     public function headings(): array
     {
-        return array_merge(
-            $this->extraHeadings,
-            [['']],        // blank row 1
-            [['']],        // blank row 2
-            [$this->columns] // actual table headings
-        );
+        $headings = [];
+
+
+        if (!empty($this->extraHeadings)) {
+            foreach ($this->extraHeadings as $extra) {
+                $headings[] = $extra;
+            }
+        }
+
+        $headings[] = [];
+        $headings[] = [];
+
+        // Add actual table headings
+        if (!empty($this->columns)) {
+            $headings[] = $this->columns;
+        }
+
+        return $headings;
     }
+
 
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
 
-                // Make all heading rows bold
-                $event->sheet->getStyle('A1:Z10')->getFont()->setBold(true);
+                // Make extra headings bold (top rows)
+                if (!empty($this->extraHeadings)) {
+                    $event->sheet->getStyle('A1:Z' . count($this->extraHeadings))->getFont()->setBold(true);
+                }
 
-                // Center alignment for header and table headings
-                $event->sheet->getStyle('A1:Z10')->getAlignment()->setHorizontal('center');
+                // Table heading row index
+                $headingRow = 2 + count($this->extraHeadings) + 1; // 2 blank rows + extra headings
 
-                // Increase row height for beauty
-                foreach ([1, 2, 3, 4, 5, 6, 7] as $row) {
-                    $event->sheet->getRowDimension($row)->setRowHeight(22);
+                // Bold & center table headings
+                $event->sheet->getStyle('A' . $headingRow . ':Z' . $headingRow)->getFont()->setBold(true);
+                $event->sheet->getStyle('A' . $headingRow . ':Z' . $headingRow)->getAlignment()->setHorizontal('center');
+
+                // Set row height for top rows
+                for ($i = 1; $i <= $headingRow; $i++) {
+                    $event->sheet->getRowDimension($i)->setRowHeight(22);
                 }
 
                 // Table heading background color
-                $event->sheet->getStyle('A8:Z8')->applyFromArray([
+                $event->sheet->getStyle('A' . $headingRow . ':Z' . $headingRow)->applyFromArray([
                     'fill' => [
                         'fillType' => 'solid',
                         'color' => ['rgb' => 'E0EBF7']

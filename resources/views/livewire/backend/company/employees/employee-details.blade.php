@@ -113,19 +113,28 @@
                                     <input type="hidden" id="employeeId" value="{{ $details->id }}">
                                     <input type="hidden" id="companySubdomain"
                                         value="{{ app('authUser')->company->sub_domain }}">
-                                    <div class="mb-3">
-                                        <input type="hidden" id="baseDomain" value="{{ config('app.base_domain') }}">
+                                    <div class="mb-3 position-relative">
                                         <label class="form-label fw-semibold">New Password <span
                                                 class="text-danger">*</span></label>
                                         <input type="password" id="new_password" class="form-control"
                                             placeholder="Enter new password" required>
+                                        <span class="toggle-password" toggle="#new_password"
+                                            style="position:absolute; right:10px; top:40px; cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
                                     </div>
-                                    <div class="mb-3">
+
+                                    <div class="mb-3 position-relative">
                                         <label class="form-label fw-semibold">Confirm Password <span
                                                 class="text-danger">*</span></label>
                                         <input type="password" id="confirm_password" class="form-control"
                                             placeholder="Confirm new password" required>
+                                        <span class="toggle-password" toggle="#confirm_password"
+                                            style="position:absolute; right:10px; top:40px; cursor:pointer;">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
                                     </div>
+
                                     <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold"
                                         id="changePasswordBtn">
                                         <span id="btnText">Save Password</span>
@@ -148,6 +157,20 @@
     </div>
 
     <script src="{{ asset('js/company/changePassword.js') }}"></script>
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function(element) {
+            element.addEventListener('click', function() {
+                const input = document.querySelector(this.getAttribute('toggle'));
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+
+                // Change icon
+                this.innerHTML = type === 'password' ?
+                    '<i class="fa fa-eye"></i>' :
+                    '<i class="fa fa-eye-slash"></i>';
+            });
+        });
+    </script>
 
 
 </x-layouts.app>

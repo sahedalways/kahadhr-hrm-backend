@@ -158,119 +158,146 @@
                         <i class="fas fa-times" style="color:black;"></i>
                     </button>
                 </div>
-                <form wire:submit.prevent="submitEmployee">
-                    <div class="modal-body row g-2">
 
-                        <!-- Email -->
-                        <div class="col-md-6">
-                            <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" wire:model="email" required>
-
-                            @error('email')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Job Title -->
-                        <div class="col-md-6">
-                            <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model="job_title">
-
-                            @error('job_title')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Department -->
-                        <div class="col-md-6">
-                            <label class="form-label">Department <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="department_id">
-                                <option value="">Select Department</option>
-                                @foreach ($departments as $dep)
-                                    <option value="{{ $dep->id }}">{{ $dep->name }}</option>
-                                @endforeach
-                            </select>
-
-                            @error('department_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Team -->
-                        <div class="col-md-6">
-                            <label class="form-label">Team <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="team_id">
-                                <option value="">Select Team</option>
-                                @foreach ($teams as $team)
-                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                @endforeach
-                            </select>
-
-
-                            @error('team_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Role -->
-                        <div class="col-md-6">
-                            <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="role">
-                                <option value="" selected disabled>Select a role</option>
-                                @foreach (config('roles') as $role)
-                                    <option value="{{ $role }}">
-                                        {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}</option>
-                                @endforeach
-                            </select>
-
-                            @error('role')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Salary Type -->
-                        <div class="col-md-6">
-                            <label class="form-label">Salary Type <span class="text-danger">*</span></label>
-
-                            <select class="form-select" wire:model.live="salary_type" wire:key="salary_type">
-                                <option value="" selected disabled>Select Salary Type</option>
-                                <option value="hourly">Hourly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
-
-                            @error('salary_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        @if ($salary_type === 'hourly')
-                            <div class="col-md-6" wire:key="contract-hours-field">
-                                <label class="form-label">Contract Hours <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" class="form-control"
-                                    wire:model="contract_hours">
-
-                                @error('contract_hours')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        @endif
-
-
+                <div class="modal-body">
+                    <!-- Select Add Method -->
+                    <div class="mb-3">
+                        <label class="form-label">Add Employee Via</label>
+                        <select class="form-select" wire:model.live="addMethod" wire:key="addMethod">
+                            <option value="manual">Manual Entry</option>
+                            <option value="csv">Import CSV</option>
+                        </select>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="submitEmployee">
-                            <span wire:loading wire:target="submitEmployee">
-                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
-                            </span>
-                            <span wire:loading.remove wire:target="submitEmployee">Save</span>
+
+                    <!-- Conditional: CSV Import -->
+                    @if ($addMethod === 'csv')
+                        <div class="mb-3" wire:key="csv-field">
+                            <label class="form-label">Upload CSV File <span class="text-danger">*</span></label>
+                            <input type="file" wire:model="csv_file" accept=".csv" class="form-control">
+                            @error('csv_file')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                            <small class="text-muted">CSV must include headers: f_name, l_name, email,
+                                department, role</small>
+                        </div>
+                        <button class="btn btn-primary" wire:click="importCsv" wire:loading.attr="disabled">
+                            <span wire:loading wire:target="importCsv"><i
+                                    class="fas fa-spinner fa-spin me-2"></i>Importing...</span>
+                            <span wire:loading.remove wire:target="importCsv">Import CSV</span>
                         </button>
-                    </div>
-                </form>
+                    @endif
+
+                    <!-- Conditional: Manual Entry -->
+                    @if ($addMethod === 'manual')
+                        <form wire:submit.prevent="submitEmployee" wire:key="manual-field">
+                            <div class="row g-2">
+
+                                <!-- Email -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" wire:model="email" required>
+                                    @error('email')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Job Title -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" wire:model="job_title">
+                                    @error('job_title')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Department -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                                    <select class="form-select" wire:model="department_id">
+                                        <option value="">Select Department</option>
+                                        @foreach ($departments as $dep)
+                                            <option value="{{ $dep->id }}">{{ $dep->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('department_id')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Team -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Team</label>
+                                    <select class="form-select" wire:model="team_id">
+                                        <option value="">Select Team</option>
+                                        @foreach ($teams as $team)
+                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('team_id')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Role -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Role <span class="text-danger">*</span></label>
+                                    <select class="form-select" wire:model="role">
+                                        <option value="" selected disabled>Select a role</option>
+                                        @foreach (config('roles') as $role)
+                                            <option value="{{ $role }}">
+                                                {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('role')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Salary Type -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Salary Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" wire:model.live="salary_type" wire:key="salary_type">
+                                        <option value="" selected disabled>Select Salary Type</option>
+                                        <option value="hourly">Hourly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                    @error('salary_type')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                @if ($salary_type === 'hourly')
+                                    <div class="col-md-6" wire:key="contract-hours-field">
+                                        <label class="form-label">Contract Hours <span
+                                                class="text-danger">*</span></label>
+                                        <input type="number" step="0.01" class="form-control"
+                                            wire:model="contract_hours">
+                                        @error('contract_hours')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                                    wire:target="submitEmployee">
+                                    <span wire:loading wire:target="submitEmployee"><i
+                                            class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                                    <span wire:loading.remove wire:target="submitEmployee">Save</span>
+                                </button>
+                            </div>
+                        </form>
+                    @endif
+
+                </div>
             </div>
         </div>
     </div>
+
 
 
 

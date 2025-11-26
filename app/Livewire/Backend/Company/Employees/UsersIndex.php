@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\API\VerificationService;
+use App\Traits\Exportable;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
@@ -19,6 +20,7 @@ use Illuminate\Http\UploadedFile;
 class UsersIndex extends BaseComponent
 {
     use WithFileUploads;
+    use Exportable;
 
     public $employees, $employee, $employee_id;
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
@@ -41,8 +43,16 @@ class UsersIndex extends BaseComponent
     public $verification_code;
 
     public $departments, $teams;
+    public $csv_file;
+
+    public $addMethod = 'manual';
 
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
+
+
+    protected $rulesCsv = [
+        'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+    ];
 
 
     public function openModal($field)
@@ -494,5 +504,162 @@ class UsersIndex extends BaseComponent
         $this->updating_field = null;
         $this->code_sent = false;
         $this->otpCooldown = 0;
+    }
+
+
+
+    public function exportEmployees($type)
+    {
+        $employees = $this->loaded;
+
+        if ($employees->isEmpty()) {
+            $this->toast('No employees to export!', 'info');
+            return;
+        }
+
+        // Define column headers
+        $columns = [
+            'Employee ID',
+            'First Name',
+            'Last Name',
+            'Email',
+            'Phone',
+            'Job Title',
+            'Department',
+            'Team',
+            'Role',
+            'Salary Type',
+            'Contract Hours',
+            'Status',
+            'Start Date',
+            'End Date',
+            'Created At'
+        ];
+
+        // Define keys for PDF / Excel mapping
+        $keys = [
+            'employee_id',
+            'f_name',
+            'l_name',
+            'email',
+            'phone_no',
+            'job_title',
+            'department',
+            'team',
+            'role',
+            'salary_type',
+            'contract_hours',
+            'status',
+            'start_date',
+            'end_date',
+            'created_at'
+        ];
+
+        // Map data for export
+        $data = $employees->map(function ($emp) {
+            return [
+                'employee_id'    => $emp->id,
+                'f_name'         => $emp->f_name,
+                'l_name'         => $emp->l_name,
+                'email'          => $emp->email,
+                'phone_no'       => $emp->user?->phone_no ?? '',
+                'job_title'      => $emp->job_title,
+                'department'     => $emp->department?->name ?? '',
+                'team'           => $emp->team?->name ?? '',
+                'role'           => ucfirst($emp->role),
+                'salary_type'    => ucfirst($emp->salary_type),
+                'contract_hours' => $emp->contract_hours ?? '',
+                'status'         => $emp->is_active ? 'Active' : 'Former',
+                'start_date'     => optional($emp->start_date)->format('Y-m-d'),
+                'end_date'       => optional($emp->end_date)->format('Y-m-d'),
+                'created_at'     => $emp->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        // Call your existing export helper
+        return $this->export(
+            $data,
+            $type,
+            'employees',
+            'exports.generic-table-pdf',
+            [
+                'title'   => siteSetting()->site_title . ' - Employee List',
+                'columns' => $columns,
+                'keys'    => $keys
+            ]
+        );
+    }
+
+
+
+    public function importCsv()
+    {
+        $this->validate($this->rulesCsv);
+
+        $file = $this->csv_file->getRealPath();
+
+        // ফাইল থেকে সব লাইন পড়া
+        if (($handle = fopen($file, "r")) !== false) {
+            $header = null;
+            $rows = [];
+
+            while (($data = fgetcsv($handle, 0, ",")) !== false) {
+                // প্রথম লাইন header হিসেবে ধরে নাও
+                if (!$header) {
+                    $header = array_map('trim', $data);
+                    continue;
+                }
+
+                // ভ্যালু খালি হলে null ধরা
+                $rows[] = array_map(function ($val) {
+                    return $val === "" ? null : trim($val);
+                }, $data);
+            }
+            fclose($handle);
+        }
+
+        foreach ($rows as $index => $row) {
+            // Header এবং row মিলিয়ে অ্যারে তৈরি
+            $row = array_combine($header, $row);
+
+            if (!$row) {
+                $this->toast("Row " . ($index + 2) . ": Invalid row", 'error');
+                continue;
+            }
+
+            // Email ভ্যালিডেশন
+            if (empty($row['email']) || !filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+                $this->toast("Row " . ($index + 2) . ": Invalid email", 'error');
+                continue;
+            }
+
+            // Email এক্সিস্টেন্স চেক
+            if (Employee::where('email', $row['email'])->exists() || User::where('email', $row['email'])->exists()) {
+                $this->toast("Row " . ($index + 2) . ": Email already exists", 'error');
+                continue;
+            }
+
+            // Department খোঁজা
+            $department = Department::where('name', $row['department'] ?? '')->first();
+
+            try {
+                Employee::create([
+                    'company_id' => auth()->user()->company->id,
+                    'email' => $row['email'],
+                    'f_name' => $row['f_name'] ?? null,
+                    'l_name' => $row['l_name'] ?? null,
+                    'department_id' => $department?->id,
+                    'role' => in_array($row['role'], config('roles')) ? $row['role'] : 'employee',
+                ]);
+            } catch (\Exception $e) {
+                $this->toast("Row " . ($index + 2) . ": " . $e->getMessage(), 'error');
+                continue;
+            }
+        }
+
+        $this->toast("CSV Import finished!", 'success');
+        $this->reset(['csv_file']);
+        $this->resetLoaded();
+        $this->dispatch('closemodal');
     }
 }

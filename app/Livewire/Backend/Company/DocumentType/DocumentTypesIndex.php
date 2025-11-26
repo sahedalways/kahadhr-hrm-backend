@@ -173,14 +173,14 @@ class DocumentTypesIndex extends BaseComponent
             return [
                 'id' => $doc->id,
                 'name' => $doc->name,
-                'company_name' => $doc->company ? $doc->company->company_name : 'N/A',
+
                 'created_at' => $doc->created_at ? Carbon::parse($doc->created_at)->format('d F, Y') : 'N/A',
                 'updated_at' => $doc->updated_at ? Carbon::parse($doc->updated_at)->format('d F, Y') : 'N/A',
             ];
         });
 
-        $columns = ['ID', 'Name', 'Company', 'Created At', 'Updated At'];
-        $keys = ['id', 'name', 'company_name', 'created_at', 'updated_at'];
+        $columns = ['ID', 'Name', 'Created At', 'Updated At'];
+        $keys = ['id', 'name',  'created_at', 'updated_at'];
 
         return $this->export($data, $type, 'document-types', 'exports.generic-table-pdf', [
             'title' => siteSetting()->site_title . ' - Document Types',

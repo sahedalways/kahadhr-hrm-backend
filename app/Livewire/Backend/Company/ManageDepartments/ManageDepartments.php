@@ -216,7 +216,7 @@ class ManageDepartments extends BaseComponent
             return [
                 'id' => $dept->id,
                 'name' => $dept->name,
-                'company_name' => $dept->company ? $dept->company->company_name : 'N/A',
+
                 'created_at' => $dept->created_at ? Carbon::parse($dept->created_at)->format('d F, Y') : 'N/A',
                 'updated_at' => $dept->updated_at ? Carbon::parse($dept->updated_at)->format('d F, Y') : 'N/A',
             ];
@@ -227,7 +227,6 @@ class ManageDepartments extends BaseComponent
         $columns = [
             'Department ID',
             'Department Name',
-            'Company Name',
             'Created At',
             'Updated At',
         ];
@@ -235,7 +234,7 @@ class ManageDepartments extends BaseComponent
         $keys = [
             'id',
             'name',
-            'company_name',
+
             'created_at',
             'updated_at',
         ];

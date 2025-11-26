@@ -19,7 +19,7 @@
 
 
 
-                                    <h6 class="text-primary">Welcome to Company Panel</h6>
+                                    <h6 class="text-primary">Welcome to Employee Panel</h6>
                                 </div>
 
                             </div>

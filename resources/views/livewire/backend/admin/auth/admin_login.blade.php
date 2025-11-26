@@ -32,9 +32,16 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                        <div class="mb-3">
-                                            <input type="password" class="form-control" placeholder="Password"
-                                                wire:model="password">
+                                        <div class="mb-3 position-relative">
+                                            <input type="password" id="password" class="form-control"
+                                                placeholder="Password" wire:model="password">
+
+                                            <span
+                                                class="position-absolute top-50 end-3 translate-middle-y cursor-pointer"
+                                                onclick="togglePassword()">
+                                                <i id="passwordEye" class="fas fa-eye"></i>
+                                            </span>
+
                                             @error('password')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
@@ -225,6 +232,23 @@
                 el.value = '';
             }
             event.preventDefault(); // Prevent default behavior
+        }
+    }
+</script>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('passwordEye');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
         }
     }
 </script>

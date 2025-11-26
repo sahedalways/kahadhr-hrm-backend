@@ -13,7 +13,7 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasApiTokens, Notifiable;
 
-    /**
+    /**    '
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -27,7 +27,10 @@ class User extends Authenticatable
         'permissions',
         'profile_completed',
         'email_verified_at',
-        'phone_verified_at'
+        'phone_verified_at',
+        'remember_token',
+        'user_type',
+        'is_active'
     ];
 
 

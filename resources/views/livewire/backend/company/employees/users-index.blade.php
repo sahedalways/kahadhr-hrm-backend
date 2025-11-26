@@ -78,7 +78,7 @@
                                     <td>
                                         <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
                                             style="cursor:pointer; padding:2px 4px; border-radius:4px;">
-                                            {{ $employee->user->email ?? 'N/A' }}
+                                            {{ $employee->email ?? 'N/A' }}
                                         </span>
                                     </td>
                                     <td>{{ $employee->job_title ?? 'N/A' }}</td>
@@ -216,7 +216,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Salary Type <span class="text-danger">*</span></label>
 
-                            <select class="form-select" wire:model="salary_type" wire:key="salary_type">
+                            <select class="form-select" wire:model.live="salary_type" wire:key="salary_type">
                                 <option value="" selected disabled>Select Salary Type</option>
                                 <option value="hourly">Hourly</option>
                                 <option value="monthly">Monthly</option>

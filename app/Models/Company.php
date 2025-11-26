@@ -29,7 +29,8 @@ class Company extends Model
         'subscription_end',
         'payment_failed_count',
         'payment_status',
-        'status'
+        'status',
+
     ];
 
 

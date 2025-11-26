@@ -42,10 +42,10 @@ class SetPasswordController extends Controller
             'email_verified_at' => now(),
             'phone_verified_at' => null,
             'password'          => bcrypt($request->password),
-            'user_type'         => 'employee',
+            'user_type'         => $employee->role,
             'is_active'         => $employee->is_active ?? 1,
             'profile_completed' => 0,
-            'permissions'       => json_encode([]),
+            'permissions'       => null,
             'remember_token'    => Str::random(60),
         ]);
 
@@ -56,6 +56,15 @@ class SetPasswordController extends Controller
         $employee->start_date  = now();
         $employee->save();
 
-        return redirect()->route('login')->with('success', 'Password set successfully! You can now login.');
+
+        $newSubdomain = $employee->company->sub_domain;
+        $baseDomain = config('app.base_domain');
+
+        $loginUrl = "http://{$newSubdomain}.{$baseDomain}/employee-login?message="
+            . urlencode('Password set successfully! You can now login.')
+            . "&type=info";
+
+
+        return redirect()->to($loginUrl);
     }
 }

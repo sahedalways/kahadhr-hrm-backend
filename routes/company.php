@@ -19,6 +19,7 @@ use App\Livewire\Backend\Company\Settings\ProfileSettings;
 use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
 use App\Livewire\Backend\Company\Training\TrainingIndex;
+use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use App\Livewire\Backend\Settings\SmsSettings;
@@ -36,6 +37,7 @@ Route::domain('{company}.' . config('app.base_domain'))
   ->name('company.auth.')
   ->group(function () {
     Route::get('/', CompanyLogin::class)->name('login');
+    Route::get('/employee-login', EmployeeLogin::class)->name('empLogin');
   });
 
 /*

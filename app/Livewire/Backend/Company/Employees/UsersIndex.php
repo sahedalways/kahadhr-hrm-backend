@@ -100,6 +100,8 @@ class UsersIndex extends BaseComponent
                     $fail('This email is already used.');
                 } elseif (Company::where('company_email', $value)->exists()) {
                     $fail('This email is already used.');
+                } elseif (Employee::where('email', $value)->exists()) {
+                    $fail('This email is already used.');
                 }
             }],
 
@@ -141,13 +143,12 @@ class UsersIndex extends BaseComponent
         // SendEmployeeInvitation::dispatch($employee, $inviteUrl);
         SendEmployeeInvitation::dispatch($employee, $inviteUrl)->onConnection('sync')->onQueue('urgent');
 
-
         // Reset form
         $this->reset(['email', 'job_title', 'department_id', 'team_id', 'role', 'salary_type', 'contract_hours']);
-
-        // Emit events / toast message
-        $this->dispatch('close-modal');
-        $this->toast('Employee updated successfully!', 'success');
+        $this->dispatch('closemodal');
+        $this->resetInputFields();
+        $this->resetLoaded();
+        $this->toast('Employee added successfully!', 'success');
     }
 
 

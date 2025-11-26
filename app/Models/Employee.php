@@ -22,7 +22,8 @@ class Employee extends Model
         'contract_hours',
         'team_id',
         'department_id',
-        'job_title'
+        'job_title',
+        'email'
     ];
 
     protected $casts = [

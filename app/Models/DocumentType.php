@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model
+class DocumentType extends Model
 {
-    protected $fillable = ['company_id', 'user_id', 'name', 'file_path', 'expires_at', 'status'];
+    protected $fillable = [
+        'company_id',
+        'user_id',
+        'name',
+    ];
 
     public function company()
     {

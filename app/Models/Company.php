@@ -98,6 +98,21 @@ class Company extends Model
                 'site_email'        => $company->company_email ?? null,
                 'copyright_text'    => $copyrightText,
             ]);
+
+
+            $defaultTypes = [
+                'Passport',
+                'Driving License',
+                'Right to Work',
+            ];
+
+            foreach ($defaultTypes as $type) {
+                DocumentType::create([
+                    'company_id' => $company->id,
+                    'user_id'    => $company->user_id,
+                    'name'       => $type,
+                ]);
+            }
         });
 
         static::deleted(function ($company) {

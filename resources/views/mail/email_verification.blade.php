@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Contact Message</title>
+    <title>Email Verification</title>
 
     <style>
         body {
@@ -51,19 +51,15 @@
             margin-bottom: 14px;
         }
 
-        .details-box {
+        .otp-box {
             background-color: #f0f4f8;
             border-radius: 8px;
-            padding: 18px 20px;
+            padding: 20px;
             margin: 20px 0;
-        }
-
-        .details-row {
-            margin-bottom: 10px;
-        }
-
-        .label {
-            font-weight: 600;
+            text-align: center;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            font-weight: bold;
             color: #164f84;
         }
 
@@ -93,62 +89,44 @@
 
         <!-- Header -->
         <div class="email-header">
-            New Contact Message – {{ siteSetting()->site_title ?? 'Kahadhr' }}
+            {{ $data['title'] ?? 'Email Verification' }} – {{ $data['companyName'] ?? siteSetting()->site_title }}
         </div>
 
         <!-- Body -->
         <div class="email-body">
-            <h2>You've Received a New Contact Message</h2>
+            <h2>Email Verification Code</h2>
 
-            <p>
-                Someone has submitted a message through the contact form on
-                <strong>{{ siteSetting()->site_title ?? 'Kahadhr' }}</strong>.
+            <p>Hello,</p>
+            <p>We received a request to verify your email <strong>{{ $data['email'] }}</strong> for
+                <strong>{{ $data['companyName'] ?? siteSetting()->site_title }}</strong>.
             </p>
 
-            <!-- Contact Details -->
-            <div class="details-box">
-                <div class="details-row">
-                    <span class="label">Name:</span>
-                    {{ $contact->first_name }} {{ $contact->last_name }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Email:</span>
-                    {{ $contact->email }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Phone:</span>
-                    {{ $contact->phone ?? 'N/A' }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Topic:</span>
-                    {{ $contact->topic }}
-                </div>
-
-                <div class="details-row">
-                    <span class="label">Message:</span><br>
-                    {{ $contact->description }}
-                </div>
+            <div class="otp-box">
+                {{ $data['otp'] }}
             </div>
 
             <p>
-                Please reply to the user if support is needed.
+                Enter this code in the app or website to complete your email verification.
+                <br>
+                This code will expire in 2 minutes.
+            </p>
+
+            <p>
+                If you did not request this verification, please ignore this email.
             </p>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <p>
-                Need system help? Contact support:
+                Need help? Contact support:
                 <a href="mailto:{{ getSiteEmail() ?? 'support@kahadhr.com' }}">
                     {{ getSiteEmail() ?? 'support@kahadhr.com' }}
                 </a>
             </p>
 
             <p>
-                {{ siteSetting()->copyright_text }}
+                {{ siteSetting()->copyright_text ?? '' }}
             </p>
 
             <p>

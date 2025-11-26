@@ -1,3 +1,5 @@
+@section('title', 'Admin Login | ' . siteSetting()->site_title)
+
 <div>
     <main class="main-content main-content-bg mt-0">
         <div class="page-header min-vh-100" style="background-image: url('assets/img/login-bg.jpg');">

@@ -16,7 +16,7 @@ class VerificationService
     $this->repository = $repository;
   }
 
-  public function sendEmailOtp(?string $email = null,  string $companyName): bool
+  public function sendEmailOtp(?string $email = null,  ?string $companyName = null): bool
   {
     // $otp = rand(100000, 999999);
     $otp = 123456;
@@ -39,7 +39,7 @@ class VerificationService
 
 
 
-  public function sendPhoneOtp(string $phoneNo,  string $companyName): bool
+  public function sendPhoneOtp(string $phoneNo,  ?string $companyName = null): bool
   {
     // $otp = rand(100000, 999999);
     $otp = 123456;

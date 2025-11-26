@@ -18,7 +18,7 @@
                             <div class="flex-grow-1">
                                 <label class="form-label">Company Mobile <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control shadow-sm" wire:model="company_mobile"
-                                    readonly>
+                                    readonly oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 @error('company_mobile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

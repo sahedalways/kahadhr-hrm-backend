@@ -1,6 +1,6 @@
 @extends('components.layouts.login_layout')
 
-@section('title', 'Set Password')
+@section('title', 'Set Password | ' . siteSetting()->site_title)
 
 @section('content')
 

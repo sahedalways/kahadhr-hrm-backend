@@ -66,14 +66,16 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     Route::prefix('employees')->name('employees.')->group(function () {
       Route::get('/', UsersIndex::class)->name('index');
+
+      Route::controller(EmployeeController::class)->group(function () {
+
+        Route::get('/details/{id}', 'empDetails')->name('details');
+
+        Route::post('/change-password/{id}', 'changePassword')->name('changePassword');
+      });
     });
 
-    Route::name('employee.')->controller(EmployeeController::class)->group(function () {
 
-      Route::get('/details/{id}', 'details')->name('details');
-
-      Route::post('/change-password/{id}', 'changeEmployeePassword')->name('changePassword');
-    });
 
     Route::prefix('chat')->name('chat.')->group(function () {
       Route::get('/', ChatIndex::class)->name('index');

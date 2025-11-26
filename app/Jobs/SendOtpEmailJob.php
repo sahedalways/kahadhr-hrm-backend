@@ -24,7 +24,7 @@ class SendOtpEmailJob implements ShouldQueue
   /**
    * Create a new job instance.
    */
-  public function __construct(string $email, $otp, string $companyName)
+  public function __construct(string $email, $otp, ?string $companyName = null)
   {
     $this->email = $email;
     $this->otp = $otp;

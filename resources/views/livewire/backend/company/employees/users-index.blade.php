@@ -77,7 +77,8 @@
                                     <td>{{ $employee->l_name ?? 'N/A' }}</td>
                                     <td>
                                         <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
-                                            style="cursor:pointer; padding:2px 4px; border-radius:4px;">
+                                            style="cursor:pointer; padding:2px 4px; border-radius:4px;"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
                                             {{ $employee->email ?? 'N/A' }}
                                         </span>
                                     </td>
@@ -85,16 +86,21 @@
                                     <td>{{ $employee->department->name ?? 'N/A' }}</td>
                                     <td>{{ $employee->team->name ?? 'N/A' }}</td>
                                     <td>
-                                        <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})">
+                                        <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Click to change status">
                                             {!! statusBadgeTwo($employee->is_active) !!}
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ route('company.dashboard.employee.details', [
+                                        <a href="{{ route('company.dashboard.employees.details', [
                                             'company' => app('authUser')->company->sub_domain,
                                             'id' => $employee->id,
                                         ]) }}"
-                                            class="badge badge-xs text-white" style="background-color:#5acaa3;">
+                                            class="badge badge-xs text-white"
+                                            style="background-color:#5acaa3; color:#ffffff; transition: all 0.3s ease;"
+                                            onmouseover="this.style.setProperty('background-color', '#4ebf9f', 'important'); this.style.setProperty('color', '#000000', 'important');"
+                                            onmouseout="this.style.setProperty('background-color', '#5acaa3', 'important'); this.style.setProperty('color', '#ffffff', 'important');">
                                             View Details
                                         </a>
 
@@ -102,17 +108,25 @@
                                         <a data-bs-toggle="modal" data-bs-target="#editProfile"
                                             wire:click="editProfile({{ $employee->id }})"
                                             class="badge badge-info badge-xs text-white"
-                                            style="background-color:#4ba3f7;">Edit Profile</a>
+                                            style="background-color:#4ba3f7 !important; color:#ffffff !important; cursor:pointer; transition: all 0.3s ease;"
+                                            onmouseover="this.style.setProperty('background-color', '#5ca6f9', 'important'); this.style.setProperty('color', '#000000', 'important');"
+                                            onmouseout="this.style.setProperty('background-color', '#4ba3f7', 'important'); this.style.setProperty('color', '#ffffff', 'important');">
+                                            Edit Employee
+                                        </a>
+
+
+
+
+                                        <a href="#" class="badge badge-warning badge-xs"
+                                            wire:click.prevent="assignAAdmin({{ $employee->id }})">
+                                            A-Admin
+                                        </a>
 
                                         <a href="#" class="badge badge-danger badge-xs"
                                             wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
                                             Delete
                                         </a>
 
-                                        <a href="#" class="badge badge-warning badge-xs"
-                                            wire:click.prevent="assignAAdmin({{ $employee->id }})">
-                                            A-Admin
-                                        </a>
                                     </td>
                                 </tr>
                             @empty
@@ -140,7 +154,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Add Employee</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times" style="color:black;"></i>
+                    </button>
                 </div>
                 <form wire:submit.prevent="submitEmployee">
                     <div class="modal-body row g-2">
@@ -259,80 +275,329 @@
 
 
 
-
-    {{-- edit Employee Modal --}}
-    {{-- <div wire:ignore.self class="modal fade" id="editEmployee" tabindex="-1" data-bs-backdrop="static">
+    <div wire:ignore.self class="modal fade" id="editProfile" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Edit Employee</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times" style="color:black;"></i>
+                    </button>
                 </div>
-                <form wire:submit.prevent="updateEmployee">
+                <form wire:submit.prevent="updateProfile">
                     <div class="modal-body row g-2">
 
                         <div class="col-md-6">
-                            <label class="form-label">First Name</label>
+                            <label class="form-label">First Name </label>
                             <input type="text" class="form-control" wire:model="f_name">
+                            @error('f_name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
+
+                        <!-- Last Name -->
                         <div class="col-md-6">
-                            <label class="form-label">Last Name</label>
+                            <label class="form-label">Last Name </label>
                             <input type="text" class="form-control" wire:model="l_name">
+                            @error('l_name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" wire:model="email">
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="flex-grow-1">
+                                <label class="form-label"> Mobile No.<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control shadow-sm" wire:model="phone_no" readonly
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                @error('phone_no')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <button type="button" class="btn btn-primary ms-2 mb-0" wire:click="openModal('mobile')"
+                                data-bs-toggle="modal" data-bs-target="#verifyModal">
+                                Change
+                            </button>
                         </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="flex-grow-1">
+                                <label class="form-label"> Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" wire:model="email" readonly>
+                                @error('email')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <button type="button" class="btn btn-primary ms-2 mb-0" wire:click="openModal('email')"
+                                data-bs-toggle="modal" data-bs-target="#verifyModal">
+                                Change
+                            </button>
+                        </div>
+
+
+                        <!-- Job Title -->
                         <div class="col-md-6">
-                            <label class="form-label">Job Title</label>
+                            <label class="form-label">Job Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" wire:model="job_title">
+
+                            @error('job_title')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
+
+                        <!-- Department -->
                         <div class="col-md-6">
-                            <label class="form-label">Department</label>
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
                             <select class="form-select" wire:model="department_id">
                                 <option value="">Select Department</option>
                                 @foreach ($departments as $dep)
                                     <option value="{{ $dep->id }}">{{ $dep->name }}</option>
                                 @endforeach
                             </select>
+
+                            @error('department_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
+
+                        <!-- Team -->
                         <div class="col-md-6">
-                            <label class="form-label">Team</label>
+                            <label class="form-label">Team <span class="text-danger">*</span></label>
                             <select class="form-select" wire:model="team_id">
                                 <option value="">Select Team</option>
                                 @foreach ($teams as $team)
                                     <option value="{{ $team->id }}">{{ $team->name }}</option>
                                 @endforeach
                             </select>
+
+
+                            @error('team_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
 
+                        <!-- Role -->
                         <div class="col-md-6">
-                            <label class="form-label">Role</label>
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
                             <select class="form-select" wire:model="role">
                                 <option value="" selected disabled>Select a role</option>
                                 @foreach (config('roles') as $role)
-                                    <option value="{{ $role }}">{{ ucfirst($role) }}</option>
+                                    <option value="{{ $role }}">
+                                        {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}</option>
                                 @endforeach
                             </select>
+
+                            @error('role')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
 
-
+                        <!-- Salary Type -->
                         <div class="col-md-6">
-                            <label class="form-label">Contract Hours</label>
-                            <input type="number" class="form-control" wire:model="contract_hours">
+                            <label class="form-label">Salary Type <span class="text-danger">*</span></label>
+
+                            <select class="form-select" wire:model.live="salary_type" wire:key="salary_type">
+                                <option value="" selected disabled>Select Salary Type</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+
+                            @error('salary_type')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
 
+                        @if ($salary_type === 'hourly')
+                            <div class="col-md-6" wire:key="contract-hours-field">
+                                <label class="form-label">Contract Hours <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control"
+                                    wire:model="contract_hours">
+
+                                @error('contract_hours')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+                        <!-- Start Date -->
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" wire:model="start_date" required readonly>
+                            @error('start_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-md-6">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" wire:model="end_date">
+                            @error('end_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled">Save</button>
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="updateProfile">
+                            <span wire:loading wire:target="updateProfile">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                            </span>
+                            <span wire:loading.remove wire:target="updateProfile">Save</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div> --}}
+    </div>
+
+
+    <div wire:ignore.self class="modal fade" id="verifyModal" tabindex="-1" role="dialog"
+        aria-labelledby="verifyModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">Verification Centre</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times" style="color:black;"></i>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="verifyAndUpdate">
+                    <div class="modal-body">
+
+                        <!-- Email Input -->
+                        @if ($updating_field === 'email')
+                            <div class="mb-3">
+                                <label>New Email <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="email" class="form-control form-control-sm shadow-sm"
+                                        wire:model="new_email" placeholder="Enter new email" style="height: 38px;">
+
+                                    <button
+                                        class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                        type="button" style="height: 38px;"
+                                        wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                        wire:loading.attr="disabled" wire:target="requestVerification"
+                                        @if ($otpCooldown > 0) disabled @endif>
+                                        <span wire:loading wire:target="requestVerification">
+                                            <i class="fas fa-spinner fa-spin me-2"></i> Sending...
+                                        </span>
+                                        <span wire:loading.remove wire:target="requestVerification">
+                                            @if ($otpCooldown > 0)
+                                                Resend In
+                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                            @elseif($code_sent)
+                                                Resend OTP
+                                            @else
+                                                Send OTP
+                                            @endif
+                                        </span>
+                                    </button>
+
+
+
+
+
+                                </div>
+
+                                <!-- Livewire polling for countdown -->
+                                @if ($otpCooldown > 0)
+                                    <div wire:poll.1000ms="tick"></div>
+                                @endif
+
+                                @error('new_email')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+                        <!-- Mobile Input -->
+                        @if ($updating_field === 'mobile')
+                            <div class="mb-3">
+                                <label>New Mobile No. <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control shadow-sm form-control-sm"
+                                        wire:model="new_mobile" placeholder="Enter new mobile no."
+                                        style="height: 38px;">
+                                    <button
+                                        class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                        type="button" style="height: 38px;"
+                                        wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                        wire:loading.attr="disabled" wire:target="requestVerification"
+                                        @if ($otpCooldown > 0) disabled @endif>
+                                        <span wire:loading wire:target="requestVerification">
+                                            <i class="fas fa-spinner fa-spin me-2"></i> Sending...
+                                        </span>
+                                        <span wire:loading.remove wire:target="requestVerification">
+                                            @if ($otpCooldown > 0)
+                                                Resend In
+                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                            @elseif($code_sent)
+                                                Resend OTP
+                                            @else
+                                                Send OTP
+                                            @endif
+                                        </span>
+                                    </button>
+                                </div>
+
+
+                                @if ($otpCooldown > 0)
+                                    <div wire:poll.1000ms="tick"></div>
+                                @endif
+
+                                @error('new_mobile')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+                        <!-- Verification Code Input -->
+                        @if ($code_sent)
+                            <div class="mb-3">
+                                <label>Verification Code <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-2">
+                                    @for ($i = 0; $i < 6; $i++)
+                                        <input type="text" wire:model="otp.{{ $i }}"
+                                            class="form-control text-center otp-field" maxlength="1" placeholder="-"
+                                            style="width: 50px; font-size: 1.5rem; height: 50px;"
+                                            oninput="handleOtpInput(this)"
+                                            onkeydown="handleOtpBackspace(event, this)">
+                                    @endfor
+                                </div>
+                                @error('verification_code')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+
+
+
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        @if ($code_sent)
+                            <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                                wire:target="verifyOtp">
+                                <span wire:loading wire:target="verifyOtp">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
+                                </span>
+                                <span wire:loading.remove wire:target="verifyOtp">Verify</span>
+                            </button>
+                        @endif
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -351,4 +616,38 @@
             });
         }
     });
+</script>
+
+<script>
+    function handleOtpInput(el) {
+
+        el.value = el.value.replace(/[^0-9]/g, '');
+
+
+        if (el.value.length === 1) {
+            const next = el.nextElementSibling;
+            if (next && next.classList.contains('otp-field')) {
+                next.focus();
+            }
+        }
+    }
+
+    function handleOtpBackspace(e, el) {
+
+        if (e.key === 'Backspace') {
+            if (el.value) {
+
+                el.value = '';
+            } else {
+
+                const prev = el.previousElementSibling;
+                if (prev && prev.classList.contains('otp-field')) {
+                    prev.focus();
+                    prev.value = '';
+                }
+            }
+
+            e.preventDefault();
+        }
+    }
 </script>

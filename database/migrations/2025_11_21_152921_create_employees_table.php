@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('l_name')->nullable();
             $table->string('email')->unique();
 
+            $table->string('avatar')->nullable();
+
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'teamLead'])->default('employee');
 

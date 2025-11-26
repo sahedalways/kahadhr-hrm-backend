@@ -25,12 +25,16 @@ class Employee extends Model
         'team_id',
         'department_id',
         'job_title',
-        'email'
+        'email',
+        'avatar'
     ];
 
     protected $casts = [
         'is_active'        => 'boolean',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
+
 
     /**
      * Relation: Employee belongs to a Company
@@ -63,6 +67,16 @@ class Employee extends Model
     public function team()
     {
         return $this->belongsTo(Team::class);
+    }
+
+
+
+    // Accessor for logo URL
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar
+            ? asset('storage/' . $this->avatar)
+            : asset('assets/img/default-avatar.png');
     }
 
 

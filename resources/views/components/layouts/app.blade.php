@@ -49,6 +49,18 @@
     </main>
 
 
+    {{-- for showing image --}}
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-body p-0">
+                    <img id="modalImage" src="" class="img-fluid w-100" alt="Preview">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>
@@ -58,6 +70,9 @@
     <script src="{{ asset('assets/js/plugins/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/dragula/dragula.min.js') }}"></script>
     <script src="{{ asset('assets/js/argon-dashboard.min.js') }}"></script>
+
+
+
     <script>
         "use strict";
         var win = navigator.platform.indexOf('Win') > -1;
@@ -143,6 +158,22 @@
             setTimeout(() => {
                 location.reload();
             }, 2000);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.clickable-image');
+            const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+            const modalImage = document.getElementById('modalImage');
+
+            images.forEach(img => {
+                img.addEventListener('click', function() {
+                    const src = img.getAttribute('data-src');
+                    modalImage.src = src;
+                    modal.show();
+                });
+            });
         });
     </script>
 

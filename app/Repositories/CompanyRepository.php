@@ -56,32 +56,12 @@ class CompanyRepository
 
     // Handle company logo like your ResortImage example
     if (isset($data['company_logo']) && $data['company_logo'] instanceof UploadedFile) {
-      $image = $data['company_logo'];
-
-
-      if ($company->company_logo && file_exists(storage_path('app/public/' . $company->company_logo))) {
-        unlink(storage_path('app/public/' . $company->company_logo));
-      }
-
-      $directory = storage_path('app/public/image/company/logo');
-
-      if (!file_exists($directory)) {
-        mkdir($directory, 0755, true);
-      }
-
-
-      $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-
-      $img = Image::read($image->getRealPath());
-
-
-      $path = $directory . '/' . $filename;
-
-      $img->save($path);
-
-      $company->company_logo = 'image/company/logo/' . $filename;
+      $company->company_logo = uploadImage(
+        $data['company_logo'],
+        'image/company/logo',
+        $company->company_logo
+      );
     }
-
 
 
     $company->save();

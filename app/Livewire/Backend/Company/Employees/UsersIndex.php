@@ -14,13 +14,14 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 class UsersIndex extends BaseComponent
 {
     use WithFileUploads;
 
     public $employees, $employee, $employee_id;
-    public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
+    public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
     public $perPage = 10;
     public $sortOrder = 'desc';
@@ -81,6 +82,8 @@ class UsersIndex extends BaseComponent
         $this->contract_hours = '';
         $this->start_date = '';
         $this->end_date = '';
+        $this->avatar_preview = '';
+        $this->avatar = '';
         $this->is_active = 1;
         $this->resetErrorBag();
     }
@@ -176,6 +179,7 @@ class UsersIndex extends BaseComponent
         $this->start_date = $this->employee->start_date;
         $this->end_date = $this->employee->end_date;
         $this->phone_no = $this->employee->user->phone_no;
+        $this->avatar_preview = $this->employee->avatar_url;
     }
 
 
@@ -198,6 +202,7 @@ class UsersIndex extends BaseComponent
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => 'required|in:hourly,monthly',
             'end_date' => 'nullable|date|after_or_equal:start_date',
+            'avatar' => 'nullable|image|max:2048',
         ];
 
         // Contract hours only required if salary_type is hourly
@@ -208,6 +213,12 @@ class UsersIndex extends BaseComponent
         }
 
         $validatedData = $this->validate($rules);
+
+
+        if ($this->avatar instanceof UploadedFile) {
+            $this->employee->avatar = uploadImage($this->avatar, 'image/employee/avatar', $this->employee->avatar);
+        }
+
 
         // Update employee
         $this->employee->update([
@@ -221,6 +232,7 @@ class UsersIndex extends BaseComponent
             'contract_hours' => $this->contract_hours,
             'is_active' => $this->is_active,
             'end_date' => $this->end_date,
+            'avatar' => $this->employee->avatar,
         ]);
 
         // Reset form and close modal

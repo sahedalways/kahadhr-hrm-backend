@@ -1,10 +1,17 @@
 <x-layouts.app>
     <div class="container-fluid py-4">
         <div class="row g-4">
-            <a class="list-group-item list-group-item-action py-3 fw-semibold "
-                href="{{ route('super-admin.companies') }}">
-                <i class="bi bi-list-ul me-2"></i> Company List
-            </a>
+
+
+            <div class="text-end mb-2">
+                <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                    style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
+                    href="{{ route('super-admin.companies') }}">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Companies
+                </a>
+            </div>
+
             <!-- Sidebar -->
             <div class="col-lg-3">
                 <div class="card border-0 shadow-sm rounded-4">
@@ -58,9 +65,12 @@
                             <div class="card-body">
                                 <div class="row align-items-center mb-3">
                                     <div class="col-md-4 text-center">
-                                        <img src="{{ $details->company_logo_url ?? asset('assets/default-image.jpg') }}"
-                                            class="img-fluid rounded-3 shadow-sm mb-3"
-                                            style="max-height: 160px; object-fit: contain;">
+                                        <img src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                                            class="img-fluid rounded-3 shadow-sm mb-3 clickable-image"
+                                            style="max-height: 160px; object-fit: contain; transition:transform 0.25s ease; cursor: pointer;"
+                                            data-src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                                            onmouseover="this.style.transform='scale(1.1)'"
+                                            onmouseout="this.style.transform='scale(1)'">
                                     </div>
                                     <div class="col-md-8">
                                         <h2 class="fw-bold mb-1">{{ $details->company_name }}</h2>

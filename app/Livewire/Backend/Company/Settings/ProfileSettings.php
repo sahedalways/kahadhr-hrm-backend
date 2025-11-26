@@ -75,25 +75,13 @@ class ProfileSettings extends BaseComponent
 
 
         if ($this->company_logo instanceof UploadedFile) {
-            $image = $this->company_logo;
-
-
-            if ($company->company_logo && file_exists(storage_path('app/public/' . $company->company_logo))) {
-                unlink(storage_path('app/public/' . $company->company_logo));
-            }
-
-            $directory = storage_path('app/public/image/company/logo');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-
-            $img = Image::read($image->getRealPath());
-            $img->save($directory . '/' . $filename);
-
-            $company->company_logo = 'image/company/logo/' . $filename;
+            $company->company_logo = uploadImage(
+                $this->company_logo,
+                'image/company/logo',
+                $company->company_logo
+            );
         }
+
 
         $company->update([
             'company_name'          => $this->company_name,

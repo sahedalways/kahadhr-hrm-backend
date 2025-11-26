@@ -2,10 +2,17 @@
     <div class="container-fluid py-4">
         <div class="row g-4">
             <!-- Back to Employees List -->
-            <a class="list-group-item list-group-item-action py-3 fw-semibold"
-                href="{{ route('company.dashboard.employees') }}">
-                <i class="bi bi-arrow-left me-2"></i> Back to Employees
-            </a>
+            <div class="text-end mb-2">
+                <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                    style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
+                    href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Employees
+                </a>
+            </div>
+
+
+
 
             <!-- Sidebar -->
             <div class="col-lg-3">
@@ -23,7 +30,7 @@
                             </a>
 
                             <a class="list-group-item list-group-item-action py-3 fw-semibold" data-bs-toggle="tab"
-                                href="#settings">
+                                href="#settingsEmp">
                                 <i class="bi bi-gear me-2"></i> Settings
                             </a>
                         </div>
@@ -44,10 +51,14 @@
                             <div class="card-body">
                                 <div class="row align-items-center mb-3">
                                     <div class="col-md-4 text-center">
-                                        <img src="{{ $details->profile_photo_url ?? asset('assets/default-user.jpg') }}"
-                                            class="img-fluid rounded-3 shadow-sm mb-3"
-                                            style="max-height: 160px; object-fit: cover;">
+                                        <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                            class="img-fluid rounded-3 shadow-sm mb-3 clickable-image"
+                                            style="max-height: 160px; object-fit: cover; cursor: pointer; transition:transform 0.25s ease;"
+                                            data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                            alt="Avatar" onmouseover="this.style.transform='scale(1.1)'"
+                                            onmouseout="this.style.transform='scale(1)'">
                                     </div>
+
                                     <div class="col-md-8">
                                         <h2 class="fw-bold mb-1">{{ $details->full_name }}</h2>
                                         <p class="text-muted mb-2 fs-6">{{ $details->job_title ?: 'N/A' }}</p>
@@ -58,7 +69,8 @@
                                         </span>
                                         <hr>
                                         <p class="mb-1"><strong>Email:</strong> {{ $details->email }}</p>
-                                        <p class="mb-1"><strong>Phone:</strong> {{ $details->phone_no ?? 'N/A' }}</p>
+                                        <p class="mb-1"><strong>Phone:</strong>
+                                            {{ $details->user->phone_no ?? 'N/A' }}</p>
                                         <p class="mb-1"><strong>Department:</strong>
                                             {{ $details->department?->name ?? 'N/A' }}</p>
                                         <p class="mb-1"><strong>Team:</strong> {{ $details->team?->name ?? 'N/A' }}
@@ -90,7 +102,7 @@
                     </div>
 
                     <!-- Settings -->
-                    <div class="tab-pane fade" id="settings">
+                    <div class="tab-pane fade" id="settingsEmp">
                         <div class="card border-0 shadow-sm rounded-4">
                             <div class="card-header bg-white py-3 border-0">
                                 <h4 class="mb-0 fw-bold">Settings</h4>
@@ -99,13 +111,18 @@
                                 <h5 class="fw-semibold mb-3">Change Password</h5>
                                 <form id="changePasswordForm">
                                     <input type="hidden" id="employeeId" value="{{ $details->id }}">
+                                    <input type="hidden" id="companySubdomain"
+                                        value="{{ app('authUser')->company->sub_domain }}">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">New Password</label>
+                                        <input type="hidden" id="baseDomain" value="{{ config('app.base_domain') }}">
+                                        <label class="form-label fw-semibold">New Password <span
+                                                class="text-danger">*</span></label>
                                         <input type="password" id="new_password" class="form-control"
                                             placeholder="Enter new password" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">Confirm Password</label>
+                                        <label class="form-label fw-semibold">Confirm Password <span
+                                                class="text-danger">*</span></label>
                                         <input type="password" id="confirm_password" class="form-control"
                                             placeholder="Confirm new password" required>
                                     </div>
@@ -124,7 +141,13 @@
                 </div>
             </div>
         </div>
+
+        <!-- Image Preview Modal -->
+
+
     </div>
 
-    <script src="{{ asset('js/admin/changePassword.js') }}"></script>
+    <script src="{{ asset('js/company/changePassword.js') }}"></script>
+
+
 </x-layouts.app>

@@ -439,6 +439,28 @@
                         </div>
 
 
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label">Profile Image</label>
+                            <input type="file" class="form-control" wire:model="avatar">
+
+
+                            @if ($avatar)
+                                <img src="{{ $avatar->temporaryUrl() }}" class="img-thumbnail mt-2" width="80">
+
+                                <div wire:loading wire:target="avatar">
+                                    <span class="text-muted">Uploading...</span>
+                                </div>
+                            @elseif ($avatar_preview)
+                                <img src="{{ $avatar_preview }}" class="img-thumbnail mt-2" width="80">
+                            @endif
+
+                            @error('avatar')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

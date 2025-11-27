@@ -22,7 +22,7 @@ trait FilterByUserType
             }
 
             if ($user->user_type === 'company') {
-                return $builder->where('company_id', $user->company_id ?? 0);
+                return $builder->where('company_id', $user->company->id ?? 0);
             }
 
             if (in_array($user->user_type, ['employee', 'teamLead'])) {

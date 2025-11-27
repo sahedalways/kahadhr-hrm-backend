@@ -141,15 +141,27 @@ class Company extends Model
         });
 
         static::updated(function ($company) {
-            // Check if any of the important fields changed
-            if ($company->isDirty(['company_name', 'company_email', 'company_mobile'])) {
+            $companyDirty = $company->isDirty(['company_email', 'company_mobile']);
+
+            $user = $company->user;
+
+            if ($companyDirty && $user) {
+
+
+                $user->update([
+                    'email'    => $company->company_email,
+                    'phone_no' => $company->company_mobile,
+                ]);
+            }
+
+            if ($companyDirty) {
 
                 $siteSettings = SiteSetting::where('company_id', $company->id)->first();
 
                 if ($siteSettings) {
                     $siteSettings->update([
-                        'site_title' => $company->company_name,
-                        'site_email' => $company->company_email,
+                        'site_title'        => $company->company_name,
+                        'site_email'        => $company->company_email,
                         'site_phone_number' => $company->company_mobile,
                     ]);
                 }

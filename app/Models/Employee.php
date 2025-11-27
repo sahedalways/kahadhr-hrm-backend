@@ -98,5 +98,22 @@ class Employee extends Model
                 $builder->where('company_id', $user->company->id ?? 0);
             }
         });
+
+
+        static::updated(function ($employee) {
+
+
+            if ($employee->isDirty('email')) {
+
+                // get related user
+                $user = $employee->user;
+
+                if ($user) {
+                    $user->update([
+                        'email' => $employee->email,
+                    ]);
+                }
+            }
+        });
     }
 }

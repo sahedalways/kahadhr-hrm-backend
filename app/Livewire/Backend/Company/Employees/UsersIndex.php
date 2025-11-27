@@ -449,7 +449,6 @@ class UsersIndex extends BaseComponent
         $this->updating_field = $field;
 
         if ($field === 'email') {
-
             $this->validate([
                 'new_email' => [
                     'required',
@@ -459,8 +458,18 @@ class UsersIndex extends BaseComponent
                 ],
             ]);
 
+            $emailExists =
+                User::where('email', $this->new_email)->where('id', '!=', $this->employee->user_id)->exists() ||
+                Company::where('company_email', $this->new_email)->where('id', '!=', $this->employee->company_id)->exists();
+
+            if ($emailExists) {
+                $this->toast('This email is already in use.', 'error');
+                return;
+            }
+
             $target = $this->new_email;
         } else {
+
 
             $this->validate([
                 'new_mobile' => [
@@ -472,6 +481,17 @@ class UsersIndex extends BaseComponent
                     Rule::unique('users', 'phone_no')->ignore($this->employee->user->id),
                 ],
             ]);
+
+
+            $mobileExists =
+                Company::where('company_mobile', $this->new_mobile)
+                ->where('id', '!=', $this->employee->company_id)
+                ->exists();
+
+            if ($mobileExists) {
+                $this->toast('This phone number is already in use.', 'error');
+                return;
+            }
 
             $target = $this->new_mobile;
         }

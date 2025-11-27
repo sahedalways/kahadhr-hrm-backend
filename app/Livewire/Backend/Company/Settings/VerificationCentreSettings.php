@@ -4,6 +4,9 @@
 namespace App\Livewire\Backend\Company\Settings;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\Company;
+use App\Models\Employee;
+use App\Models\User;
 use App\Services\API\VerificationService;
 use Illuminate\Validation\Rule;
 
@@ -86,12 +89,42 @@ class VerificationCentreSettings extends BaseComponent
         $this->updating_field = $field;
 
         if ($field === 'email') {
-            $this->validate(['new_email' => 'required|email|max:255']);
+
+            $this->validate([
+                'new_email' => 'required|email|max:255',
+            ]);
+
+            // Check existence in all tables
+            $exists =
+                Employee::where('email', $this->new_email)->exists() ||
+                User::where('email', $this->new_email)->exists() ||
+                Company::where('company_email', $this->new_email)->exists();
+
+            if ($exists) {
+                $this->toast('This email is already in use.', 'error');
+                return;
+            }
+
             $target = $this->new_email;
         } else {
-            $this->validate(['new_mobile' => 'required|min:10|max:20']);
+
+            $this->validate([
+                'new_mobile' => 'required|min:10|max:20',
+            ]);
+
+            // Check existence in all tables
+            $exists =
+                User::where('phone_no', $this->new_mobile)->exists() ||
+                Company::where('company_mobile', $this->new_mobile)->exists();
+
+            if ($exists) {
+                $this->toast('This phone number is already in use.', 'error');
+                return;
+            }
+
             $target = $this->new_mobile;
         }
+
 
 
 
@@ -163,8 +196,7 @@ class VerificationCentreSettings extends BaseComponent
             $this->resetVerificationFields();
             $this->dispatch('closemodal');
         } catch (\Exception $e) {
-
-            $this->toast("OTP does not match.", 'error');
+            $this->toast($e->getMessage(), 'error');
         }
     }
 

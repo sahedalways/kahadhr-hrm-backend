@@ -5,35 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class CompanyDocument extends Model
+class CalendarYearSetting extends Model
 {
     protected $fillable = [
         'company_id',
-        'emp_id',
-        'name',
-        'file_path',
-        'expires_at',
-        'status',
+        'calendar_year',
     ];
+
+
+
+
 
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function employee()
-    {
-        return $this->belongsTo(Employee::class, 'emp_id');
-    }
-
-    public function getDocumentUrlAttribute()
-    {
-        if (!$this->file_path) {
-            return null;
-        }
-
-        return asset('storage/' . $this->file_path);
-    }
 
     // Global Scope based on user type
     protected static function booted()

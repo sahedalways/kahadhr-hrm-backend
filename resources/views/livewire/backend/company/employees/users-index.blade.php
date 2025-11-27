@@ -197,6 +197,8 @@
                 </div>
 
                 <div class="modal-body">
+
+
                     <!-- Select Add Method -->
                     <div class="mb-3">
                         <label class="form-label">Add Employee Via</label>
@@ -306,7 +308,7 @@
 
                                 @if ($salary_type === 'hourly')
                                     <div class="col-md-6" wire:key="contract-hours-field">
-                                        <label class="form-label">Contract Hours <span
+                                        <label class="form-label">Contract Hours (Weekly)<span
                                                 class="text-danger">*</span></label>
                                         <input type="number" step="0.01" class="form-control"
                                             wire:model="contract_hours">
@@ -350,6 +352,18 @@
                 </div>
                 <form wire:submit.prevent="updateProfile">
                     <div class="modal-body row g-2">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Title <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="title" required>
+                                <option value="" selected>Select Title</option>
+                                <option value="Mr">Mr</option>
+                                <option value="Mrs">Mrs</option>
+                            </select>
+                            @error('title')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label">First Name </label>
@@ -474,7 +488,8 @@
 
                         @if ($salary_type === 'hourly')
                             <div class="col-md-6" wire:key="contract-hours-field">
-                                <label class="form-label">Contract Hours <span class="text-danger">*</span></label>
+                                <label class="form-label">Contract Hours (Weekly) <span
+                                        class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control"
                                     wire:model="contract_hours">
 

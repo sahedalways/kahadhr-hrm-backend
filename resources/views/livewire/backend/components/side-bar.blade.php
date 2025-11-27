@@ -433,6 +433,17 @@
                             </li>
 
 
+                            <!-- Calendar Year Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/calendar-year') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.settings.calendar-year', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-calendar-alt sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> Calendar Year Settings </span>
+                                </a>
+                            </li>
+
+
+
 
                             <!-- Password Settings -->
                             <li class="nav-item">

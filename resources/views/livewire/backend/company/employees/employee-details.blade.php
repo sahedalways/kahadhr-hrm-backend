@@ -91,13 +91,21 @@
                             <div class="card-body">
                                 <p class="mb-1"><strong>Salary Type:</strong>
                                     {{ ucfirst($details->salary_type ?? 'N/A') }}</p>
-                                <p class="mb-1"><strong>Contract Hours:</strong>
-                                    {{ $details->contract_hours ?? 'N/A' }}</p>
+
+                                @if (($details->salary_type ?? '') === 'hourly')
+                                    <p class="mb-1"><strong>Contract Hours:</strong>
+                                        {{ $details->contract_hours ?? 'N/A' }}</p>
+                                    <p class="mb-1"><strong>Employment Type:</strong> Part Time</p>
+                                @else
+                                    <p class="mb-1"><strong>Employment Type:</strong> Full Time</p>
+                                @endif
+
                                 <p class="mb-1"><strong>Start Date:</strong>
                                     {{ $details->start_date?->format('d M Y') ?? 'N/A' }}</p>
                                 <p class="mb-1"><strong>End Date:</strong>
                                     {{ $details->end_date?->format('d M Y') ?? 'N/A' }}</p>
                             </div>
+
                         </div>
                     </div>
 

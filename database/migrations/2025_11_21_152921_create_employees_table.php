@@ -19,6 +19,7 @@ return new class extends Migration
             // Employee info
             $table->string('f_name')->nullable();
             $table->string('l_name')->nullable();
+            $table->enum('title', ['Mr', 'Mrs'])->nullable()->after('l_name');
             $table->string('email')->unique();
 
             $table->string('avatar')->nullable();

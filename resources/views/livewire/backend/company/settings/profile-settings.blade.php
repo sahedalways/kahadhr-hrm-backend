@@ -121,18 +121,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Calendar Year -->
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold">Calendar Year</label>
-                                <select class="form-select shadow-sm" wire:model="calendar_year">
-                                    <option value="">Select</option>
-                                    <option value="english">English</option>
-                                    <option value="hmrc">HMRC</option>
-                                </select>
-                                @error('calendar_year')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                @enderror
-                            </div>
+
                         </div>
 
                         <hr class="mt-4">

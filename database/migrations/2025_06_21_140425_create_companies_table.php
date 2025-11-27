@@ -23,8 +23,6 @@ return new class extends Migration
             $table->text('address_contact_info')->nullable();
             $table->string('company_logo')->nullable();
             $table->string('registered_domain')->nullable();
-            $table->enum('calendar_year', ['english', 'hmrc'])
-                ->default('english');
             $table->foreignId('billing_plan_id')
                 ->nullable()
                 ->constrained('billing_plans')

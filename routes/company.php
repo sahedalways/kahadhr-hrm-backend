@@ -16,6 +16,7 @@ use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\ReportsIndex;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
+use App\Livewire\Backend\Company\Settings\CalendarYearSettings;
 use App\Livewire\Backend\Company\Settings\ProfileSettings;
 use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
@@ -66,6 +67,7 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('profile', ProfileSettings::class)->name('profile');
       Route::get('bank-info', BankInfoSettings::class)->name('bank-info');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
+      Route::get('calendar-year', CalendarYearSettings::class)->name('calendar-year');
     });
 
 

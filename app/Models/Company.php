@@ -21,7 +21,6 @@ class Company extends Model
         'address_contact_info',
         'company_logo',
         'registered_domain',
-        'calendar_year',
         'billing_plan_id',
         'subscription_status',
         'subscription_start',

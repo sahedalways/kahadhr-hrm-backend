@@ -16,7 +16,7 @@ class ProfileSettings extends BaseComponent
 
     public $company_name, $sub_domain, $company_house_number;
     public $company_mobile, $company_email, $business_type;
-    public $address_contact_info, $registered_domain, $calendar_year;
+    public $address_contact_info, $registered_domain;
     public $company_logo, $old_company_logo;
 
 
@@ -40,7 +40,7 @@ class ProfileSettings extends BaseComponent
         $this->business_type         = $this->company->business_type;
         $this->address_contact_info  = $this->company->address_contact_info;
         $this->registered_domain     = $this->company->registered_domain;
-        $this->calendar_year         = $this->company->calendar_year;
+
 
         $this->old_company_logo = $this->company->company_logo_url;
     }
@@ -65,7 +65,6 @@ class ProfileSettings extends BaseComponent
                 'regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,6}$/',
                 Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
-            'calendar_year' => 'nullable|in:english,hmrc',
             'company_logo' => 'nullable|image|max:2048',
         ]);
 
@@ -89,7 +88,6 @@ class ProfileSettings extends BaseComponent
             'business_type'         => $this->business_type,
             'address_contact_info'  => $this->address_contact_info,
             'registered_domain'     => $this->registered_domain,
-            'calendar_year'         => $this->calendar_year,
             'company_logo'          => $company->company_logo,
 
         ]);

@@ -22,7 +22,7 @@ class UsersIndex extends BaseComponent
     use WithFileUploads;
     use Exportable;
 
-    public $employees, $employee, $employee_id;
+    public $employees, $employee, $employee_id, $title;
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
     public $perPage = 10;
@@ -86,6 +86,7 @@ class UsersIndex extends BaseComponent
         $this->l_name = '';
         $this->email = '';
         $this->job_title = '';
+        $this->title;
         $this->department_id = '';
         $this->team_id = '';
         $this->role = '';
@@ -186,6 +187,7 @@ class UsersIndex extends BaseComponent
         // Load all relevant fields
         $this->f_name = $this->employee->f_name;
         $this->l_name = $this->employee->l_name;
+        $this->title = $this->employee->title;
         $this->email = $this->employee->email;
         $this->job_title = $this->employee->job_title;
         $this->department_id = $this->employee->department_id;
@@ -255,6 +257,7 @@ class UsersIndex extends BaseComponent
         $rules = [
             'f_name' => 'nullable|string|max:255',
             'l_name' => 'nullable|string|max:255',
+            'title' => 'required|in:Mr,Mrs',
             'job_title' => 'nullable|string|max:255',
             'department_id' => 'required|exists:departments,id',
             'team_id' => 'nullable|exists:teams,id',
@@ -284,6 +287,7 @@ class UsersIndex extends BaseComponent
             'f_name' => $this->f_name,
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
+            'title' => $this->title,
             'department_id' => $this->department_id,
             'team_id' => $this->team_id,
             'role' => $this->role,

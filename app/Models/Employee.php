@@ -81,6 +81,7 @@ class Employee extends Model
     }
 
 
+
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {

@@ -12,7 +12,6 @@ class SetPasswordController extends Controller
     public function showForm($company, $token)
 
     {
-
         $employee = Employee::where('invite_token', $token)
             ->where('invite_token_expires_at', '>=', now())
             ->firstOrFail();

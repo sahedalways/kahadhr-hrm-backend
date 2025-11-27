@@ -24,4 +24,13 @@ class CompanyDocument extends Model
     {
         return $this->belongsTo(Employee::class, 'emp_id');
     }
+
+    public function getDocumentUrlAttribute()
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return asset('storage/' . $this->file_path);
+    }
 }

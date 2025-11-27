@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('company_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('emp_id')->constrained('employees')->cascadeOnDelete();
+            $table->foreignId('emp_id')->nullable()->constrained('employees')->cascadeOnDelete();
 
             $table->string('name');
             $table->string('file_path')->nullable();

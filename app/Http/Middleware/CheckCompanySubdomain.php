@@ -12,14 +12,18 @@ class CheckCompanySubdomain
     {
         $subdomain = $request->route('company');
 
-
         $company = Company::where('sub_domain', $subdomain)->first();
 
         if (!$company) {
             abort(404, 'Company not found for this subdomain.');
         }
 
-        // চাইলে $request এ company inject করতে পারেন
+        if ($company->status !== 'Active') {
+            abort(403, 'This company is currently inactive. Please contact support for assistance.');
+        }
+
+
+
         $request->merge(['company_model' => $company]);
 
         return $next($request);

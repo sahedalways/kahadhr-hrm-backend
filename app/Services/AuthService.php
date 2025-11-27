@@ -30,6 +30,7 @@ class AuthService
 
   public function loginCompany(string $email, string $password)
   {
+    // Find the user with the given email and user_type 'company'
     $user = User::where('email', $email)
       ->where('user_type', 'company')
       ->first();
@@ -38,7 +39,40 @@ class AuthService
       return false;
     }
 
+
     if (!password_verify($password, $user->password)) {
+      return false;
+    }
+
+
+    if (!$user->company || $user->company->status !== 'Active') {
+      return false;
+    }
+
+    return $user;
+  }
+
+
+
+
+  public function loginEmployee(string $email, string $password)
+  {
+    // Find the user with the given email and user_type 'company'
+    $user = User::where('email', $email)
+      ->where('user_type', 'employee')
+      ->first();
+
+    if (!$user) {
+      return false;
+    }
+
+
+    if (!password_verify($password, $user->password)) {
+      return false;
+    }
+
+
+    if (!$user->company || $user->employee->company->status !== 'Active') {
       return false;
     }
 

@@ -7,12 +7,17 @@
             <div class="container">
                 <div class="row justify-content-center">
 
-
-
-
                     <div class="col-lg-4 col-md-7">
                         <div class="card border-0 mb-0">
-                            <div class="card-header bg-transparent text-center">
+
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <a href="{{ route('company.auth.empLogin', ['company' => $company]) }}"
+                                    class="btn btn-sm btn-secondary">
+                                    Employee Login
+                                </a>
+                            </div>
+
+                            <div class="card-header bg-transparent text-center mt-5">
                                 <div class="d-flex flex-column align-items-center justify-content-center mt-2 mb-4">
                                     <div class="d-flex flex-column align-items-center justify-content-center">
                                         <img src="{{ getCompanyLogoUrl() }}" alt="Logo" class="login-logo mb-2"

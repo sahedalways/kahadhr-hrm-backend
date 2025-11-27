@@ -11,8 +11,8 @@ trait ToastTrait
    * @param string $type (success, error, info, warning)
    * @return void
    */
-  public function toast(string $message, string $type = 'success'): void
+  public function toast(string $message, string $type = 'success', ?string $route = null): void
   {
-    $this->dispatch('toast', message: $message, notify: $type);
+    $this->dispatch('toast', message: $message, notify: $type, route: $route);
   }
 }

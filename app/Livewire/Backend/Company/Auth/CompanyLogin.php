@@ -6,12 +6,14 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
 use App\Services\API\VerificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 
 class CompanyLogin extends BaseComponent
 {
     public $email, $phone_no, $userId, $password, $success = false;
     public $otp = [], $generatedOtp, $showOtpModal = false;
+    public $company;
     public $updating_field;
     public $code_sent = false;
     public $otpCooldown = 0;
@@ -28,7 +30,9 @@ class CompanyLogin extends BaseComponent
     //Render Page
     public function render()
     {
-        return view('livewire.backend.company.auth.company_login')->extends('components.layouts.login_layout')->section('content');
+        return view('livewire.backend.company.auth.company_login', ['company' => $this->company])
+            ->extends('components.layouts.login_layout')
+            ->section('content');
     }
 
 
@@ -153,8 +157,11 @@ class CompanyLogin extends BaseComponent
 
 
     //Initialize Variables
-    public function mount()
+    public function mount(Request $request)
     {
+        $this->company = $request->route('company') ?? null;
+
+
         if (app('authUser')) {
             if (app('authUser')->user_type == 'company') {
                 return redirect()->route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]);

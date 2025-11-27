@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->constrained()->onDelete('cascade');
             $table->enum('calendar_year', ['english', 'hmrc'])
                 ->default('english');
-
             $table->timestamps();
         });
     }

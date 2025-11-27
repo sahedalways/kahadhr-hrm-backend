@@ -29,6 +29,12 @@ class AuthRepository
   }
 
 
+  public function loginEmployee(string $email, string $password)
+  {
+    return $this->authService->loginEmployee($email, $password);
+  }
+
+
   public function sendOtpSms($phone, $otp)
   {
     $this->authService->sendOtpSms($phone, $otp);

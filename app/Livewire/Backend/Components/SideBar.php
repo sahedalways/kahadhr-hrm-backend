@@ -30,8 +30,25 @@ class SideBar extends Component
 
     public function logout()
     {
-        Auth::logout();
-        Session::flush();
+        $user = auth()->user();
+
+        if ($user && $user->user_type == 'employee' && $user->employee) {
+            $sub = $user->employee->company->sub_domain;
+            auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+
+            return redirect()->route('employee.auth.empLogin', [
+                'company' => $sub
+            ]);
+        }
+
+
+        auth()->logout();
+        session()->invalidate();
+        session()->regenerateToken();
+
+
         return redirect('/');
     }
 }

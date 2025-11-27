@@ -3,6 +3,9 @@
 use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Employee\Dashboard;
 use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
+use App\Livewire\Backend\Employee\Settings\ProfileSettings;
+use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
+use App\Livewire\Backend\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,4 +38,12 @@ Route::domain('{company}.' . config('app.base_domain'))
   ->group(function () {
     // Dashboard home
     Route::get('/', Dashboard::class)->name('index');
+
+
+    // Settings routes
+    Route::prefix('settings')->name('settings.')->group(function () {
+      Route::get('password', PasswordSettings::class)->name('password');
+      Route::get('profile', ProfileSettings::class)->name('profile');
+      Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
+    });
   });

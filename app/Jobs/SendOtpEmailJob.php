@@ -18,17 +18,17 @@ class SendOtpEmailJob implements ShouldQueue
 
   protected $email;
   protected $otp;
-  protected $companyName;
+  protected $name;
 
 
   /**
    * Create a new job instance.
    */
-  public function __construct(string $email, $otp, ?string $companyName = null)
+  public function __construct(string $email, $otp, ?string $name = null)
   {
     $this->email = $email;
     $this->otp = $otp;
-    $this->companyName = $companyName;
+    $this->name = $name;
   }
 
   /**
@@ -61,7 +61,7 @@ class SendOtpEmailJob implements ShouldQueue
     try {
       Mail::send('mail.email_verification', [
         'data' => [
-          'companyName' => $this->companyName,
+          'companyName' => $this->name,
           'otp'      => $this->otp,
           'email'    => $this->email,
           'title'    => "Your Email Verification Code",

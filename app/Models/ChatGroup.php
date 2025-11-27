@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class ChatGroup extends Model
 {
+    use FilterByUserType;
     protected $fillable = ['company_id', 'name', 'created_by'];
 
     public function company()

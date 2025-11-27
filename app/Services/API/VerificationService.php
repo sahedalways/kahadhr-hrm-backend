@@ -16,7 +16,7 @@ class VerificationService
     $this->repository = $repository;
   }
 
-  public function sendEmailOtp(?string $email = null,  ?string $companyName = null): bool
+  public function sendEmailOtp(?string $email = null,  ?string $name = null): bool
   {
     // $otp = rand(100000, 999999);
     $otp = 123456;
@@ -27,7 +27,7 @@ class VerificationService
     ]);
 
     if ($email) {
-      SendOtpEmailJob::dispatch($email, $otp, $companyName)->onConnection('sync')->onQueue('urgent');
+      SendOtpEmailJob::dispatch($email, $otp, $name)->onConnection('sync')->onQueue('urgent');
     }
 
     // if ($phone) {
@@ -39,7 +39,7 @@ class VerificationService
 
 
 
-  public function sendPhoneOtp(string $phoneNo,  ?string $companyName = null): bool
+  public function sendPhoneOtp(string $phoneNo,  ?string $name = null): bool
   {
     // $otp = rand(100000, 999999);
     $otp = 123456;

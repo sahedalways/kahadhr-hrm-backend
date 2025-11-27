@@ -2,7 +2,6 @@
 
 
 use App\Http\Controllers\Company\EmployeeController;
-use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Dashboard;
@@ -21,7 +20,6 @@ use App\Livewire\Backend\Company\Settings\ProfileSettings;
 use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
 use App\Livewire\Backend\Company\Training\TrainingIndex;
-use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use App\Livewire\Backend\Settings\SmsSettings;

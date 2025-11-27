@@ -89,16 +89,16 @@
 
         <!-- Header -->
         <div class="email-header">
-            {{ $data['title'] ?? 'Email Verification' }} – {{ $data['companyName'] ?? siteSetting()->site_title }}
+            {{ $data['title'] ?? 'Email Verification' }} – {{ siteSetting()->site_title }}
         </div>
 
         <!-- Body -->
         <div class="email-body">
             <h2>Email Verification Code</h2>
 
-            <p>Hello,</p>
-            <p>We received a request to verify your email <strong>{{ $data['email'] }}</strong> for
-                <strong>{{ $data['companyName'] ?? siteSetting()->site_title }}</strong>.
+            <p>Hello {{ $data['name'] ?? null }},</p>
+            <p>We received a request to verify your email <strong>{{ $data['email'] }}</strong> of
+                <strong>{{ siteSetting()->site_title ?? null }}</strong>.
             </p>
 
             <div class="otp-box">

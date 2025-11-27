@@ -7,13 +7,22 @@
 
         @php
             $authUser = app('authUser');
-            $logoHref =
-                $authUser->user_type === 'company'
-                    ? route('company.dashboard.index', ['company' => $authUser->company->sub_domain])
-                    : route('super-admin.home');
 
-            $logoUrl = $authUser->user_type === 'company' ? getCompanyLogoUrl() : asset(siteSetting()->logo_url);
+            $logoHref = match ($authUser->user_type) {
+                'company' => route('company.dashboard.index', ['company' => $authUser->company->sub_domain]),
+                'employee' => route('employee.dashboard.index', [
+                    'company' => $authUser->employee->company->sub_domain,
+                ]),
+                default => route('super-admin.home'),
+            };
+
+            $logoUrl = match ($authUser->user_type) {
+                'company' => getCompanyLogoUrl(),
+                'employee' => $authUser->employee->company ? getCompanyLogoUrl() : asset(siteSetting()->logo_url),
+                default => asset(siteSetting()->logo_url),
+            };
         @endphp
+
 
         <a class="navbar-brand m-0" href="{{ $logoHref }}">
             <img src="{{ $logoUrl }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
@@ -488,6 +497,62 @@
                         </div>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#settings"
+                        class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
+                        aria-controls="settings" role="button" aria-expanded="false">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Settings</span>
+                    </a>
+
+
+
+
+                    <div class="collapse {{ Request::is('employee/dashboard/settings*') ? 'show' : '' }}"
+                        id="settings">
+                        <ul class="nav ms-4">
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/settings/profile') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.settings.profile', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fas fa-user sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Profile Settings </span>
+                                </a>
+                            </li>
+
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/settings/verification-center') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.settings.verification-center', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fas fa-shield-alt sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Verification Center </span>
+                                </a>
+                            </li>
+
+
+
+                            <!-- Password Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/settings/password') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> Password Settings </span>
+                                </a>
+                            </li>
+
+
+
+                        </ul>
+                    </div>
+
                 </li>
 
 

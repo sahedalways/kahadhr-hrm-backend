@@ -26,10 +26,18 @@ if (!function_exists('getFileUrl')) {
      */
     function getCompanyLogoUrl(): string
     {
+      $user = auth()->user();
+      $company = null;
 
-      $company = auth()->check() ? auth()->user()->company : null;
+      if ($user) {
+        if ($user->user_type === 'company') {
+          $company = $user->company;
+        } elseif ($user->user_type === 'employee' && $user->employee) {
+          $company = $user->employee->company;
+        }
+      }
 
-
+      // Check company logo
       if ($company && $company->company_logo && file_exists(storage_path('app/public/' . ltrim($company->company_logo, '/')))) {
         return asset('storage/' . ltrim($company->company_logo, '/'));
       }
@@ -44,7 +52,6 @@ if (!function_exists('getFileUrl')) {
       return asset('assets/img/default-image.jpg');
     }
   }
-
 
 
 

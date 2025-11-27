@@ -96,10 +96,6 @@ class Employee extends Model
                 $builder->whereNull('company_id');
             } elseif ($user->user_type === 'company') {
                 $builder->where('company_id', $user->company->id ?? 0);
-            } elseif (in_array($user->user_type, ['employee', 'teamLead'])) {
-                $builder->whereHas('company.employees', function (Builder $query) use ($user) {
-                    $query->where('id', $user->id);
-                });
             }
         });
     }

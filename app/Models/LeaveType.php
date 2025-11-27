@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class LeaveType extends Model
 {
+    use FilterByUserType;
     protected $fillable = ['company_id', 'name', 'emoji', 'is_adjustable'];
 
     public function company()

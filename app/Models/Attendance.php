@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
+    use FilterByUserType;
     protected $fillable = [
         'user_id',
         'company_id',

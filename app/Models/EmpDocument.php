@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class EmpDocument extends Model
 {
+    use FilterByUserType;
     protected $fillable = [
         'doc_type_id',
         'emp_id',

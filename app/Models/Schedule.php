@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
+    use FilterByUserType;
     protected $fillable = ['company_id', 'user_id', 'date', 'start_time', 'end_time', 'notes'];
 
     public function company()

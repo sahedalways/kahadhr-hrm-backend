@@ -61,7 +61,7 @@ class SiteSetting extends Model
             $user = auth()->check() ? app('authUser') : null;
 
             if (!$user) {
-                // Guest: show SuperAdmin items only
+                // Guest see only superAdmin/global employees (if any)
                 $builder->whereNull('company_id');
                 return;
             }
@@ -71,9 +71,7 @@ class SiteSetting extends Model
             } elseif ($user->user_type === 'company') {
                 $builder->where('company_id', $user->company->id ?? 0);
             } elseif (in_array($user->user_type, ['employee', 'teamLead'])) {
-                $builder->whereHas('company.employees', function (Builder $query) use ($user) {
-                    $query->where('id', $user->id);
-                });
+                $builder->where('company_id', $user->employee->company->id ?? 0);
             }
         });
 

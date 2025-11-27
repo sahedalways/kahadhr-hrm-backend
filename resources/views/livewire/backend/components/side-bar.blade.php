@@ -475,6 +475,34 @@
                     </a>
                 </li>
             @endif
+
+
+
+            @if (app('authUser')->user_type == 'employee')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('employee.dashboard.index') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+
+
+
+
+                <li class="nav-item">
+                    <a class="nav-link" wire:click.prevent="logout" href="#">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Logout</span>
+                    </a>
+                </li>
+            @endif
         </ul>
     </div>
     <hr class="horizontal dark mt-2">

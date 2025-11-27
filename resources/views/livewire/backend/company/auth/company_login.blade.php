@@ -11,7 +11,7 @@
                         <div class="card border-0 mb-0">
 
                             <div class="position-absolute top-0 end-0 p-2">
-                                <a href="{{ route('company.auth.empLogin', ['company' => $company]) }}"
+                                <a href="{{ route('employee.auth.empLogin', ['company' => $company]) }}"
                                     class="btn btn-sm btn-secondary">
                                     Employee Login
                                 </a>

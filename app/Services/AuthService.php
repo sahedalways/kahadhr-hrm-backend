@@ -58,7 +58,7 @@ class AuthService
   public function loginEmployee(string $email, string $password)
   {
     // Find the user with the given email and user_type 'company'
-    $user = User::where('email', $email)
+    $user = User::with('employee', 'employee.company')->where('email', $email)
       ->where('user_type', 'employee')
       ->first();
 
@@ -72,9 +72,18 @@ class AuthService
     }
 
 
-    if (!$user->company || $user->employee->company->status !== 'Active') {
+    $employee = $user->employee()->withoutGlobalScopes()->first();
+
+    if (!$employee) {
       return false;
     }
+
+    $company = $employee->company()->withoutGlobalScopes()->first();
+
+    if (!$company || $company->status !== 'Active') {
+      return false;
+    }
+
 
     return $user;
   }

@@ -151,7 +151,7 @@ class UsersIndex extends BaseComponent
         ]);
 
         $inviteUrl = route(
-            'company.auth.employee.set-password',
+            'employee.auth.set-password',
             [
                 'company' => app('authUser')->company->sub_domain,
                 'token' => $employee->invite_token,
@@ -225,7 +225,7 @@ class UsersIndex extends BaseComponent
 
 
         $inviteUrl = route(
-            'company.auth.employee.set-password',
+            'employee.auth.set-password',
             [
                 'company' => app('authUser')->company->sub_domain,
                 'token' => $employee->invite_token,

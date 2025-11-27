@@ -9,5 +9,9 @@ require __DIR__ . '/admin.php';
 require __DIR__ . '/company.php';
 
 
+// all those employee routes below
+require __DIR__ . '/employee.php';
+
+
 // dev tools routes below
 require __DIR__ . '/dev-tools.php';

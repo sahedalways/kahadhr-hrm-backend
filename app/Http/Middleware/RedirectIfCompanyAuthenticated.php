@@ -10,9 +10,21 @@ class RedirectIfCompanyAuthenticated
 {
     public function handle(Request $request, Closure $next, $guard = 'web')
     {
-        // Check if company admin is logged in
-        if (Auth::guard($guard)->check()) {
-            return redirect()->route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]);
+        $authUser = app('authUser');
+
+        if ($authUser) {
+            if ($authUser->user_type === 'company') {
+                return redirect()->route(
+                    'company.dashboard.index',
+                    ['company' => $authUser->company->sub_domain]
+                );
+            } elseif ($authUser->user_type === 'employee') {
+
+                return redirect()->route(
+                    'employee.dashboard.index',
+                    ['company' => $authUser->employee->company->sub_domain]
+                );
+            }
         }
 
         return $next($request);

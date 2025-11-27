@@ -28,7 +28,7 @@ class EmployeeLogin extends BaseComponent
         $authUser = app('authUser');
         if ($authUser?->user_type === 'employee') {
             return redirect()->route(
-                'company.employee.dashboard.index',
+                'employee.dashboard.index',
                 ['company' => $authUser->employee->company->sub_domain]
             );
         }
@@ -53,13 +53,16 @@ class EmployeeLogin extends BaseComponent
 
         // Check company subdomain
         $currentSubdomain = explode('.', request()->getHost())[0];
-        if ($user->company?->sub_domain !== $currentSubdomain) {
+        $employee = $user->employee()->withoutGlobalScopes()->first();
+
+        if (!$employee || $employee->company?->sub_domain !== $currentSubdomain) {
             return $this->toast('Invalid subdomain for this account.', 'error');
         }
 
 
+
         Auth::loginUsingId($user->id, $this->rememberMe);
 
-        return redirect()->intended('dashboard/');
+        return redirect()->intended(route('employee.dashboard.index', ['company' => $employee->company->sub_domain]));
     }
 }

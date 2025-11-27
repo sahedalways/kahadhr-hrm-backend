@@ -13,3 +13,5 @@ Schedule::command('companies:charge')->dailyAt('00:00');
 
 
 Schedule::command('otp:delete-expired')->dailyAt('00:00');
+
+Schedule::command('documents:update-expired')->dailyAt('00:00');

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Company\DocumentManage;
 
+use App\Jobs\EmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\Employee;
@@ -69,7 +70,7 @@ class DocumentManageIndex extends BaseComponent
         $filePath = $this->file_path->store('pdf/company/documents', 'public');
 
 
-        CompanyDocument::create([
+        $doc =  CompanyDocument::create([
             'company_id' => $this->company_id,
             'emp_id' => $this->emp_id,
             'name' => $this->name,
@@ -77,6 +78,10 @@ class DocumentManageIndex extends BaseComponent
             'expires_at' => $this->expires_at,
             'status' => 'pending',
         ]);
+
+        if ($this->emp_id) {
+            EmployeeAssignedNotificationJob::dispatch($doc->id)->onConnection('sync')->onQueue('urgent');
+        }
 
         $this->toast('Document created successfully!', 'success');
         $this->dispatch('closemodal');
@@ -120,6 +125,8 @@ class DocumentManageIndex extends BaseComponent
             return;
         }
 
+        $oldEmpId = $doc->emp_id;
+
 
         $newFilePath = $doc->file_path;
 
@@ -140,6 +147,10 @@ class DocumentManageIndex extends BaseComponent
             'expires_at' => $this->expires_at,
             'file_path'  => $newFilePath,
         ]);
+
+        if (!$oldEmpId && $this->emp_id) {
+            EmployeeAssignedNotificationJob::dispatch($doc->id);
+        }
 
         $this->toast('Document updated successfully!', 'success');
         $this->dispatch('closemodal');

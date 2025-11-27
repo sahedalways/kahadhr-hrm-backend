@@ -501,6 +501,45 @@
 
 
                 <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#documents"
+                        class="nav-link {{ Request::is('employee/dashboard/documents*') ? 'active' : '' }}"
+                        aria-controls="documents" role="button" aria-expanded="false">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="ni ni-folder-17 text-danger text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Documents</span>
+                    </a>
+
+                    <div class="collapse {{ Request::is('employee/dashboard/documents*') ? 'show' : '' }}"
+                        id="documents">
+                        <ul class="nav ms-4">
+
+                            {{-- Assigned Documents --}}
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/documents/assigned') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.documents.assigned', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fas fa-file-alt sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Assigned Documents </span>
+                                </a>
+                            </li>
+
+                            {{-- Manage Documents --}}
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/documents/manage') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.documents.manage', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fas fa-folder-open sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Manage Documents </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+
+
+                <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">

@@ -18,10 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'superAdmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'companyAdmin' => \App\Http\Middleware\CompanyAdmin::class,
             'checkCompanySubdomain' => \App\Http\Middleware\CheckCompanySubdomain::class,
-            'employee' => \App\Http\Middleware\Employee::class,
+            'checkEmployee' => \App\Http\Middleware\CheckEmployee::class,
             'cors' => \App\Http\Middleware\Cors::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            'guest' => \App\Http\Middleware\RedirectIfCompanyAuthenticated::class,
+            'guest' => \App\Http\Middleware\RedirectIfCompanyorEmployeeAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

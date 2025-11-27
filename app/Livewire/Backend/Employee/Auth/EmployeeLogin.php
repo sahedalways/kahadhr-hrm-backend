@@ -26,7 +26,7 @@ class EmployeeLogin extends BaseComponent
 
         // Redirect already logged-in employees
         $authUser = app('authUser');
-        if ($authUser?->user_type === 'employee') {
+        if ($authUser?->user_type === 'employee' && $authUser->employee?->company?->sub_domain) {
             return redirect()->route(
                 'employee.dashboard.index',
                 ['company' => $authUser->employee->company->sub_domain]

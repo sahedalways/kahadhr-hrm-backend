@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 
-class Employee
+class CheckEmployee
 {
     public function handle(Request $request, Closure $next)
     {

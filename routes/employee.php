@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public routes for company (no auth required)
+| Public routes for employee (no auth required)
 |--------------------------------------------------------------------------
 */
 
@@ -25,12 +25,12 @@ Route::domain('{company}.' . config('app.base_domain'))
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated company dashboard routes
+| Authenticated employee dashboard routes
 |--------------------------------------------------------------------------
 */
 Route::domain('{company}.' . config('app.base_domain'))
   ->prefix('employee/dashboard')
-  ->middleware(['auth', 'employee'])
+  ->middleware(['auth', 'checkEmployee'])
   ->name('employee.dashboard.')
   ->group(function () {
     // Dashboard home

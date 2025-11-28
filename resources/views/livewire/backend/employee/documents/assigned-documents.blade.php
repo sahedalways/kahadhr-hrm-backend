@@ -10,6 +10,16 @@
                 <option value="desc">Newest First</option>
                 <option value="asc">Oldest First</option>
             </select>
+
+
+        </div>
+        <div class="col-md-3 mb-2">
+            <select class="form-select" wire:change="handleFilter($event.target.value)">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="signed">Signed</option>
+                <option value="expired">Expired</option>
+            </select>
         </div>
     </div>
 

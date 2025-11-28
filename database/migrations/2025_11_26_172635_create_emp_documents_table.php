@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('emp_documents', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             // Document Type
             $table->foreignId('doc_type_id')
                 ->constrained('document_types')
@@ -31,6 +32,8 @@ return new class extends Migration
             $table->string('file_path')->nullable();
 
             $table->date('expires_at')->nullable();
+
+
             $table->timestamps();
         });
     }

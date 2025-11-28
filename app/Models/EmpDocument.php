@@ -14,6 +14,7 @@ class EmpDocument extends Model
         'company_id',
         'file_path',
         'expires_at',
+        'comment',
     ];
 
     public function documentType()
@@ -29,5 +30,15 @@ class EmpDocument extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+
+    public function getDocumentUrlAttribute()
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return asset('storage/' . $this->file_path);
     }
 }

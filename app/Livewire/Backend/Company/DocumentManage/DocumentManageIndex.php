@@ -22,7 +22,7 @@ class DocumentManageIndex extends BaseComponent
     public $search, $sortOrder = 'desc', $perPage = 10;
     public $loaded, $lastId = null, $hasMore = true;
     public $employees;
-
+    public $statusFilter = null;
     protected $listeners = [
         'deleteDocument' => 'deleteDocument',
         'sortUpdated' => 'handleSort'
@@ -176,6 +176,14 @@ class DocumentManageIndex extends BaseComponent
         $this->resetLoaded();
     }
 
+
+    public function handleFilter($value)
+    {
+        $this->statusFilter = $value;
+        $this->resetLoaded();
+    }
+
+
     public function loadMore()
     {
         if (!$this->hasMore) return;
@@ -188,6 +196,11 @@ class DocumentManageIndex extends BaseComponent
 
         if ($this->lastId) {
             $query->where('id', $this->sortOrder === 'desc' ? '<' : '>', $this->lastId);
+        }
+
+
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
         }
 
         $items = $query->orderBy('id', $this->sortOrder)

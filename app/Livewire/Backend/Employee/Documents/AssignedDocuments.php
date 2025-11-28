@@ -22,6 +22,7 @@ class AssignedDocuments extends BaseComponent
 
     protected $listeners = ['refreshDocuments' => '$refresh'];
     public $currentDocument;
+    public $statusFilter = null;
 
     public function mount()
     {
@@ -47,6 +48,12 @@ class AssignedDocuments extends BaseComponent
         $this->resetLoaded();
     }
 
+    public function handleFilter($value)
+    {
+        $this->statusFilter = $value;
+        $this->resetLoaded();
+    }
+
     public function loadMore()
     {
         if (!$this->hasMore) return;
@@ -60,6 +67,11 @@ class AssignedDocuments extends BaseComponent
 
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
         }
 
         if ($this->lastId) {
@@ -79,21 +91,6 @@ class AssignedDocuments extends BaseComponent
         if ($items->count() < $this->perPage) {
             $this->hasMore = false;
         }
-    }
-
-    private function resetLoaded()
-    {
-        $this->loaded = collect();
-        $this->lastId = null;
-        $this->hasMore = true;
-        $this->loadMore();
-    }
-
-
-
-    public function openDocumentModal($docId)
-    {
-        $this->currentDocument = CompanyDocument::find($docId);
     }
 
 
@@ -148,5 +145,21 @@ class AssignedDocuments extends BaseComponent
         EmployeeSignedNotificationJob::dispatch($this->currentDocument->id)->onConnection('sync')->onQueue('urgent');
 
         $this->toast('Signature added to PDF successfully!', 'success');
+        $this->resetLoaded();
+    }
+
+    public function resetLoaded()
+    {
+        $this->loaded = collect();
+        $this->lastId = null;
+        $this->hasMore = true;
+        $this->loadMore();
+    }
+
+
+
+    public function openDocumentModal($docId)
+    {
+        $this->currentDocument = CompanyDocument::find($docId);
     }
 }

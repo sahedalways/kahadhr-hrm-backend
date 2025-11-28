@@ -38,7 +38,7 @@
                         <div class="row g-3 align-items-center mb-3">
 
                             <!-- Search Input -->
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i
                                             class="bi bi-search"></i></span>
@@ -49,11 +49,20 @@
                             </div>
 
                             <!-- Sort -->
-                            <div class="col-md-4 d-flex gap-2">
+                            <div class="col-md-3 d-flex gap-2">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mb-2">
+                                <select class="form-select" wire:change="handleFilter($event.target.value)">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="signed">Signed</option>
+                                    <option value="expired">Expired</option>
                                 </select>
                             </div>
                         </div>

@@ -5,12 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("message_input");
     const trigger = document.getElementById("show_emoji_box");
 
-    if (!trigger || !input) return; // safety check
+    if (!trigger || !input) return;
 
-    // Initialize Emoji Picker
     const picker = new EmojiButton({
-        position: "top-start", // adjust position relative to button
-        autoHide: false, // allow multiple emoji selections
+        position: "top-start",
+        autoHide: false,
     });
 
     // When an emoji is selected
@@ -24,10 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
         input.focus();
         input.selectionStart = input.selectionEnd = start + emojiChar.length;
 
-        // Trigger input event for Livewire
         input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-    // Toggle emoji picker on button click
     trigger.addEventListener("click", () => picker.togglePicker(trigger));
 });

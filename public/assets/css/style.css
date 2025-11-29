@@ -511,4 +511,13 @@ margin-top: 1rem;
             color: #000;
             border-bottom-left-radius: 2px !important;
         }
-        
+        .hover-bg-light:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+}
+
+.mention {
+    font-weight: bold;
+    color: rgb(255, 255, 255); 
+    
+}

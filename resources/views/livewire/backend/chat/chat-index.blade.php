@@ -130,6 +130,33 @@
                 <p class="text-center text-muted my-3" style="font-size: 0.8rem;">Today</p>
 
                 @foreach ($messages as $msg)
+                    @php
+                        $employees = auth()->user()->company ? auth()->user()->company->employees()->get() : collect();
+
+                        $message = $msg->message;
+
+                        // Escape the rest of the message to prevent XSS
+                        $message = e($message);
+
+                        foreach ($employees as $user) {
+                            $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                            if (empty($displayName)) {
+                                $displayName = $user->email ?? '';
+                            }
+
+                            // Only keep first word if mention is typed as single word
+                            $displayName = explode(' ', $displayName)[0];
+
+                            // Match @name (case-insensitive)
+                            $pattern = '/@' . preg_quote($displayName, '/') . '/i';
+                            $replacement = '<span class="mention">@' . $displayName . '</span>';
+
+                            $message = preg_replace($pattern, $replacement, $message);
+                        }
+                    @endphp
+
+
+
                     <div
                         class="mb-3 d-flex {{ $msg->sender_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
                         <div
@@ -137,7 +164,7 @@
 
                             <div class="message-bubble {{ $msg->sender_id == auth()->id() ? 'outgoing-message' : 'incoming-message' }}"
                                 style="border-radius: 12px; position: relative; padding-right: 1.5rem; width: 300px;">
-                                {{ $msg->message }}
+                                {!! $message !!}
 
                                 @if ($msg->sender_id == auth()->id())
                                     <i class="fas fa-check-double"
@@ -211,9 +238,29 @@
 
 
 
-                        <!-- Mention Button -->
-                        <button type="button" class="btn btn-light rounded-circle p-2" id="mentionBtn"
+                        <button type="button" class="btn btn-light rounded-circle p-2" wire:click="toggleMentionBox"
                             title="Mention">@</button>
+
+                        <!-- Mention Dropdown -->
+                        @if ($showMentionBox)
+                            <div class="position-absolute bg-white border shadow-sm p-2"
+                                style="top:-150px; left:50px; z-index:1000; width:200px; max-height:200px; overflow-y:auto;">
+                                <input type="text" class="form-control mb-1" placeholder="Search..."
+                                    wire:model="mentionSearch">
+
+                                @foreach ($mentionUsers->filter(fn($u) => stripos($u->f_name . ' ' . $u->l_name ?: $u->email, $mentionSearch) !== false) as $user)
+                                    <div class="p-2 hover-bg-light cursor-pointer"
+                                        wire:click="selectMention({{ $user->id }})">
+                                        {{ trim($user->f_name . ' ' . $user->l_name) ?: $user->email }}
+                                    </div>
+                                @endforeach
+
+
+                                @if ($mentionUsers->filter(fn($u) => stripos($u->f_name . ' ' . $u->l_name, $mentionSearch) !== false)->isEmpty())
+                                    <div class="text-muted p-2">No users found</div>
+                                @endif
+                            </div>
+                        @endif
 
                     </div>
 
@@ -252,5 +299,32 @@
     Livewire.on("scrollToBottom", () => {
         const box = document.getElementById("chatScroll");
         setTimeout(() => (box.scrollTop = box.scrollHeight), 50);
+    });
+
+    document.addEventListener("insert-mention", (e) => {
+        const input = document.getElementById("message_input");
+        if (!input) return;
+
+        const mentionHtml = e.detail?.[0]?.html || '';
+        if (!mentionHtml) return;
+
+        // Convert <span> mention HTML to plain text, e.g., "@sahed"
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = mentionHtml;
+        const mentionText = tempDiv.innerText;
+
+        // Insert at current cursor position
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + mentionText + input.value.substring(end);
+
+        // Move cursor after inserted mention
+        const cursorPos = start + mentionText.length;
+        input.setSelectionRange(cursorPos, cursorPos);
+
+        // Trigger Livewire update
+        input.dispatchEvent(new Event('input', {
+            bubbles: true
+        }));
     });
 </script>

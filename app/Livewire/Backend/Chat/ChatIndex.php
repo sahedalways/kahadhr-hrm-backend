@@ -20,7 +20,14 @@ class ChatIndex extends BaseComponent
     public $typing = false;
     public $typingUser = null;
 
+    public $showMentionBox = false;
+    public $mentionUsers = [];
+    public $mentionSearch = '';
+    public $selectedMention = null;
+
     protected $listeners = ['incomingMessage'];
+
+
 
     public function mount()
     {
@@ -31,14 +38,16 @@ class ChatIndex extends BaseComponent
             if (auth()->user()->company) {
                 $this->chatUsers = auth()->user()->company
                     ->employees()
-                    ->where('id', '!=', auth()->id())
+                    ->where('user_id', '!=', auth()->id())
+                    ->where('is_active', 1)
                     ->get();
             }
         } else {
             if (auth()->user()->employee && auth()->user()->employee->company) {
                 $this->chatUsers = auth()->user()->employee->company
                     ->employees()
-                    ->where('id', '!=', auth()->id())
+                    ->where('user_id', '!=', auth()->id())
+                    ->where('is_active', 1)
                     ->get();
             }
         }
@@ -135,5 +144,38 @@ class ChatIndex extends BaseComponent
         } else {
             broadcast(new UserTyping(auth()->user(), $this->receiverId))->toOthers();
         }
+    }
+
+
+    public function toggleMentionBox()
+    {
+        $this->showMentionBox = !$this->showMentionBox;
+
+        if ($this->showMentionBox) {
+            $this->mentionUsers = auth()->user()->company
+                ? auth()->user()->company->employees()
+                ->where('user_id', '!=', auth()->id())
+                ->where('is_active', 1)
+                ->get()
+                : collect();
+        }
+    }
+
+    // Insert mention
+    public function selectMention($id)
+    {
+        $employee = collect($this->mentionUsers)->firstWhere('id', $id);
+        if (!$employee) return;
+
+
+        $displayName = trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? ''));
+        if (empty($displayName)) {
+            $displayName = $employee->email ?? 'Unknown';
+        }
+
+        $mentionText = '<span style="color: #0d6efd">@' . $displayName . '</span>&nbsp;';
+
+        $this->dispatch('insert-mention', ['html' => $mentionText]);
+        $this->showMentionBox = false;
     }
 }

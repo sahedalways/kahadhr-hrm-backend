@@ -52,7 +52,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
-document.getElementById("mentionBtn").addEventListener("click", () => {
-    // show employee list to mention
-});

@@ -72,6 +72,7 @@ Route::domain('{company}.' . config('app.base_domain'))
         Route::get('/details/{id}', 'empDetails')->name('details');
 
         Route::post('/change-password/{id}', 'changePassword')->name('changePassword');
+        Route::delete('/documents/delete/{id}', 'destroy');
       });
     });
 

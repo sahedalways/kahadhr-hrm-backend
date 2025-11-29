@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\DocumentType;
+use App\Models\EmpDocument;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Traits\ToastTrait;
@@ -11,12 +13,16 @@ use App\Traits\ToastTrait;
 class EmployeeController extends Controller
 {
     use ToastTrait;
-    public function empDetails($company, $id)
+    public function empDetails($company, $id, Request $request)
     {
+        $details = Employee::with('documents', 'documents.documentType')->findOrFail($id);
 
-        $details = Employee::findOrFail($id);
-        return view('livewire.backend.company.employees.employee-details', compact('details'));
+
+        $types = DocumentType::all();
+
+        return view('livewire.backend.company.employees.employee-details', compact('details', 'types'));
     }
+
 
 
     public function changePassword(Request $request, $company, $id)
@@ -36,5 +42,19 @@ class EmployeeController extends Controller
             'success' => true,
             'message' => 'Password updated successfully!'
         ]);
+    }
+
+
+    public function destroy($id)
+    {
+        $doc = EmpDocument::findOrFail($id);
+
+
+        if ($doc->file_path && file_exists(storage_path('app/public/' . $doc->file_path))) {
+            unlink(storage_path('app/public/' . $doc->file_path));
+        }
+        $doc->delete();
+
+        return response()->json(['success' => true, 'message' => 'Document deleted successfully.']);
     }
 }

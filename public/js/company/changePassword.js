@@ -11,8 +11,6 @@ document
         const csrfToken = document.querySelector(
             'meta[name="csrf-token"]'
         ).content;
-        const baseDomain = document.getElementById("baseDomain").value;
-        const company = document.getElementById("companySubdomain").value;
 
         const submitBtn = document.getElementById("changePasswordBtn");
         const btnText = document.getElementById("btnText");
@@ -73,3 +71,18 @@ document
             submitBtn.disabled = false;
         }
     });
+
+document.querySelectorAll(".toggle-password").forEach(function (element) {
+    element.addEventListener("click", function () {
+        const input = document.querySelector(this.getAttribute("toggle"));
+        const type =
+            input.getAttribute("type") === "password" ? "text" : "password";
+        input.setAttribute("type", type);
+
+        // Change icon
+        this.innerHTML =
+            type === "password"
+                ? '<i class="fa fa-eye"></i>'
+                : '<i class="fa fa-eye-slash"></i>';
+    });
+});

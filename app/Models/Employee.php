@@ -71,6 +71,11 @@ class Employee extends Model
     }
 
 
+    public function documents()
+    {
+        return $this->hasMany(EmpDocument::class, 'emp_id');
+    }
+
 
     // Accessor for logo URL
     public function getAvatarUrlAttribute()

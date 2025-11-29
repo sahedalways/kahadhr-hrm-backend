@@ -10,7 +10,7 @@
 
     <link rel="icon" type="image/png" href="{{ siteSetting()->favicon_url }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <meta http-equiv="Permissions-Policy" content="fullscreen=(self)">
 
     <link href="{{ asset('assets/css/poppinsfont.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />

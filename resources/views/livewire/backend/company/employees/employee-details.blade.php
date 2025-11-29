@@ -30,6 +30,12 @@
                             </a>
 
                             <a class="list-group-item list-group-item-action py-3 fw-semibold" data-bs-toggle="tab"
+                                href="#documentsSection">
+                                <i class="bi bi-folder me-2"></i> Documents
+                            </a>
+
+
+                            <a class="list-group-item list-group-item-action py-3 fw-semibold" data-bs-toggle="tab"
                                 href="#settingsEmp">
                                 <i class="bi bi-gear me-2"></i> Settings
                             </a>
@@ -109,6 +115,82 @@
                         </div>
                     </div>
 
+
+                    <!-- Documents -->
+                    <div class="tab-pane fade" id="documentsSection">
+                        <div class="row g-4"> {{-- parent row with gap --}}
+
+                            @foreach ($types as $type)
+                                @php
+                                    $docsForType = $details->documents->where('doc_type_id', $type->id);
+                                @endphp
+
+                                @if ($docsForType->isEmpty())
+                                    @continue
+                                @endif
+
+                                <div class="col-md-3">
+                                    <div class="card shadow-sm border-0 rounded-3 h-100">
+
+                                        <div
+                                            class="card-header bg-light text-primary fw-semibold d-flex align-items-center">
+                                            <i class="fas fa-folder me-2"></i> {{ $type->name }}
+                                        </div>
+
+                                        <div class="card-body d-flex flex-column">
+
+                                            <div class="mb-3 flex-grow-1">
+
+                                                @foreach ($docsForType as $doc)
+                                                    <div class="shadow-sm rounded p-3 mb-2 border position-relative"
+                                                        data-doc-id="{{ $doc->id }}"
+                                                        onclick="openDocumentModal({{ $type->id }}, {{ $doc->id }}, '{{ $doc->document_url }}', '{{ $doc->expires_at }}', '{{ $doc->comment }}')"
+                                                        style="cursor:pointer; background-color:#f9f9f9; transition: .3s;"
+                                                        data-bs-toggle="modal" data-bs-target="#openDocumentModal"
+                                                        onmouseover="this.style.backgroundColor='#e6f0ff';"
+                                                        onmouseout="this.style.backgroundColor='#f9f9f9';">
+
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-file-pdf text-primary me-2"
+                                                                style="font-size:28px;"></i>
+
+                                                            <div class="flex-grow-1">
+                                                                <div class="fw-semibold text-truncate"
+                                                                    style="max-width: 200px;">
+                                                                    {{ $doc->name ?? 'Document' }}
+                                                                </div>
+
+                                                                <div class="small text-muted mt-1">
+                                                                    Expiry:
+                                                                    <span
+                                                                        class="{{ $doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast() ? 'text-danger' : '' }}">
+                                                                        {{ $doc->expires_at ? \Carbon\Carbon::parse($doc->expires_at)->format('d M, Y') : 'No Expiry' }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        @if ($doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast())
+                                                            <span
+                                                                class="badge bg-danger position-absolute top-0 end-0 m-2">Expired</span>
+                                                        @endif
+
+                                                    </div>
+                                                @endforeach
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
+                    </div>
+
+
+
                     <!-- Settings -->
                     <div class="tab-pane fade" id="settingsEmp">
                         <div class="card border-0 shadow-sm rounded-4">
@@ -160,25 +242,11 @@
         </div>
 
         <!-- Image Preview Modal -->
-
+        @include('livewire.backend.company.components.document-view')
 
     </div>
 
     <script src="{{ asset('js/company/changePassword.js') }}"></script>
-    <script>
-        document.querySelectorAll('.toggle-password').forEach(function(element) {
-            element.addEventListener('click', function() {
-                const input = document.querySelector(this.getAttribute('toggle'));
-                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                input.setAttribute('type', type);
-
-                // Change icon
-                this.innerHTML = type === 'password' ?
-                    '<i class="fa fa-eye"></i>' :
-                    '<i class="fa fa-eye-slash"></i>';
-            });
-        });
-    </script>
-
+    <script src="{{ asset('js/company/document.js') }}"></script>
 
 </x-layouts.app>

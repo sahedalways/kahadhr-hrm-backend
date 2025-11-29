@@ -59,4 +59,21 @@ if (!function_exists('siteSetting')) {
       return $settings?->copyright_text ?? null;
     }
   }
+
+  function currentCompanyId()
+  {
+    $user = auth()->user();
+
+    if (!$user) return null;
+
+    if ($user->user_type === 'company') {
+      return $user->company->id;
+    }
+
+    if ($user->user_type === 'employee') {
+      return $user->employee->company_id;
+    }
+
+    return null;
+  }
 }

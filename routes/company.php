@@ -2,8 +2,8 @@
 
 
 use App\Http\Controllers\Company\EmployeeController;
+use App\Livewire\Backend\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
-use App\Livewire\Backend\Company\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Dashboard;
 use App\Livewire\Backend\Company\DocumentManage\DocumentManageIndex;
 use App\Livewire\Backend\Company\DocumentType\DocumentTypesIndex;

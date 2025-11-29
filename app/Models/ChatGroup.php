@@ -12,7 +12,7 @@ class ChatGroup extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(User::class);
     }
 
     public function creator()

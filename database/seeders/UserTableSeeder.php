@@ -5,130 +5,221 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\CompanyBankInfo;
-use Carbon\Carbon;
+use App\Models\Employee;
+use App\Models\Department;
+use App\Models\Team;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserTableSeeder extends Seeder
 {
-  /**
-   * Seed the application's database.
-   */
   public function run(): void
   {
-
-    /**
-     * ============================
-     *  Create Super Admin User
-     * ============================
-     */
+    // --------------------------
+    // 1. Super Admin
+    // --------------------------
     User::create([
-      'f_name'            => 'Super',
-      'l_name'            => 'Admin',
-      'email'             => 'admin@admin.com',
-      'phone_no'          => '0177xxxxxxx',
-      'profile_completed'          => true,
-      'password'          => Hash::make('12345678'),
-      'user_type'         => 'superAdmin',
-      'email_verified_at' => Carbon::now(),
-      'phone_verified_at' => Carbon::now(),
+      'f_name' => 'Super',
+      'l_name' => 'Admin',
+      'email' => 'admin@admin.com',
+      'phone_no' => '0177xxxxxxx',
+      'profile_completed' => true,
+      'password' => Hash::make('12345678'),
+      'user_type' => 'superAdmin',
+      'email_verified_at' => now(),
+      'phone_verified_at' => now(),
     ]);
 
-
-    /**
-     * ============================
-     *  Create Company User
-     * ============================
-     */
-    $companyUser = User::create([
-      'f_name'            => 'XYZ LTD',
-      'l_name'            => 'Company.',
-      'email'             => 'company@company.com',
-      'phone_no'          => '016165238944',
-      'password'          => Hash::make('12345678'),
-      'user_type'         => 'company',
-      'email_verified_at' => Carbon::now(),
-      'phone_verified_at' => Carbon::now(),
+    // --------------------------
+    // 2. Companies
+    // --------------------------
+    $companyUser1 = User::create([
+      'f_name' => 'XYZ LTD',
+      'l_name' => 'Company',
+      'email' => 'company@company.com',
+      'phone_no' => '016165238944',
+      'password' => Hash::make('12345678'),
+      'user_type' => 'company',
+      'email_verified_at' => now(),
+      'phone_verified_at' => now(),
     ]);
 
-
-    /**
-     * ============================
-     *  Create Company (for the above user)
-     * ============================
-     */
-    $company = Company::create([
-      'user_id'               => $companyUser->id,
-      'company_name'          => 'XYZ IT Solutions Ltd.',
-      'company_house_number'  => 'House 12, Road 8',
-      'company_mobile'        => '016165238944',
-      'company_email'         => 'company@company.com',
-      'subscription_status'  => 'trial',
-      'subscription_start'   => now(),
-      'subscription_end'     => now()->addDays(14),
+    $company1 = Company::create([
+      'user_id' => $companyUser1->id,
+      'company_name' => 'XYZ IT Solutions Ltd.',
+      'company_house_number' => 'House 12, Road 8',
+      'company_mobile' => '016165238944',
+      'company_email' => 'company@company.com',
+      'subscription_status' => 'trial',
+      'subscription_start' => now(),
+      'subscription_end' => now()->addDays(14),
     ]);
-
-
-    /**
-     * ============================
-     *  Create Company Bank Info
-     * ============================
-     */
-
 
     CompanyBankInfo::create([
-      'company_id'  => $company->id,
-      'bank_name'   => 'BRAC Bank',
+      'company_id' => $company1->id,
+      'bank_name' => 'BRAC Bank',
       'card_number' => '5500000000000004',
       'expiry_date' => '11/28',
-      'cvv'         => '321',
+      'cvv' => '321',
     ]);
 
-
-
-    /**
-     * ============================
-     *  Create Another Company User
-     * ============================
-     */
     $companyUser2 = User::create([
-      'f_name'            => 'ABC Tech Ltd',
-      'l_name'            => 'Company.',
-      'email'             => 'abc@company.com',
-      'phone_no'          => '01712345678',
-      'password'          => Hash::make('12345678'),
-      'user_type'         => 'company',
-      'email_verified_at' => Carbon::now(),
-      'phone_verified_at' => Carbon::now(),
+      'f_name' => 'ABC Tech Ltd',
+      'l_name' => 'Company',
+      'email' => 'abc@company.com',
+      'phone_no' => '01712345678',
+      'password' => Hash::make('12345678'),
+      'user_type' => 'company',
+      'email_verified_at' => now(),
+      'phone_verified_at' => now(),
     ]);
 
-    /**
-     * ============================
-     *  Create Another Company (for the above user)
-     * ============================
-     */
     $company2 = Company::create([
-      'user_id'               => $companyUser2->id,
-      'company_name'          => 'ABC Tech Solutions Ltd.',
-      'company_house_number'  => 'House 34, Road 12',
-      'company_mobile'        => '01712345678',
-      'company_email'         => 'abc@company.com',
-      'subscription_status'  => 'trial',
-      'subscription_start'   => now(),
-      'subscription_end'     => now()->addDays(14),
+      'user_id' => $companyUser2->id,
+      'company_name' => 'ABC Tech Solutions Ltd.',
+      'company_house_number' => 'House 34, Road 12',
+      'company_mobile' => '01712345678',
+      'company_email' => 'abc@company.com',
+      'subscription_status' => 'trial',
+      'subscription_start' => now(),
+      'subscription_end' => now()->addDays(14),
     ]);
 
-    /**
-     * ============================
-     *  Create Another Company Bank Info
-     * ============================
-     */
     CompanyBankInfo::create([
-      'company_id'  => $company2->id,
-      'bank_name'   => 'Dutch-Bangla Bank',
+      'company_id' => $company2->id,
+      'bank_name' => 'Dutch-Bangla Bank',
       'card_number' => '5500000000000005',
       'expiry_date' => '09/27',
-      'cvv'         => '123',
+      'cvv' => '123',
     ]);
+
+    // --------------------------
+    // 3. Employees
+    // --------------------------
+    $employeesCompany1 = [
+      ['f_name' => 'John', 'l_name' => 'Doe', 'email' => 'emp@abc.com', 'phone_no' => '01710000001'],
+      ['f_name' => 'Jane', 'l_name' => 'Smith', 'email' => 'jane@abc.com', 'phone_no' => '01710000002'],
+    ];
+
+    $employeesCompany2 = [
+      ['f_name' => 'Alice', 'l_name' => 'Brown', 'email' => 'emp@xyz.com', 'phone_no' => '01720000001'],
+      ['f_name' => 'Bob', 'l_name' => 'Johnson', 'email' => 'jane@xyz.com', 'phone_no' => '01720000002'],
+    ];
+
+    $employeeModels1 = [];
+    foreach ($employeesCompany1 as $emp) {
+      $user = User::create([
+        'f_name' => $emp['f_name'],
+        'l_name' => $emp['l_name'],
+        'email' => $emp['email'],
+        'phone_no' => $emp['phone_no'],
+        'password' => Hash::make('12345678'),
+        'user_type' => 'employee',
+        'email_verified_at' => now(),
+        'phone_verified_at' => now(),
+      ]);
+
+      $employeeModels1[] = Employee::create([
+        'user_id' => $user->id,
+        'company_id' => $company1->id,
+        'role' => 'employee',
+        'email' => $emp['email'],
+        'contract_hours' => 50,
+        'salary_type' => 'hourly',
+        'start_date' => now(),
+      ]);
+    }
+
+    $employeeModels2 = [];
+    foreach ($employeesCompany2 as $emp) {
+      $user = User::create([
+        'f_name' => $emp['f_name'],
+        'l_name' => $emp['l_name'],
+        'email' => $emp['email'],
+        'phone_no' => $emp['phone_no'],
+        'password' => Hash::make('12345678'),
+        'user_type' => 'employee',
+        'email_verified_at' => now(),
+        'phone_verified_at' => now(),
+      ]);
+
+      $employeeModels2[] = Employee::create([
+        'user_id' => $user->id,
+        'company_id' => $company2->id,
+        'role' => 'employee',
+        'email' => $emp['email'],
+        'contract_hours' => 40,
+        'salary_type' => 'hourly',
+        'start_date' => now(),
+      ]);
+    }
+
+    // --------------------------
+    // 4. Departments
+    // --------------------------
+    $departments1 = [];
+    foreach (['IT', 'HR', 'Marketing'] as $deptName) {
+      $departments1[] = Department::create([
+        'company_id' => $company1->id,
+        'name' => $deptName,
+      ]);
+    }
+
+    $departments2 = [];
+    foreach (['Development', 'Support', 'Sales'] as $deptName) {
+      $departments2[] = Department::create([
+        'company_id' => $company2->id,
+        'name' => $deptName,
+      ]);
+    }
+
+    // --------------------------
+    // 5. Teams
+    // --------------------------
+    $teams1 = [];
+    foreach ($departments1 as $dept) {
+      $teams1[] = Team::create([
+        'company_id' => $company1->id,
+        'department_id' => $dept->id,
+        'name' => $dept->name . ' Team 1',
+      ]);
+      $teams1[] = Team::create([
+        'company_id' => $company1->id,
+        'department_id' => $dept->id,
+        'name' => $dept->name . ' Team 2',
+      ]);
+    }
+
+    $teams2 = [];
+    foreach ($departments2 as $dept) {
+      $teams2[] = Team::create([
+        'company_id' => $company2->id,
+        'department_id' => $dept->id,
+        'name' => $dept->name . ' Team 1',
+      ]);
+      $teams2[] = Team::create([
+        'company_id' => $company2->id,
+        'department_id' => $dept->id,
+        'name' => $dept->name . ' Team 2',
+      ]);
+    }
+
+    // --------------------------
+    // 6. Assign employees to teams and departments
+    // --------------------------
+    foreach ($employeeModels1 as $index => $emp) {
+      $team = $teams1[$index % count($teams1)];
+      $emp->team_id = $team->id;
+      $emp->department_id = $team->department_id;
+      $emp->save();
+    }
+
+    foreach ($employeeModels2 as $index => $emp) {
+      $team = $teams2[$index % count($teams2)];
+      $emp->team_id = $team->id;
+      $emp->department_id = $team->department_id;
+      $emp->save();
+    }
   }
 }

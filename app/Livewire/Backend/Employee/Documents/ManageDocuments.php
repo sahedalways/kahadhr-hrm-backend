@@ -149,7 +149,7 @@ class ManageDocuments extends BaseComponent
 
     public function openUploadModal($typeId)
     {
-        $this->resetValidation();
+
         $this->file_path = null;
         $this->comment = null;
         $this->expires_at = null;

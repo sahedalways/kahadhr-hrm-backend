@@ -7,35 +7,36 @@
                     <i class="fas fa-folder-open me-2"></i> Manage Documents
                 </h4>
 
-                <!-- Filters -->
-                <div class="col-md-2 d-flex gap-2">
-                    <!-- Document Type Filter -->
 
-                    <select class="form-select form-select-lg" wire:change="filterByType($event.target.value)">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                    <select class="form-select form-select-lg" style="min-width: 220px;"
+                        wire:change="filterByType($event.target.value)">
                         <option value="">All Types</option>
                         @foreach ($documentTypes as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
                         @endforeach
                     </select>
 
-
-                    <!-- Status Filter -->
-
-                    <select class="form-select form-select-lg" wire:change="handleFilter($event.target.value)">
+                    <select class="form-select form-select-lg" style="min-width: 180px;"
+                        wire:change="handleFilter($event.target.value)">
                         <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="expired">Expired</option>
                     </select>
-
                 </div>
-
-
             </div>
+
 
             <p class="text-white mb-0">View and upload documents for each category. Click a PDF to view or the plus
                 button to upload.</p>
         </div>
     </div>
+    @php
+        $hasDocuments = $documents->isNotEmpty();
+    @endphp
+
+
 
     <div class="row g-4">
         @foreach ($this->filteredDocumentTypes as $type)
@@ -108,6 +109,7 @@
             </div>
         @endforeach
     </div>
+
 
 
 
@@ -218,7 +220,8 @@
 
 
                             <!-- Right: PDF Preview -->
-                            <div class="col-lg-8" wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
+                            <div class="col-lg-8"
+                                wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
                                 <label class="form-label fw-semibold">Document Preview</label>
                                 <div class="border rounded p-2" style="height: 70vh; overflow: auto;">
 

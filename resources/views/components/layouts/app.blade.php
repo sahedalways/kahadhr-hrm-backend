@@ -105,17 +105,12 @@
     </script>
 
     <script>
-        "use strict";
-
-        window.companyId = @json(currentCompanyId());
-        window.userId = @json(auth()->id());
-
-        Echo.channel("company." + window.companyId)
-            .listen("MessageSent", (e) => {
-                Livewire.dispatch('incomingMessage', e.message);
+        Livewire.on('incomingMessage', () => {
+            window.Echo.channel('company.1').listen('MessageSent', (e) => {
+                console.log('New message', e);
             });
+        });
     </script>
-
     <script>
         document.addEventListener("livewire:init", () => {
             Livewire.on("toast", (event) => {

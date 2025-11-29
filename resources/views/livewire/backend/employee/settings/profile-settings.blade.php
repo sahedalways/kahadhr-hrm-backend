@@ -1,7 +1,7 @@
 <div>
     <div class="row align-items-center justify-content-between mb-4">
         <div class="col">
-            <h5 class="fw-500 text-white">Employee Profile Settings</h5>
+            <h5 class="fw-500 text-white">Employee Profile</h5>
         </div>
     </div>
 

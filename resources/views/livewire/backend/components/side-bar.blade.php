@@ -499,6 +499,25 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/profile*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.profile.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fas fa-user"></i>
+                        <span class="nav-link-text ms-1">Profile</span>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/chat*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.chat.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fas fa-comments"></i>
+                        <span class="nav-link-text ms-1">Group / Chat</span>
+                    </a>
+                </li>
+
+
+
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#documents"
@@ -510,6 +529,10 @@
                         </div>
                         <span class="nav-link-text ms-1">Documents</span>
                     </a>
+
+
+
+
 
                     <div class="collapse {{ Request::is('employee/dashboard/documents*') ? 'show' : '' }}"
                         id="documents">
@@ -539,6 +562,12 @@
 
 
 
+
+
+
+
+
+
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
@@ -556,15 +585,6 @@
                     <div class="collapse {{ Request::is('employee/dashboard/settings*') ? 'show' : '' }}"
                         id="settings">
                         <ul class="nav ms-4">
-
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('employee/dashboard/settings/profile') ? 'active' : '' }}"
-                                    href="{{ route('employee.dashboard.settings.profile', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                                    <i class="fas fa-user sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Profile Settings </span>
-                                </a>
-                            </li>
 
 
 

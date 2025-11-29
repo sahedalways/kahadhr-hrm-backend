@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SetPasswordController;
+use App\Livewire\Backend\Chat\ChatIndex;
 use App\Livewire\Backend\Employee\Dashboard;
 use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
 use App\Livewire\Backend\Employee\Documents\AssignedDocuments;
@@ -45,8 +46,18 @@ Route::domain('{company}.' . config('app.base_domain'))
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
       Route::get('password', PasswordSettings::class)->name('password');
-      Route::get('profile', ProfileSettings::class)->name('profile');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
+    });
+
+    // profile manage
+    Route::prefix('profile')->name('profile.')->group(function () {
+      Route::get('/', ProfileSettings::class)->name('index');
+    });
+
+
+    // chat manage
+    Route::prefix('chat')->name('chat.')->group(function () {
+      Route::get('/', ChatIndex::class)->name('index');
     });
 
 

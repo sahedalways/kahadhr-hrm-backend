@@ -20,7 +20,25 @@ class ChatIndex extends BaseComponent
 
     public function mount()
     {
-        $this->chatUsers = auth()->user()->company->employees()->get();
+        // Empty collection default
+        $this->chatUsers = collect();
+
+        if (auth()->user()->user_type == "company") {
+            if (auth()->user()->company) {
+                $this->chatUsers = auth()->user()->company
+                    ->employees()
+                    ->where('id', '!=', auth()->id())
+                    ->get();
+            }
+        } else {
+            if (auth()->user()->employee && auth()->user()->employee->company) {
+                $this->chatUsers = auth()->user()->employee->company
+                    ->employees()
+                    ->where('id', '!=', auth()->id())
+                    ->get();
+            }
+        }
+
         $this->loadMessages();
     }
 
@@ -91,5 +109,12 @@ class ChatIndex extends BaseComponent
         return view('livewire.backend.chat.chat-index', [
             'chatUsers' => $filteredUsers
         ]);
+    }
+
+
+    public function incomingMessage($msg)
+    {
+        $this->messages->push(ChatMessage::find($msg['id']));
+        $this->dispatch('scrollToBottom');
     }
 }

@@ -22,6 +22,6 @@ class MessageSent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('company.' . $this->message->company_id);
+        return new Channel('company.1');
     }
 }

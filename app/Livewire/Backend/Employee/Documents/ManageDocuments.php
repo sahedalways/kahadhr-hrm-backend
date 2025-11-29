@@ -155,7 +155,10 @@ class ManageDocuments extends BaseComponent
         $this->expires_at = null;
         $this->statusFilter = null;
         $this->selectedType = null;
+        $this->existingDocument = null;
         $this->selectedType = $typeId;
+
+        $this->dispatch('reset-file-url');
 
         $employeeId = auth()->user()->employee->id ?? null;
         $this->existingDocument = EmpDocument::where('emp_id', $employeeId)

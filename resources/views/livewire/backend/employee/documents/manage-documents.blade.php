@@ -218,7 +218,7 @@
 
 
                             <!-- Right: PDF Preview -->
-                            <div class="col-lg-8">
+                            <div class="col-lg-8" wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
                                 <label class="form-label fw-semibold">Document Preview</label>
                                 <div class="border rounded p-2" style="height: 70vh; overflow: auto;">
 

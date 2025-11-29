@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Chat;
 
 use App\Events\MessageSent;
+use App\Events\UserTyping;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\ChatMessage;
 
@@ -14,9 +15,12 @@ class ChatIndex extends BaseComponent
     public $tab = 'all';
     public $searchTerm = '';
     public $chatUsers;
-    public $receiverId = 'group'; // default to group chat
+    public $receiverId = 'group';
 
-    protected $listeners = ['incomingMessage' => 'loadMessages'];
+    public $typing = false;
+    public $typingUser = null;
+
+    protected $listeners = ['incomingMessage'];
 
     public function mount()
     {
@@ -82,6 +86,7 @@ class ChatIndex extends BaseComponent
         broadcast(new MessageSent($msg))->toOthers();
 
         $this->messages->push($msg);
+
         $this->messageText = "";
 
         $this->dispatch('scrollToBottom');
@@ -112,9 +117,23 @@ class ChatIndex extends BaseComponent
     }
 
 
-    public function incomingMessage($msg)
+    public function incomingMessage($id)
     {
-        $this->messages->push(ChatMessage::find($msg['id']));
-        $this->dispatch('scrollToBottom');
+        $msg = ChatMessage::find($id);
+        if ($msg && !$this->messages->contains('id', $msg->id)) {
+            $this->messages->push($msg);
+            $this->dispatch('scrollToBottom');
+        }
+    }
+
+    public function userTyping()
+    {
+        if (!$this->receiverId) return;
+
+        if ($this->receiverId === 'group') {
+            broadcast(new UserTyping(auth()->user(), 'chat-between-all-users'))->toOthers();
+        } else {
+            broadcast(new UserTyping(auth()->user(), $this->receiverId))->toOthers();
+        }
     }
 }

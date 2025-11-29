@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
+
     @livewireStyles
     @livewireScripts
 </head>
@@ -104,13 +105,8 @@
         })
     </script>
 
-    <script>
-        Livewire.on('incomingMessage', () => {
-            window.Echo.channel('company.1').listen('MessageSent', (e) => {
-                console.log('New message', e);
-            });
-        });
-    </script>
+
+
     <script>
         document.addEventListener("livewire:init", () => {
             Livewire.on("toast", (event) => {

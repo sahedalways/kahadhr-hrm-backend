@@ -118,6 +118,13 @@
                 </div>
             </div>
 
+            <input type="hidden" id="pusher_key" value="{{ config('broadcasting.connections.pusher.key') }}">
+            <input type="hidden" id="pusher_cluster"
+                value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+            <input type="hidden" id="current_company_id" value="{{ currentCompanyId() }}">
+            <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
+
+
             {{-- Messages --}}
             <div class="flex-grow-1 p-4 main-chat-area" style="overflow-y: auto;" id="chatScroll">
                 <p class="text-center text-muted my-3" style="font-size: 0.8rem;">Today</p>
@@ -125,29 +132,52 @@
                 @foreach ($messages as $msg)
                     <div
                         class="mb-3 d-flex {{ $msg->sender_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
-                        <div class="message-bubble {{ $msg->sender_id == auth()->id() ? 'outgoing-message' : 'incoming-message' }}"
-                            style="border-radius: 12px;">
-                            {{ $msg->message }}
-                            <small style="display: block; color: #bdd2e4; margin-top: 0.25rem; font-size: 0.7rem;">
+                        <div
+                            class="d-flex flex-column align-items-{{ $msg->sender_id == auth()->id() ? 'end' : 'start' }}">
+
+                            <div class="message-bubble {{ $msg->sender_id == auth()->id() ? 'outgoing-message' : 'incoming-message' }}"
+                                style="border-radius: 12px; position: relative; padding-right: 1.5rem; width: 300px;">
+                                {{ $msg->message }}
+
+                                @if ($msg->sender_id == auth()->id())
+                                    <i class="fas fa-check-double"
+                                        style="position: absolute; right: 4px; bottom: 4px; font-size: 0.6rem; color: #9bbbd4;"></i>
+                                @endif
+                            </div>
+
+
+                            <!-- Sender Info Below Bubble -->
+                            <small class="text-muted mt-1" style="font-size: 0.7rem;">
                                 {{ $msg->sender->f_name . ' ' . $msg->sender->l_name }} ·
                                 {{ $msg->created_at->format('H:i') }}
                             </small>
+
                         </div>
                     </div>
                 @endforeach
             </div>
 
+
+            <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
+                <span id="typingUser"></span> is typing...
+            </div>
+
+
+
             {{-- Message Input --}}
             <div class="p-3 border-top d-flex flex-column" style="background: #fff;">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Write something..."
-                        wire:model.defer="messageText" wire:keydown.enter="sendMessage"
+                        wire:model.defer="messageText" wire:model.defer="messageText" wire:keydown="userTyping"
+                        wire:keydown.enter="sendMessage"
                         style="border-radius: 20px; padding-right: 120px; border-color: #ddd;">
                     <div class="position-absolute end-0 top-50 translate-middle-y me-5 pe-2 d-flex align-items-center">
                         <i class="bi bi-emoji-smile text-muted me-3"></i>
                         <i class="bi bi-paperclip text-muted me-3"></i>
                         <i class="bi bi-mic text-muted"></i>
                     </div>
+
+
                     <div class="position-absolute end-0 top-50 translate-middle-y me-2">
                         <button class="btn btn-primary rounded-circle p-0" wire:click="sendMessage"
                             style="width:38px;height:38px;display:flex;justify-content:center;align-items:center;">
@@ -163,9 +193,14 @@
     </div>
 </div>
 
+
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+
+<script src="{{ asset('js/company/chat.js') }}"></script>
+
 <script>
-    Livewire.on('scrollToBottom', () => {
-        const box = document.getElementById('chatScroll');
-        setTimeout(() => box.scrollTop = box.scrollHeight, 50);
+    Livewire.on("scrollToBottom", () => {
+        const box = document.getElementById("chatScroll");
+        setTimeout(() => (box.scrollTop = box.scrollHeight), 50);
     });
 </script>

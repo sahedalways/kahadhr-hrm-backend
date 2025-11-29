@@ -20,8 +20,14 @@ class MessageSent implements ShouldBroadcast
         $this->message = $message->load('sender');
     }
 
+    // Use company ID for the channel
     public function broadcastOn()
     {
-        return new Channel('company.1');
+        return new Channel('company.' . $this->message->company_id);
+    }
+
+    public function broadcastAs()
+    {
+        return 'allUsersMessage';
     }
 }

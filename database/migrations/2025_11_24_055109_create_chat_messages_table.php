@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('group_id')->nullable()->constrained('chat_groups')->onDelete('cascade');
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('receiver_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained('teams')->onDelete('cascade');
             $table->foreignId('company_id')->constrained('users')->onDelete('cascade');
             $table->text('message')->nullable();

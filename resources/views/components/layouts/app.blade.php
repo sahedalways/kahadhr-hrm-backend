@@ -25,6 +25,7 @@
 
 
     @livewireStyles
+
     @livewireScripts
 </head>
 
@@ -182,7 +183,7 @@
     </script>
 
 
-    <script src="{{ asset('js/app.js') }}"></script>
+
     @stack('js')
 
 

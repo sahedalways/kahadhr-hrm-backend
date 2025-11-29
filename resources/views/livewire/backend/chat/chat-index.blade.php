@@ -1,3 +1,8 @@
+<head>
+    @vite('resources/js/app.js')
+</head>
+
+
 <div class="container-fluid chat-app-container">
     <div class="row h-100">
 
@@ -168,6 +173,10 @@
             <div class="p-3 border-top" style="background: #fff;">
                 <div class="input-group position-relative">
 
+                    <input type="text" class="form-control ps-5" placeholder="Write something..."
+                        wire:model.defer="messageText" wire:keydown="userTyping" wire:keydown.enter="sendMessage"
+                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;" id="message_input">
+
                     <!-- LEFT ACTIONS -->
                     <div class="d-flex position-absolute start-0 top-50 translate-middle-y ms-2 align-items-center">
 
@@ -203,12 +212,9 @@
                         </div>
 
                         <!-- Emoji Button -->
-                        <button type="button" class="btn btn-light rounded-circle p-2" id="emojiBtn"
-                            title="Emoji">
-                            <i class="fas fa-smile"></i>
-                        </button>
+                        <button id="show_emoji_box" style="width:40px;height:40px;">😊</button>
 
-                        <emoji-picker id="emojiPicker" style="position: absolute; display: none;"></emoji-picker>
+
 
                         <!-- Mention Button -->
                         <button type="button" class="btn btn-light rounded-circle p-2" id="mentionBtn"
@@ -217,9 +223,7 @@
                     </div>
 
                     <!-- INPUT FIELD -->
-                    {{-- <input type="text" class="form-control ps-5" placeholder="Write something..."
-                        wire:model.defer="messageText" wire:keydown="userTyping" wire:keydown.enter="sendMessage"
-                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;"> --}}
+
 
                     <!-- RIGHT ACTIONS -->
                     <div class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center">

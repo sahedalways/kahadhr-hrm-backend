@@ -15,6 +15,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "@joeattardi/emoji-button": "^4.6.4",
         "emoji-picker-element": "^1.28.0"
     }
 }

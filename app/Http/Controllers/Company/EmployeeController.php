@@ -45,7 +45,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy($company, $id)
     {
         $doc = EmpDocument::findOrFail($id);
 

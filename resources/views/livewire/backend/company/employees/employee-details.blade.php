@@ -118,73 +118,85 @@
 
                     <!-- Documents -->
                     <div class="tab-pane fade" id="documentsSection">
-                        <div class="row g-4"> {{-- parent row with gap --}}
+                        <div class="row g-4">
 
-                            @foreach ($types as $type)
-                                @php
-                                    $docsForType = $details->documents->where('doc_type_id', $type->id);
-                                @endphp
+                            @php
+                                $hasDocs = $details->documents->isNotEmpty();
+                            @endphp
 
-                                @if ($docsForType->isEmpty())
-                                    @continue
-                                @endif
+                            @if (!$hasDocs)
+                                <div class="col-12">
+                                    <div class="alert alert-info text-center text-white">
+                                        No documents found for this employee.
+                                    </div>
+                                </div>
+                            @else
+                                @foreach ($types as $type)
+                                    @php
+                                        $docsForType = $details->documents->where('doc_type_id', $type->id);
+                                    @endphp
 
-                                <div class="col-md-3">
-                                    <div class="card shadow-sm border-0 rounded-3 h-100">
+                                    @if ($docsForType->isEmpty())
+                                        @continue
+                                    @endif
 
-                                        <div
-                                            class="card-header bg-light text-primary fw-semibold d-flex align-items-center">
-                                            <i class="fas fa-folder me-2"></i> {{ $type->name }}
-                                        </div>
+                                    <div class="col-md-3">
+                                        <div class="card shadow-sm border-0 rounded-3 h-100">
 
-                                        <div class="card-body d-flex flex-column">
+                                            <div
+                                                class="card-header bg-light text-primary fw-semibold d-flex align-items-center">
+                                                <i class="fas fa-folder me-2"></i> {{ $type->name }}
+                                            </div>
 
-                                            <div class="mb-3 flex-grow-1">
+                                            <div class="card-body d-flex flex-column">
 
-                                                @foreach ($docsForType as $doc)
-                                                    <div class="shadow-sm rounded p-3 mb-2 border position-relative"
-                                                        data-doc-id="{{ $doc->id }}"
-                                                        onclick="openDocumentModal({{ $type->id }}, {{ $doc->id }}, '{{ $doc->document_url }}', '{{ $doc->expires_at }}', '{{ $doc->comment }}')"
-                                                        style="cursor:pointer; background-color:#f9f9f9; transition: .3s;"
-                                                        data-bs-toggle="modal" data-bs-target="#openDocumentModal"
-                                                        onmouseover="this.style.backgroundColor='#e6f0ff';"
-                                                        onmouseout="this.style.backgroundColor='#f9f9f9';">
+                                                <div class="mb-3 flex-grow-1">
 
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fas fa-file-pdf text-primary me-2"
-                                                                style="font-size:28px;"></i>
+                                                    @foreach ($docsForType as $doc)
+                                                        <div class="shadow-sm rounded p-3 mb-2 border position-relative"
+                                                            data-doc-id="{{ $doc->id }}"
+                                                            onclick="openDocumentModal({{ $type->id }}, {{ $doc->id }}, '{{ $doc->document_url }}', '{{ $doc->expires_at }}', '{{ $doc->comment }}')"
+                                                            style="cursor:pointer; background-color:#f9f9f9; transition: .3s;"
+                                                            data-bs-toggle="modal" data-bs-target="#openDocumentModal"
+                                                            onmouseover="this.style.backgroundColor='#e6f0ff';"
+                                                            onmouseout="this.style.backgroundColor='#f9f9f9';">
 
-                                                            <div class="flex-grow-1">
-                                                                <div class="fw-semibold text-truncate"
-                                                                    style="max-width: 200px;">
-                                                                    {{ $doc->name ?? 'Document' }}
-                                                                </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-file-pdf text-primary me-2"
+                                                                    style="font-size:28px;"></i>
 
-                                                                <div class="small text-muted mt-1">
-                                                                    Expiry:
-                                                                    <span
-                                                                        class="{{ $doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast() ? 'text-danger' : '' }}">
-                                                                        {{ $doc->expires_at ? \Carbon\Carbon::parse($doc->expires_at)->format('d M, Y') : 'No Expiry' }}
-                                                                    </span>
+                                                                <div class="flex-grow-1">
+                                                                    <div class="fw-semibold text-truncate"
+                                                                        style="max-width: 200px;">
+                                                                        {{ $doc->name ?? 'Document' }}
+                                                                    </div>
+
+                                                                    <div class="small text-muted mt-1">
+                                                                        Expiry:
+                                                                        <span
+                                                                            class="{{ $doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast() ? 'text-danger' : '' }}">
+                                                                            {{ $doc->expires_at ? \Carbon\Carbon::parse($doc->expires_at)->format('d M, Y') : 'No Expiry' }}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+
+                                                            @if ($doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast())
+                                                                <span
+                                                                    class="badge bg-danger position-absolute top-0 end-0 m-2">Expired</span>
+                                                            @endif
+
                                                         </div>
+                                                    @endforeach
 
-                                                        @if ($doc->expires_at && \Carbon\Carbon::parse($doc->expires_at)->isPast())
-                                                            <span
-                                                                class="badge bg-danger position-absolute top-0 end-0 m-2">Expired</span>
-                                                        @endif
-
-                                                    </div>
-                                                @endforeach
+                                                </div>
 
                                             </div>
 
                                         </div>
-
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            @endif
 
                         </div>
                     </div>

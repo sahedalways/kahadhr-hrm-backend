@@ -114,8 +114,8 @@
     <div wire:ignore.self class="modal fade" id="openUploadModal" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1">
         <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content" x-data="{ dragover: false, fileUrl: null }" x-on:dragover.prevent="dragover = true"
-                x-on:dragleave.prevent="dragover = false"
+            <div class="modal-content" x-data="{ dragover: false, fileUrl: null }" x-init="window.addEventListener('reset-file-url', () => { fileUrl = null });"
+                x-on:dragover.prevent="dragover = true" x-on:dragleave.prevent="dragover = false"
                 x-on:drop.prevent="
                  dragover = false;
                  if ($event.dataTransfer.files.length > 0) {
@@ -230,8 +230,7 @@
 
                                     <!-- Show existing document if no new file selected -->
                                     <template x-if="!fileUrl && @js($existingDocument)">
-                                        <embed
-                                            src="{{ $existingDocument ? asset('storage/' . $existingDocument->file_path) : '' }}"
+                                        <embed src="{{ $existingDocument ? $existingDocument->document_url : '' }}"
                                             type="application/pdf" width="100%" height="100%"></embed>
                                     </template>
 

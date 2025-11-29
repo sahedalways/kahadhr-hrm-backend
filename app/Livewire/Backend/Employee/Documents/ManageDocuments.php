@@ -149,21 +149,19 @@ class ManageDocuments extends BaseComponent
 
     public function openUploadModal($typeId)
     {
-        $this->selectedType = $typeId;
         $this->resetValidation();
         $this->file_path = null;
         $this->comment = null;
         $this->expires_at = null;
         $this->statusFilter = null;
         $this->selectedType = null;
-
+        $this->selectedType = $typeId;
 
         $employeeId = auth()->user()->employee->id ?? null;
         $this->existingDocument = EmpDocument::where('emp_id', $employeeId)
             ->where('doc_type_id', $typeId)
             ->latest()
             ->first();
-
 
         if ($this->existingDocument) {
             $this->comment = $this->existingDocument->comment;
@@ -190,11 +188,16 @@ class ManageDocuments extends BaseComponent
             'file_path'   => $filePath,
         ]);
 
+        $this->statusFilter = null;
+        $this->file_path = null;
+        $this->comment = null;
+        $this->expires_at = null;
+        $this->statusFilter = null;
+        $this->selectedType = null;
 
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
-        $this->statusFilter = null;
-        $this->selectedType = null;
+
         $this->resetLoaded();
     }
 

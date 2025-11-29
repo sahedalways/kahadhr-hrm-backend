@@ -1,30 +1,33 @@
+// Import EmojiButton
 import { EmojiButton } from "@joeattardi/emoji-button/dist/index.js";
 
-document.addEventListener("livewire:load", () => {
+document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("message_input");
     const trigger = document.getElementById("show_emoji_box");
 
-    if (!trigger || !input) return;
+    if (!trigger || !input) return; // safety check
 
+    // Initialize Emoji Picker
     const picker = new EmojiButton({
-        position: "top-start",
-        autoHide: false,
+        position: "top-start", // adjust position relative to button
+        autoHide: false, // allow multiple emoji selections
     });
 
+    // When an emoji is selected
     picker.on("emoji", (selection) => {
-        const emoji = selection.emoji;
-
+        const emojiChar = selection.emoji;
         const start = input.selectionStart;
         const end = input.selectionEnd;
         const text = input.value;
 
-        input.value = text.slice(0, start) + emoji + text.slice(end);
+        input.value = text.slice(0, start) + emojiChar + text.slice(end);
         input.focus();
-        input.selectionStart = input.selectionEnd = start + emoji.length;
+        input.selectionStart = input.selectionEnd = start + emojiChar.length;
 
-        // Dispatch input event for Livewire
+        // Trigger input event for Livewire
         input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
+    // Toggle emoji picker on button click
     trigger.addEventListener("click", () => picker.togglePicker(trigger));
 });

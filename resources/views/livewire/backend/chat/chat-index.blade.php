@@ -1,8 +1,3 @@
-<head>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-
-
 <div class="container-fluid chat-app-container">
     <div class="row h-100">
 
@@ -247,6 +242,7 @@
 
 
 <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+
 
 
 

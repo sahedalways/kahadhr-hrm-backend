@@ -150,7 +150,7 @@
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Department <span class="text-danger">*</span></label>
                                 <select class="form-select shadow-sm" wire:model="department_id" required>
-                                    <option value="" selected disabled>Select Department</option>
+                                    <option value="" selected>Select Department</option>
                                     @foreach ($departments as $dep)
                                         <option value="{{ $dep->id }}">{{ $dep->name }}</option>
                                     @endforeach

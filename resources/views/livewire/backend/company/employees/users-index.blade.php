@@ -249,25 +249,13 @@
                                     @enderror
                                 </div>
 
-                                <!-- Department -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Department <span class="text-danger">*</span></label>
-                                    <select class="form-select" wire:model="department_id">
-                                        <option value="">Select Department</option>
-                                        @foreach ($departments as $dep)
-                                            <option value="{{ $dep->id }}">{{ $dep->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('department_id')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
+
 
                                 <!-- Team -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Team</label>
+                                    <label class="form-label">Team <span class="text-danger">*</span></label>
                                     <select class="form-select" wire:model="team_id">
-                                        <option value="">Select Team</option>
+                                        <option value="">Select Team </option>
                                         @foreach ($teams as $team)
                                             <option value="{{ $team->id }}">{{ $team->name }}</option>
                                         @endforeach
@@ -281,7 +269,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Role <span class="text-danger">*</span></label>
                                     <select class="form-select" wire:model="role">
-                                        <option value="" selected disabled>Select a role</option>
+                                        <option value="" selected>Select a role</option>
                                         @foreach (config('roles') as $role)
                                             <option value="{{ $role }}">
                                                 {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}
@@ -424,20 +412,7 @@
                             @enderror
                         </div>
 
-                        <!-- Department -->
-                        <div class="col-md-6">
-                            <label class="form-label">Department <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="department_id">
-                                <option value="">Select Department</option>
-                                @foreach ($departments as $dep)
-                                    <option value="{{ $dep->id }}">{{ $dep->name }}</option>
-                                @endforeach
-                            </select>
 
-                            @error('department_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
 
                         <!-- Team -->
                         <div class="col-md-6">

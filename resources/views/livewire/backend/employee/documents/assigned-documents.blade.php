@@ -75,7 +75,7 @@
             </div>
         @empty
             <div class="col-12 text-center mt-4">
-                <p class="text-muted">No documents assigned.</p>
+                <p class="text-white">No documents assigned.</p>
             </div>
         @endforelse
     </div>

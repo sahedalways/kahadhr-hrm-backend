@@ -120,8 +120,7 @@ class UsersIndex extends BaseComponent
 
 
             'job_title' => ['nullable', 'string', 'max:255'],
-            'department_id' => ['required', 'exists:departments,id'],
-            'team_id' => ['nullable', 'exists:teams,id'],
+            'team_id' => ['required', 'exists:teams,id'],
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => ['required', 'in:hourly,monthly'],
         ];
@@ -132,7 +131,7 @@ class UsersIndex extends BaseComponent
         }
 
         $validatedData = $this->validate($rules);
-
+        $team = Team::find($this->team_id);
 
 
         // Save employee
@@ -140,7 +139,7 @@ class UsersIndex extends BaseComponent
             'company_id' => auth()->user()->company->id,
             'email' => $this->email,
             'job_title' => $this->job_title,
-            'department_id' => $this->department_id,
+            'department_id' => $team->department_id,
             'team_id' => $this->team_id,
             'role' => $this->role,
             'salary_type' => $this->salary_type,
@@ -259,8 +258,7 @@ class UsersIndex extends BaseComponent
             'l_name' => 'nullable|string|max:255',
             'title' => 'required|in:Mr,Mrs',
             'job_title' => 'nullable|string|max:255',
-            'department_id' => 'required|exists:departments,id',
-            'team_id' => 'nullable|exists:teams,id',
+            'team_id' => 'required|exists:teams,id',
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => 'required|in:hourly,monthly',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -281,6 +279,8 @@ class UsersIndex extends BaseComponent
             $this->employee->avatar = uploadImage($this->avatar, 'image/employee/avatar', $this->employee->avatar);
         }
 
+        $team = Team::find($this->team_id);
+
 
         // Update employee
         $this->employee->update([
@@ -288,7 +288,7 @@ class UsersIndex extends BaseComponent
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
             'title' => $this->title,
-            'department_id' => $this->department_id,
+            'department_id' => $team->department_id,
             'team_id' => $this->team_id,
             'role' => $this->role,
             'salary_type' => $this->salary_type,

@@ -74,6 +74,8 @@ class AuthService
 
     $employee = $user->employee()->withoutGlobalScopes()->first();
 
+
+
     if (!$employee) {
       return false;
     }

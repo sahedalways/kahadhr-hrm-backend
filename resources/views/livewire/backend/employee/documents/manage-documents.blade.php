@@ -8,8 +8,8 @@
                 </h4>
 
 
-                <div class="d-flex flex-wrap gap-2 align-items-center">
-
+                <div class="d-flex flex-row gap-2 align-items-center">
+                    <!-- Document Type Filter -->
                     <select class="form-select form-select-lg" style="min-width: 220px;"
                         wire:change="filterByType($event.target.value)">
                         <option value="">All Types</option>
@@ -18,6 +18,7 @@
                         @endforeach
                     </select>
 
+                    <!-- Status Filter -->
                     <select class="form-select form-select-lg" style="min-width: 180px;"
                         wire:change="handleFilter($event.target.value)">
                         <option value="">All Status</option>
@@ -25,6 +26,8 @@
                         <option value="expired">Expired</option>
                     </select>
                 </div>
+
+
             </div>
 
 

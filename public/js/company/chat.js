@@ -33,4 +33,65 @@ document.addEventListener("DOMContentLoaded", function () {
             indicator.style.display = "none";
         }, 2000);
     });
+
+    const attachmentBtn = document.getElementById("attachmentBtn");
+    const attachmentPopup = document.getElementById("attachmentPopup");
+
+    attachmentBtn.addEventListener("click", () => {
+        // toggle popup visibility
+        attachmentPopup.style.display =
+            attachmentPopup.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (
+            !attachmentBtn.contains(e.target) &&
+            !attachmentPopup.contains(e.target)
+        ) {
+            attachmentPopup.style.display = "none";
+        }
+    });
+
+    const emojiBtn = document.getElementById("emojiBtn");
+    const emojiPicker = document.getElementById("emojiPicker");
+    const messageInput = document.getElementById("messageInput");
+
+    emojiBtn.addEventListener("click", () => {
+        const isHidden = emojiPicker.style.display === "none";
+        emojiPicker.style.display = isHidden ? "block" : "none";
+    });
+
+    emojiPicker.addEventListener("emoji-click", (event) => {
+        const emoji = event.detail.unicode;
+
+        const start = messageInput.selectionStart;
+        const end = messageInput.selectionEnd;
+        messageInput.value =
+            messageInput.value.substring(0, start) +
+            emoji +
+            messageInput.value.substring(end);
+
+        messageInput.selectionStart = messageInput.selectionEnd =
+            start + emoji.length;
+        messageInput.focus();
+
+        emojiPicker.style.display = "none";
+    });
+
+    document.addEventListener("click", (event) => {
+        if (
+            !emojiBtn.contains(event.target) &&
+            !emojiPicker.contains(event.target)
+        ) {
+            emojiPicker.style.display = "none";
+        }
+    });
+    // Toggle picker when button clicked
+    emojiBtn.addEventListener("click", () => {
+        picker.togglePicker(emojiBtn);
+    });
+});
+
+document.getElementById("mentionBtn").addEventListener("click", () => {
+    // show employee list to mention
 });

@@ -165,20 +165,65 @@
 
 
             {{-- Message Input --}}
-            <div class="p-3 border-top d-flex flex-column" style="background: #fff;">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Write something..."
-                        wire:model.defer="messageText" wire:model.defer="messageText" wire:keydown="userTyping"
-                        wire:keydown.enter="sendMessage"
-                        style="border-radius: 20px; padding-right: 120px; border-color: #ddd;">
-                    <div class="position-absolute end-0 top-50 translate-middle-y me-5 pe-2 d-flex align-items-center">
-                        <i class="bi bi-emoji-smile text-muted me-3"></i>
-                        <i class="bi bi-paperclip text-muted me-3"></i>
-                        <i class="bi bi-mic text-muted"></i>
+            <div class="p-3 border-top" style="background: #fff;">
+                <div class="input-group position-relative">
+
+                    <!-- LEFT ACTIONS -->
+                    <div class="d-flex position-absolute start-0 top-50 translate-middle-y ms-2 align-items-center">
+
+                        <!-- Attachment Button -->
+                        <div class="position-relative me-2">
+                            <button type="button" class="btn btn-light rounded-circle p-2" id="attachmentBtn"
+                                title="Attachment">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+
+                            <!-- Attachment Popup -->
+                            <div id="attachmentPopup" class="bg-white border rounded shadow-sm p-2 position-absolute"
+                                style="bottom: 50px; left: 0; display:none; width: 220px; z-index:1000;">
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                        <i class="fas fa-image fa-lg mb-1"></i>
+                                        <small>Image</small>
+                                    </button>
+                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                        <i class="fas fa-video fa-lg mb-1"></i>
+                                        <small>Video</small>
+                                    </button>
+                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                        <i class="fas fa-file-video fa-lg mb-1"></i>
+                                        <small>GIF</small>
+                                    </button>
+                                    <button class="btn btn-light d-flex flex-column align-items-center p-2">
+                                        <i class="fas fa-file-alt fa-lg mb-1"></i>
+                                        <small>File</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emoji Button -->
+                        <button type="button" class="btn btn-light rounded-circle p-2" id="emojiBtn"
+                            title="Emoji">
+                            <i class="fas fa-smile"></i>
+                        </button>
+
+                        <emoji-picker id="emojiPicker" style="position: absolute; display: none;"></emoji-picker>
+
+                        <!-- Mention Button -->
+                        <button type="button" class="btn btn-light rounded-circle p-2" id="mentionBtn"
+                            title="Mention">@</button>
+
                     </div>
 
+                    <!-- INPUT FIELD -->
+                    {{-- <input type="text" class="form-control ps-5" placeholder="Write something..."
+                        wire:model.defer="messageText" wire:keydown="userTyping" wire:keydown.enter="sendMessage"
+                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;"> --}}
 
-                    <div class="position-absolute end-0 top-50 translate-middle-y me-2">
+                    <!-- RIGHT ACTIONS -->
+                    <div class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center">
+
                         <button class="btn btn-primary rounded-circle p-0" wire:click="sendMessage"
                             style="width:38px;height:38px;display:flex;justify-content:center;align-items:center;">
                             <i class="fas fa-paper-plane"></i>
@@ -188,13 +233,18 @@
                 </div>
             </div>
 
+
         </div>
 
     </div>
+
+
 </div>
 
 
 <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+
+
 
 <script src="{{ asset('js/company/chat.js') }}"></script>
 

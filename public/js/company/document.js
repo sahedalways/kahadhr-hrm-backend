@@ -34,16 +34,36 @@ document
 
             if (result.success) {
                 toastr.success(result.message);
+                const docEl = document.querySelector(
+                    `[data-doc-id="${docId}"]`
+                );
+                if (docEl) {
+                    const parentCard = docEl.closest(".col-md-3");
+                    docEl.remove();
 
+                    const remainingDocs =
+                        parentCard.querySelectorAll("[data-doc-id]");
+                    if (remainingDocs.length === 0) {
+                        parentCard.remove();
+                    }
+                }
+
+                const remainingTypeCards =
+                    document.querySelectorAll(".col-md-3");
+                if (remainingTypeCards.length === 0) {
+                    const container = document.querySelector(".row.g-4");
+                    const alert = document.createElement("div");
+                    alert.className = "col-12";
+                    alert.innerHTML = `
+                <div class="alert alert-info text-center text-white">
+                    No documents found for this employee.
+                </div>
+            `;
+                    container.appendChild(alert);
+                }
                 // Close modal
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 modal.hide();
-
-                // Optionally, remove the document card from DOM
-                const docCard = document.querySelector(
-                    `[data-doc-id="${docId}"]`
-                );
-                if (docCard) docCard.remove();
             } else {
                 toastr.error(result.message);
             }

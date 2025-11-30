@@ -228,30 +228,32 @@ class ChatIndex extends BaseComponent
         $this->showMentionBox = !$this->showMentionBox;
 
         if ($this->showMentionBox) {
-            $this->mentionUsers = auth()->user()->company
-                ? auth()->user()->company->employees()
-                ->where('user_id', '!=', auth()->id())
-                ->where('is_active', 1)
-                ->get()
-                : collect();
+            $this->mentionUsers = $this->newChatUsers;
         }
     }
 
     // Insert mention
     public function selectMention($id)
     {
+
         $employee = collect($this->mentionUsers)->firstWhere('id', $id);
         if (!$employee) return;
 
 
-        $displayName = trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? ''));
-        if (empty($displayName)) {
-            $displayName = $employee->email ?? 'Unknown';
+        if ($employee->user_type === 'company') {
+            $displayName = 'Company Admin';
+        } else {
+            $displayName = trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? ''));
+            $displayName = $displayName ?: ($employee->email ?? 'Unknown');
         }
+
 
         $mentionText = '<span style="color: #0d6efd">@' . $displayName . '</span>&nbsp;';
 
+
         $this->dispatch('insert-mention', ['html' => $mentionText]);
+
+
         $this->showMentionBox = false;
     }
 

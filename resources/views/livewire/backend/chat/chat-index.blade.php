@@ -1,6 +1,7 @@
 @php
     use Illuminate\Support\Str;
     use Carbon\Carbon;
+    use App\Models\Employee;
     $lastDate = null;
 @endphp
 
@@ -40,23 +41,14 @@
             {{-- Search --}}
             <div class="p-3 border-bottom">
                 {{-- Search --}}
+
                 <div class="input-group mb-2 position-relative">
-                    <input type="text" id="message_input" class="form-control ps-5" placeholder="Write something..."
-                        wire:model.defer="messageText" wire:keydown.enter="sendMessage" wire:loading.attr="readonly"
-                        wire:target="sendMessage"
+                    <input type="text" class="form-control ps-5" placeholder="Search" wire:model="searchTerm"
+                        wire:keyup="set('searchTerm', $event.target.value)"
                         style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
 
-                    <span wire:loading wire:target="sendMessage"
-                        class="position-absolute end-0 top-50 translate-middle-y me-2">
-                        <span class="spinner-border spinner-border-sm"></span>
-                    </span>
 
-                    <span class="input-group-text bg-white border-0 position-absolute end-0"
-                        style="z-index: 10; padding: 0.375rem 1rem;">
-                        <i class="bi bi-search text-muted"></i>
-                    </span>
                 </div>
-
 
                 {{-- Tabs --}}
                 <div class="d-flex" id="chat-filters">
@@ -328,42 +320,51 @@
 
 
                     @php
-                        if ($receiverId === 'group' && $msg->receiver_id !== null) {
-                            continue;
-                        } elseif (
-                            $receiverId !== 'group' &&
-                            !(
-                                ($msg->sender_id == auth()->id() && $msg->receiver_id == $receiverId) ||
-                                ($msg->sender_id == $receiverId && $msg->receiver_id == auth()->id())
-                            )
-                        ) {
-                            continue;
-                        }
-
-                        $employees = auth()->user()->company ? auth()->user()->company->employees()->get() : collect();
 
                         $message = $msg->message;
 
-                        // Escape the rest of the message to prevent XSS
-                        $message = e($message);
+                        // 1️⃣ Static Company Admin highlight
+                        $message = preg_replace(
+                            '/@Company Admin/u',
+                            '<span style="background-color: rgb(9, 58, 219); color: white; font-weight: bold; padding: 2px 4px; border-radius: 3px;">@Company Admin</span>',
+                            $message,
+                        );
 
-                        foreach ($employees as $user) {
-                            $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                            if (empty($displayName)) {
-                                $displayName = $user->email ?? '';
+                        // 2️⃣ Fetch current company employees (without global scopes)
+                        $companyId = currentCompanyId(); // assuming helper function exists
+                        $employees = Employee::withoutGlobalScopes()->where('company_id', $companyId)->get();
+
+                        // 3️⃣ Loop through employees and highlight mentions
+                        foreach ($employees as $employee) {
+                            $names = [];
+
+                            // full name
+                            $fullName = trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? ''));
+                            if (!empty($fullName)) {
+                                $names[] = $fullName;
                             }
 
-                            // Only keep first word if mention is typed as single word
-                            $displayName = explode(' ', $displayName)[0];
+                            // email
+                            if (!empty($employee->email)) {
+                                $names[] = $employee->email;
+                            }
 
-                            // Match @name (case-insensitive)
-                            $pattern = '/@' . preg_quote($displayName, '/') . '/i';
-                            $replacement = '<span class="mention">@' . $displayName . '</span>';
+                            foreach ($names as $name) {
+                                // skip if Company Admin (already handled)
+                                if (strtolower($name) === 'company admin') {
+                                    continue;
+                                }
 
-                            $message = preg_replace($pattern, $replacement, $message);
+                                $pattern = '/@' . preg_quote($name, '/') . '/u';
+                                $replacement =
+                                    '<span style="background-color: rgb(9, 58, 219); color: white; font-weight: bold; padding: 2px 4px; border-radius: 3px;">@' .
+                                    $name .
+                                    '</span>';
+
+                                $message = preg_replace($pattern, $replacement, $message);
+                            }
                         }
                     @endphp
-
 
 
                     <div
@@ -410,9 +411,22 @@
             <div class="p-3 border-top" style="background: #fff;">
                 <div class="input-group position-relative">
 
-                    <input type="text" class="form-control ps-5" placeholder="Write something..."
-                        wire:model.defer="messageText" wire:keydown="userTyping" wire:keydown.enter="sendMessage"
-                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;" id="message_input">
+                    <div class="input-group mb-2 position-relative">
+                        <input type="text" id="message_input" class="form-control ps-5"
+                            placeholder="Write something..." wire:model.defer="messageText"
+                            wire:keydown.enter="sendMessage" wire:loading.attr="readonly" wire:target="sendMessage"
+                            style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
+
+                        <span wire:loading wire:target="sendMessage"
+                            class="position-absolute end-0 top-50 translate-middle-y me-2">
+                            <span class="spinner-border spinner-border-sm"></span>
+                        </span>
+
+                        <span class="input-group-text bg-white border-0 position-absolute end-0"
+                            style="z-index: 10; padding: 0.375rem 1rem;">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                    </div>
 
                     <!-- LEFT ACTIONS -->
                     <div class="d-flex position-absolute start-0 top-50 translate-middle-y ms-2 align-items-center">
@@ -457,25 +471,35 @@
                             title="Mention">@</button>
 
                         <!-- Mention Dropdown -->
-                        @if ($showMentionBox)
-                            <div class="position-absolute bg-white border shadow-sm p-2"
-                                style="top:-150px; left:50px; z-index:1000; width:200px; max-height:200px; overflow-y:auto;">
-                                <input type="text" class="form-control mb-1" placeholder="Search..."
-                                    wire:model="mentionSearch">
+                        <div id="mentionWrapper" class="position-relative">
+                            @if ($showMentionBox)
+                                <div id="mentionBox" class="position-absolute bg-white border shadow-sm p-2"
+                                    style="top:-150px; left:50px; z-index:1000; width:200px; max-height:200px; overflow-y:auto;">
 
-                                @foreach ($mentionUsers->filter(fn($u) => stripos($u->f_name . ' ' . $u->l_name ?: $u->email, $mentionSearch) !== false) as $user)
-                                    <div class="p-2 hover-bg-light cursor-pointer"
-                                        wire:click="selectMention({{ $user->id }})">
-                                        {{ trim($user->f_name . ' ' . $user->l_name) ?: $user->email }}
-                                    </div>
-                                @endforeach
+                                    <input type="text" class="form-control mb-1" placeholder="Search..."
+                                        wire:model="mentionSearch">
 
+                                    @foreach ($mentionUsers as $user)
+                                        @php
+                                            $displayName =
+                                                $user->user_type === 'company'
+                                                    ? 'Company Admin'
+                                                    : trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                            $displayName = $displayName ?: $user->email;
+                                        @endphp
+                                        <div class="p-2 hover-bg-light cursor-pointer"
+                                            wire:click="selectMention({{ $user->id }})">
+                                            {{ $displayName }}
+                                        </div>
+                                    @endforeach
 
-                                @if ($mentionUsers->filter(fn($u) => stripos($u->f_name . ' ' . $u->l_name, $mentionSearch) !== false)->isEmpty())
-                                    <div class="text-muted p-2">No users found</div>
-                                @endif
-                            </div>
-                        @endif
+                                    @if (empty($mentionUsers))
+                                        <div class="text-muted p-2">No users found</div>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
 
                     </div>
 
@@ -616,6 +640,16 @@
     chatBox.addEventListener('scroll', () => {
         if (chatBox.scrollTop === 0) {
             @this.loadMore();
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        const wrapper = document.getElementById('mentionWrapper');
+        const box = document.getElementById('mentionBox');
+
+
+        if (box && !wrapper.contains(event.target)) {
+            @this.set('showMentionBox', false);
         }
     });
 </script>

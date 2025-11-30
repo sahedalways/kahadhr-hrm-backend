@@ -8,9 +8,11 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
 use App\Models\User;
+use Livewire\WithFileUploads;
 
 class ChatIndex extends BaseComponent
 {
+    use WithFileUploads;
     public $messages;
     public $messageText;
     public $tab = 'all';
@@ -38,6 +40,16 @@ class ChatIndex extends BaseComponent
     public $totalMessages = 0;
 
     protected $listeners = ['incomingMessage'];
+
+    public $attachment;
+    public $showAttachmentPopup = false;
+    public $showAttachmentModal = false;
+    public $attachmentSending = false;
+
+
+    protected $rules = [
+        'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx,xls,xlsx,txt',
+    ];
 
 
 
@@ -152,6 +164,7 @@ class ChatIndex extends BaseComponent
         $this->sortChatUsersByLastMessage();
         $this->dispatch('scrollToBottom');
     }
+
 
     public function selectReceiver($id)
     {
@@ -545,5 +558,66 @@ class ChatIndex extends BaseComponent
     {
         $this->page++;
         $this->loadMessages(false);
+    }
+
+
+    public function updatedAttachment()
+    {
+        if ($this->attachment) {
+            // Open modal when a file is selected
+            $this->showAttachmentModal = true;
+        }
+    }
+
+    public function sendAttachmentMessage()
+    {
+        if (!$this->attachment) return;
+
+        $this->attachmentSending = true;
+
+
+        $path = $this->attachment->store('chat/attachments', 'public');
+
+        $tempPath = public_path('storage/chat/attachments/tmp/' . $this->attachment->getClientOriginalName());
+        if (file_exists($tempPath)) {
+            unlink($tempPath);
+        }
+
+
+        $msg = ChatMessage::create([
+            'company_id'  => currentCompanyId(),
+            'sender_id'   => auth()->id(),
+            'receiver_id' => $this->receiverId === 'group' ? null : $this->receiverId,
+            'message'     => $this->messageText,
+            'media_path'  => $path,
+        ]);
+
+
+        broadcast(new MessageSent($msg))->toOthers();
+
+        $this->messages->push($msg);
+
+        $this->messageText = "";
+
+        $this->loadConversationUsers();
+        $this->attachmentSending = false;
+        $this->showAttachmentModal = false;
+        $this->loadLastMessages();
+        $this->loadMessages();
+        $this->sortChatUsersByLastMessage();
+        $this->dispatch('scrollToBottom');
+    }
+
+    public function cancelAttachment()
+    {
+        if ($this->attachment) {
+
+            $this->attachment->delete();
+
+
+            $this->attachment = null;
+        }
+
+        $this->showAttachmentModal = false;
     }
 }

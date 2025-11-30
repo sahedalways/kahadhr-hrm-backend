@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ChatMessage extends Model
 {
@@ -37,5 +38,47 @@ class ChatMessage extends Model
     public function reads()
     {
         return $this->hasMany(ChatMessageRead::class, 'message_id');
+    }
+
+
+    /**
+     * Get full URL for media attachment
+     *
+     * @return string|null
+     */
+    public function getAttachmentUrlAttribute()
+    {
+        if (!$this->media_path) {
+            return null;
+        }
+
+
+        if (Storage::disk('public')->exists($this->media_path)) {
+            return asset('storage/' . $this->media_path);
+        }
+    }
+
+    /**
+     * Check type of attachment
+     *
+     * @return string|null ('image', 'video', 'gif', 'file', null)
+     */
+    public function getAttachmentTypeAttribute()
+    {
+        if (!$this->media_path) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($this->media_path, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            return 'image';
+        } elseif (in_array($extension, ['mp4', 'mov', 'avi'])) {
+            return 'video';
+        } elseif ($extension === 'gif') {
+            return 'gif';
+        } else {
+            return 'file';
+        }
     }
 }

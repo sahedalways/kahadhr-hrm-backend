@@ -367,6 +367,7 @@
                     @endphp
 
 
+
                     <div
                         class="mb-3 d-flex {{ $msg->sender_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
                         <div
@@ -375,6 +376,22 @@
                             <div class="message-bubble {{ $msg->sender_id == auth()->id() ? 'outgoing-message' : 'incoming-message' }}"
                                 style="border-radius: 12px; position: relative; padding-right: 1.5rem; width: 300px;">
                                 {!! $message !!}
+
+
+
+                                @if ($msg->attachment_url)
+                                    @if ($msg->attachment_type === 'image' || $msg->attachment_type === 'gif')
+                                        <img src="{{ $msg->attachment_url }}" style="max-width:200px;"
+                                            class="rounded">
+                                    @elseif($msg->attachment_type === 'video')
+                                        <video controls style="max-width:200px;">
+                                            <source src="{{ $msg->attachment_url }}">
+                                        </video>
+                                    @else
+                                        <a href="{{ $msg->attachment_url }}"
+                                            target="_blank">{{ basename($msg->media_path) }}</a>
+                                    @endif
+                                @endif
 
                                 @if ($msg->sender_id == auth()->id())
                                     <i class="fas fa-check-double"
@@ -439,27 +456,45 @@
                             </button>
 
                             <!-- Attachment Popup -->
+                            <!-- Attachment Popup -->
                             <div id="attachmentPopup" class="bg-white border rounded shadow-sm p-2 position-absolute"
-                                style="bottom: 50px; left: 0; display:none; width: 220px; z-index:1000;">
+                                style="bottom: 50px; left: 0; display: {{ $showAttachmentPopup ? 'block' : 'none' }}; width: 220px; z-index:1000;">
                                 <div class="d-flex justify-content-between">
-                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                    <!-- Image -->
+                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
                                         <i class="fas fa-image fa-lg mb-1"></i>
                                         <small>Image</small>
-                                    </button>
-                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                        <input type="file" wire:model="attachment" accept="image/*" hidden>
+                                    </label>
+
+                                    <!-- Video -->
+                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
                                         <i class="fas fa-video fa-lg mb-1"></i>
                                         <small>Video</small>
-                                    </button>
-                                    <button class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                                        <input type="file" wire:model="attachment" accept="video/*" hidden>
+                                    </label>
+
+                                    <!-- GIF -->
+                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
                                         <i class="fas fa-file-video fa-lg mb-1"></i>
                                         <small>GIF</small>
-                                    </button>
-                                    <button class="btn btn-light d-flex flex-column align-items-center p-2">
+                                        <input type="file" wire:model="attachment" accept=".gif" hidden>
+                                    </label>
+
+                                    <!-- File -->
+                                    <label class="btn btn-light d-flex flex-column align-items-center p-2">
                                         <i class="fas fa-file-alt fa-lg mb-1"></i>
                                         <small>File</small>
-                                    </button>
+                                        <input type="file" wire:model="attachment" hidden accept=".pdf">
+                                    </label>
                                 </div>
+
+
                             </div>
+
+
+
+
                         </div>
 
                         <!-- Emoji Button -->
@@ -506,11 +541,7 @@
                     <!-- INPUT FIELD -->
 
 
-                    <!-- RIGHT ACTIONS -->
-                    <div class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center">
 
-
-                    </div>
 
                 </div>
             </div>
@@ -519,6 +550,93 @@
         </div>
 
     </div>
+
+
+
+
+    <div class="modal fade @if ($showAttachmentModal) show @endif" tabindex="-1"
+        style="@if ($showAttachmentModal) display:block; @else display:none; @endif; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Send Attachment</h5>
+                    <button type="button" class="btn-close"
+                        wire:click="$set('showAttachmentModal', false)"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" id="message_input" class="form-control ps-5"
+                            placeholder="Write something..." wire:model.defer="messageText"
+                            wire:keydown.enter="sendAttachmentMessage" wire:loading.attr="readonly"
+                            wire:target="sendAttachmentMessage"
+                            style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
+                    </div>
+                    @if ($attachment)
+                        @php
+                            $extension = strtolower($attachment->getClientOriginalExtension());
+                        @endphp
+                        <div class="mt-2">
+                            <strong>Attachment:</strong> {{ $attachment->getClientOriginalName() }}
+
+                            @if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
+                                <div class="mt-2">
+                                    <img src="{{ $attachment->temporaryUrl() }}" class="img-fluid rounded"
+                                        style="max-width: 100%;">
+                                </div>
+                            @elseif (in_array($extension, ['mp4', 'mov', 'avi']))
+                                <div class="mt-2">
+                                    <video controls class="w-100" style="max-height:300px;">
+                                        <source src="{{ $attachment->temporaryUrl() }}">
+                                    </video>
+                                </div>
+                            @elseif (in_array($extension, ['pdf']))
+                                @php
+                                    $extension = strtolower($attachment->getClientOriginalExtension());
+
+                                    $previewPath =
+                                        'chat/attachments/tmp/' . uniqid() . '_' . $attachment->getClientOriginalName();
+                                    \Storage::disk('public')->putFileAs(
+                                        'chat/attachments/tmp',
+                                        $attachment,
+                                        basename($previewPath),
+                                    );
+                                    $previewUrl = asset('storage/' . $previewPath);
+                                @endphp
+                                <div class="mt-2">
+                                    <iframe src="{{ $previewUrl }}" style="width:100%; height:400px;"
+                                        frameborder="0"></iframe>
+                                </div>
+                            @else
+                                <div class="mt-2 p-2 border rounded bg-light">
+                                    <strong>File:</strong> {{ $attachment->getClientOriginalName() }}
+                                    <br>
+                                    <small>Preview not available. Will send as download.</small>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" wire:click="cancelAttachment" wire:loading.attr="disabled"
+                        wire:target="sendAttachmentMessage">
+                        Cancel
+                    </button>
+
+
+                    <button class="btn btn-primary" wire:click="sendAttachmentMessage" wire:loading.attr="disabled"
+                        wire:target="sendAttachmentMessage">
+                        <span wire:loading.remove wire:target="sendAttachmentMessage">Send</span>
+                        <span wire:loading wire:target="sendAttachmentMessage">
+                            <i class="fas fa-spinner fa-spin"></i> Sending...
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
     <!-- NEW CHAT MODAL -->
     <div class="modal fade" id="newChatModal" tabindex="-1" aria-hidden="true" wire:ignore.self>

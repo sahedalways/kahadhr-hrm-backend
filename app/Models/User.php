@@ -71,6 +71,7 @@ class User extends Authenticatable
 
 
 
+
     // One User → One Company
     public function company()
     {

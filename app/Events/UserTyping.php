@@ -23,14 +23,16 @@ class UserTyping implements ShouldBroadcast
 
   public function broadcastOn()
   {
-    return new Channel($this->receiverId);
+    return new Channel('chat-' . $this->receiverId);
   }
 
   public function broadcastWith()
   {
     return [
       'user_id'   => $this->user->id,
-      'user_name' => $this->user->f_name . ' ' . $this->user->l_name,
+      'user_name' => $this->user->user_type === 'company'
+        ? 'Company Admin'
+        : trim(($this->user->f_name ?? '') . ' ' . ($this->user->l_name ?? '')),
     ];
   }
 

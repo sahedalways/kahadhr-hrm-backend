@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 <div class="container-fluid chat-app-container">
     <div class="row h-100">
 
@@ -12,10 +16,21 @@
                         <i class="bi bi-plus me-1"></i> Add new
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="addNewDropdown">
-                        <li><a class="dropdown-item d-flex align-items-center" href="#"><i
-                                    class="bi bi-chat-left-text me-2"></i> New Chat</a></li>
-                        <li><a class="dropdown-item d-flex align-items-center" href="#"><i
-                                    class="bi bi-people-fill me-2"></i> New Team</a></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal"
+                                data-bs-target="#newChatModal" wire:click="$set('searchUser', '')">
+
+                                <i class="bi bi-chat-left-text me-2"></i> New Chat
+                            </a>
+                        </li>
+                        @if (auth()->user()->user_type === 'company')
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <i class="bi bi-people-fill me-2"></i> New Team
+                                </a>
+                            </li>
+                        @endif
+
                     </ul>
                 </div>
             </div>
@@ -50,18 +65,32 @@
             <div class="flex-grow-1 overflow-auto mt-2">
                 @if ($tab == 'all')
                     {{-- Always show All users' team chat first --}}
-                    <div class="chat-list-item {{ $receiverId == 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
-                        wire:click="$set('receiverId', 'group')"
-                        style="{{ $receiverId == 'group' ? 'background-color:#f0f0f0;' : '' }}">
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle p-2 me-3"
-                                style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
-                                <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
-                                    style="width: 40px; height: 40px; object-fit: cover;">
+                    <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
+                        wire:click="startNewChat('group')"
+                        style="{{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}; position: relative;">
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle p-2 me-3"
+                                    style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
+                                    <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
+                                        style="width:40px;height:40px;object-fit:cover;">
+                                </div>
+                                <div>
+                                    <div class="fw-bold">All users' team chat</div>
+                                    <small class="text-muted">
+                                        {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
+                                    </small>
+                                </div>
                             </div>
-                            <div>
-                                <div class="fw-bold">All users' team chat</div>
-                                <small class="text-muted">All employees & company can see messages</small>
+
+                            {{-- Hook icon on right-bottom --}}
+                            <div style="display:flex; align-items:flex-end;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    fill="currentColor" class="text-muted" viewBox="0 0 24 24">
+                                    <path
+                                        d="M13.9571 3.89646C13.3271 3.2665 12.25 3.71266 12.25 4.60357V5.68935L8.09484 9.84449L5.64655 10.6606C4.94132 10.8957 4.73002 11.7907 5.25567 12.3164L7.93932 15L4.46967 18.4697C4.17678 18.7626 4.17678 19.2374 4.46967 19.5303C4.76256 19.8232 5.23744 19.8232 5.53033 19.5303L8.99998 16.0607L11.7244 18.7851C12.207 19.2677 13.0207 19.1357 13.3259 18.5252L15.1164 14.9443L18.3106 11.75H19.3964C20.2873 11.75 20.7335 10.6729 20.1035 10.0429L13.9571 3.89646ZM13.75 5.89646V5.81067L18.1893 10.25H18.1035C17.8383 10.25 17.584 10.3554 17.3964 10.5429L13.9983 13.941C13.9223 14.017 13.8591 14.1048 13.811 14.2009L12.2945 17.2339L6.88839 11.8278L8.68115 11.2302C8.82843 11.1811 8.96226 11.0984 9.07203 10.9886L13.4571 6.60357C13.6446 6.41603 13.75 6.16168 13.75 5.89646Z" />
+                                </svg>
                             </div>
                         </div>
                     </div>
@@ -69,24 +98,34 @@
 
                 {{-- Employee list --}}
                 @foreach ($chatUsers as $user)
-                    @if ($tab != 'teams' || $tab == 'teams')
-                        {{-- show in all and teams tab --}}
-                        <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
-                            wire:click="$set('receiverId', {{ $user->id }})"
-                            style="{{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle p-2 me-3"
-                                    style="width: 40px; height: 40px; background-color:#cfe2ff; display:flex; justify-content:center; align-items:center;">
-                                    <i class="bi bi-person-fill text-primary"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-bold">{{ $user->f_name . ' ' . $user->l_name }}</div>
-                                    <small class="text-muted">Tap to chat</small>
-                                </div>
+                    @php
+                        if ($user->user_type == 'company') {
+                            $displayName = 'Company Admin';
+                            $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
+                        } else {
+                            $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                            $displayName = $displayName ?: $user->email;
+                            $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
+                        }
+                    @endphp
+
+                    <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                        wire:click="startNewChat({{ $user->id }})"
+                        style="{{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                style="width:40px;height:40px;object-fit:cover;">
+                            <div>
+                                <div class="fw-bold">{{ $displayName }}</div>
+                                <small class="text-muted">
+                                    {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                </small>
                             </div>
                         </div>
-                    @endif
+                    </div>
                 @endforeach
+
+
             </div>
 
 
@@ -98,19 +137,28 @@
             {{-- Chat Header --}}
             <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
+
+
                     <div class="rounded-circle p-2 me-2"
                         style="width: 45px; height: 45px; background-color: #d1e7dd; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-                        <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
-                            style="width: 40px; height: 40px; object-fit: cover;">
+
+                        @if ($receiverInfo && $receiverInfo['type'] === 'group')
+                            <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                        @else
+                            <img src="{{ $receiverInfo['photo'] }}" alt="User Icon"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                        @endif
                     </div>
+
+
                     <div>
-                        <div class="fw-bold" style="font-size: 1rem;">All users' team chat</div>
-                        <small class="text-muted" style="font-size: 0.85rem;">All employees & company can see
-                            messages</small>
+                        <div class="fw-bold" style="font-size: 1rem;">
+                            {{ $receiverInfo['name'] ?? 'Select a chat' }}
+                        </div>
+
                     </div>
                 </div>
-
-
 
                 <div>
                     <i class="bi bi-search text-muted me-3" style="cursor: pointer;"></i>
@@ -118,11 +166,14 @@
                 </div>
             </div>
 
+
             <input type="hidden" id="pusher_key" value="{{ config('broadcasting.connections.pusher.key') }}">
             <input type="hidden" id="pusher_cluster"
                 value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
             <input type="hidden" id="current_company_id" value="{{ currentCompanyId() }}">
             <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
+            <input type="hidden" id="currentReceiverId" value="{{ $receiverId }}">
+
 
 
             {{-- Messages --}}
@@ -131,6 +182,18 @@
 
                 @foreach ($messages as $msg)
                     @php
+                        if ($receiverId === 'group' && $msg->receiver_id !== null) {
+                            continue;
+                        } elseif (
+                            $receiverId !== 'group' &&
+                            !(
+                                ($msg->sender_id == auth()->id() && $msg->receiver_id == $receiverId) ||
+                                ($msg->sender_id == $receiverId && $msg->receiver_id == auth()->id())
+                            )
+                        ) {
+                            continue;
+                        }
+
                         $employees = auth()->user()->company ? auth()->user()->company->employees()->get() : collect();
 
                         $message = $msg->message;
@@ -175,7 +238,8 @@
 
                             <!-- Sender Info Below Bubble -->
                             <small class="text-muted mt-1" style="font-size: 0.7rem;">
-                                {{ $msg->sender->f_name . ' ' . $msg->sender->l_name }} ·
+                                {{ $msg->sender->user_type === 'company' ? 'Company Admin' : trim($msg->sender->f_name . ' ' . $msg->sender->l_name) }}
+                                .
                                 {{ $msg->created_at->format('H:i') }}
                             </small>
 
@@ -284,6 +348,76 @@
 
     </div>
 
+    <!-- NEW CHAT MODAL -->
+    <div class="modal fade" id="newChatModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content" style="border-radius: 15px;" data-bs-backdrop="static"
+                data-bs-keyboard="false">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Start New Chat</h5>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times" style="color:black;"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+
+                    <!-- 🔍 SEARCH FIELD -->
+                    <input type="text" class="form-control mb-3" placeholder="Search users..."
+                        wire:model="searchUser" wire:keyup="set('searchUser', $event.target.value)">
+
+                    <!-- USER LIST -->
+                    @foreach ($newChatUsers as $user)
+                        @php
+                            if ($user->user_type === 'company') {
+                                $displayName = 'Company Admin';
+                            } else {
+                                $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                if (!$displayName) {
+                                    $displayName = $user->email;
+                                }
+                            }
+
+                            // Avatar logic
+                            if ($user->user_type === 'employee') {
+                                $avatar =
+                                    $user->employee && $user->employee->avatar_url
+                                        ? asset($user->employee->avatar_url)
+                                        : asset('/assets/img/default-avatar.png');
+                            } elseif ($user->user_type === 'company') {
+                                $avatar =
+                                    $user->company && $user->company->company_logo_url
+                                        ? asset($user->company->company_logo_url)
+                                        : asset('/assets/img/default-image.jpg');
+                            } else {
+                                $avatar = asset('/assets/img/default-image.jpg');
+                            }
+                        @endphp
+
+
+                        <div class="d-flex align-items-center p-2 hover-bg-light rounded mb-2" style="cursor:pointer;"
+                            wire:click="startNewChat({{ $user->id }})" data-bs-dismiss="modal">
+
+                            <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                style="width:45px;height:45px;object-fit:cover;">
+
+                            <div>
+                                <div class="fw-bold">{{ $displayName }}</div>
+
+                            </div>
+                        </div>
+                    @endforeach
+
+                    @if ($newChatUsers->isEmpty())
+                        <p class="text-center text-muted mt-3">No users found.</p>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </div>
 
@@ -300,6 +434,8 @@
         const box = document.getElementById("chatScroll");
         setTimeout(() => (box.scrollTop = box.scrollHeight), 50);
     });
+
+
 
     document.addEventListener("insert-mention", (e) => {
         const input = document.getElementById("message_input");

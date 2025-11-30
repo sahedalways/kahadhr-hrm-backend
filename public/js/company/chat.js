@@ -1,9 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
     var pusherKey = document.getElementById("pusher_key").value;
     var pusherCluster = document.getElementById("pusher_cluster").value;
-    var companyId = document.getElementById("current_company_id").value;
-    const indicator = document.getElementById("typingIndicator");
-    const userSpan = document.getElementById("typingUser");
+    var companyId = parseInt(
+        document.getElementById("current_company_id").value
+    );
+    const currentUserId = parseInt(
+        document.getElementById("current_user_id").value
+    );
+    var currentReceiverId = parseInt(
+        document.getElementById("currentReceiverId").value
+    );
 
     // Initialize Pusher
     var pusher = new Pusher(pusherKey, {
@@ -17,21 +23,24 @@ document.addEventListener("DOMContentLoaded", function () {
         Livewire.dispatch("incomingMessage", { id: data.message.id });
     });
 
-    var typingChannel = pusher.subscribe("chat-between-all-users");
-
-    typingChannel.bind("UserTyping", function (data) {
-        const currentUserId = parseInt(
-            document.getElementById("current_user_id").value
-        );
+    const typingChannelAll = pusher.subscribe(
+        `chat-${companyId}-between-all-users`
+    );
+    typingChannelAll.bind("UserTyping", function (data) {
+        if (currentReceiverId !== "group") return;
         if (data.user_id === currentUserId) return;
 
-        userSpan.textContent = data.user_name;
-        indicator.style.display = "block";
+        showTypingIndicator(data.user_name);
+    });
 
-        clearTimeout(window.typingTimeout);
-        window.typingTimeout = setTimeout(() => {
-            indicator.style.display = "none";
-        }, 2000);
+    const typingChannelTwo = pusher.subscribe(
+        `chat-${companyId}-${currentReceiverId}`
+    );
+    typingChannelTwo.bind("UserTyping", function (data) {
+        if (currentReceiverId == "group") return;
+        if (data.user_id === currentUserId) return;
+
+        showTypingIndicator(data.user_name);
     });
 
     const attachmentBtn = document.getElementById("attachmentBtn");
@@ -51,4 +60,17 @@ document.addEventListener("DOMContentLoaded", function () {
             attachmentPopup.style.display = "none";
         }
     });
+
+    function showTypingIndicator(userName) {
+        const indicator = document.getElementById("typingIndicator");
+        const userSpan = document.getElementById("typingUser");
+
+        userSpan.textContent = userName;
+        indicator.style.display = "block";
+
+        clearTimeout(window.typingTimeout);
+        window.typingTimeout = setTimeout(() => {
+            indicator.style.display = "none";
+        }, 2000);
+    }
 });

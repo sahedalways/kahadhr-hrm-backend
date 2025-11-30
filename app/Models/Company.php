@@ -206,7 +206,7 @@ class Company extends Model
     {
         return $this->company_logo
             ? asset('storage/' . $this->company_logo)
-            : asset('assets/img/default-company-logo.jpg');
+            : asset('assets/img/default-avatar.png');
     }
 
 

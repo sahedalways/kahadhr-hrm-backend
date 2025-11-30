@@ -40,7 +40,7 @@
                 {{-- Search --}}
                 <div class="input-group mb-2">
                     <input type="text" class="form-control" placeholder="Search" style="border-radius: 20px;"
-                        wire:model="searchTerm">
+                        wire:model="searchTerm" wire:keyup="set('searchTerm', $event.target.value)">
                     <span class="input-group-text bg-white border-0 position-absolute end-0"
                         style="z-index: 10; padding: 0.375rem 1rem;">
                         <i class="bi bi-search text-muted"></i>
@@ -81,6 +81,11 @@
                                     <small class="text-muted">
                                         {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
                                     </small>
+
+                                    @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
+                                        <span class="badge bg-danger">{{ $unreadCounts['group'] }}</span>
+                                    @endif
+
                                 </div>
                             </div>
 
@@ -94,36 +99,88 @@
                             </div>
                         </div>
                     </div>
-                @endif
 
-                {{-- Employee list --}}
-                @foreach ($chatUsers as $user)
-                    @php
-                        if ($user->user_type == 'company') {
-                            $displayName = 'Company Admin';
-                            $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
-                        } else {
-                            $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                            $displayName = $displayName ?: $user->email;
-                            $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
-                        }
-                    @endphp
+                    {{-- Employee list --}}
+                    @if ($chatUsers->isEmpty())
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-chat-left-dots fs-3 d-block mb-2"></i>
+                            No users found
+                        </div>
+                    @else
+                        @foreach ($chatUsers as $user)
+                            @php
+                                if ($user->user_type == 'company') {
+                                    $displayName = 'Company Admin';
+                                    $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
+                                } else {
+                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                    $displayName = $displayName ?: $user->email;
+                                    $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
+                                }
+                            @endphp
 
-                    <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
-                        wire:click="startNewChat({{ $user->id }})"
-                        style="{{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ $avatar }}" class="rounded-circle me-3"
-                                style="width:40px;height:40px;object-fit:cover;">
-                            <div>
-                                <div class="fw-bold">{{ $displayName }}</div>
-                                <small class="text-muted">
-                                    {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
-                                </small>
+                            <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                                wire:click="startNewChat({{ $user->id }})"
+                                style="{{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                        style="width:40px;height:40px;object-fit:cover;">
+                                    <div>
+                                        <div class="fw-bold">{{ $displayName }}</div>
+                                        <small class="text-muted">
+                                            {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                        </small>
+
+                                        @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
+                                            <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                @elseif($tab == 'teams')
+                    <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
+                        wire:click="startNewChat('group')"
+                        style="{{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}; position: relative;">
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle p-2 me-3"
+                                    style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
+                                    <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
+                                        style="width:40px;height:40px;object-fit:cover;">
+                                </div>
+                                <div>
+                                    <div class="fw-bold">All users' team chat</div>
+                                    <small class="text-muted">
+                                        {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
+                                    </small>
+
+                                    @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
+                                        <span class="badge bg-danger">{{ $unreadCounts['group'] }}</span>
+                                    @endif
+
+
+                                </div>
+                            </div>
+
+                            {{-- Hook icon on right-bottom --}}
+                            <div style="display:flex; align-items:flex-end;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    fill="currentColor" class="text-muted" viewBox="0 0 24 24">
+                                    <path
+                                        d="M13.9571 3.89646C13.3271 3.2665 12.25 3.71266 12.25 4.60357V5.68935L8.09484 9.84449L5.64655 10.6606C4.94132 10.8957 4.73002 11.7907 5.25567 12.3164L7.93932 15L4.46967 18.4697C4.17678 18.7626 4.17678 19.2374 4.46967 19.5303C4.76256 19.8232 5.23744 19.8232 5.53033 19.5303L8.99998 16.0607L11.7244 18.7851C12.207 19.2677 13.0207 19.1357 13.3259 18.5252L15.1164 14.9443L18.3106 11.75H19.3964C20.2873 11.75 20.7335 10.6729 20.1035 10.0429L13.9571 3.89646ZM13.75 5.89646V5.81067L18.1893 10.25H18.1035C17.8383 10.25 17.584 10.3554 17.3964 10.5429L13.9983 13.941C13.9223 14.017 13.8591 14.1048 13.811 14.2009L12.2945 17.2339L6.88839 11.8278L8.68115 11.2302C8.82843 11.1811 8.96226 11.0984 9.07203 10.9886L13.4571 6.60357C13.6446 6.41603 13.75 6.16168 13.75 5.89646Z" />
+                                </svg>
                             </div>
                         </div>
                     </div>
-                @endforeach
+
+
+
+                @endif
+
 
 
             </div>
@@ -249,9 +306,9 @@
             </div>
 
 
-            <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
+            {{-- <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
                 <span id="typingUser"></span> is typing...
-            </div>
+            </div> --}}
 
 
 

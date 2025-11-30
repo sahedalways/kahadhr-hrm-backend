@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('users')->onDelete('cascade');
             $table->text('message')->nullable();
             $table->string('media_path')->nullable();
+            $table->boolean('is_read')->default(0);
             $table->timestamps();
         });
     }

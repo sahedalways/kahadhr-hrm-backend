@@ -6,7 +6,7 @@ use App\Events\MessageSent;
 use App\Events\UserTyping;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\ChatMessage;
-use App\Models\Employee;
+use App\Models\ChatMessageRead;
 use App\Models\User;
 
 class ChatIndex extends BaseComponent
@@ -31,6 +31,7 @@ class ChatIndex extends BaseComponent
     public $searchUser = '';
     public $receiverInfo = null;
     public $lastMessageTimes = [];
+    public $unreadCounts = [];
 
     protected $listeners = ['incomingMessage'];
 
@@ -58,11 +59,25 @@ class ChatIndex extends BaseComponent
     public function loadMessages()
     {
         if ($this->receiverId === 'group') {
-            // Group chat: all messages from company
             $this->messages = ChatMessage::where('company_id', currentCompanyId())
                 ->whereNull('receiver_id')
                 ->orderBy('id', 'asc')
                 ->get();
+
+
+            foreach ($this->messages as $msg) {
+                if ($msg->sender_id === auth()->id()) continue;
+
+                ChatMessageRead::updateOrCreate(
+                    [
+                        'message_id' => $msg->id,
+                        'user_id' => auth()->id()
+                    ],
+                    [
+                        'read_at' => now()
+                    ]
+                );
+            }
         } else {
             // Personal chat
             $this->messages = ChatMessage::where('company_id', currentCompanyId())
@@ -74,7 +89,24 @@ class ChatIndex extends BaseComponent
                 })
                 ->orderBy('id', 'asc')
                 ->get();
+
+
+            foreach ($this->messages as $msg) {
+                if ($msg->sender_id === $this->receiverId && !$msg->reads->contains('user_id', auth()->id())) {
+                    ChatMessageRead::updateOrCreate(
+                        [
+                            'message_id' => $msg->id,
+                            'user_id' => auth()->id()
+                        ],
+                        [
+                            'read_at' => now()
+                        ]
+                    );
+                }
+            }
         }
+
+        $this->loadLastMessages();
     }
 
     public function sendMessage()
@@ -240,6 +272,11 @@ class ChatIndex extends BaseComponent
         $this->loadChatUsers();
     }
 
+    public function updatedSearchTerm()
+    {
+        $this->loadConversationUsers();
+    }
+
 
     public function loadChatUsers()
     {
@@ -295,11 +332,9 @@ class ChatIndex extends BaseComponent
 
 
 
-
     public function loadConversationUsers()
     {
         $companyId = currentCompanyId();
-
 
         $userIds = ChatMessage::where('company_id', $companyId)
             ->where(function ($q) {
@@ -316,16 +351,40 @@ class ChatIndex extends BaseComponent
                     ->pluck('receiver_id')
             )
             ->unique()
-            ->filter(fn($id) => $id != auth()->id())
+            ->filter(fn($id) => $id != auth()->id()) // remove self
             ->values();
 
-        $this->chatUsers = User::withoutGlobalScopes()
-            ->with(['employee' => function ($q) {
-                $q->withoutGlobalScopes();
-            }])
+        // Load users from these IDs
+        $users = User::withoutGlobalScopes()
+            ->with([
+                'employee' => fn($q) => $q->withoutGlobalScopes(),
+                'company'
+            ])
             ->whereIn('id', $userIds)
             ->get();
+
+        // Apply search filter
+        if ($this->searchTerm) {
+            $search = strtolower($this->searchTerm);
+
+            $users = $users->filter(function ($user) use ($search) {
+
+                $fullName = strtolower(trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? '')));
+                $email = strtolower($user->email ?? '');
+
+                // MATCH cases
+                return str_contains($fullName, $search)
+                    || str_contains($email, $search)
+                    || ($user->user_type == 'company' && str_contains('company admin', $search));
+            })->values();
+        }
+
+        $this->chatUsers = $users;
     }
+
+
+
+
 
     public function loadNewChatUsers()
     {
@@ -359,12 +418,12 @@ class ChatIndex extends BaseComponent
         }
     }
 
-
     public function loadLastMessages()
     {
         $companyId = currentCompanyId();
         $this->lastMessages = [];
-        $this->lastMessageTimes = []; // track timestamps for sorting
+        $this->lastMessageTimes = [];
+        $this->unreadCounts = [];
 
         // Group message
         $groupMsg = ChatMessage::where('company_id', $companyId)
@@ -380,9 +439,19 @@ class ChatIndex extends BaseComponent
 
             $this->lastMessages['group'] = $senderName . ': ' . $groupMsg->message;
             $this->lastMessageTimes['group'] = $groupMsg->created_at;
+
+            // unread count for group
+            $this->unreadCounts['group'] = ChatMessage::where('company_id', $companyId)
+                ->whereNull('receiver_id')
+                ->where('sender_id', '!=', auth()->id())
+                ->whereDoesntHave('reads', function ($q) {
+                    $q->where('user_id', auth()->id());
+                })
+                ->count();
         } else {
             $this->lastMessages['group'] = null;
             $this->lastMessageTimes['group'] = null;
+            $this->unreadCounts['group'] = 0;
         }
 
         // Personal messages
@@ -403,12 +472,23 @@ class ChatIndex extends BaseComponent
 
                 $this->lastMessages[$user->id] = $senderName . ': ' . $lastMsg->message;
                 $this->lastMessageTimes[$user->id] = $lastMsg->created_at;
+
+
+                $this->unreadCounts[$user->id] = ChatMessage::where('company_id', $companyId)
+                    ->where('sender_id', $user->id)
+                    ->where('receiver_id', auth()->id())
+                    ->whereDoesntHave('reads', function ($q) {
+                        $q->where('user_id', auth()->id());
+                    })
+                    ->count();
             } else {
                 $this->lastMessages[$user->id] = null;
                 $this->lastMessageTimes[$user->id] = null;
+                $this->unreadCounts[$user->id] = 0;
             }
         }
     }
+
 
     public function sortChatUsersByLastMessage()
     {

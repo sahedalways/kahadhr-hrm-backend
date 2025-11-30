@@ -23,25 +23,25 @@ document.addEventListener("DOMContentLoaded", function () {
         Livewire.dispatch("incomingMessage", { id: data.message.id });
     });
 
-    const typingChannelAll = pusher.subscribe(
-        `chat-${companyId}-between-all-users`
-    );
-    typingChannelAll.bind("UserTyping", function (data) {
-        if (currentReceiverId !== "group") return;
-        if (data.user_id === currentUserId) return;
+    // const typingChannelAll = pusher.subscribe(
+    //     `chat-${companyId}-between-all-users`
+    // );
+    // typingChannelAll.bind("UserTyping", function (data) {
+    //     if (currentReceiverId !== "group") return;
+    //     if (data.user_id === currentUserId) return;
 
-        showTypingIndicator(data.user_name);
-    });
+    //     showTypingIndicator(data.user_name);
+    // });
 
-    const typingChannelTwo = pusher.subscribe(
-        `chat-${companyId}-${currentReceiverId}`
-    );
-    typingChannelTwo.bind("UserTyping", function (data) {
-        if (currentReceiverId == "group") return;
-        if (data.user_id === currentUserId) return;
+    // const typingChannelTwo = pusher.subscribe(
+    //     `chat-${companyId}-${currentReceiverId}`
+    // );
+    // typingChannelTwo.bind("UserTyping", function (data) {
+    //     if (currentReceiverId == "group") return;
+    //     if (data.user_id === currentUserId) return;
 
-        showTypingIndicator(data.user_name);
-    });
+    //     showTypingIndicator(data.user_name);
+    // });
 
     const attachmentBtn = document.getElementById("attachmentBtn");
     const attachmentPopup = document.getElementById("attachmentPopup");

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatMessage extends Model
 {
-    protected $fillable = ['group_id', 'sender_id', 'receiver_id', 'message', 'media_path', 'company_id', 'team_id'];
+    protected $fillable = ['group_id', 'sender_id', 'receiver_id', 'message', 'media_path', 'company_id', 'team_id', 'is_read'];
 
     public function group()
     {
@@ -32,5 +32,10 @@ class ChatMessage extends Model
     public function team()
     {
         return $this->belongsTo(User::class, 'team_id');
+    }
+
+    public function reads()
+    {
+        return $this->hasMany(ChatMessageRead::class, 'message_id');
     }
 }

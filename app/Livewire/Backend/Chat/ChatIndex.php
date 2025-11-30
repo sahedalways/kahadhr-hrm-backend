@@ -33,6 +33,10 @@ class ChatIndex extends BaseComponent
     public $lastMessageTimes = [];
     public $unreadCounts = [];
 
+    public $page = 1;
+    public $perPage = 20;
+    public $totalMessages = 0;
+
     protected $listeners = ['incomingMessage'];
 
 
@@ -56,55 +60,70 @@ class ChatIndex extends BaseComponent
         $this->loadMessages();
     }
 
-    public function loadMessages()
+
+    public function loadMessages($resetPage = true)
     {
+        if ($resetPage) $this->page = 1;
+
         if ($this->receiverId === 'group') {
-            $this->messages = ChatMessage::where('company_id', currentCompanyId())
+            $query = ChatMessage::where('company_id', currentCompanyId())
                 ->whereNull('receiver_id')
-                ->orderBy('id', 'asc')
-                ->get();
+                ->orderBy('id', 'desc');
 
-            // Mark all group messages as read for logged-in user
-            foreach ($this->messages as $msg) {
-                if ($msg->sender_id === auth()->id()) continue;
+            $messages = $query->skip(($this->page - 1) * $this->perPage)
+                ->take($this->perPage)
+                ->get()
+                ->reverse();
 
-                ChatMessageRead::updateOrCreate(
-                    [
-                        'message_id' => $msg->id,
-                        'user_id' => auth()->id()
-                    ],
-                    [
-                        'read_at' => now()
-                    ]
-                );
+            foreach ($messages as $msg) {
+                if ($msg->sender_id !== auth()->id()) {
+                    ChatMessageRead::updateOrCreate(
+                        [
+                            'message_id' => $msg->id,
+                            'user_id' => auth()->id()
+                        ],
+                        ['read_at' => now()]
+                    );
+                }
             }
         } else {
             // Personal chat
-            $this->messages = ChatMessage::where('company_id', currentCompanyId())
+            $query = ChatMessage::where('company_id', currentCompanyId())
                 ->where(function ($q) {
                     $q->where('sender_id', auth()->id())
                         ->where('receiver_id', $this->receiverId)
                         ->orWhere('sender_id', $this->receiverId)
                         ->where('receiver_id', auth()->id());
                 })
-                ->orderBy('id', 'asc')
-                ->get();
+                ->orderBy('id', 'desc');
 
-            // Mark only messages from this receiver as read
-            foreach ($this->messages as $msg) {
+            $this->totalMessages = $query->count();
+
+            $messages = $query->skip(($this->page - 1) * $this->perPage)
+                ->take($this->perPage)
+                ->get()
+                ->reverse();
+
+            // Mark only receiver messages as read
+            foreach ($messages as $msg) {
                 if ($msg->sender_id === $this->receiverId) {
                     ChatMessageRead::updateOrCreate(
                         [
                             'message_id' => $msg->id,
                             'user_id' => auth()->id()
                         ],
-                        [
-                            'read_at' => now()
-                        ]
+                        ['read_at' => now()]
                     );
                 }
             }
         }
+
+        if ($this->page === 1) {
+            $this->messages = $messages;
+        } else {
+            $this->messages = $messages->merge($this->messages);
+        }
+
 
         $this->loadLastMessages();
     }
@@ -240,6 +259,7 @@ class ChatIndex extends BaseComponent
     public function startNewChat($userId)
     {
         $this->receiverId = $userId;
+        $this->messageText = '';
 
         if ($userId === 'group') {
             $this->receiverInfo = [
@@ -516,5 +536,12 @@ class ChatIndex extends BaseComponent
         $this->chatUsers = $this->chatUsers->sortByDesc(function ($user) {
             return $this->lastMessageTimes[$user->id] ?? null;
         })->values();
+    }
+
+
+    public function loadMore()
+    {
+        $this->page++;
+        $this->loadMessages(false);
     }
 }

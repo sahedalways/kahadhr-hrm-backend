@@ -1,5 +1,7 @@
 @php
     use Illuminate\Support\Str;
+    use Carbon\Carbon;
+    $lastDate = null;
 @endphp
 
 <div class="container-fluid chat-app-container">
@@ -38,14 +40,23 @@
             {{-- Search --}}
             <div class="p-3 border-bottom">
                 {{-- Search --}}
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control" placeholder="Search" style="border-radius: 20px;"
-                        wire:model="searchTerm" wire:keyup="set('searchTerm', $event.target.value)">
+                <div class="input-group mb-2 position-relative">
+                    <input type="text" id="message_input" class="form-control ps-5" placeholder="Write something..."
+                        wire:model.defer="messageText" wire:keydown.enter="sendMessage" wire:loading.attr="readonly"
+                        wire:target="sendMessage"
+                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
+
+                    <span wire:loading wire:target="sendMessage"
+                        class="position-absolute end-0 top-50 translate-middle-y me-2">
+                        <span class="spinner-border spinner-border-sm"></span>
+                    </span>
+
                     <span class="input-group-text bg-white border-0 position-absolute end-0"
                         style="z-index: 10; padding: 0.375rem 1rem;">
                         <i class="bi bi-search text-muted"></i>
                     </span>
                 </div>
+
 
                 {{-- Tabs --}}
                 <div class="d-flex" id="chat-filters">
@@ -120,6 +131,7 @@
                                     $displayName = $displayName ?: $user->email;
                                     $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
                                 }
+
                             @endphp
 
                             <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
@@ -284,10 +296,37 @@
 
 
             {{-- Messages --}}
-            <div class="flex-grow-1 p-4 main-chat-area" style="overflow-y: auto;" id="chatScroll">
-                <p class="text-center text-muted my-3" style="font-size: 0.8rem;">Today</p>
 
+            <div class="flex-grow-1 p-4 main-chat-area" style="overflow-y: auto;" id="chatScroll">
+                @php $lastDate = null; @endphp
                 @foreach ($messages as $msg)
+                    @php
+                        $messageDate = $msg->created_at->format('Y-m-d');
+
+                        $today = Carbon::today()->format('Y-m-d');
+                        $yesterday = Carbon::yesterday()->format('Y-m-d');
+
+                        $showDateDivider = false;
+
+                        if ($lastDate !== $messageDate) {
+                            $lastDate = $messageDate;
+                            $showDateDivider = true;
+
+                            if ($messageDate == $today) {
+                                $dateText = 'Today';
+                            } elseif ($messageDate == $yesterday) {
+                                $dateText = 'Yesterday';
+                            } else {
+                                $dateText = $msg->created_at->format('d M, Y');
+                            }
+                        }
+                    @endphp
+
+                    @if ($showDateDivider)
+                        <p class="text-center text-muted my-3" style="font-size: 0.8rem;">{{ $dateText }}</p>
+                    @endif
+
+
                     @php
                         if ($receiverId === 'group' && $msg->receiver_id !== null) {
                             continue;
@@ -359,6 +398,11 @@
             {{-- <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
                 <span id="typingUser"></span> is typing...
             </div> --}}
+
+            <div class="text-center my-2" wire:loading.flex wire:target="sendMessage, loadMore">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading...
+            </div>
+
 
 
 
@@ -441,10 +485,7 @@
                     <!-- RIGHT ACTIONS -->
                     <div class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center">
 
-                        <button class="btn btn-primary rounded-circle p-0" wire:click="sendMessage"
-                            style="width:38px;height:38px;display:flex;justify-content:center;align-items:center;">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+
                     </div>
 
                 </div>
@@ -569,5 +610,12 @@
         input.dispatchEvent(new Event('input', {
             bubbles: true
         }));
+    });
+
+    let chatBox = document.getElementById('chatScroll');
+    chatBox.addEventListener('scroll', () => {
+        if (chatBox.scrollTop === 0) {
+            @this.loadMore();
+        }
     });
 </script>

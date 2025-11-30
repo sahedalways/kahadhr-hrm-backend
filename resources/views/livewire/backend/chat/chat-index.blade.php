@@ -67,7 +67,10 @@
                     {{-- Always show All users' team chat first --}}
                     <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
                         wire:click="startNewChat('group')"
-                        style="{{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}; position: relative;">
+                        style="
+        {{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}
+        {{ isset($unreadCounts['group']) && $unreadCounts['group'] > 0 ? 'background-color:#ffe5e5;' : '' }}
+     ">
 
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
@@ -121,7 +124,10 @@
 
                             <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
                                 wire:click="startNewChat({{ $user->id }})"
-                                style="{{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}">
+                                style="
+        {{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}
+        {{ isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+     ">
                                 <div class="d-flex align-items-center">
                                     <img src="{{ $avatar }}" class="rounded-circle me-3"
                                         style="width:40px;height:40px;object-fit:cover;">
@@ -134,7 +140,6 @@
                                         @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
                                             <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
                                         @endif
-
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +148,10 @@
                 @elseif($tab == 'teams')
                     <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
                         wire:click="startNewChat('group')"
-                        style="{{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}; position: relative;">
+                        style="
+        {{ $receiverId === 'group' ? 'background-color:#f0f0f0;' : '' }}
+        {{ isset($unreadCounts['group']) && $unreadCounts['group'] > 0 ? 'background-color:#ffe5e5;' : '' }}
+     ">
 
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
@@ -176,11 +184,53 @@
                             </div>
                         </div>
                     </div>
-
-
-
                 @endif
 
+                @if ($tab == 'unread')
+                    @php
+                        $unreadUsers = $chatUsers->filter(function ($user) use ($unreadCounts) {
+                            return isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0;
+                        });
+                    @endphp
+
+                    @if ($unreadUsers->isEmpty())
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-chat-left-dots fs-3 d-block mb-2"></i>
+                            No unread messages
+                        </div>
+                    @else
+                        @foreach ($unreadUsers as $user)
+                            @php
+                                if ($user->user_type == 'company') {
+                                    $displayName = 'Company Admin';
+                                    $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
+                                } else {
+                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                    $displayName = $displayName ?: $user->email;
+                                    $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
+                                }
+                            @endphp
+
+                            <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                                wire:click="startNewChat({{ $user->id }})" style="background-color:#ffe5e5;">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                        style="width:40px;height:40px;object-fit:cover;">
+                                    <div>
+                                        <div class="fw-bold">{{ $displayName }}</div>
+                                        <small class="text-muted">
+                                            {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                        </small>
+
+                                        @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
+                                            <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                @endif
 
 
             </div>

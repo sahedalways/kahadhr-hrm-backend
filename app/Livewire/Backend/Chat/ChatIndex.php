@@ -64,7 +64,7 @@ class ChatIndex extends BaseComponent
                 ->orderBy('id', 'asc')
                 ->get();
 
-
+            // Mark all group messages as read for logged-in user
             foreach ($this->messages as $msg) {
                 if ($msg->sender_id === auth()->id()) continue;
 
@@ -90,9 +90,9 @@ class ChatIndex extends BaseComponent
                 ->orderBy('id', 'asc')
                 ->get();
 
-
+            // Mark only messages from this receiver as read
             foreach ($this->messages as $msg) {
-                if ($msg->sender_id === $this->receiverId && !$msg->reads->contains('user_id', auth()->id())) {
+                if ($msg->sender_id === $this->receiverId) {
                     ChatMessageRead::updateOrCreate(
                         [
                             'message_id' => $msg->id,
@@ -108,6 +108,7 @@ class ChatIndex extends BaseComponent
 
         $this->loadLastMessages();
     }
+
 
     public function sendMessage()
     {
@@ -128,6 +129,7 @@ class ChatIndex extends BaseComponent
 
         $this->loadConversationUsers();
         $this->loadLastMessages();
+        $this->loadMessages();
         $this->sortChatUsersByLastMessage();
         $this->dispatch('scrollToBottom');
     }
@@ -160,7 +162,26 @@ class ChatIndex extends BaseComponent
     public function incomingMessage($id)
     {
         $msg = ChatMessage::find($id);
+
+
         if ($msg && !$this->messages->contains('id', $msg->id)) {
+
+            if (($msg->receiver_id === null && $this->receiverId === 'group') ||
+                ($msg->receiver_id !== null && $msg->sender_id == $this->receiverId)
+            ) {
+
+                ChatMessageRead::updateOrCreate(
+                    [
+                        'message_id' => $msg->id,
+                        'user_id' => auth()->id()
+                    ],
+                    [
+                        'read_at' => now()
+                    ]
+                );
+            }
+
+
             $this->messages->push($msg);
             $this->loadConversationUsers();
             $this->loadLastMessages();

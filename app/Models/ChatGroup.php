@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChatGroup extends Model
 {
     use FilterByUserType;
-    protected $fillable = ['company_id', 'name', 'created_by', 'image', 'desc'];
+    protected $fillable = ['company_id', 'name', 'created_by', 'image', 'desc', 'team_id'];
 
     public function company()
     {
@@ -30,8 +30,17 @@ class ChatGroup extends Model
         return $this->belongsToMany(User::class, 'chat_group_members', 'group_id', 'user_id');
     }
 
-    // public function teams()
-    // {
-    //     return $this->hasMany(Team::class, 'team_id');
-    // }
+    public function teams()
+    {
+        return $this->hasMany(Team::class, 'team_id');
+    }
+
+
+    // Accessor for image URL
+    public function getImageUrlAttribute()
+    {
+        return $this->image
+            ? asset('storage/' . $this->image)
+            : asset('assets/img/default-image.jpg');
+    }
 }

@@ -108,49 +108,77 @@
                         </div>
                     </div>
 
-                    {{-- Employee list --}}
-                    @if ($chatUsers->isEmpty())
-                        <div class="text-center text-muted py-4">
-                            <i class="bi bi-chat-left-dots fs-3 d-block mb-2"></i>
-                            No users found
-                        </div>
-                    @else
-                        @foreach ($chatUsers as $user)
-                            @php
-                                if ($user->user_type == 'company') {
-                                    $displayName = 'Company Admin';
-                                    $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
-                                } else {
-                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                    $displayName = $displayName ?: $user->email;
-                                    $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
-                                }
 
-                            @endphp
 
-                            <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
-                                wire:click="startNewChat({{ $user->id }})"
-                                style="
-        {{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}
-        {{ isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
-     ">
+                    @foreach ($teamGroups as $group)
+                        <div class="chat-list-item {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                            wire:click="startNewChat('teamGroup_{{ $group->id }}')"
+                            style="
+                {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
+                {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+            ">
+                            <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $avatar }}" class="rounded-circle me-3"
-                                        style="width:40px;height:40px;object-fit:cover;">
+                                    <div class="rounded-circle p-2 me-3"
+                                        style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
+                                        <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
+                                            194 alt="{{ $group->name }}"
+                                            style="width:40px;height:40px;object-fit:cover;">
+                                    </div>
                                     <div>
-                                        <div class="fw-bold">{{ $displayName }}</div>
+                                        <div class="fw-bold">{{ $group->name }}</div>
                                         <small class="text-muted">
-                                            {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                            {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                         </small>
 
-                                        @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
-                                            <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                        @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
+                                            <span
+                                                class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
                                         @endif
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    @endif
+                        </div>
+                    @endforeach
+
+
+
+
+                    @foreach ($chatUsers as $user)
+                        @php
+                            if ($user->user_type == 'company') {
+                                $displayName = 'Company Admin';
+                                $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
+                            } else {
+                                $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                $displayName = $displayName ?: $user->email;
+                                $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
+                            }
+
+                        @endphp
+
+                        <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                            wire:click="startNewChat({{ $user->id }})"
+                            style="
+        {{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}
+        {{ isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+     ">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                    style="width:40px;height:40px;object-fit:cover;">
+                                <div>
+                                    <div class="fw-bold">{{ $displayName }}</div>
+                                    <small class="text-muted">
+                                        {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                    </small>
+
+                                    @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
+                                        <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 @elseif($tab == 'teams')
                     <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
                         wire:click="startNewChat('group')"
@@ -190,6 +218,38 @@
                             </div>
                         </div>
                     </div>
+
+
+                    @foreach ($teamGroups as $group)
+                        <div class="chat-list-item {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                            wire:click="startNewChat('teamGroup_{{ $group->id }}')"
+                            style="
+                {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
+                {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+            ">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle p-2 me-3"
+                                        style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
+                                        <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
+                                            194 alt="{{ $group->name }}"
+                                            style="width:40px;height:40px;object-fit:cover;">
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ $group->name }}</div>
+                                        <small class="text-muted">
+                                            {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
+                                        </small>
+
+                                        @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
+                                            <span
+                                                class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 @endif
 
                 @if ($tab == 'unread')
@@ -256,6 +316,9 @@
                         style="width: 45px; height: 45px; background-color: #d1e7dd; display: flex; justify-content: center; align-items: center; overflow: hidden;">
 
                         @if ($receiverInfo && $receiverInfo['type'] === 'group')
+                            <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                        @elseif($receiverInfo && $receiverInfo['type'] === 'teamGroup')
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
                                 style="width: 40px; height: 40px; object-fit: cover;">
                         @else
@@ -751,35 +814,92 @@
                     <!-- STEP 2 -->
                     @if ($teamStep == 2)
                         <div>
-
-                            <label class="form-label fw-bold">Add Members</label>
-
-                            <input type="text" class="form-control mb-2" placeholder="Search members..."
-                                wire:model="teamMemberSearch">
-
-                            <div style="max-height:300px; overflow-y:auto;">
-                                @foreach ($teamMemberList as $member)
-                                    <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                        <div>
-                                            {{ $member->f_name }} {{ $member->l_name }}
-                                            <br>
-                                            <small class="text-muted">{{ $member->email }}</small>
-                                        </div>
-
-                                        <input type="checkbox" wire:model="selectedTeamMembers"
-                                            value="{{ $member->id }}">
-                                    </div>
-                                @endforeach
+                            {{-- Toggle between Manual Team or Existing Team --}}
+                            <div class="mb-3">
+                                <button class="btn btn-outline-primary me-2"
+                                    wire:click="$set('manualTeam', true)">Manual Team</button>
+                                <button class="btn btn-outline-secondary"
+                                    wire:click="$set('manualTeam', false)">Select Existing Team</button>
                             </div>
 
+                            {{-- Existing Team Selection --}}
+                            @if (!$manualTeam)
+                                <label class="form-label fw-bold">Select Existing Team</label>
+                                <select class="form-select mb-3" wire:model="selectedTeamId">
+                                    <option value="">-- Select Existing Team --</option>
+                                    @foreach ($existingTeams ?? [] as $team)
+                                        <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+
+                            {{-- Manual Team Member Addition --}}
+                            @if ($manualTeam)
+                                <label class="form-label fw-bold">Add Members</label>
+                                <input type="text" class="form-control mb-2"
+                                    placeholder="Search members by  name, email" wire:model="teamMemberSearch"
+                                    wire:keyup="set('teamMemberSearch', $event.target.value)">
+
+
+                                <div style="max-height: 300px; overflow-y: auto;">
+                                    @if (!empty($teamMemberList))
+                                        @foreach ($teamMemberList as $member)
+                                            <div
+                                                class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                                <div>
+                                                    {{ $member->f_name }} {{ $member->l_name }}
+                                                    <br>
+                                                    <small class="text-muted">{{ $member->email }}</small>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                    wire:click.prevent="addTeamMember({{ $member->id }})"
+                                                    @if (in_array($member->id, $selectedTeamMembers ?? [])) disabled @endif>
+                                                    Add
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-muted p-2">No members available.</div>
+                                    @endif
+                                </div>
+                            @endif
+
+                            {{-- Selected Members List --}}
+                            @if (!empty($selectedTeamMembersList))
+                                <div class="mt-3">
+                                    <label class="form-label fw-bold">Selected Members</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach ($selectedTeamMembersList as $member)
+                                            <div class="badge bg-secondary d-flex align-items-center">
+                                                {{ $member->f_name }} {{ $member->l_name }}
+                                                <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+                                                    wire:click.prevent="removeTeamMember({{ $member->id }})"></button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Navigation --}}
                             <div class="d-flex mt-3">
                                 <button class="btn btn-secondary w-50 me-2" wire:click="prevTeamStep">← Back</button>
+                                <button class="btn btn-success w-50" wire:click="createTeam"
+                                    wire:loading.attr="disabled" wire:target="createTeam">
 
-                                <button class="btn btn-success w-50" wire:click="createTeam">Create Team</button>
+                                    <span wire:loading.remove wire:target="createTeam">Create Team</span>
+
+
+                                    <span wire:loading wire:target="createTeam">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"
+                                            aria-hidden="true"></span>
+                                        Creating...
+                                    </span>
+                                </button>
                             </div>
-
                         </div>
                     @endif
+
+
 
                 </div>
             </div>

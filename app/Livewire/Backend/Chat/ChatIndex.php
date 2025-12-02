@@ -8,9 +8,13 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\ChatGroup;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
+use App\Models\Employee;
+use App\Models\Team;
 use App\Models\User;
 use Livewire\WithFileUploads;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ChatIndex extends BaseComponent
 {
@@ -51,12 +55,16 @@ class ChatIndex extends BaseComponent
     public $teamStep = 1;
     public $teamName = '';
     public $teamDescription = '';
-    public $teamImage = '';
+    public $teamImage;
     public $teamMemberSearch = '';
-    public $teamMemberList = [];
+    public $teamMemberList;
     public $selectedTeamMembers = [];
+    public $existingTeams = [];
+    public $selectedTeamMembersList = [];
+    public $teamGroups;
+    public $selectedTeamId = null;
 
-
+    public $manualTeam = false;
 
 
     protected $rules = [
@@ -69,10 +77,13 @@ class ChatIndex extends BaseComponent
     {
         // Empty collection default
         $this->chatUsers = collect();
+        $this->teamGroups = collect();
 
         $this->loadConversationUsers();
         $this->loadNewChatUsers();
         $this->loadLastMessages();
+        $this->loadTeamGroups();
+        $this->loadCompanyTeams();
         $this->sortChatUsersByLastMessage();
         $this->startNewChat($this->receiverId);
 
@@ -89,56 +100,45 @@ class ChatIndex extends BaseComponent
     {
         if ($resetPage) $this->page = 1;
 
+        $query = ChatMessage::where('company_id', currentCompanyId());
+
         if ($this->receiverId === 'group') {
-            $query = ChatMessage::where('company_id', currentCompanyId())
-                ->whereNull('receiver_id')
-                ->orderBy('id', 'desc');
-
-            $messages = $query->skip(($this->page - 1) * $this->perPage)
-                ->take($this->perPage)
-                ->get()
-                ->reverse();
-
-            foreach ($messages as $msg) {
-                if ($msg->sender_id !== auth()->id()) {
-                    ChatMessageRead::updateOrCreate(
-                        [
-                            'message_id' => $msg->id,
-                            'user_id' => auth()->id()
-                        ],
-                        ['read_at' => now()]
-                    );
-                }
-            }
+            $query->whereNull('receiver_id')
+                ->whereNull('team_id');
+        } elseif (str_starts_with($this->receiverId, 'teamGroup_')) {
+            $groupId = intval(str_replace('teamGroup_', '', $this->receiverId));
+            $query->where('team_id', $groupId);
         } else {
-            // Personal chat
-            $query = ChatMessage::where('company_id', currentCompanyId())
-                ->where(function ($q) {
-                    $q->where('sender_id', auth()->id())
-                        ->where('receiver_id', $this->receiverId)
-                        ->orWhere('sender_id', $this->receiverId)
-                        ->where('receiver_id', auth()->id());
-                })
-                ->orderBy('id', 'desc');
+            $query->where(function ($q) {
+                $q->where('sender_id', auth()->id())
+                    ->where('receiver_id', $this->receiverId)
+                    ->orWhere('sender_id', $this->receiverId)
+                    ->where('receiver_id', auth()->id());
+            });
+        }
 
-            $this->totalMessages = $query->count();
+        $query->orderBy('id', 'desc');
 
-            $messages = $query->skip(($this->page - 1) * $this->perPage)
-                ->take($this->perPage)
-                ->get()
-                ->reverse();
+        $this->totalMessages = $query->count();
 
-            // Mark only receiver messages as read
-            foreach ($messages as $msg) {
-                if ($msg->sender_id === $this->receiverId) {
-                    ChatMessageRead::updateOrCreate(
-                        [
-                            'message_id' => $msg->id,
-                            'user_id' => auth()->id()
-                        ],
-                        ['read_at' => now()]
-                    );
-                }
+        $messages = $query->skip(($this->page - 1) * $this->perPage)
+            ->take($this->perPage)
+            ->get()
+            ->reverse();
+
+        foreach ($messages as $msg) {
+            if (
+                ($this->receiverId === 'group' && $msg->sender_id !== auth()->id()) ||
+                (str_starts_with($this->receiverId, 'teamGroup_') && $msg->sender_id !== auth()->id()) ||
+                ($this->receiverId !== 'group' && !str_starts_with($this->receiverId, 'teamGroup_') && $msg->sender_id === $this->receiverId)
+            ) {
+                ChatMessageRead::updateOrCreate(
+                    [
+                        'message_id' => $msg->id,
+                        'user_id' => auth()->id()
+                    ],
+                    ['read_at' => now()]
+                );
             }
         }
 
@@ -148,21 +148,35 @@ class ChatIndex extends BaseComponent
             $this->messages = $messages->merge($this->messages);
         }
 
-
         $this->loadLastMessages();
     }
+
 
 
     public function sendMessage()
     {
         if (empty(trim($this->messageText))) return;
 
-        $msg = ChatMessage::create([
-            'company_id'  => currentCompanyId(),
-            'sender_id'   => auth()->id(),
-            'receiver_id' => $this->receiverId === 'group' ? null : $this->receiverId,
-            'message'     => $this->messageText,
-        ]);
+
+        $data = [
+            'company_id' => currentCompanyId(),
+            'sender_id'  => auth()->id(),
+            'message'    => $this->messageText,
+        ];
+
+        if ($this->receiverId === 'group') {
+            $data['receiver_id'] = null;
+            $data['team_id'] = null;
+        } elseif (str_starts_with($this->receiverId, 'teamGroup_')) {
+            $groupId = intval(str_replace('teamGroup_', '', $this->receiverId));
+            $data['team_id'] = $groupId;
+            $data['receiver_id'] = null;
+        } else {
+            $data['receiver_id'] = $this->receiverId;
+            $data['team_id'] = null;
+        }
+
+        $msg = ChatMessage::create($data);
 
         broadcast(new MessageSent($msg))->toOthers();
 
@@ -207,31 +221,44 @@ class ChatIndex extends BaseComponent
     {
         $msg = ChatMessage::find($id);
 
-
-        if ($msg && !$this->messages->contains('id', $msg->id)) {
-
-            if (($msg->receiver_id === null && $this->receiverId === 'group') ||
-                ($msg->receiver_id !== null && $msg->sender_id == $this->receiverId)
-            ) {
-
-                ChatMessageRead::updateOrCreate(
-                    [
-                        'message_id' => $msg->id,
-                        'user_id' => auth()->id()
-                    ],
-                    [
-                        'read_at' => now()
-                    ]
-                );
-            }
-
-
-            $this->messages->push($msg);
-            $this->loadConversationUsers();
-            $this->loadLastMessages();
-            $this->sortChatUsersByLastMessage();
-            $this->dispatch('scrollToBottom');
+        if (!$msg || $this->messages->contains('id', $msg->id)) {
+            return;
         }
+
+        $isCurrentChat = false;
+
+        // All users group chat
+        if ($msg->receiver_id === null && $msg->chat_group_id === null && $this->receiverId === 'group') {
+            $isCurrentChat = true;
+        }
+        // Team group chat
+        elseif ($msg->chat_group_id && $this->receiverId === 'teamGroup_' . $msg->chat_group_id) {
+            $isCurrentChat = true;
+        }
+        // Personal chat
+        elseif ($msg->receiver_id !== null && $msg->sender_id == $this->receiverId) {
+            $isCurrentChat = true;
+        }
+
+        if ($isCurrentChat) {
+            // Mark message as read
+            ChatMessageRead::updateOrCreate(
+                [
+                    'message_id' => $msg->id,
+                    'user_id' => auth()->id()
+                ],
+                ['read_at' => now()]
+            );
+        }
+
+        // Add to messages collection
+        $this->messages->push($msg);
+
+        // Refresh chat UI
+        $this->loadConversationUsers();
+        $this->loadLastMessages();
+        $this->sortChatUsersByLastMessage();
+        $this->dispatch('scrollToBottom');
     }
 
     public function userTyping()
@@ -282,56 +309,65 @@ class ChatIndex extends BaseComponent
         $this->showMentionBox = false;
     }
 
-
-    public function startNewChat($userId)
+    public function startNewChat($id)
     {
-        $this->receiverId = $userId;
+        $this->receiverId = $id;
         $this->messageText = '';
 
-        if ($userId === 'group') {
+        if ($id === 'group') {
+            // All users group chat
             $this->receiverInfo = [
                 'type'     => 'group',
                 'name'     => "All users' team chat",
                 'subtitle' => "All employees & company can see messages",
                 'photo'    => asset('/assets/img/chat/group-icon.png'),
             ];
-            $this->loadMessages();
-            return;
-        }
+        } elseif (str_starts_with($id, 'teamGroup_')) {
+            $groupId = intval(str_replace('teamGroup_', '', $id));
+            $group = ChatGroup::find($groupId);
 
-        $user = User::withoutGlobalScopes()->find($userId);
-
-        if ($user) {
-            // Determine display name
-            $fullName = $user->user_type === 'company'
-                ? 'Company Admin'
-                : trim($user->f_name . ' ' . $user->l_name);
-
-            // Determine photo
-            if ($user->user_type === 'employee') {
-                $employee = $user->employee()->withoutGlobalScopes()->first();
-                $photo = $employee && $employee->avatar_url
-                    ? asset($employee->avatar_url)
-                    : asset('/assets/img/default-avatar.png');
-            } elseif ($user->user_type === 'company') {
-                $photo = $user->company && $user->company->company_logo_url
-                    ? asset($user->company->company_logo_url)
-                    : asset('/assets/img/default-image.jpg');
-            } else {
-                $photo = asset('/assets/img/default-image.jpg');
-            }
+            if (!$group) return;
 
             $this->receiverInfo = [
-                'type'     => 'user',
-                'name'     => $fullName !== '' ? $fullName : $user->email,
-                'subtitle' => $user->email,
-                'photo'    => $photo,
+                'type'     => 'teamGroup',
+                'name'     => $group->name,
+                'subtitle' => "Team members chat",
+                'photo'    => $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png'),
             ];
+        } else {
+            $user = User::withoutGlobalScopes()->find($id);
+
+            if ($user) {
+                $fullName = $user->user_type === 'company'
+                    ? 'Company Admin'
+                    : trim($user->f_name . ' ' . $user->l_name);
+
+                // Determine photo
+                if ($user->user_type === 'employee') {
+                    $employee = $user->employee()->withoutGlobalScopes()->first();
+                    $photo = $employee && $employee->avatar_url
+                        ? asset($employee->avatar_url)
+                        : asset('/assets/img/default-avatar.png');
+                } elseif ($user->user_type === 'company') {
+                    $photo = $user->company && $user->company->company_logo_url
+                        ? asset($user->company->company_logo_url)
+                        : asset('/assets/img/default-image.jpg');
+                } else {
+                    $photo = asset('/assets/img/default-image.jpg');
+                }
+
+                $this->receiverInfo = [
+                    'type'     => 'user',
+                    'name'     => $fullName !== '' ? $fullName : $user->email,
+                    'subtitle' => $user->email,
+                    'photo'    => $photo,
+                ];
+            }
         }
 
         $this->loadMessages();
-        $this->messageText = "";
     }
+
 
 
 
@@ -450,7 +486,14 @@ class ChatIndex extends BaseComponent
         $this->chatUsers = $users;
     }
 
-
+    public function loadCompanyTeams()
+    {
+        if (auth()->user()->user_type === 'company') {
+            $this->existingTeams = Team::where('company_id', auth()->user()->company->id)->get();
+        } else {
+            $this->existingTeams = collect();
+        }
+    }
 
 
 
@@ -666,17 +709,29 @@ class ChatIndex extends BaseComponent
         $this->teamImage = null;
         $this->selectedTeamMembers = [];
 
+
         $this->teamMemberList = $this->newChatUsers;
     }
 
 
     public function nextTeamStep()
     {
-        $this->validate([
+
+        $rules = [
             'teamName' => 'required|string|min:3|max:75',
             'teamDescription' => 'nullable|string|max:255',
             'teamImage'       => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
+        ];
+
+        $data = [
+            'teamName' => $this->teamName,
+            'teamDescription' => $this->teamDescription,
+            'teamImage' => $this->teamImage,
+        ];
+
+        $validator = Validator::make($data, $rules);
+        $validator->validate();
+
 
 
 
@@ -687,6 +742,8 @@ class ChatIndex extends BaseComponent
 
     public function prevTeamStep()
     {
+        $this->resetValidation(['teamName', 'teamDescription', 'teamImage']);
+
         $this->teamStep = 1;
     }
 
@@ -704,46 +761,122 @@ class ChatIndex extends BaseComponent
     }
 
 
+
     public function createTeam()
     {
-        $this->validate([
+        $data = [
+            'teamName' => $this->teamName,
+            'teamDescription' => $this->teamDescription,
+            'teamImage' => $this->teamImage,
+            'selectedTeamMembers' => $this->selectedTeamMembers,
+            'selectedTeamId' => $this->selectedTeamId,
+            'manualTeam' => $this->manualTeam,
+        ];
 
+        $rules = [
             'teamName' => 'required|string|min:3|max:75',
             'teamDescription' => 'nullable|string|max:255',
-            'teamImage'       => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'selectedTeamMembers' => 'required|array|min:1',
-        ]);
+            'teamImage' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ];
+
+        $validator = Validator::make($data, $rules);
 
 
-        $imagePath = null;
+        $validator->sometimes('selectedTeamMembers', 'required|array|min:1', function ($input) {
+            return $input->manualTeam == true;
+        });
 
-        if ($this->teamImage instanceof UploadedFile) {
-            $imagePath = uploadImage(
-                $this->teamImage,
-                'chat/group/image',
-                null
-            );
+        $validator->sometimes('selectedTeamId', 'required', function ($input) {
+            return $input->manualTeam == false;
+        });
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
         }
 
 
-        $group = ChatGroup::create([
-            'company_id' => auth()->id(),
-            'name'       => $this->teamName,
-            'created_by' => auth()->id(),
-            'desc'    => $this->teamDescription,
-            'image'    => $imagePath,
-        ]);
+        $imagePath = null;
+        if ($this->teamImage instanceof UploadedFile) {
+            $imagePath = uploadImage($this->teamImage, 'chat/group/image', null);
+        }
 
 
+        if ($this->manualTeam) {
 
-        $group->members()->sync($this->selectedTeamMembers);
+            $group = ChatGroup::create([
+                'company_id' => auth()->user()->company->id,
+                'name' => $this->teamName,
+                'created_by' => auth()->id(),
+                'desc' => $this->teamDescription,
+                'image' => $imagePath,
+            ]);
 
-        $this->reset(['teamStep', 'teamName', 'teamDescription', 'teamImage', 'selectedTeamMembers']);
+            $group->members()->sync($this->selectedTeamMembers);
+        } else {
+            $this->selectedTeamMembers = Employee::where('team_id', $this->selectedTeamId)
+                ->pluck('user_id')
+                ->toArray();
 
+
+            $group = ChatGroup::create([
+                'company_id' => auth()->user()->company->id,
+                'name' => $this->teamName,
+                'created_by' => auth()->id(),
+                'desc' => $this->teamDescription,
+                'image' => $imagePath,
+                'team_id' => $this->selectedTeamId,
+            ]);
+
+            $group->members()->sync($this->selectedTeamMembers);
+        }
+
+        $this->reset(['teamStep', 'teamName', 'teamDescription', 'teamImage', 'selectedTeamMembers', 'selectedTeamId']);
         $this->teamStep = 1;
+
+
+
+        $this->startNewChat('teamGroup_' . $group->id);
 
 
         $this->toast("Team created successfully.", 'success');
         $this->dispatch('closemodal');
+    }
+
+
+    public function addTeamMember($memberId)
+    {
+        if (!in_array($memberId, $this->selectedTeamMembers)) {
+            $this->selectedTeamMembers[] = $memberId;
+
+            $member = $this->newChatUsers->firstWhere('id', $memberId);
+            if ($member) {
+                $this->selectedTeamMembersList[] = $member;
+            }
+        }
+    }
+
+    public function removeTeamMember($memberId)
+    {
+        $this->selectedTeamMembers = array_filter($this->selectedTeamMembers, fn($id) => $id != $memberId);
+        $this->selectedTeamMembersList = array_filter($this->selectedTeamMembersList, fn($member) => $member->id != $memberId);
+    }
+
+
+    public function loadTeamGroups()
+    {
+        $user = auth()->user();
+
+        if (in_array($user->user_type, ['employee', 'teamLead'])) {
+            $this->teamGroups = ChatGroup::whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+                ->where('company_id', currentCompanyId())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $this->teamGroups = ChatGroup::where('company_id', currentCompanyId())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
     }
 }

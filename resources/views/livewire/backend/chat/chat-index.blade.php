@@ -509,10 +509,12 @@
                         <div id="mentionWrapper" class="position-relative">
                             @if ($showMentionBox)
                                 <div id="mentionBox" class="position-absolute bg-white border shadow-sm p-2"
-                                    style="top:-150px; left:50px; z-index:1000; width:200px; max-height:200px; overflow-y:auto;">
+                                    style="top:-150px; left:50px; z-index:1000; width:200px; 
+                   max-height:160px; overflow-y:auto;">
 
                                     <input type="text" class="form-control mb-1" placeholder="Search..."
-                                        wire:model="mentionSearch">
+                                        wire:model="mentionSearch"
+                                        wire:keyup="set('mentionSearch', $event.target.value)">
 
                                     @foreach ($mentionUsers as $user)
                                         @php
@@ -734,7 +736,7 @@
         const mentionHtml = e.detail?.[0]?.html || '';
         if (!mentionHtml) return;
 
-        // Convert <span> mention HTML to plain text, e.g., "@sahed"
+
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = mentionHtml;
         const mentionText = tempDiv.innerText;

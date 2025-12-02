@@ -47,6 +47,8 @@ class ChatIndex extends BaseComponent
     public $attachmentSending = false;
 
 
+
+
     protected $rules = [
         'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx,xls,xlsx,txt',
     ];
@@ -619,5 +621,29 @@ class ChatIndex extends BaseComponent
         }
 
         $this->showAttachmentModal = false;
+    }
+
+
+
+    public function updatedMentionSearch()
+    {
+        $this->searchMentionUsers();
+    }
+
+    public function searchMentionUsers()
+    {
+        if (!$this->newChatUsers) {
+            $this->loadNewChatUsers();
+        }
+
+        $search = strtolower($this->mentionSearch);
+
+
+        $this->mentionUsers = $this->newChatUsers->filter(function ($user) use ($search) {
+            $name = strtolower(trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? '')));
+            $email = strtolower($user->email ?? '');
+
+            return str_contains($name, $search) || str_contains($email, $search);
+        })->take(20)->values();
     }
 }

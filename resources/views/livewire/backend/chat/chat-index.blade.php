@@ -28,7 +28,9 @@
                         </li>
                         @if (auth()->user()->user_type === 'company')
                             <li>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal"
+                                    data-bs-target="#newTeamModal" wire:click="openNewTeamModal">
+
                                     <i class="bi bi-people-fill me-2"></i> New Team
                                 </a>
                             </li>
@@ -638,6 +640,152 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="newTeamModal" tabindex="-1" aria-hidden="true" wire:ignore.self aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content" style="border-radius: 15px;">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Create New Team</h5>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- STEP NAVIGATION -->
+                    <div class="d-flex justify-content-center mb-3">
+                        <span class="badge {{ $teamStep == 1 ? 'bg-primary' : 'bg-secondary' }} me-2">1</span>
+                        <span class="badge {{ $teamStep == 2 ? 'bg-primary' : 'bg-secondary' }}">2</span>
+                    </div>
+
+                    <!-- STEP 1 -->
+                    @if ($teamStep == 1)
+                        <div>
+
+                            <label class="form-label fw-bold">Team Image <span class="text-danger">*</span></label>
+
+                            <div onclick="document.getElementById('teamImageInput').click()"
+                                style="
+        width:130px;
+        height:130px;
+        border-radius:50%;
+        overflow:hidden;
+        border:3px solid #ddd;
+        cursor:pointer;
+        position:relative;
+        transition:0.3s;
+        background:#f8f9fa;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    "
+                                onmouseover="this.style.borderColor='#3b82f6'"
+                                onmouseout="this.style.borderColor='#ddd'">
+
+
+                                @if ($teamImage)
+                                    <img src="{{ $teamImage->temporaryUrl() }}"
+                                        style="width:100%; height:100%; object-fit:cover;">
+                                @else
+                                    <img src="{{ asset('assets/img/default-image.jpg') }}"
+                                        style="width:100%; height:100%; object-fit:cover;">
+                                @endif
+
+                                <div wire:loading.flex wire:target="teamImage"
+                                    style="
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(255,255,255,0.6);
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            display:none; /* initial hidden */
+         ">
+                                    <div class="spinner-border text-primary" role="status"
+                                        style="width:40px; height:40px;">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <input type="file" id="teamImageInput" wire:model="teamImage" style="display:none;"
+                                accept="image/*">
+
+
+                            @error('teamImage')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+
+
+
+                            <label class="form-label fw-bold mt-3">Team Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" wire:model="teamName" required>
+
+                            @error('teamName')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+
+                            <label class="form-label fw-bold mt-3">Description</label>
+                            <textarea class="form-control" rows="3" wire:model="teamDescription"></textarea>
+
+                            @error('teamDescription')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+
+                            <button class="btn btn-primary mt-3 w-100" wire:click="nextTeamStep">
+                                Next →
+                            </button>
+
+                        </div>
+                    @endif
+
+                    <!-- STEP 2 -->
+                    @if ($teamStep == 2)
+                        <div>
+
+                            <label class="form-label fw-bold">Add Members</label>
+
+                            <input type="text" class="form-control mb-2" placeholder="Search members..."
+                                wire:model="teamMemberSearch">
+
+                            <div style="max-height:300px; overflow-y:auto;">
+                                @foreach ($teamMemberList as $member)
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                        <div>
+                                            {{ $member->f_name }} {{ $member->l_name }}
+                                            <br>
+                                            <small class="text-muted">{{ $member->email }}</small>
+                                        </div>
+
+                                        <input type="checkbox" wire:model="selectedTeamMembers"
+                                            value="{{ $member->id }}">
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="d-flex mt-3">
+                                <button class="btn btn-secondary w-50 me-2" wire:click="prevTeamStep">← Back</button>
+
+                                <button class="btn btn-success w-50" wire:click="createTeam">Create Team</button>
+                            </div>
+
+                        </div>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- NEW CHAT MODAL -->

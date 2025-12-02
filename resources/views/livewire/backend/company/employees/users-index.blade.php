@@ -495,7 +495,7 @@
 
                         <div class="col-md-12 mb-2">
                             <label class="form-label">Profile Image</label>
-                            <input type="file" class="form-control" wire:model="avatar">
+                            <input type="file" class="form-control" wire:model="avatar" accept="image/*">
 
 
                             @if ($avatar)

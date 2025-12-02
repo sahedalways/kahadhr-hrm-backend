@@ -5,10 +5,12 @@ namespace App\Livewire\Backend\Chat;
 use App\Events\MessageSent;
 use App\Events\UserTyping;
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\ChatGroup;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
 use App\Models\User;
 use Livewire\WithFileUploads;
+use Illuminate\Http\UploadedFile;
 
 class ChatIndex extends BaseComponent
 {
@@ -45,6 +47,14 @@ class ChatIndex extends BaseComponent
     public $showAttachmentPopup = false;
     public $showAttachmentModal = false;
     public $attachmentSending = false;
+
+    public $teamStep = 1;
+    public $teamName = '';
+    public $teamDescription = '';
+    public $teamImage = '';
+    public $teamMemberSearch = '';
+    public $teamMemberList = [];
+    public $selectedTeamMembers = [];
 
 
 
@@ -645,5 +655,95 @@ class ChatIndex extends BaseComponent
 
             return str_contains($name, $search) || str_contains($email, $search);
         })->take(20)->values();
+    }
+
+
+    public function openNewTeamModal()
+    {
+        $this->teamStep = 1;
+        $this->teamName = '';
+        $this->teamDescription = '';
+        $this->teamImage = null;
+        $this->selectedTeamMembers = [];
+
+        $this->teamMemberList = $this->newChatUsers;
+    }
+
+
+    public function nextTeamStep()
+    {
+        $this->validate([
+            'teamName' => 'required|string|min:3|max:75',
+            'teamDescription' => 'nullable|string|max:255',
+            'teamImage'       => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+
+
+        $this->teamStep = 2;
+    }
+
+
+
+    public function prevTeamStep()
+    {
+        $this->teamStep = 1;
+    }
+
+
+    public function updatedTeamMemberSearch()
+    {
+        $search = strtolower($this->teamMemberSearch);
+
+        $this->teamMemberList = $this->newChatUsers->filter(function ($user) use ($search) {
+            $name = strtolower(trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? '')));
+            $email = strtolower($user->email ?? '');
+
+            return str_contains($name, $search) || str_contains($email, $search);
+        })->values();
+    }
+
+
+    public function createTeam()
+    {
+        $this->validate([
+
+            'teamName' => 'required|string|min:3|max:75',
+            'teamDescription' => 'nullable|string|max:255',
+            'teamImage'       => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'selectedTeamMembers' => 'required|array|min:1',
+        ]);
+
+
+        $imagePath = null;
+
+        if ($this->teamImage instanceof UploadedFile) {
+            $imagePath = uploadImage(
+                $this->teamImage,
+                'chat/group/image',
+                null
+            );
+        }
+
+
+        $group = ChatGroup::create([
+            'company_id' => auth()->id(),
+            'name'       => $this->teamName,
+            'created_by' => auth()->id(),
+            'desc'    => $this->teamDescription,
+            'image'    => $imagePath,
+        ]);
+
+
+
+        $group->members()->sync($this->selectedTeamMembers);
+
+        $this->reset(['teamStep', 'teamName', 'teamDescription', 'teamImage', 'selectedTeamMembers']);
+
+        $this->teamStep = 1;
+
+
+        $this->toast("Team created successfully.", 'success');
+        $this->dispatch('closemodal');
     }
 }

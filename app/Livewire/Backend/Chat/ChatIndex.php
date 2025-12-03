@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Events\UserTyping;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\ChatGroup;
+use App\Models\ChatGroupMember;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
 use App\Models\Employee;
@@ -142,6 +143,9 @@ class ChatIndex extends BaseComponent
                 );
             }
         }
+
+
+
 
         if ($this->page === 1) {
             $this->messages = $messages;
@@ -308,7 +312,21 @@ class ChatIndex extends BaseComponent
         $this->showMentionBox = !$this->showMentionBox;
 
         if ($this->showMentionBox) {
-            $this->mentionUsers = $this->newChatUsers;
+            if ($this->receiverId === 'group') {
+                $this->mentionUsers = $this->newChatUsers;
+            } elseif (str_starts_with($this->receiverId, 'teamGroup_')) {
+                $groupId = intval(str_replace('teamGroup_', '', $this->receiverId));
+                $group = $this->teamGroups->firstWhere('id', $groupId);
+
+                if ($group) {
+                    $this->mentionUsers = $group->members->map(fn($m) => $m->user)->filter()->values();
+                } else {
+                    $this->mentionUsers = collect();
+                }
+            } else {
+                $user = $this->chatUsers->firstWhere('id', $this->receiverId);
+                $this->mentionUsers = $user ? collect([$user]) : collect();
+            }
         }
     }
 
@@ -422,6 +440,7 @@ class ChatIndex extends BaseComponent
     public function updatedSearchTerm()
     {
         $this->loadConversationUsers();
+        $this->loadTeamGroups();
     }
 
 
@@ -498,7 +517,7 @@ class ChatIndex extends BaseComponent
                     ->pluck('receiver_id')
             )
             ->unique()
-            ->filter(fn($id) => $id != auth()->id()) // remove self
+            ->filter(fn($id) => $id != auth()->id())
             ->values();
 
         // Load users from these IDs
@@ -595,8 +614,18 @@ class ChatIndex extends BaseComponent
                 ? 'Me'
                 : ($sender->user_type === 'company' ? 'Company Admin' : ($sender->f_name ?? $sender->email));
 
-            $this->lastMessages['group'] = $senderName . ': ' . $groupMsg->message;
+            if (!empty($groupMsg->message)) {
+                $this->lastMessages['group'] = $senderName . ': ' . $groupMsg->message;
+            } elseif (!empty($groupMsg->media_path)) {
+                $this->lastMessages['group'] = $senderName . ': Sent an attachment';
+            } else {
+                $this->lastMessages['group'] = $senderName . ': Start a conversation';
+            }
+
+
+
             $this->lastMessageTimes['group'] = $groupMsg->created_at;
+
 
             // unread count from chat_message_reads table
             $this->unreadCounts['group'] = ChatMessage::where('company_id', $companyId)
@@ -633,7 +662,14 @@ class ChatIndex extends BaseComponent
                     ? 'Me'
                     : ($sender->user_type === 'company' ? 'Company Admin' : ($sender->f_name ?? $sender->email));
 
-                $this->lastMessages[$key]  = $senderName . ': ' . $lastMsg->message;
+                if (!empty($lastMsg->message)) {
+                    $this->lastMessages[$key] = $senderName . ': ' . $lastMsg->message;
+                } elseif (!empty($lastMsg->media_path)) {
+                    $this->lastMessages[$key] = $senderName . ': Sent an attachment';
+                } else {
+                    $this->lastMessages[$key] = $senderName . ': Start a conversation';
+                }
+
                 $this->lastMessageTimes[$key] = $lastMsg->created_at;
 
 
@@ -672,8 +708,16 @@ class ChatIndex extends BaseComponent
                     ? 'Me'
                     : ($sender->user_type === 'company' ? 'Company Admin' : ($sender->f_name ?? $sender->email));
 
-                $this->lastMessages[$user->id] = $senderName . ': ' . $lastMsg->message;
+                if (!empty($lastMsg->message)) {
+                    $this->lastMessages[$user->id] = $senderName . ': ' . $lastMsg->message;
+                } elseif (!empty($lastMsg->media_path)) {
+                    $this->lastMessages[$user->id] = $senderName . ': Sent an attachment';
+                } else {
+                    $this->lastMessages[$user->id] = $senderName . ': Start a conversation';
+                }
+
                 $this->lastMessageTimes[$user->id] = $lastMsg->created_at;
+
 
                 // PERSONAL unread uses is_read column
                 $this->unreadCounts[$user->id] = ChatMessage::where('company_id', $companyId)
@@ -732,14 +776,26 @@ class ChatIndex extends BaseComponent
             unlink($tempPath);
         }
 
-
-        $msg = ChatMessage::create([
-            'company_id'  => currentCompanyId(),
-            'sender_id'   => auth()->id(),
-            'receiver_id' => $this->receiverId === 'group' ? null : $this->receiverId,
-            'message'     => $this->messageText,
+        $data = [
+            'company_id' => currentCompanyId(),
+            'sender_id'  => auth()->id(),
+            'message'    => $this->messageText,
             'media_path'  => $path,
-        ]);
+        ];
+
+        if ($this->receiverId === 'group') {
+            $data['receiver_id'] = null;
+            $data['team_id'] = null;
+        } elseif (str_starts_with($this->receiverId, 'teamGroup_')) {
+            $groupId = intval(str_replace('teamGroup_', '', $this->receiverId));
+            $data['team_id'] = $groupId;
+            $data['receiver_id'] = null;
+        } else {
+            $data['receiver_id'] = $this->receiverId;
+            $data['team_id'] = null;
+        }
+
+        $msg = ChatMessage::create($data);
 
 
         broadcast(new MessageSent($msg))->toOthers();
@@ -961,16 +1017,93 @@ class ChatIndex extends BaseComponent
         $user = auth()->user();
 
         if (in_array($user->user_type, ['employee', 'teamLead'])) {
-            $this->teamGroups = ChatGroup::whereHas('members', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            $groups = ChatGroup::whereHas('members', fn($q) => $q->where('user_id', $user->id))
                 ->where('company_id', currentCompanyId())
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-            $this->teamGroups = ChatGroup::where('company_id', currentCompanyId())
+            $groups = ChatGroup::where('company_id', currentCompanyId())
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
+
+        if ($this->searchTerm) {
+            $search = strtolower($this->searchTerm);
+
+            $groups = $groups->filter(function ($group) use ($search) {
+                return str_contains(strtolower($group->name), $search)
+                    || str_contains(strtolower($group->desc ?? ''), $search)
+                    || str_contains(strval($group->id), $search);
+            })->values();
+        }
+
+        $this->teamGroups = $groups;
+    }
+
+
+
+    public function deleteConversation($id)
+    {
+        $companyId = currentCompanyId();
+
+        if (str_starts_with($id, 'teamGroup_')) {
+            $groupId = intval(str_replace('teamGroup_', '', $id));
+            ChatMessage::where('company_id', $companyId)
+                ->where('team_id', $groupId)
+                ->delete();
+
+
+            ChatGroupMember::where('group_id', $groupId)->delete();
+
+
+            $group = ChatGroup::where('company_id', $companyId)
+                ->where('id', $groupId)
+                ->first();
+
+
+            if ($group) {
+
+                if (!empty($group->image)) {
+
+
+                    $relativePath = ltrim($group->image, '/');
+
+                    $filePath = public_path($relativePath);
+
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
+
+            ChatGroup::where('company_id', $companyId)
+                ->where('id', $groupId)
+                ->delete();
+
+
+            unset($this->lastMessages[$id], $this->lastMessageTimes[$id], $this->unreadCounts[$id]);
+
+
+            $this->loadTeamGroups();
+        } else {
+            // Personal chat
+            ChatMessage::where('company_id', $companyId)
+                ->where(function ($q) use ($id) {
+                    $q->where('sender_id', auth()->id())->where('receiver_id', $id)
+                        ->orWhere('sender_id', $id)->where('receiver_id', auth()->id());
+                })
+                ->delete();
+
+
+            unset($this->lastMessages[$id], $this->lastMessageTimes[$id], $this->unreadCounts[$id]);
+
+
+            $this->loadConversationUsers();
+            $this->loadNewChatUsers();
+            $this->loadLastMessages();
+        }
+
+
+        $this->toast("Conversation deleted.", 'success');
     }
 }

@@ -48,8 +48,6 @@
                     <input type="text" class="form-control ps-5" placeholder="Search" wire:model="searchTerm"
                         wire:keyup="set('searchTerm', $event.target.value)"
                         style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
-
-
                 </div>
 
                 {{-- Tabs --}}
@@ -90,6 +88,12 @@
                                         {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
                                     </small>
 
+
+                                    <div class="text-muted small">
+
+                                        {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                    </div>
+
                                     @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
                                         <span class="badge bg-danger">{{ $unreadCounts['group'] }}</span>
                                     @endif
@@ -106,31 +110,36 @@
                                 </svg>
                             </div>
                         </div>
+
+
                     </div>
 
 
-
                     @foreach ($teamGroups as $group)
-                        <div class="chat-list-item {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                        <div x-data="{ showMenu: false }" @contextmenu.prevent="showMenu = true"
+                            @click.away="showMenu = false"
+                            class="chat-list-item position-relative {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
                             wire:click="startNewChat('teamGroup_{{ $group->id }}')"
                             style="
-                {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
-                {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
-            ">
+            {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
+            {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+         ">
+
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle p-2 me-3"
                                         style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                         <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
-                                            194 alt="{{ $group->name }}"
-                                            style="width:40px;height:40px;object-fit:cover;">
+                                            alt="{{ $group->name }}" style="width:40px;height:40px;object-fit:cover;">
                                     </div>
                                     <div>
                                         <div class="fw-bold">{{ $group->name }}</div>
                                         <small class="text-muted">
                                             {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                         </small>
-
+                                        <div class="text-muted small">
+                                            {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                        </div>
                                         @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                             <span
                                                 class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
@@ -138,10 +147,18 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Dropdown context menu -->
+                            <div x-show="showMenu" x-cloak class="position-absolute bg-white border rounded shadow-sm"
+                                style="top: 0.5rem; right: 2rem; z-index:1000; min-width: 140px;">
+                                <button type="button" class="dropdown-item text-danger"
+                                    wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')">
+                                    <i class="bi bi-trash me-1"></i> Delete Conversation
+                                </button>
+                            </div>
+
                         </div>
                     @endforeach
-
-
 
 
                     @foreach ($chatUsers as $user)
@@ -154,29 +171,53 @@
                                 $displayName = $displayName ?: $user->email;
                                 $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
                             }
-
+                            $itemKey = $user->id;
                         @endphp
 
-                        <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
-                            wire:click="startNewChat({{ $user->id }})"
+                        <div x-data="{ showMenu: false }" @click.away="showMenu = false"
+                            @contextmenu.prevent="showMenu = true"
+                            class="chat-list-item {{ $receiverId == $itemKey ? 'active-chat border-start border-3 border-primary' : '' }}"
+                            wire:click="startNewChat({{ $itemKey }})"
                             style="
-        {{ $receiverId == $user->id ? 'background-color:#f0f0f0;' : '' }}
-        {{ isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
-     ">
+            {{ $receiverId == $itemKey ? 'background-color:#f0f0f0;' : '' }}
+            {{ isset($unreadCounts[$itemKey]) && $unreadCounts[$itemKey] > 0 ? 'background-color:#ffe5e5;' : '' }}
+        ">
+
                             <div class="d-flex align-items-center">
                                 <img src="{{ $avatar }}" class="rounded-circle me-3"
                                     style="width:40px;height:40px;object-fit:cover;">
                                 <div>
                                     <div class="fw-bold">{{ $displayName }}</div>
+
                                     <small class="text-muted">
-                                        {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                        @if (isset($lastMessages[$itemKey]) && $lastMessages[$itemKey])
+                                            {{ Str::limit($lastMessages[$itemKey], 50) }}
+                                        @elseif(isset($lastAttachments[$itemKey]) && $lastAttachments[$itemKey])
+                                            Sent an attachment
+                                        @else
+                                            Start a conversation
+                                        @endif
                                     </small>
 
-                                    @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
-                                        <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                    @if (isset($unreadCounts[$itemKey]) && $unreadCounts[$itemKey] > 0)
+                                        <span class="badge bg-danger ms-1">{{ $unreadCounts[$itemKey] }}</span>
                                     @endif
+
+                                    <div class="text-muted small">
+                                        {{ isset($lastMessageTimes[$itemKey]) ? $lastMessageTimes[$itemKey]->format('d M, H:i') : '' }}
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- RIGHT CLICK MENU -->
+                            <div x-show="showMenu" class="position-absolute bg-white shadow p-2 rounded"
+                                style="top:10px; right:10px; width:150px; z-index:1000;">
+                                <button class="dropdown-item text-danger"
+                                    wire:click.stop="deleteConversation('{{ $itemKey }}')">
+                                    <i class="bi bi-trash"></i> Delete Conversation
+                                </button>
+                            </div>
+
                         </div>
                     @endforeach
                 @elseif($tab == 'teams')
@@ -196,9 +237,24 @@
                                 </div>
                                 <div>
                                     <div class="fw-bold">All users' team chat</div>
+
+
+
                                     <small class="text-muted">
-                                        {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
+                                        @if (isset($lastMessages['group']) && $lastMessages['group'])
+                                            {{ Str::limit($lastMessages['group'], 50) }}
+                                        @elseif(isset($lastAttachments['group']) && $lastAttachments['group'])
+                                            Sent an attachment
+                                        @else
+                                            Start a conversation
+                                        @endif
                                     </small>
+
+
+                                    <div class="text-muted small">
+
+                                        {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                    </div>
 
                                     @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
                                         <span class="badge bg-danger">{{ $unreadCounts['group'] }}</span>
@@ -221,18 +277,21 @@
 
 
                     @foreach ($teamGroups as $group)
-                        <div class="chat-list-item {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                        <div x-data="{ showMenu: false }" @contextmenu.prevent="showMenu = true"
+                            @click.away="showMenu = false"
+                            class="chat-list-item position-relative {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
                             wire:click="startNewChat('teamGroup_{{ $group->id }}')"
                             style="
-                {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
-                {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
-            ">
+            {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
+            {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+         ">
+
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle p-2 me-3"
                                         style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                         <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
-                                            194 alt="{{ $group->name }}"
+                                            alt="{{ $group->name }}"
                                             style="width:40px;height:40px;object-fit:cover;">
                                     </div>
                                     <div>
@@ -240,7 +299,9 @@
                                         <small class="text-muted">
                                             {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                         </small>
-
+                                        <div class="text-muted small">
+                                            {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                        </div>
                                         @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                             <span
                                                 class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
@@ -248,55 +309,105 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Dropdown context menu -->
+                            <div x-show="showMenu" x-cloak class="position-absolute bg-white border rounded shadow-sm"
+                                style="top: 0.5rem; right: 2rem; z-index:1000; min-width: 140px;">
+                                <button type="button" class="dropdown-item text-danger"
+                                    wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')">
+                                    <i class="bi bi-trash me-1"></i> Delete Conversation
+                                </button>
+                            </div>
+
                         </div>
                     @endforeach
                 @endif
 
                 @if ($tab == 'unread')
                     @php
-                        $unreadUsers = $chatUsers->filter(function ($user) use ($unreadCounts) {
-                            return isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0;
-                        });
+                        // Personal unread users
+                        $unreadUsers = $chatUsers->filter(
+                            fn($user) => isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0,
+                        );
+
+                        // Group unread
+                        $unreadGroups = collect();
+                        if (isset($unreadCounts['group']) && $unreadCounts['group'] > 0) {
+                            $unreadGroups->push(
+                                (object) [
+                                    'id' => 'group',
+                                    'name' => "All users' team chat",
+                                    'avatar' => asset('/assets/img/chat/group-icon.png'),
+                                ],
+                            );
+                        }
+
+                        // TeamGroup unread
+                        $teamGroupsUnread = collect();
+                        foreach ($teamGroups as $group) {
+                            $key = 'teamGroup_' . $group->id;
+                            if (isset($unreadCounts[$key]) && $unreadCounts[$key] > 0) {
+                                $teamGroupsUnread->push(
+                                    (object) [
+                                        'id' => $key,
+                                        'name' => $group->name,
+                                        'avatar' => $group->image
+                                            ? asset($group->image_url)
+                                            : asset('/assets/img/chat/group-icon.png'),
+                                    ],
+                                );
+                            }
+                        }
+
+                        $allUnread = $unreadGroups->merge($teamGroupsUnread)->merge($unreadUsers);
                     @endphp
 
-                    @if ($unreadUsers->isEmpty())
+                    @if ($allUnread->isEmpty())
                         <div class="text-center text-muted py-4">
                             <i class="bi bi-chat-left-dots fs-3 d-block mb-2"></i>
                             No unread messages
                         </div>
                     @else
-                        @foreach ($unreadUsers as $user)
+                        @foreach ($allUnread as $item)
                             @php
-                                if ($user->user_type == 'company') {
-                                    $displayName = 'Company Admin';
-                                    $avatar = $user->company->company_logo_url ?? asset('assets/img/default-image.jpg');
+                                if (isset($item->email)) {
+                                    $displayName =
+                                        $item->user_type === 'company'
+                                            ? 'Company Admin'
+                                            : trim(($item->f_name ?? '') . ' ' . ($item->l_name ?? ''));
+                                    $displayName = $displayName ?: $item->email;
+                                    $avatar = $item->employee->avatar_url ?? asset('assets/img/default-image.jpg');
                                 } else {
-                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                    $displayName = $displayName ?: $user->email;
-                                    $avatar = $user->employee->avatar_url ?? asset('assets/img/default-image.jpg');
+                                    $displayName = $item->name;
+                                    $avatar = $item->avatar;
                                 }
+
+                                $count = $unreadCounts[$item->id] ?? 0;
                             @endphp
 
-                            <div class="chat-list-item {{ $receiverId == $user->id ? 'active-chat border-start border-3 border-primary' : '' }}"
-                                wire:click="startNewChat({{ $user->id }})" style="background-color:#ffe5e5;">
+                            <div class="chat-list-item {{ $receiverId == $item->id ? 'active-chat border-start border-3 border-primary' : '' }}"
+                                wire:click="startNewChat('{{ $item->id }}')" style="background-color:#ffe5e5;">
                                 <div class="d-flex align-items-center">
                                     <img src="{{ $avatar }}" class="rounded-circle me-3"
                                         style="width:40px;height:40px;object-fit:cover;">
                                     <div>
                                         <div class="fw-bold">{{ $displayName }}</div>
                                         <small class="text-muted">
-                                            {{ isset($lastMessages[$user->id]) ? Str::limit($lastMessages[$user->id], 50) : 'Start a conversation' }}
+                                            {{ $lastMessages[$item->id] ?? 'Start a conversation' }}
                                         </small>
 
-                                        @if (isset($unreadCounts[$user->id]) && $unreadCounts[$user->id] > 0)
-                                            <span class="badge bg-danger ms-1">{{ $unreadCounts[$user->id] }}</span>
+                                        @if ($count > 0)
+                                            <span class="badge bg-danger ms-1">{{ $count }}</span>
                                         @endif
                                     </div>
                                 </div>
+
+
                             </div>
                         @endforeach
                     @endif
                 @endif
+
 
 
             </div>
@@ -444,7 +555,7 @@
 
 
 
-                                @if ($msg->attachment_url)
+                                @if (isset($msg->attachment_url) && $msg->attachment_url)
                                     @if ($msg->attachment_type === 'image' || $msg->attachment_type === 'gif')
                                         <img src="{{ $msg->attachment_url }}" style="max-width:200px;"
                                             class="rounded">
@@ -692,7 +803,8 @@
 
                     <button class="btn btn-primary" wire:click="sendAttachmentMessage" wire:loading.attr="disabled"
                         wire:target="sendAttachmentMessage">
-                        <span wire:loading.remove wire:target="sendAttachmentMessage">Send</span>
+                        <span wire:loading.remove wire:target="sendAttachmentMessage"
+                            wire:keydown.enter.prevent="sendAttachmentMessage">Send</span>
                         <span wire:loading wire:target="sendAttachmentMessage">
                             <i class="fas fa-spinner fa-spin"></i> Sending...
                         </span>

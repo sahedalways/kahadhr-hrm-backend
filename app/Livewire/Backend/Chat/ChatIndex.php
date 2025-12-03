@@ -98,6 +98,7 @@ class ChatIndex extends BaseComponent
 
     public function loadMessages($resetPage = true)
     {
+
         if ($resetPage) $this->page = 1;
 
         $query = ChatMessage::where('company_id', currentCompanyId());
@@ -225,41 +226,49 @@ class ChatIndex extends BaseComponent
             return;
         }
 
+        $receiver = $this->receiverId;
         $isCurrentChat = false;
 
-        // All users group chat
-        if ($msg->receiver_id === null && $msg->chat_group_id === null && $this->receiverId === 'group') {
-            $isCurrentChat = true;
-        }
-        // Team group chat
-        elseif ($msg->chat_group_id && $this->receiverId === 'teamGroup_' . $msg->chat_group_id) {
-            $isCurrentChat = true;
-        }
-        // Personal chat
-        elseif ($msg->receiver_id !== null && $msg->sender_id == $this->receiverId) {
+
+        if ($msg->receiver_id === null && $msg->team_id === null && $receiver === 'group') {
             $isCurrentChat = true;
         }
 
-        if ($isCurrentChat) {
-            // Mark message as read
-            ChatMessageRead::updateOrCreate(
-                [
-                    'message_id' => $msg->id,
-                    'user_id' => auth()->id()
-                ],
-                ['read_at' => now()]
-            );
+        if ($msg->team_id !== null && $receiver === 'teamGroup_' . $msg->team_id) {
+            $isCurrentChat = true;
         }
 
-        // Add to messages collection
-        $this->messages->push($msg);
 
-        // Refresh chat UI
+        if ($msg->receiver_id == auth()->id() && $receiver == $msg->sender_id) {
+            $isCurrentChat = true;
+        }
+
+
+
+        ChatMessageRead::updateOrCreate(
+            [
+                'message_id' => $msg->id,
+                'user_id' => auth()->id()
+            ],
+            ['read_at' => now()]
+        );
+
+
+
+
         $this->loadConversationUsers();
         $this->loadLastMessages();
         $this->sortChatUsersByLastMessage();
+
+        if (!$isCurrentChat) {
+            return;
+        }
+
+
+        $this->messages->push($msg);
         $this->dispatch('scrollToBottom');
     }
+
 
     public function userTyping()
     {
@@ -336,7 +345,7 @@ class ChatIndex extends BaseComponent
             ];
         } else {
             $user = User::withoutGlobalScopes()->find($id);
-
+            $this->markAsReadPersonal($id);
             if ($user) {
                 $fullName = $user->user_type === 'company'
                     ? 'Company Admin'
@@ -367,6 +376,21 @@ class ChatIndex extends BaseComponent
 
         $this->loadMessages();
     }
+
+
+
+
+    public function markAsReadPersonal($userId)
+    {
+        ChatMessage::where('company_id', currentCompanyId())
+            ->where('sender_id', $userId)
+            ->where('receiver_id', auth()->id())
+            ->where('is_read', 0)
+            ->update(['is_read' => 1]);
+
+        $this->unreadCounts[$userId] = 0;
+    }
+
 
 
 
@@ -536,9 +560,13 @@ class ChatIndex extends BaseComponent
         $this->lastMessageTimes = [];
         $this->unreadCounts = [];
 
-        // Group message
+
+        /* ----------------------
+       GROUP MESSAGES
+    -----------------------*/
         $groupMsg = ChatMessage::where('company_id', $companyId)
             ->whereNull('receiver_id')
+            ->whereNull('team_id')
             ->latest('id')
             ->first();
 
@@ -551,9 +579,10 @@ class ChatIndex extends BaseComponent
             $this->lastMessages['group'] = $senderName . ': ' . $groupMsg->message;
             $this->lastMessageTimes['group'] = $groupMsg->created_at;
 
-            // unread count for group
+            // unread count from chat_message_reads table
             $this->unreadCounts['group'] = ChatMessage::where('company_id', $companyId)
                 ->whereNull('receiver_id')
+                ->whereNull('team_id')
                 ->where('sender_id', '!=', auth()->id())
                 ->whereDoesntHave('reads', function ($q) {
                     $q->where('user_id', auth()->id());
@@ -565,8 +594,49 @@ class ChatIndex extends BaseComponent
             $this->unreadCounts['group'] = 0;
         }
 
-        // Personal messages
+
+        /* ----------------------
+       TEAM GROUP MESSAGES
+    -----------------------*/
+        foreach ($this->teamGroups as $group) {
+
+            $key = 'teamGroup_' . $group->id;
+
+            $lastMsg = ChatMessage::where('company_id', $companyId)
+                ->where('team_id', $group->id)
+                ->latest('id')
+                ->first();
+
+            if ($lastMsg) {
+                $sender = $lastMsg->sender;
+                $senderName = $sender->id === auth()->id()
+                    ? 'Me'
+                    : ($sender->user_type === 'company' ? 'Company Admin' : ($sender->f_name ?? $sender->email));
+
+                $this->lastMessages[$key]  = $senderName . ': ' . $lastMsg->message;
+                $this->lastMessageTimes[$key] = $lastMsg->created_at;
+
+                // unread from chat_message_reads table
+                $this->unreadCounts[$key] = ChatMessage::where('company_id', $companyId)
+                    ->where('team_id', $group->id)
+                    ->where('sender_id', '!=', auth()->id())
+                    ->whereDoesntHave('reads', function ($q) {
+                        $q->where('user_id', auth()->id());
+                    })
+                    ->count();
+            } else {
+                $this->lastMessages[$key] = null;
+                $this->lastMessageTimes[$key] = null;
+                $this->unreadCounts[$key] = 0;
+            }
+        }
+
+
+        /* ----------------------
+       PERSONAL MESSAGES
+    -----------------------*/
         foreach ($this->chatUsers as $user) {
+
             $lastMsg = ChatMessage::where('company_id', $companyId)
                 ->where(function ($q) use ($user) {
                     $q->where('sender_id', auth()->id())->where('receiver_id', $user->id)
@@ -584,14 +654,15 @@ class ChatIndex extends BaseComponent
                 $this->lastMessages[$user->id] = $senderName . ': ' . $lastMsg->message;
                 $this->lastMessageTimes[$user->id] = $lastMsg->created_at;
 
-
+                // PERSONAL unread uses is_read column
                 $this->unreadCounts[$user->id] = ChatMessage::where('company_id', $companyId)
                     ->where('sender_id', $user->id)
                     ->where('receiver_id', auth()->id())
-                    ->whereDoesntHave('reads', function ($q) {
-                        $q->where('user_id', auth()->id());
-                    })
+                    ->where('is_read', 0)
                     ->count();
+                if ($this->receiverId == $user->id) {
+                    $this->markAsReadPersonal($user->id);
+                }
             } else {
                 $this->lastMessages[$user->id] = null;
                 $this->lastMessageTimes[$user->id] = null;
@@ -599,6 +670,7 @@ class ChatIndex extends BaseComponent
             }
         }
     }
+
 
 
     public function sortChatUsersByLastMessage()
@@ -836,7 +908,7 @@ class ChatIndex extends BaseComponent
 
 
         $this->startNewChat('teamGroup_' . $group->id);
-
+        $this->loadTeamGroups();
 
         $this->toast("Team created successfully.", 'success');
         $this->dispatch('closemodal');

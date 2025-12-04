@@ -74,7 +74,7 @@ class LeavesIndexEmp extends BaseComponent
         $start = Carbon::parse($this->start_date)->startOfDay();
         $end = Carbon::parse($this->end_date)->startOfDay();
 
-        $totalDays = $start->diffInDays($end, false) + 1; // use false if you want signed diff
+        $totalDays = $start->diffInDays($end, false) + 1;
         $totalDays = abs($totalDays);
 
         $hoursPerDay = 8;

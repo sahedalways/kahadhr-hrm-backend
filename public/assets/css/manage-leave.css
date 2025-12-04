@@ -1,0 +1,34 @@
+.fc-event-approved {
+    background-color: #28a745;
+    border-color: #28a745;
+} /* Green */
+.fc-event-pending {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #343a40;
+} /* Yellow/Orange */
+.fc-event-rejected {
+    background-color: #dc3545;
+    border-color: #dc3545;
+} /* Red */
+
+/* Ensure the calendar container has a defined height */
+#calendar {
+    max-width: 1000px;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 15px;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 5px;
+}

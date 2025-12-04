@@ -31,29 +31,28 @@ class ResetCarryOverLeave extends Command
                 ]);
 
                 if ($leaveBalance->exists) {
-                    if ($leaveBalance->carry_over_hours > 0) {
-                        $settingHours = LeaveSetting::where('company_id', $employee->company_id)
-                            ->value('full_time_hours') ?? 0;
 
-                        $leaveBalance->total_hours = $settingHours + $leaveBalance->carry_over_hours;
-                        $leaveBalance->used_hours = 0;
-                        $leaveBalance->carry_over_hours = $settingHours + $leaveBalance->carry_over_hours;
-
-                        $leaveBalance->save();
-
-                        $this->info("Adjusted leave balance for employee ID: {$employee->user_id}");
+                    if ($employee->salary_type === 'hourly') {
+                        $contractHours = $employee->contract_hours ?? 0;
+                        $partTimePercent = config('leave.part_time_percentage', 100);
+                        $settingHours = $contractHours * 52 * ($partTimePercent / 100);
                     } else {
                         $settingHours = LeaveSetting::where('company_id', $employee->company_id)
                             ->value('full_time_hours') ?? 0;
+                    }
 
+                    if ($leaveBalance->carry_over_hours > 0) {
+                        $leaveBalance->total_hours = $settingHours + $leaveBalance->carry_over_hours;
+                        $leaveBalance->used_hours = 0;
+                        $leaveBalance->carry_over_hours = $settingHours + $leaveBalance->carry_over_hours;
+                    } else {
                         $leaveBalance->total_hours = $settingHours;
                         $leaveBalance->used_hours = 0;
                         $leaveBalance->carry_over_hours = $settingHours;
-
-                        $leaveBalance->save();
-
-                        $this->info("Reset leave balance for employee ID: {$employee->user_id}");
                     }
+
+                    $leaveBalance->save();
+                    $this->info("Adjusted leave balance for employee ID: {$employee->user_id}");
                 }
             }
         }

@@ -4,6 +4,7 @@ namespace App\Livewire\Backend\Employee\Leaves;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
+use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\LeaveSetting;
@@ -164,44 +165,12 @@ class LeavesIndexEmp extends BaseComponent
         $user = auth()->user();
 
 
-        $employee = Employee::where('user_id', $user->id)->first();
+        $leaveBalance = LeaveBalance::where('user_id', $user->id)->first();
 
-        if (!$employee) {
-            $this->entitlementHours = 0;
-            $this->usedHours = 0;
-            $this->remainingHours = 0;
-            return;
-        }
-
-        $entitlementHours = 0;
-        $partTimePercent = config('leave.part_time_percentage');
-
-
-        if ($employee->salary_type === 'hourly') {
-            $contractHours = $employee->contract_hours ?? 0;
-
-
-            $totalPartTimeHours = $contractHours * 52;
-
-            $entitlementHours = $totalPartTimeHours * $partTimePercent / 100;
-        } elseif ($employee->salary_type === 'monthly') {
-            $setting = LeaveSetting::where('company_id', $employee->company_id)->first();
-            $entitlementHours = $setting ? $setting->full_time_hours : 0;
-        }
-
-        $this->entitlementHours = $entitlementHours;
-
-
-        $this->usedHours = LeaveRequest::where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->sum('total_hours');
-
-
-        $this->remainingHours = $this->entitlementHours - $this->usedHours;
+        $this->remainingHours = $leaveBalance->carry_over_hours;
+        $this->entitlementHours = $leaveBalance->total_hours;
+        $this->usedHours = $leaveBalance->used_hours;
     }
-
-
-
 
 
 

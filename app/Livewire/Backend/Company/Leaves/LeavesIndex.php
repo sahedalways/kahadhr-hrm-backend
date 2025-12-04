@@ -82,6 +82,10 @@ class LeavesIndex extends BaseComponent
 
 
             $this->toast('User do not have enough leave hours available!', 'error');
+            $this->resetForm();
+
+            $this->mount();
+            $this->dispatch('closemodal');
             return;
         }
 
@@ -96,14 +100,28 @@ class LeavesIndex extends BaseComponent
         ]);
 
         if (!$leaveBalance->exists) {
-            $totalHours = LeaveSetting::where('company_id', $companyId)->value('full_time_hours') ?? 0;
+            $employee = $request->user->employee;
+
+            if ($employee->salary_type === 'hourly') {
+                $contractHours = $employee->contract_hours ?? 0;
+                $partTimePercent = config('leave.part_time_percentage', 100);
+                $totalHours = $contractHours * 52 * ($partTimePercent / 100);
+            } else {
+                $totalHours = LeaveSetting::where('company_id', $companyId)
+                    ->value('full_time_hours') ?? 0;
+            }
+
             $leaveBalance->total_hours = $totalHours;
         }
 
-        $leaveBalance->used_hours = ($leaveBalance->used_hours ?? 0) + $hoursUsed;
-        $leaveBalance->carry_over_hours = max(0, $leaveBalance->total_hours - $leaveBalance->used_hours);
 
-        $leaveBalance->save();
+        if (($leaveBalance->total_hours - ($leaveBalance->used_hours ?? 0)) > 0) {
+            $leaveBalance->used_hours = ($leaveBalance->used_hours ?? 0) + $hoursUsed;
+            $leaveBalance->carry_over_hours = max(0, $leaveBalance->total_hours - $leaveBalance->used_hours);
+            $leaveBalance->save();
+        }
+
+
         $this->resetForm();
 
         $this->mount();
@@ -162,20 +180,31 @@ class LeavesIndex extends BaseComponent
             'company_id' => auth()->user()->company->id,
         ]);
 
-
         if (!$leaveBalance->exists) {
-            $totalSettingHours = LeaveSetting::where('company_id', auth()->user()->company->id)->value('full_time_hours') ?? 0;
+            $employee = Employee::find($this->selectedEmployee);
+
+            if ($employee && $employee->salary_type === 'hourly') {
+                $contractHours = $employee->contract_hours ?? 0;
+                $partTimePercent = config('leave.part_time_percentage', 100);
+                $totalSettingHours = $contractHours * 52 * ($partTimePercent / 100);
+            } else {
+                $totalSettingHours = LeaveSetting::where('company_id', auth()->user()->company->id)
+                    ->value('full_time_hours') ?? 0;
+            }
+
             $leaveBalance->total_hours = $totalSettingHours;
             $leaveBalance->carry_over_hours = $totalSettingHours;
+            $leaveBalance->used_hours = 0;
             $leaveBalance->save();
         }
+
 
         if (($leaveBalance->carry_over_hours ?? $leaveBalance->total_hours) > 0) {
             $leaveBalance->used_hours = ($leaveBalance->used_hours ?? 0) + $totalHours;
             $leaveBalance->carry_over_hours = max(0, $leaveBalance->total_hours - $leaveBalance->used_hours);
-
             $leaveBalance->save();
         }
+
 
 
         $this->toast('Leave has been submitted successfully.', 'success');
@@ -222,26 +251,9 @@ class LeavesIndex extends BaseComponent
 
     private function getAvailableLeaveHours($userId)
     {
-        $employee = Employee::where('user_id', $userId)->first();
+        $leaveBalance = LeaveBalance::where('user_id', $userId)->first();
 
-        if (!$employee) return 0;
-
-        if ($employee->salary_type === 'hourly') {
-            $contractHours = $employee->contract_hours ?? 0;
-            $partTimePercent = config('leave.part_time_percentage');
-            $totalPartTimeHours = $contractHours * 52;
-            $entitlementHours = $totalPartTimeHours * $partTimePercent / 100;
-        } else {
-            $setting = LeaveSetting::where('company_id', $employee->company_id)->first();
-            $entitlementHours = $setting ? $setting->full_time_hours : 0;
-        }
-
-
-        $used = LeaveRequest::where('user_id', $userId)
-            ->where('status', 'approved')
-            ->sum('total_hours');
-
-        return $entitlementHours - $used;
+        return $leaveBalance->carry_over_hours ?? 0;
     }
 
 

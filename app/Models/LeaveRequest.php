@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class LeaveRequest extends Model
 {
-
-    protected $fillable = ['user_id', 'leave_type_id', 'start_date', 'end_date', 'total_hours', 'status'];
+    use FilterByUserType;
+    protected $fillable = ['company_id', 'user_id', 'leave_type_id', 'start_date', 'end_date', 'total_hours', 'status', 'other_reason'];
 
     public function user()
     {
@@ -17,5 +18,11 @@ class LeaveRequest extends Model
     public function leaveType()
     {
         return $this->belongsTo(LeaveType::class);
+    }
+
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

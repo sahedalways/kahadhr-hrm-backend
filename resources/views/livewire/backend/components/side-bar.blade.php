@@ -305,12 +305,43 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/leaves*') ? 'active' : '' }}"
-                        href="{{ route('company.dashboard.leaves.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                        <i class="fas fa-plane-departure"></i>
+                    <a data-bs-toggle="collapse" href="#leaves"
+                        class="nav-link {{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'active' : '' }}"
+                        aria-controls="leaves" role="button"
+                        aria-expanded="{{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'true' : 'false' }}">
+                        <div
+                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
+                            <i class="fas fa-plane-departure text-primary text-sm opacity-10"></i>
+                        </div>
                         <span class="nav-link-text ms-1">Leaves</span>
                     </a>
+
+                    <div class="collapse {{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'show' : '' }}"
+                        id="leaves">
+                        <ul class="nav ms-4">
+
+                            <!-- Leave Settings -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/leaves/settings*') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.leaves.settings', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-cogs sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Leave Settings </span>
+                                </a>
+                            </li>
+
+                            <!-- Leave Management -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/leaves/manage') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.leaves.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-tasks sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Leave Management </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </li>
+
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#documents"
@@ -348,6 +379,8 @@
 
                         </ul>
                     </div>
+                </li>
+
 
 
                 <li class="nav-item">
@@ -519,6 +552,36 @@
 
 
 
+
+                {{-- Clock In --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/clock-in*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.clockin.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-regular fa-clock"></i>
+                        <span class="nav-link-text ms-1">Clock In</span>
+                    </a>
+                </li>
+
+                {{-- Schedule --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/schedule*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.schedule.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span class="nav-link-text ms-1">Schedule</span>
+                    </a>
+                </li>
+
+                {{-- Leaves --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/leaves*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.leaves.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-umbrella-beach"></i>
+                        <span class="nav-link-text ms-1">Leaves</span>
+                    </a>
+                </li>
+
+
+
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#documents"
                         class="nav-link {{ Request::is('employee/dashboard/documents*') ? 'active' : '' }}"
@@ -561,10 +624,41 @@
                 </li>
 
 
+                {{-- Expenses --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/expenses*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.expenses.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span class="nav-link-text ms-1">Expenses</span>
+                    </a>
+                </li>
 
+                {{-- Training --}}
+                {{-- <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/training*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.training.index', ['company' => app('authUser')->employee->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-chalkboard-teacher"></i>
+                        <span class="nav-link-text ms-1">Training</span>
+                    </a>
+                </li> --}}
 
+                {{-- Onboarding --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/onboarding*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.onboarding.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-user-check"></i>
+                        <span class="nav-link-text ms-1">Onboarding</span>
+                    </a>
+                </li>
 
-
+                {{-- Reports --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/reports*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.reports.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span class="nav-link-text ms-1">Reports</span>
+                    </a>
+                </li>
 
 
 

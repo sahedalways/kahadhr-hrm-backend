@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leave_types', function (Blueprint $table) {
+        Schema::create('leave_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('emoji')->nullable();
+            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+
+            $table->decimal('full_time_hours', 8, 2)->default(224);
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_types');
+        Schema::dropIfExists('leave_settings');
     }
 };

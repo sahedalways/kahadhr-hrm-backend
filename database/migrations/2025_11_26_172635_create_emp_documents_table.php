@@ -30,6 +30,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('file_path')->nullable();
+            $table->string('comment')->nullable();
 
             $table->date('expires_at')->nullable();
 

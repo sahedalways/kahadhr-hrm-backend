@@ -8,6 +8,7 @@ use App\Livewire\Backend\Company\Dashboard;
 use App\Livewire\Backend\Company\DocumentManage\DocumentManageIndex;
 use App\Livewire\Backend\Company\DocumentType\DocumentTypesIndex;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
+use App\Livewire\Backend\Company\Leaves\LeaveSettings;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
 use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
@@ -90,8 +91,14 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', ScheduleIndex::class)->name('index');
     });
 
+
+
     Route::prefix('leaves')->name('leaves.')->group(function () {
-      Route::get('/', LeavesIndex::class)->name('index');
+      Route::get('/manage', LeavesIndex::class)->name('index');
+
+
+      Route::get('settings', LeaveSettings::class)
+        ->name('settings');
     });
 
 

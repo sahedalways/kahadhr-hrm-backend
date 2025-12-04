@@ -4,10 +4,17 @@ use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Chat\ChatIndex;
 use App\Livewire\Backend\Employee\Dashboard;
 use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
+use App\Livewire\Backend\Employee\ClockIn\ClockInIndex;
 use App\Livewire\Backend\Employee\Documents\AssignedDocuments;
 use App\Livewire\Backend\Employee\Documents\ManageDocuments;
+use App\Livewire\Backend\Employee\Expenses\ExpensesIndex;
+use App\Livewire\Backend\Employee\Leaves\LeavesIndexEmp;
+use App\Livewire\Backend\Employee\Onboarding\OnboardingIndex;
+use App\Livewire\Backend\Employee\Reports\ReportsIndex;
+use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Employee\Settings\ProfileSettings;
 use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
+use App\Livewire\Backend\Employee\Training\TrainingIndex;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Route;
 
@@ -59,6 +66,46 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::prefix('chat')->name('chat.')->group(function () {
       Route::get('/', ChatIndex::class)->name('index');
     });
+
+
+
+
+    // CLOCK IN
+    Route::prefix('clock-in')->name('clockin.')->group(function () {
+      Route::get('/', ClockInIndex::class)->name('index');
+    });
+
+    // SCHEDULE
+    Route::prefix('schedule')->name('schedule.')->group(function () {
+      Route::get('/', ScheduleIndex::class)->name('index');
+    });
+
+    // LEAVES
+    Route::prefix('leaves')->name('leaves.')->group(function () {
+      Route::get('/', LeavesIndexEmp::class)->name('index');
+    });
+
+
+    // EXPENSES
+    Route::prefix('expenses')->name('expenses.')->group(function () {
+      Route::get('/', ExpensesIndex::class)->name('index');
+    });
+
+    // TRAINING
+    Route::prefix('training')->name('training.')->group(function () {
+      Route::get('/', TrainingIndex::class)->name('index');
+    });
+
+    // ONBOARDING
+    Route::prefix('onboarding')->name('onboarding.')->group(function () {
+      Route::get('/', OnboardingIndex::class)->name('index');
+    });
+
+    // REPORTS
+    Route::prefix('reports')->name('reports.')->group(function () {
+      Route::get('/', ReportsIndex::class)->name('index');
+    });
+
 
 
     // documents manage

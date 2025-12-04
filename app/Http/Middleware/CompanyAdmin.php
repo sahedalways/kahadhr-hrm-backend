@@ -15,14 +15,16 @@ class CompanyAdmin
         $subdomain = $request->route('company');
         $user = Auth::user();
 
-        if (!$user || $user->company->sub_domain !== $subdomain) {
-            abort(403, 'Unauthorized access for this subdomain.');
+
+        if ($user->user_type == 'company') {
+            if (!$user || $user->company->sub_domain !== $subdomain) {
+                abort(403, 'Unauthorized access for this subdomain.');
+            }
+        } else {
+            abort(403, 'This page is only accessible by company.');
         }
 
 
-        if ($user->user_type !== 'company') {
-            abort(403, 'This page is only accessible by company admin.');
-        }
 
 
         return $next($request);

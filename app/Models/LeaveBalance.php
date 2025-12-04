@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
 
 class LeaveBalance extends Model
 {
-    protected $fillable = ['user_id', 'leave_type_id', 'total_hours', 'used_hours', 'carry_over_hours'];
+    use FilterByUserType;
+    protected $fillable = ['user_id', 'company_id', 'total_hours', 'used_hours', 'carry_over_hours'];
 
     public function user()
     {
@@ -16,5 +18,10 @@ class LeaveBalance extends Model
     public function leaveType()
     {
         return $this->belongsTo(LeaveType::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

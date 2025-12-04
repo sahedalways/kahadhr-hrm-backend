@@ -14,13 +14,15 @@ class CheckEmployee
         $subdomain = $request->route('company');
         $user = Auth::user();
 
-        if (!$user || $user->employee->company->sub_domain !== $subdomain) {
-            abort(403, 'Unauthorized access for this subdomain.');
-        }
-
-        if ($user->user_type !== 'employee') {
+        if ($user->user_type == 'employee') {
+            if (!$user || $user->employee->company->sub_domain !== $subdomain) {
+                abort(403, 'Unauthorized access for this subdomain.');
+            }
+        } else {
             abort(403, 'This page is only accessible by employees.');
         }
+
+
 
         return $next($request);
     }

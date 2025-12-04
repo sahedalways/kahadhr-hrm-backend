@@ -191,8 +191,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Add Employee</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                        <i class="fas fa-times" style="color:black;"></i>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 
@@ -334,8 +335,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Edit Employee</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                        <i class="fas fa-times" style="color:black;"></i>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <form wire:submit.prevent="updateProfile">
@@ -538,8 +540,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Verification Centre</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                        <i class="fas fa-times" style="color:black;"></i>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 

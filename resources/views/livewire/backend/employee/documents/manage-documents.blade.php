@@ -134,8 +134,9 @@
                     <h5 class="modal-title">
                         {{ $existingDocument ? 'View Document' : 'Upload Document' }}
                     </h5>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                        <i class="fas fa-times" style="color:black;"></i>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 

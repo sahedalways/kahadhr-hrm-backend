@@ -83,4 +83,27 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
+
+
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->employee) {
+                $companyId = $user->employee->company_id;
+
+                $leaveSettings = LeaveSetting::where('company_id', $companyId)->get();
+
+                foreach ($leaveSettings as $setting) {
+                    LeaveBalance::create([
+                        'user_id' => $user->id,
+                        'company_id' => $companyId,
+                        'total_hours' => $setting->full_time_hours,
+                        'used_hours' => 0,
+                        'carry_over_hours' => $setting->full_time_hours,
+                    ]);
+                }
+            }
+        });
+    }
 }

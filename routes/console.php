@@ -11,9 +11,10 @@ Artisan::command('inspire', function () {
 // for charging company
 Schedule::command('companies:charge')->dailyAt('00:00');
 
-
 Schedule::command('otp:delete-expired')->dailyAt('00:00');
 
 Schedule::command('documents:update-expired')->dailyAt('00:00');
 
 Schedule::command('chat:clean-temp')->dailyAt('00:00');
+
+Schedule::command('leave:reset-carry-over')->dailyAt('00:00');

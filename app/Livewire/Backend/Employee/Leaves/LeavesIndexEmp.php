@@ -109,15 +109,7 @@ class LeavesIndexEmp extends BaseComponent
 
         $this->resetLoaded();
     }
-    public function deleteLeaveRequest($id)
-    {
-        $leave = LeaveRequest::where('user_id', auth()->id())->find($id);
-        if ($leave) $leave->delete();
 
-        $this->toast('Leave request deleted successfully!', 'success');
-        $this->calculateLeaveHours();
-        $this->resetLoaded();
-    }
 
     public function updatedSearch()
     {
@@ -207,6 +199,10 @@ class LeavesIndexEmp extends BaseComponent
 
         $this->remainingHours = $this->entitlementHours - $this->usedHours;
     }
+
+
+
+
 
 
 

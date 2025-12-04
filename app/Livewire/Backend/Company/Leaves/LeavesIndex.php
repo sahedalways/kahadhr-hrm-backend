@@ -15,13 +15,20 @@ class LeavesIndex extends BaseComponent
 {
     public $employees;
     public $requestDetails;
+    public $calendarLeaveInfo;
     public $leaveRequests;
     public $company;
     public $selectedEmployee;
     public $selectedEmployeeName;
     public $leaveTypes;
+    public $search;
     public $other_leave_reason;
     public $leave_type_id, $start_date, $end_date;
+
+    public $selectedEmployeeLeaves = [];
+    public $activeEmployeeId = null;
+    protected $listeners = ['showLeaveRequestInfo'];
+
 
 
 
@@ -44,6 +51,23 @@ class LeavesIndex extends BaseComponent
             ->get();
 
         $this->leaveTypes = LeaveType::all();
+    }
+
+
+
+    public function updatedSearch()
+    {
+        $this->employees = Employee::where('company_id', $this->company->id)
+            ->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('job_title', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('department', function ($d) {
+                        $d->where('name', 'like', '%' . $this->search . '%');
+                    });
+            })
+            ->orderBy('f_name')
+            ->get();
     }
 
 
@@ -224,6 +248,7 @@ class LeavesIndex extends BaseComponent
         $this->other_leave_reason = null;
         $this->requestDetails = null;
         $this->start_date = null;
+        $this->calendarLeaveInfo = null;
         $this->end_date = null;
     }
 
@@ -263,6 +288,41 @@ class LeavesIndex extends BaseComponent
         $this->selectedEmployee = $id;
         $emp = Employee::where('user_id', $id)->first();
         $this->selectedEmployeeName = $emp->full_name;
+    }
+
+
+
+    public function showEmployeeLeave($employeeId)
+    {
+        $this->activeEmployeeId = $employeeId;
+
+        $this->selectedEmployeeLeaves = LeaveRequest::where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->with('leaveType:id,emoji')
+            ->get()
+            ->map(function ($leave) {
+                return [
+                    'start' => $leave->start_date,
+                    'end' => $leave->end_date,
+                    'emoji' => $leave->leaveType->emoji,
+                    'id' => $leave->id,
+                ];
+            })
+            ->toArray();
+
+        $this->dispatch('employeeLeaveLoaded', leaves: $this->selectedEmployeeLeaves);
+    }
+
+
+
+    public function showLeaveRequestInfo($id)
+    {
+        $this->calendarLeaveInfo = LeaveRequest::with('leaveType', 'user.employee')
+            ->where('id', $id)
+            ->where('status', 'approved')
+            ->first();
+
+        $this->dispatch('show-leave-modal');
     }
 
 

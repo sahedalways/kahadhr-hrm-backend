@@ -25,16 +25,17 @@
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
                                         class="fas fa-search"></i></span>
                                 <input type="text" class="form-control border-start-0 ps-0"
-                                    placeholder="Search by name, department, or title..."
-                                    wire:model.debounce.300ms="searchQuery">
+                                    placeholder="Search by name, department, or title..." wire:model="search"
+                                    wire:keyup="set('search', $event.target.value)">
                             </div>
 
-                            <div class="list-container" style="max-height: 400px; overflow-y: auto;">
+                            <div class="list-container" style="max-height: 380px; overflow-y: auto;">
                                 <ul class="list-group list-group-flush">
                                     @forelse ($employees as $employee)
-                                        <li class="list-group-item list-group-item-action d-flex align-items-center p-3 border-bottom-0"
-                                            style="cursor: pointer;" wire:click="selectEmployee({{ $employee->id }})">
-
+                                        <li class="list-group-item list-group-item-action d-flex align-items-center p-3 border-bottom-0
+        {{ $activeEmployeeId == $employee->user_id ? 'active-employee' : '' }}"
+                                            style="cursor: pointer;"
+                                            wire:click="showEmployeeLeave({{ $employee->user_id }})">
 
                                             <img src="{{ $employee->avatar_url }}"
                                                 class="rounded-circle me-3 border border-2 border-primary-subtle"
@@ -42,14 +43,12 @@
                                                 alt="{{ $employee->full_name }}">
 
                                             <div class="flex-grow-1">
-
                                                 <div class="fw-bold text-dark">{{ $employee->full_name }}</div>
                                                 <small
                                                     class="text-secondary d-block">{{ $employee->job_title ?? null }}</small>
                                             </div>
 
                                             <div class="text-end ms-auto">
-
                                                 <span
                                                     class="badge bg-light text-primary border border-primary-subtle fw-medium text-uppercase"
                                                     style="font-size: 0.75rem;">
@@ -57,18 +56,17 @@
                                                     {{ $employee->department->name ?? 'Unknown' }}
                                                 </span>
 
-
                                                 <i class="fas fa-chevron-right text-muted ms-3"></i>
                                             </div>
                                         </li>
                                     @empty
                                         <li class="list-group-item text-center text-muted py-5">
-                                            <i class="fas fa-info-circle me-1"></i> No employees found matching your
-                                            criteria.
+                                            <i class="fas fa-info-circle me-1"></i>No employees found.
                                         </li>
                                     @endforelse
                                 </ul>
                             </div>
+
 
                         </div>
                     </div>
@@ -280,17 +278,21 @@
 
                         <!-- 2. Leave Type -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
-                            <i class="fas fa-umbrella-beach me-3 fs-5 text-warning-icon" style="min-width: 25px;"></i>
+                            <div class="me-3 fs-5" style="min-width: 25px;">
+                                {!! $requestDetails->leaveType->emoji !!}
+                            </div>
                             <div class="fw-medium text-dark flex-grow-1">
-                                {{ $requestDetails->leaveType->name ?? 'N/A' }}</div>
-                            <i class="fas fa-chevron-right text-muted"></i>
+                                {{ $requestDetails->leaveType->name ?? 'N/A' }}
+                            </div>
                         </div>
+
 
                         <!-- 3. Reason/Description -->
                         <div
                             class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
                             <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
-                            <div class="fw-normal text-dark flex-grow-1">{{ $requestDetails->reason ?? '-' }}</div>
+                            <div class="fw-normal text-dark flex-grow-1">{{ $requestDetails->other_reason ?? '-' }}
+                            </div>
                         </div>
 
                         <!-- 4. Date Range -->
@@ -375,8 +377,105 @@
     </div>
 
 
+
+    <div wire:ignore.self class="modal fade" id="viewRequestInfoFromCalendar" data-bs-backdrop="static"
+        tabindex="-1" aria-labelledby="viewRequestInfoFromCalendar" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="viewRequestInfoFromCalendar">Leave Request</h5>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body p-4">
+                    @if ($calendarLeaveInfo)
+                        <!-- 1. Employee Card -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <img src="{{ $calendarLeaveInfo->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
+                                class="rounded-circle me-3 border border-1"
+                                alt="{{ $calendarLeaveInfo->user->full_name }}"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                            <div class="fw-bold text-dark flex-grow-1">{{ $calendarLeaveInfo->user->full_name }}</div>
+
+                        </div>
+
+                        <!-- 2. Leave Type -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <div class="me-3 fs-5" style="min-width: 25px;">
+                                {!! $calendarLeaveInfo->leaveType->emoji !!}
+                            </div>
+                            <div class="fw-medium text-dark flex-grow-1">
+                                {{ $calendarLeaveInfo->leaveType->name ?? 'N/A' }}
+                            </div>
+                        </div>
+
+
+                        <!-- 3. Reason/Description -->
+                        <div
+                            class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
+                            <div class="fw-normal text-dark flex-grow-1">{{ $calendarLeaveInfo->other_reason ?? '-' }}
+                            </div>
+                        </div>
+
+                        <!-- 4. Date Range -->
+                        <div class="row g-2 mb-4 px-2">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center py-2">
+                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">From</div>
+                                    <div class="fw-bold text-dark flex-grow-1">
+                                        {{ \Carbon\Carbon::parse($calendarLeaveInfo->start_date)->format('D, d M') }}
+                                    </div>
+                                    <div class="badge bg-success-subtle text-success fw-bold p-2">Morning</div>
+                                </div>
+                            </div>
+                            <hr class="text-light-subtle my-0">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center py-2">
+                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">To</div>
+                                    <div class="fw-bold text-dark flex-grow-1">
+                                        {{ \Carbon\Carbon::parse($calendarLeaveInfo->end_date)->format('D, d M, Y') }}
+                                    </div>
+                                    <div class="badge bg-danger-subtle text-danger fw-bold p-2">End of day</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Deduction Summary -->
+                        <div class="text-center mt-3 pt-3 border-top">
+                            <h5 class="fw-bold text-secondary">Deduction:
+                                {{ \Carbon\Carbon::parse($calendarLeaveInfo->start_date)->diffInDays(\Carbon\Carbon::parse($calendarLeaveInfo->end_date)) + 1 }}
+                                days</h5>
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-1"></i> No request selected.
+                        </div>
+                    @endif
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 <script src="{{ asset('js/company/manage-leave.js') }}"></script>
+<script>
+    window.addEventListener('show-leave-modal', event => {
+        let modalEl = document.getElementById('viewRequestInfoFromCalendar');
+        let modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    });
+</script>

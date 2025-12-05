@@ -99,34 +99,36 @@
 
                             <ul class="list-group list-group-flush mb-4">
                                 @forelse ($leaveRequests as $leave)
-                                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 leave-request-item"
-                                        data-bs-toggle="modal" data-bs-target="#viewRequestInfo"
-                                        wire:click="viewRequestInfo({{ $leave->id }})">
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ $leave->user->employee->avatar_url }}"
-                                                class="rounded-circle me-3 border border-2 border-light-subtle"
-                                                style="width: 45px; height: 45px; object-fit: cover;"
-                                                alt="{{ $leave->user->full_name }}">
-                                            <div>
-                                                <div class="fw-bold text-dark">{{ $leave->user->full_name }}</div>
-                                                <small class="text-muted text-uppercase fw-medium"
-                                                    style="font-size: 0.75rem;">
-                                                    {{ $leave->user->employee->department->name ?? 'N/A Department' }}
+                                    <div class="leave-list-container" style="max-height: 350px; overflow-y: auto;">
+                                        <li class="list-group-item d-flex align-items-center justify-content-between px-0 leave-request-item"
+                                            data-bs-toggle="modal" data-bs-target="#viewRequestInfo"
+                                            wire:click="viewRequestInfo({{ $leave->id }})">
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ $leave->user->employee->avatar_url }}"
+                                                    class="rounded-circle me-3 border border-2 border-light-subtle"
+                                                    style="width: 45px; height: 45px; object-fit: cover;"
+                                                    alt="{{ $leave->user->full_name }}">
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ $leave->user->full_name }}</div>
+                                                    <small class="text-muted text-uppercase fw-medium"
+                                                        style="font-size: 0.75rem;">
+                                                        {{ $leave->user->employee->department->name ?? 'N/A Department' }}
+                                                    </small>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-end">
+                                                <span class="badge bg-info-subtle text-info fw-bold p-2">
+                                                    {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays(\Carbon\Carbon::parse($leave->end_date)) + 1 }}
+                                                    Days
+                                                </span>
+                                                <small class="d-block text-muted mt-1" style="font-size: 0.75rem;">
+                                                    {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
+                                                    {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
                                                 </small>
                                             </div>
-                                        </div>
-
-                                        <div class="text-end">
-                                            <span class="badge bg-info-subtle text-info fw-bold p-2">
-                                                {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays(\Carbon\Carbon::parse($leave->end_date)) + 1 }}
-                                                Days
-                                            </span>
-                                            <small class="d-block text-muted mt-1" style="font-size: 0.75rem;">
-                                                {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
-                                                {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
-                                            </small>
-                                        </div>
-                                    </li>
+                                        </li>
+                                    </div>
                                 @empty
                                     <li class="list-group-item text-center text-muted py-4">
                                         <i class="fas fa-check-circle me-1"></i> No pending leave requests.
@@ -218,11 +220,13 @@
                                                 class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="end_date"
                                             wire:model="end_date" min="{{ date('Y-m-d') }}">
+                                        @error('end_date')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
-                                    @error('end_date')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
+
                                 </div>
+
 
                                 @error('remaining')
                                     <div class="text-danger mb-2">{{ $message }}</div>

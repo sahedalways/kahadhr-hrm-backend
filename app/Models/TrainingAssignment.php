@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TrainingAssignment extends Model
 {
     use FilterByUserType;
-    protected $fillable = ['training_id', 'user_id', 'status'];
+    protected $fillable = ['training_id', 'user_id', 'status', 'completed_at', 'proof_file'];
 
     public function training()
     {

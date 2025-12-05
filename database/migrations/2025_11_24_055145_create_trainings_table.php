@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('trainings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->string('course_name');
             $table->text('description')->nullable();
             $table->enum('content_type', ['video', 'file', 'text'])->default('text');
             $table->string('file_path')->nullable();
+            $table->date('from_date')->nullable();
+            $table->date('to_date')->nullable();
+            $table->date('expiry_date')->nullable();
+            $table->boolean('required_proof')->default(false);
             $table->timestamps();
         });
     }

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('training_assignments', function (Blueprint $table) {
+        Schema::create('training_views', function (Blueprint $table) {
             $table->id();
             $table->foreignId('training_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['assigned', 'completed'])->default('assigned');
+            $table->integer('view_percentage')->default(0);
+            $table->boolean('fully_watched')->default(false);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('training_assignments');
+        Schema::dropIfExists('training_views');
     }
 };

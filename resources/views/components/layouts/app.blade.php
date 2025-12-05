@@ -22,6 +22,7 @@
     <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
     @vite('resources/js/app.js')
     @stack('styles')
@@ -75,7 +76,6 @@
     <script src="{{ asset('assets/js/plugins/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/dragula/dragula.min.js') }}"></script>
     <script src="{{ asset('assets/js/argon-dashboard.min.js') }}"></script>
-
 
 
     <script>

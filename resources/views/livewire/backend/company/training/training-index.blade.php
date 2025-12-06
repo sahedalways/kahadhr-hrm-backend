@@ -95,7 +95,10 @@
                                     <td>
                                         <strong>{{ $training->course_name }}</strong>
                                         <br>
-                                        <small class="text-muted">{{ Str::limit($training->description, 40) }}</small>
+                                        <small class="text-muted">
+                                            {!! Str::limit(strip_tags($training->description), 100) !!}
+                                        </small>
+
                                     </td>
 
                                     <td>
@@ -618,6 +621,15 @@
                                 {{ ucfirst($training->content_type ?? '-') }}</li>
                         </ul>
                     </div>
+
+                    @if ($training->description)
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Training Description</h6>
+                            <div class="p-3 bg-light rounded shadow-sm" style="max-height: 150px; overflow-y:auto;">
+                                {!! $training->description !!}
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Summary Boxes -->
                     @php

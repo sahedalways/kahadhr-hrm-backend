@@ -31,7 +31,6 @@ class SendOtpSmsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Load the SMS settings (company-specific or global)
         $settings = SmsSetting::first();
 
         if (!$settings) {

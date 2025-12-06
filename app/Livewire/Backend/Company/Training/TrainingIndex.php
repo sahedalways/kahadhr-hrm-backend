@@ -2,19 +2,25 @@
 
 namespace App\Livewire\Backend\Company\Training;
 
+use App\Jobs\SendTrainingNotification;
+use App\Jobs\SendTrainingReminder;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\Training;
+use App\Models\TrainingAssignment;
 use App\Models\User;
 use App\Traits\Exportable;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use Livewire\WithFileUploads;
 
 class TrainingIndex extends BaseComponent
 {
     use Exportable;
     use WithPagination;
+    use WithFileUploads;
 
     public $loaded, $lastId = null, $hasMore = true;
     public $perPage = 10;
@@ -22,9 +28,8 @@ class TrainingIndex extends BaseComponent
     public $search = '';
 
     public $training, $training_id;
-    public $course_name, $description, $content_type = 'text';
+    public $course_name, $description, $content_type = 'video';
     public $from_date, $to_date, $expiry_date;
-    public $required_proof = false;
     public $company_id;
 
     public $selectedEmployee;
@@ -33,11 +38,26 @@ class TrainingIndex extends BaseComponent
     public $instruction_text;
     public $instruction_file;
 
-    public $require_proof = false;
+    public bool $require_proof = false;
     public $send_email = false;
     public $employees;
 
+    public $trainingId;
+
     protected $listeners = ['deleteTraining', 'sortUpdated' => 'handleSort'];
+
+
+
+    protected $rules = [
+        'selectedEmployees' => 'required|array|min:1',
+        'course_name' => 'required|string',
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+        'expiry_date' => 'nullable|date|after_or_equal:to_date',
+        'content_type' => 'required|in:video,file',
+        'require_proof' => 'boolean',
+    ];
+
 
     public function mount()
     {
@@ -67,11 +87,12 @@ class TrainingIndex extends BaseComponent
         $this->training_id = null;
         $this->course_name = '';
         $this->description = '';
-        $this->content_type = 'text';
+        $this->content_type = 'video';
         $this->from_date = null;
         $this->to_date = null;
         $this->expiry_date = null;
-        $this->required_proof = false;
+        $this->require_proof = false;
+        $this->selectedEmployees = [];
 
         $this->resetErrorBag();
     }
@@ -133,50 +154,80 @@ class TrainingIndex extends BaseComponent
         $this->resetLoaded();
     }
 
-    /* Edit training */
-    public function edit($id)
-    {
-        $this->training = Training::where('company_id', $this->company_id)->find($id);
-
-        if (!$this->training) {
-            $this->toast('Training not found!', 'error');
-            return;
-        }
-
-        $this->training_id     = $this->training->id;
-        $this->course_name     = $this->training->course_name;
-        $this->description     = $this->training->description;
-        $this->content_type    = $this->training->content_type;
-        $this->from_date       = $this->training->from_date;
-        $this->to_date         = $this->training->to_date;
-        $this->expiry_date     = $this->training->expiry_date;
-        $this->required_proof  = $this->training->required_proof;
-    }
-
     /* Save Training */
-    public function save()
+    public function saveTraining()
     {
         $this->validate([
+            'selectedEmployees' => 'required|array|min:1',
+
             'course_name' => [
                 'required',
                 Rule::unique('trainings', 'course_name')
                     ->where('company_id', $this->company_id)
-                    ->ignore($this->training_id)
+                    ->ignore($this->training_id),
             ],
-            'content_type' => 'required',
+
+            'from_date' => 'required|date',
+            'to_date'   => 'required|date|after_or_equal:from_date',
+            'expiry_date' => 'nullable|date|after_or_equal:to_date',
+
+            'content_type' => 'required|in:video,file',
+
+            'instruction_file' => [
+                'file',
+                function ($attribute, $value, $fail) {
+                    if ($this->content_type === 'video' && !$value) {
+                        $fail('The instruction file field is required for video.');
+                    } elseif ($this->content_type === 'file' && !$value) {
+                        $fail('The instruction file field is required for PDF.');
+                    }
+                },
+                'mimes:mp4,mov,avi,wmv,pdf',
+                'max:212000',
+            ],
+
+            'require_proof' => 'boolean',
+            'send_email' => 'boolean',
         ]);
 
-        Training::create([
-            'company_id'    => $this->company_id,
-            'course_name'   => $this->course_name,
-            'description'   => $this->description,
-            'content_type'  => $this->content_type,
-            'file_path'     => $this->file_path,
-            'from_date'     => $this->from_date,
-            'to_date'       => $this->to_date,
-            'expiry_date'   => $this->expiry_date,
-            'required_proof' => $this->required_proof,
+
+        $filePath = $this->instruction_file->store('training', 'public');
+
+
+
+        $training = Training::create([
+            'company_id'       => $this->company_id,
+            'course_name'      => $this->course_name,
+            'description'      => $this->description,
+            'content_type'     => $this->content_type,
+            'file_path'        => $filePath,
+            'from_date'        => $this->from_date,
+            'to_date'          => $this->to_date,
+            'expiry_date'      => $this->expiry_date,
+            'required_proof'   => $this->require_proof ?? 0,
+            'send_email'       => $this->send_email ?? 0,
         ]);
+
+        foreach ($this->selectedEmployees as $employeeId) {
+            foreach ($this->selectedEmployees as $emp) {
+                TrainingAssignment::create([
+                    'training_id' => $training->id,
+                    'user_id'     => $emp['id'],
+                    'status'      => 'assigned',
+                    'completed_at' => null,
+                    'proof_file'   => null,
+                ]);
+            }
+
+
+            if ($this->send_email) {
+                $user = User::find($emp['id']);
+                if ($user && $user->email) {
+                    SendTrainingNotification::dispatch($user, $training)->onConnection('sync')->onQueue('urgent');
+                }
+            }
+        }
+
 
         $this->toast('Training created successfully!', 'success');
         $this->dispatch('closemodal');
@@ -184,41 +235,102 @@ class TrainingIndex extends BaseComponent
         $this->resetLoaded();
     }
 
-    /* Update Training */
-    public function update()
+
+
+
+    public function edit($id)
     {
-        $this->validate([
-            'course_name' => [
-                'required',
-                Rule::unique('trainings', 'course_name')
-                    ->where('company_id', $this->company_id)
-                    ->ignore($this->training_id)
-            ],
-        ]);
+        $this->training_id = $id;
+        $this->training = Training::with('assignments')->where('company_id', $this->company_id)->find($id);
 
-        $training = Training::find($this->training_id);
 
-        if (!$training) {
-            $this->toast('Training not found!', 'error');
-            return;
+        $this->course_name = $this->training->course_name;
+        $this->description = $this->training->description;
+        $this->from_date = $this->training->from_date;
+        $this->to_date = $this->training->to_date;
+        $this->expiry_date = $this->training->expiry_date;
+        $this->content_type = $this->training->content_type;
+        $this->require_proof = (bool) $this->training->required_proof;
+
+
+        $this->selectedEmployees = $this->training->assignments->map(function ($a) {
+            return ['id' => $a->user_id, 'name' => $a->user->full_name];
+        })->toArray();
+    }
+
+
+
+
+    public function updateTraining()
+    {
+
+        $rules = $this->rules;
+
+
+        if ($this->instruction_file instanceof UploadedFile) {
+            if ($this->content_type === 'video') {
+                $rules['instruction_file'] = 'file|mimes:mp4,mov,avi,wmv|max:212000';
+            } else {
+                $rules['instruction_file'] = 'file|mimes:pdf|max:10480';
+            }
+        } else {
+            unset($rules['instruction_file']);
         }
 
+        $this->validate($rules);
+
+
+
+        $training = Training::findOrFail($this->training_id);
+
+        if ($this->instruction_file) {
+            if ($training->file_path && \Storage::disk('public')->exists($training->file_path)) {
+                \Storage::disk('public')->delete($training->file_path);
+            }
+
+
+            $filePath = $this->instruction_file->store('training', 'public');
+            $training->file_path = $filePath;
+        }
+
+        // Update training details
         $training->update([
-            'course_name'   => $this->course_name,
-            'description'   => $this->description,
-            'content_type'  => $this->content_type,
-            'file_path'     => $this->file_path,
-            'from_date'     => $this->from_date,
-            'to_date'       => $this->to_date,
-            'expiry_date'   => $this->expiry_date,
-            'required_proof' => $this->required_proof,
+            'course_name' => $this->course_name,
+            'description' => $this->description,
+            'from_date' => $this->from_date,
+            'to_date' => $this->to_date,
+            'expiry_date' => $this->expiry_date,
+            'content_type' => $this->content_type,
+            'required_proof' => $this->require_proof,
         ]);
+
+        // Update assignments
+        $currentIds = $training->assignments->pluck('user_id')->toArray();
+        $newIds = collect($this->selectedEmployees)->pluck('id')->toArray();
+
+        $toRemove = array_diff($currentIds, $newIds);
+        TrainingAssignment::whereIn('user_id', $toRemove)->where('training_id', $training->id)->delete();
+
+
+        $toAdd = array_diff($newIds, $currentIds);
+        foreach ($toAdd as $userId) {
+            TrainingAssignment::create([
+                'training_id' => $training->id,
+                'user_id' => $userId,
+                'status' => 'assigned',
+            ]);
+        }
+
 
         $this->toast('Training updated successfully!', 'success');
         $this->dispatch('closemodal');
         $this->resetInputFields();
         $this->resetLoaded();
     }
+
+
+
+
 
     /* Delete */
     public function deleteTraining($id)
@@ -257,17 +369,37 @@ class TrainingIndex extends BaseComponent
         });
     }
 
+    public function viewReport($trainingId)
+    {
+        $this->trainingId = $trainingId;
+
+        $this->training = Training::with(['assignments.user'])
+            ->findOrFail($trainingId);
+    }
+
+
+    public function sendReminder($id)
+    {
+        SendTrainingReminder::dispatch($id)->onConnection('sync')->onQueue('urgent');
+
+        $this->toast('Reminder sent successfully!', 'success');
+    }
+
 
     /* Export Training List */
     public function exportTrainings($type)
     {
         $data = $this->loaded->map(function ($t) {
+            $totalAssigned = $t->assignments->count();
+            $completedCount = $t->assignments->where('status', 'completed')->count();
+
             return [
                 'id'            => $t->id,
                 'course_name'   => $t->course_name,
                 'content_type'  => $t->content_type,
                 'from_date'     => $t->from_date,
                 'expiry_date'   => $t->expiry_date,
+                'completion'    => "$completedCount / $totalAssigned",
                 'created_at'    => Carbon::parse($t->created_at)->format('d F, Y'),
             ];
         });
@@ -285,6 +417,7 @@ class TrainingIndex extends BaseComponent
                     'Type',
                     'Start Date',
                     'Expiry Date',
+                    'Completion',
                     'Created At'
                 ],
                 'keys' => [
@@ -293,6 +426,7 @@ class TrainingIndex extends BaseComponent
                     'content_type',
                     'from_date',
                     'expiry_date',
+                    'completion',
                     'created_at'
                 ]
             ]

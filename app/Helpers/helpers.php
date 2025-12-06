@@ -76,4 +76,37 @@ if (!function_exists('siteSetting')) {
 
     return null;
   }
+
+
+
+  class EnvUpdater
+  {
+    /**
+     * Update or add key in .env file
+     */
+    public static function set(array $data)
+    {
+      $envPath = base_path('.env');
+
+      if (!file_exists($envPath)) return false;
+
+      $env = file_get_contents($envPath);
+
+      foreach ($data as $key => $value) {
+        $pattern = "/^{$key}=.*/m";
+
+
+        if (preg_match($pattern, $env)) {
+          $env = preg_replace($pattern, "{$key}={$value}", $env);
+        } else {
+
+          $env .= "\n{$key}={$value}";
+        }
+      }
+
+      file_put_contents($envPath, $env);
+
+      return true;
+    }
+  }
 }

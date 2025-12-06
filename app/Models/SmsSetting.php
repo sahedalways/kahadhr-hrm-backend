@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\Scopes\FilterByUserType;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+
 
 class SmsSetting extends Model
 {
-
-    use FilterByUserType;
 
     protected $fillable = [
         'company_id',

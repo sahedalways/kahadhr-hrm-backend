@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Settings;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\EmailSetting;
 use App\Services\SettingService;
+use Illuminate\Support\Facades\Artisan;
 
 class MailSettings extends BaseComponent
 {
@@ -56,6 +57,24 @@ class MailSettings extends BaseComponent
 
         // Save in database
         $service->saveMailSettings($mailSettings, $companyId);
+
+
+        // Update .env
+        EnvUpdater::set([
+            'MAIL_MAILER'       => $this->mail_mailer,
+            'MAIL_HOST'         => $this->mail_host,
+            'MAIL_PORT'         => $this->mail_port,
+            'MAIL_USERNAME'     => $this->mail_username ?? 'null',
+            'MAIL_PASSWORD'     => $this->mail_password ?? 'null',
+            'MAIL_ENCRYPTION'   => $this->mail_encryption ?? 'null',
+            'MAIL_FROM_ADDRESS' => $this->mail_from_address,
+            'MAIL_FROM_NAME'    => $this->mail_from_name ?? '${APP_NAME}',
+        ]);
+
+        // Clear and reload config cache
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('config:cache');
 
 
         $this->toast('Mail settings updated successfully!', 'success');

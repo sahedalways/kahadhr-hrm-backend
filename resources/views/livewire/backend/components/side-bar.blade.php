@@ -634,13 +634,13 @@
                 </li>
 
                 {{-- Training --}}
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link {{ Request::is('employee/dashboard/training*') ? 'active' : '' }}"
-                        href="{{ route('employee.dashboard.training.index', ['company' => app('authUser')->employee->employee->company->sub_domain]) }}">
+                        href="{{ route('employee.dashboard.training.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                         <i class="fa-solid fa-chalkboard-teacher"></i>
                         <span class="nav-link-text ms-1">Training</span>
                     </a>
-                </li> --}}
+                </li>
 
                 {{-- Onboarding --}}
                 <li class="nav-item">

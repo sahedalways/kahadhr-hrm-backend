@@ -15,6 +15,7 @@ use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Employee\Settings\ProfileSettings;
 use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Employee\Training\TrainingIndex;
+use App\Livewire\Backend\Employee\Training\TrainingIndexEmp;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,9 @@ Route::domain('{company}.' . config('app.base_domain'))
     });
 
 
+    Route::prefix('training')->name('training.')->group(function () {
+      Route::get('/', TrainingIndexEmp::class)->name('index');
+    });
 
 
     // CLOCK IN
@@ -91,10 +95,6 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', ExpensesIndex::class)->name('index');
     });
 
-    // TRAINING
-    Route::prefix('training')->name('training.')->group(function () {
-      Route::get('/', TrainingIndex::class)->name('index');
-    });
 
     // ONBOARDING
     Route::prefix('onboarding')->name('onboarding.')->group(function () {

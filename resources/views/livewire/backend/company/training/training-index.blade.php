@@ -709,7 +709,12 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($assignment->status !== 'completed')
+                                                @php
+                                                    $fromDate = \Carbon\Carbon::parse($training->from_date);
+                                                    $toDate = \Carbon\Carbon::parse($training->to_date);
+                                                    $today = \Carbon\Carbon::today();
+                                                @endphp
+                                                @if ($assignment->status !== 'completed' && $today->between($fromDate, $toDate))
                                                     <button wire:click="sendReminder({{ $assignment->id }})"
                                                         wire:loading.attr="disabled"
                                                         wire:target="sendReminder({{ $assignment->id }})"

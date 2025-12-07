@@ -53,15 +53,18 @@
                 </div>
 
                 <!-- Footer Buttons (Centered) -->
-                <div class="modal-footer justify-content-center">
-                    <!-- Delete Button -->
-                    <button type="button" class="btn btn-danger" id="deleteDocumentBtn" style="display:none;">
-                        <span id="deleteBtnText">Delete</span>
-                        <span id="deleteBtnLoader" class="spinner-border spinner-border-sm d-none"></span>
-                    </button>
+                @if (auth()->user()->user_type !== 'superAdmin')
+                    <div class="modal-footer justify-content-center">
+                        <!-- Delete Button -->
+                        <button type="button" class="btn btn-danger" id="deleteDocumentBtn" style="display:none;">
+                            <span id="deleteBtnText">Delete</span>
+                            <span id="deleteBtnLoader" class="spinner-border spinner-border-sm d-none"></span>
+                        </button>
 
 
-                </div>
+                    </div>
+                @endif
+
 
             </form>
 

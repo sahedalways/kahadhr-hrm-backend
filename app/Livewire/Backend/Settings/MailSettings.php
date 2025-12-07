@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Settings;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\EmailSetting;
 use App\Services\SettingService;
+use EnvUpdater;
 use Illuminate\Support\Facades\Artisan;
 
 class MailSettings extends BaseComponent
@@ -73,8 +74,7 @@ class MailSettings extends BaseComponent
 
         // Clear and reload config cache
         Artisan::call('config:clear');
-        Artisan::call('cache:clear');
-        Artisan::call('config:cache');
+
 
 
         $this->toast('Mail settings updated successfully!', 'success');

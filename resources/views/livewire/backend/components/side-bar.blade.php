@@ -67,7 +67,7 @@
 
                             <!-- Companies -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/companies*') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('dashboard/companies') ? 'active' : '' }}"
                                     href="{{ route('super-admin.companies') }}">
                                     <i class="fas fa-building sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> Companies </span>

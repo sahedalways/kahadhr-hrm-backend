@@ -3,6 +3,23 @@
         <div class="col">
             <h5 class="fw-500 text-white">Contact Inquiries</h5>
         </div>
+
+
+        <div class="col-auto d-flex gap-2">
+
+
+            <button wire:click="exportContacts('pdf')" class="btn btn-sm btn-white text-primary">
+                <i class="fa fa-file-pdf me-1"></i> PDF
+            </button>
+
+            <button wire:click="exportContacts('excel')" class="btn btn-sm btn-white text-success">
+                <i class="fa fa-file-excel me-1"></i> Excel
+            </button>
+
+            <button wire:click="exportContacts('csv')" class="btn btn-sm btn-white text-info">
+                <i class="fa fa-file-csv me-1"></i> CSV
+            </button>
+        </div>
     </div>
 
     <div class="row">
@@ -10,12 +27,41 @@
             <div class="card mb-4">
                 <div class="card-header p-4">
                     <div class="row">
-                        <div class="col-md-12" wire:ignore>
-                            <input type="text" class="form-control shadow-sm" placeholder="Search contacts..."
-                                wire:model="search" />
-                            <button type="button" wire:click="searchContact" class="btn btn-primary mt-2">
-                                Search
-                            </button>
+
+                        <div class="row g-3 align-items-center mb-3">
+                            <!-- Search Input -->
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i
+                                            class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                        placeholder="Search by name, phone no or email" wire:model="search"
+                                        wire:keyup="set('search', $event.target.value)" />
+                                </div>
+                            </div>
+
+                            <!-- Sort Dropdown -->
+                            <div class="col-md-4 d-flex gap-2">
+                                <select class="form-select form-select-lg"
+                                    wire:change="handleSort($event.target.value)">
+                                    <option value="desc">Newest First</option>
+                                    <option value="asc">Oldest First</option>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Live Search Result Indicator -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <p class="text-muted small mb-0">
+                                Showing results for: <strong>{{ $search ?: 'All Companies' }}</strong>
+                            </p>
+                            <div wire:loading wire:target="search">
+                                <span class="spinner-border spinner-border-sm text-primary" role="status"
+                                    aria-hidden="true"></span>
+                                <span class="text-primary small">Searching...</span>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -105,7 +105,7 @@
                                 <p class="mb-1"><strong>Registered Domain:</strong>
                                     {{ $details->registered_domain ?? 'N/A' }}</p>
                                 <p class="mb-1"><strong>Calendar Year:</strong>
-                                    {{ ucfirst($details->calendar_year) }}</p>
+                                    {{ $details->calendarYearSetting->calendar_year ?? 'N/A' }}</p>
                                 <p class="mb-1"><strong>Billing Plan:</strong>
                                     {{ $details->billingPlan->name ?? 'N/A' }}</p>
                                 <p class="mb-1"><strong>Subscription Status:</strong>
@@ -166,7 +166,13 @@
                                                 @foreach ($details->employees as $emp)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $emp->full_name }}</td>
+                                                        <td style="cursor:pointer; transition: background-color 0.3s;"
+                                                            onclick="window.location='{{ route('super-admin.dashboard.employees.details', $emp->id) }}'"
+                                                            onmouseover="this.style.backgroundColor='#f0f8ff';"
+                                                            onmouseout="this.style.backgroundColor=''">
+                                                            {{ $emp->full_name }}
+                                                        </td>
+
                                                         <td>{{ $emp->email }}</td>
                                                         <td>{{ ucfirst($emp->role) }}</td>
                                                         <td>

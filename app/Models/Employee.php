@@ -98,7 +98,7 @@ class Employee extends Model
             }
 
             if ($user->user_type === 'superAdmin') {
-                $builder->whereNull('company_id');
+                return;
             } elseif ($user->user_type === 'company') {
                 $builder->where('company_id', $user->company->id ?? 0);
             }

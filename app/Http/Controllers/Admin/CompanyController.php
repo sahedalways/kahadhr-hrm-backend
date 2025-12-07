@@ -12,7 +12,7 @@ class CompanyController extends Controller
     use ToastTrait;
     public function companyDetails($id)
     {
-        $details = Company::with(['bankInfos', 'employees',  'billingPlan'])->findOrFail($id);
+        $details = Company::with(['bankInfos', 'employees',  'billingPlan', 'calendarYearSetting'])->findOrFail($id);
 
 
         return view('livewire.backend.admin.company-details', compact('details'));

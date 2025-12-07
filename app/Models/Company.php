@@ -236,4 +236,10 @@ class Company extends Model
         $employeeCount = $this->employees()->count();
         return $employeeCount * $this->perEmployeeCharge();
     }
+
+
+    public function calendarYearSetting()
+    {
+        return $this->hasOne(CalendarYearSetting::class, 'company_id', 'id');
+    }
 }

@@ -4,6 +4,8 @@ namespace App\Livewire\Backend\Admin;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Company;
+use App\Models\User;
+use App\Services\API\VerificationService;
 use App\Services\CompanyService;
 use App\Traits\Exportable;
 use Carbon\Carbon;
@@ -26,11 +28,19 @@ class ManageCompanies extends BaseComponent
     public $lastId = null;
     public $hasMore = true;
     public $editMode = false;
+
+    public $otp = [],  $showOtpModal = false;
+    public $updating_field;
+    public $code_sent = false;
+    public $otpCooldown = 0;
+    public $new_email;
+    public $new_mobile;
+    public $verification_code;
     public $search;
 
     protected $companyService;
 
-    protected $listeners = ['deleteCompany', 'sortUpdated' => 'handleSort'];
+    protected $listeners = ['deleteCompany', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
 
 
 
@@ -309,6 +319,8 @@ class ManageCompanies extends BaseComponent
 
 
 
+
+
     public function toggleStatus($id)
     {
         $company = Company::find($id);
@@ -325,5 +337,162 @@ class ManageCompanies extends BaseComponent
 
 
         $this->resetLoaded();
+    }
+
+
+
+    public function openModal($field)
+    {
+        $this->resetVerificationFields();
+        $this->updating_field = $field;
+        $this->code_sent = false;
+        $this->verification_code = null;
+    }
+
+
+
+    public function requestVerification($field, VerificationService $verificationService)
+    {
+        $this->updating_field = $field;
+
+        if ($field === 'email') {
+            $this->validate([
+                'new_email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('companies', 'company_email')->ignore($this->company->id),
+                ],
+            ]);
+
+            $emailExists =
+                User::where('email', $this->new_email)->where('id', '!=', $this->company->user_id)->exists();
+
+            if ($emailExists) {
+                $this->toast('This email is already in use.', 'error');
+                return;
+            }
+
+            $target = $this->new_email;
+        } else {
+
+
+            $this->validate([
+                'new_mobile' => [
+                    'required',
+                    'string',
+                    'min:10',
+                    'max:20',
+                    'regex:/^[0-9]+$/',
+                    Rule::unique('users', 'phone_no')->ignore($this->company->user_id),
+                ],
+            ]);
+
+
+            $mobileExists =
+                Company::where('company_mobile', $this->new_mobile)
+                ->where('id', '!=', $this->company->id)
+                ->exists();
+
+            if ($mobileExists) {
+                $this->toast('This phone number is already in use.', 'error');
+                return;
+            }
+
+            $target = $this->new_mobile;
+        }
+
+
+
+
+        $sent = false;
+        if ($field === 'email') {
+            $sent = $verificationService->sendEmailOtp($target, null);
+        } else {
+            $sent = $verificationService->sendPhoneOtp($target, null);
+        }
+
+        if ($sent) {
+            $this->toast("Verification code sent to your {$field}.", 'info');
+
+            $this->code_sent = true;
+            $this->startOtpCooldown();
+        } else {
+            $this->toast("Failed to send OTP", 'error');
+        }
+    }
+
+
+    public function startOtpCooldown()
+    {
+        $this->otpCooldown = 120;
+
+        $this->dispatch('start-otp-countdown');
+    }
+
+
+    public function canResendOtp()
+    {
+        return $this->otpCooldown <= 0;
+    }
+
+    public function tick()
+    {
+        if ($this->otpCooldown > 0) {
+            $this->otpCooldown--;
+        }
+    }
+
+
+
+
+    public function verifyAndUpdate(VerificationService $verificationService)
+    {
+
+        $code = implode('', $this->otp);
+        $this->verification_code = $code;
+
+
+        $this->validate([
+            'verification_code' => 'required|digits:6',
+        ]);
+
+        $target = $this->updating_field === 'email' ? $this->new_email : $this->new_mobile;
+
+        try {
+
+            $verificationService->verifyOtp($target, $this->verification_code);
+
+
+            if ($this->updating_field === 'email') {
+                $this->company_email = $this->new_email;
+                $this->company->update(['company_email' => $this->new_email]);
+            } else {
+                $this->company_mobile = $this->new_mobile;
+                $this->company->user->update(['phone_no' => $this->new_mobile]);
+                $this->company->update(['company_mobile' => $this->new_mobile]);
+            }
+
+
+            $this->toast(ucfirst($this->updating_field) . " has been changed successfully.", 'success');
+            $this->resetVerificationFields();
+            $this->dispatch('closemodal');
+        } catch (\Exception $e) {
+
+            $this->toast("OTP does not match.", 'error');
+        }
+    }
+
+
+    public function resetVerificationFields()
+    {
+        $this->new_email = null;
+        $this->new_mobile = null;
+        $this->otp = [];
+        $this->verification_code = null;
+
+        $this->updating_field = null;
+        $this->code_sent = false;
+        $this->otpCooldown = 0;
     }
 }

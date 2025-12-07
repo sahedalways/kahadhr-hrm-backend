@@ -77,3 +77,5 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
     Route::get('/', ContactInfo::class)->name('index');
   });
 });
+
+// kk

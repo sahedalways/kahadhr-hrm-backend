@@ -121,4 +121,9 @@ class Employee extends Model
             }
         });
     }
+
+    public function profile()
+    {
+        return $this->hasOne(EmployeeProfile::class, 'emp_id');
+    }
 }

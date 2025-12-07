@@ -25,6 +25,14 @@ class UsersIndex extends BaseComponent
     public $employees, $employee, $employee_id, $title;
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
+
+    public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
+        $nationality, $home_phone, $mobile_phone, $personal_email,
+        $gender, $marital_status, $tax_reference_number,
+        $immigration_status, $brp_number, $brp_expiry_date,
+        $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
+
+
     public $perPage = 10;
     public $sortOrder = 'desc';
     public $statusFilter = '';
@@ -80,26 +88,51 @@ class UsersIndex extends BaseComponent
     /* Reset input fields */
     public function resetInputFields()
     {
+        // Basic info
         $this->employee = null;
         $this->f_name = '';
-        $this->phone_no = '';
         $this->l_name = '';
         $this->email = '';
+        $this->phone_no = '';
         $this->job_title = '';
-        $this->title;
+        $this->title = '';
         $this->department_id = '';
         $this->team_id = '';
         $this->role = '';
         $this->contract_hours = '';
         $this->start_date = '';
         $this->end_date = '';
-        $this->avatar_preview = '';
-        $this->avatar = '';
         $this->is_active = 1;
 
+        // Avatar
+        $this->avatar_preview = '';
+        $this->avatar = '';
+
+        // Profile info fields (ADD YOURS HERE)
+        $this->date_of_birth = '';
+        $this->street_1 = '';
+        $this->street_2 = '';
+        $this->city = '';
+        $this->state = '';
+        $this->postcode = '';
+        $this->country = '';
+        $this->nationality = '';
+        $this->home_phone = '';
+        $this->mobile_phone = '';
+        $this->personal_email = '';
+        $this->gender = '';
+        $this->marital_status = '';
+        $this->tax_reference_number = '';
+        $this->immigration_status = '';
+        $this->brp_number = '';
+        $this->brp_expiry_date = '';
+        $this->right_to_work_expiry_date = '';
+        $this->passport_number = '';
+        $this->passport_expiry_date = '';
+
+        // Finally
         $this->resetErrorBag();
     }
-
 
 
 
@@ -118,7 +151,8 @@ class UsersIndex extends BaseComponent
                 }
             }],
 
-
+            'f_name' => 'required|string|max:255',
+            'l_name' => 'required|string|max:255',
             'job_title' => ['nullable', 'string', 'max:255'],
             'team_id' => ['required', 'exists:teams,id'],
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
@@ -138,6 +172,8 @@ class UsersIndex extends BaseComponent
         $employee = Employee::create([
             'company_id' => auth()->user()->company->id,
             'email' => $this->email,
+            'f_name' => $this->f_name,
+            'l_name' => $this->l_name,
             'job_title' => $this->job_title,
             'department_id' => $team->department_id,
             'team_id' => $this->team_id,
@@ -176,7 +212,7 @@ class UsersIndex extends BaseComponent
     {
         $this->editMode = true;
 
-        $this->employee = Employee::with('user')->find($id);
+        $this->employee = Employee::with('user', 'profile')->find($id);
 
         if (!$this->employee) {
             $this->toast('Employee not found!', 'error');
@@ -199,6 +235,32 @@ class UsersIndex extends BaseComponent
         $this->end_date = $this->employee->end_date;
         $this->phone_no = $this->employee->user->phone_no ?? null;
         $this->avatar_preview = $this->employee->avatar_url;
+
+
+        $profile = $this->employee->profile;
+
+        if ($profile) {
+            $this->date_of_birth = $profile->date_of_birth;
+            $this->street_1 = $profile->street_1;
+            $this->street_2 = $profile->street_2;
+            $this->city = $profile->city;
+            $this->state = $profile->state;
+            $this->postcode = $profile->postcode;
+            $this->country = $profile->country;
+            $this->nationality = $profile->nationality;
+            $this->home_phone = $profile->home_phone;
+            $this->mobile_phone = $profile->mobile_phone;
+            $this->personal_email = $profile->personal_email;
+            $this->gender = $profile->gender;
+            $this->marital_status = $profile->marital_status;
+            $this->tax_reference_number = $profile->tax_reference_number;
+            $this->immigration_status = $profile->immigration_status;
+            $this->brp_number = $profile->brp_number;
+            $this->brp_expiry_date = $profile->brp_expiry_date;
+            $this->right_to_work_expiry_date = $profile->right_to_work_expiry_date;
+            $this->passport_number = $profile->passport_number;
+            $this->passport_expiry_date = $profile->passport_expiry_date;
+        }
     }
 
     public function sendVerificationLink($employeeId)
@@ -261,8 +323,39 @@ class UsersIndex extends BaseComponent
             'team_id' => 'required|exists:teams,id',
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => 'required|in:hourly,monthly',
+            'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'avatar' => 'nullable|image|max:2048',
+
+
+            'date_of_birth' => 'nullable|date',
+            'street_1' => 'nullable|string|max:255',
+            'street_2' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'postcode' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'nationality' => 'nullable|string|max:100',
+
+
+            'home_phone' => 'nullable|string|max:20',
+
+            'personal_email' => 'nullable|email|max:255',
+
+            'gender' => 'nullable|in:male,female,other',
+            'marital_status' => 'nullable|in:single,married',
+
+            'tax_reference_number' => 'nullable|string|max:100',
+
+            'immigration_status' => 'nullable|string|max:255',
+
+            'brp_number' => 'nullable|string|max:100',
+            'brp_expiry_date' => 'nullable|date',
+
+            'right_to_work_expiry_date' => 'nullable|date',
+
+            'passport_number' => 'nullable|string|max:100',
+            'passport_expiry_date' => 'nullable|date',
         ];
 
         // Contract hours only required if salary_type is hourly
@@ -294,9 +387,42 @@ class UsersIndex extends BaseComponent
             'salary_type' => $this->salary_type,
             'contract_hours' => $this->contract_hours,
             'is_active' => $this->is_active,
-            'end_date' => $this->end_date,
+            'end_date' => $this->end_date == '' ? null : $this->end_date,
+            'start_date' => $this->start_date == '' ? null : $this->start_date,
             'avatar' => $this->employee->avatar,
         ]);
+
+
+
+
+        $this->employee->profile()->updateOrCreate(
+            ['emp_id' => $this->employee->id],
+            [
+                'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
+                'street_1' => $this->street_1,
+                'street_2' => $this->street_2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'postcode' => $this->postcode,
+                'country' => $this->country,
+                'nationality' => $this->nationality,
+                'home_phone' => $this->home_phone,
+                'mobile_phone' => $this->mobile_phone,
+                'personal_email' => $this->personal_email,
+                'gender' => $this->gender,
+                'marital_status' => $this->marital_status,
+                'tax_reference_number' => $this->tax_reference_number,
+                'immigration_status' => $this->immigration_status,
+                'brp_number' => $this->brp_number,
+                'brp_expiry_date' => $this->brp_expiry_date == '' ? null : $this->brp_expiry_date,
+                'right_to_work_expiry_date' => $this->right_to_work_expiry_date == '' ? null : $this->right_to_work_expiry_date,
+                'passport_expiry_date' => $this->passport_expiry_date == '' ? null : $this->passport_expiry_date,
+                'passport_number' => $this->passport_number,
+            ]
+        );
+
+
+
 
         // Reset form and close modal
         $this->resetInputFields();

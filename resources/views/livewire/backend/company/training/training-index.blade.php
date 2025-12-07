@@ -96,7 +96,7 @@
                                         <strong>{{ $training->course_name }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            {!! Str::limit(strip_tags($training->description), 100) !!}
+                                            {!! Str::limit($training->description, 100) !!}
                                         </small>
 
                                     </td>

@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\Company\EmployeeController;
+use App\Http\Controllers\Company\OnboardingController;
 use App\Livewire\Backend\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Dashboard;
@@ -133,4 +134,8 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::prefix('document-manage')->name('document-manage.')->group(function () {
       Route::get('/', DocumentManageIndex::class)->name('index');
     });
+
+
+    Route::get('/onboarding/view/{id}', [OnboardingController::class, 'view'])
+      ->name('onboarding.view');
   });

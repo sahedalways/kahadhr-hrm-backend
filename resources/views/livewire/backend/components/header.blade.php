@@ -2,38 +2,52 @@
     $user = app('authUser');
 @endphp
 
-<div>
+
+
+<div class="position-relative">
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur"
         data-scroll="false">
         <div class="container-fluid py-1 px-3 position-relative">
 
-            <div class="sidenav-toggler sidenav-toggler-inner d-xl-block d-none">
-                <a href="javascript:;" class="nav-link p-0">
+            <div class="sidenav-toggler sidenav-toggler-inner d-xl-block d-none w-100">
+                <a href="javascript:;" class="nav-link p-0 w-fitcontent">
                     <div class="sidenav-toggler-inner">
-                        <i class="sidenav-toggler-line bg-white"></i>
-                        <i class="sidenav-toggler-line bg-white"></i>
-                        <i class="sidenav-toggler-line bg-white"></i>
+                        <i class="sidenav-toggler-line bg-dark"></i>
+                        <i class="sidenav-toggler-line bg-dark"></i>
+                        <i class="sidenav-toggler-line bg-dark"></i>
                     </div>
                 </a>
             </div>
 
+            <!-- RIGHT SIDE ICON + PROFILE -->
+            <div class="d-flex align-items-center gap-2 position-relative">
 
-            <div class="position-absolute start-50 translate-middle-x d-flex align-items-center">
-                {{-- <img src="{{ $user->contact_avatar }}" alt="Avatar" class="rounded-circle" width="40"
-                    height="40"> --}}
-                <span class="ms-2 fw-bold text-white">{{ $user->full_name }}</span>
+                <span class="d-flex">
+                    <i class="fa-regular fa-bell fs-5"></i>
+                </span>
+
+                <img src="/assets/img/default-avatar.png" alt="Avatar" class="rounded-circle cursor-pointer"
+                    width="40" height="40" id="profileImage">
+
+                <!-- PROFILE DROPDOWN -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <ul>
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Settings</a></li>
+                        <li><a href="#">Logout</a></li>
+                    </ul>
+                </div>
+
             </div>
 
             <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                 <ul class="ms-auto navbar-nav justify-content-end">
-
-
                     <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                        <a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
+                        <a href="javascript:;" class="nav-link text-dark p-0" id="iconNavbarSidenav">
                             <div class="sidenav-toggler-inner">
-                                <i class="sidenav-toggler-line bg-white"></i>
-                                <i class="sidenav-toggler-line bg-white"></i>
-                                <i class="sidenav-toggler-line bg-white"></i>
+                                <i class="sidenav-toggler-line bg-dark"></i>
+                                <i class="sidenav-toggler-line bg-dark"></i>
+                                <i class="sidenav-toggler-line bg-dark"></i>
                             </div>
                         </a>
                     </li>
@@ -43,3 +57,26 @@
         </div>
     </nav>
 </div>
+
+
+<script>
+    // PROFILE DROPDOWN JS
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileImage = document.getElementById("profileImage");
+        const profileDropdown = document.getElementById("profileDropdown");
+
+        // Toggle dropdown
+        profileImage.addEventListener("click", () => {
+            profileDropdown.style.display =
+                profileDropdown.style.display === "block" ? "none" : "block";
+        });
+
+        // Hide when clicking outside
+        document.addEventListener("click", (event) => {
+            if (!profileImage.contains(event.target) &&
+                !profileDropdown.contains(event.target)) {
+                profileDropdown.style.display = "none";
+            }
+        });
+    });
+</script>

@@ -17,6 +17,7 @@
     <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
     <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.min28b5.css?v=2.0.0') }}" rel="stylesheet" />
+    <link id="pagestyle" href="{{ asset('assets/css/newdashboard.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/js/plugins/toastr.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
@@ -44,7 +45,9 @@
     </div>
 
 
-    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    <div class="min-height-60 bg-white shadow-sm position-absolute w-100">
+
+    </div>
     @livewire('backend.components.side-bar')
     <main class="main-content position-relative border-radius-lg ">
         @livewire('backend.components.header')

@@ -1,15 +1,15 @@
 <div>
     <div class="row align-items-center justify-content-between mb-4">
         <div class="col">
-            <h5 class="fw-500 text-white">Employee Profile</h5>
+            <h5 class="fw-500 text-dark">Employee Profile</h5>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body p-3">
-                    <form class="row g-4 align-items-center p-3 shadow-sm border rounded bg-white"
+                <div class="card-body p-lg-5 p-4 shadow-sm border rounded-3 bg-white">
+                    <form class="row g-4 align-items-center"
                         wire:submit.prevent="save">
 
                         <!-- PERSONAL INFORMATION -->

@@ -24,7 +24,7 @@
         @endphp
 
 
-        <a class="navbar-brand m-0" href="{{ $logoHref }}">
+        <a class="navbar-brand m-0 flex-column d-flex gap-2" href="{{ $logoHref }}">
             <img src="{{ $logoUrl }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
             <span class="ms-2 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
         </a>

@@ -1,11 +1,13 @@
-body{
-	background: #f6f6f6;
+body {
+    background: #f6f6f6;
 }
-.min-height-60{
-	min-height: 60px;
+
+.min-height-60 {
+    min-height: 60px;
 }
-.w-fitcontent{
-	width: fit-content;
+
+.w-fitcontent {
+    width: fit-content;
 }
 
 /* PROFILE DROPDOWN STYLE */
@@ -17,7 +19,7 @@ body{
     border-radius: 8px;
     padding: 10px 0;
     width: 160px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: none;
     z-index: 2000;
 }
@@ -36,4 +38,68 @@ body{
 
 .profile-dropdown li:hover {
     background-color: #f5f5f5;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body,
+html {
+    height: 100%;
+    overflow: hidden;
+    /* Prevent full-page scroll */
+}
+
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background: #fff;
+}
+
+.fixed-sidebar {
+    position: fixed;
+    top: 70px;
+    /* header height */
+    left: 0;
+    height: calc(100% - 70px);
+    overflow-y: auto;
+    width: 260px;
+    /* your sidebar width */
+    z-index: 1020;
+}
+
+.content-wrapper {
+    /* same as sidebar width */
+    margin-left: 260px;
+    padding-top: 80px;
+    /* header height */
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.g-sidenav-hidden .content-wrapper {
+    margin-left: 77px;
+}
+
+@media (max-width: 1199px) {
+    .g-sidenav-hidden .content-wrapper {
+        margin-left: 0;
+    }
+	.content-wrapper{
+		margin-left: 0;
+	}
 }

@@ -454,7 +454,7 @@
                             </li>
 
 
-                            <!-- Mail Settings -->
+                            {{-- <!-- Mail Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/settings/mail') ? 'active' : '' }}"
                                     href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}">
@@ -462,17 +462,17 @@
                                     <span class="sidenav-normal side-bar-inner"> Mail Settings </span>
                                 </a>
                             </li>
+ --}}
 
 
-
-                            <!-- SMS Settings -->
+                            {{-- <!-- SMS Settings -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/settings/sms') ? 'active' : '' }}"
                                     href="{{ route('company.dashboard.settings.sms', ['company' => app('authUser')->company->sub_domain]) }}">
                                     <i class="fas fa-comment-alt sidenav-mini-icon side-bar-inner"></i>
                                     <span class="sidenav-normal side-bar-inner"> SMS Settings </span>
                                 </a>
-                            </li>
+                            </li> --}}
 
 
                             <!-- Calendar Year Settings -->

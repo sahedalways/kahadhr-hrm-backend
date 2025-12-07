@@ -56,8 +56,8 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
-      Route::get('mail', MailSettings::class)->name('mail');
-      Route::get('sms', SmsSettings::class)->name('sms');
+      // Route::get('mail', MailSettings::class)->name('mail');
+      // Route::get('sms', SmsSettings::class)->name('sms');
       Route::get('password', PasswordSettings::class)->name('password');
       Route::get('profile', ProfileSettings::class)->name('profile');
       Route::get('bank-info', BankInfoSettings::class)->name('bank-info');

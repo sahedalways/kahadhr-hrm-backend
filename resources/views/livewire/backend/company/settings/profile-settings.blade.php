@@ -9,8 +9,8 @@
         <div class="col-12">
 
             <div class="card">
-                <div class="card-body p-3">
-                    <form class="row g-4 align-items-center p-3 shadow-sm border rounded bg-white"
+                <div class="card-body p-lg-5 p-4 shadow-sm border rounded-3 bg-white">
+                    <form class="row g-4 align-items-center"
                         wire:submit.prevent="save">
 
                         <h5 class="fw-bold mb-0">Company Information</h5>

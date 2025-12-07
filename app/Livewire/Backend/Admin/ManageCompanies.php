@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Admin;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\CalendarYearSetting;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\API\VerificationService;
@@ -17,7 +18,7 @@ class ManageCompanies extends BaseComponent
     use WithFileUploads;
     use Exportable;
 
-    public $companies, $company, $company_id, $company_name, $business_type, $company_house_number, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview, $registered_domain, $calendar_year, $billing_plan_id, $subscription_status, $subscription_start, $subscription_end, $status;
+    public $companies, $company, $company_id, $company_name, $business_type, $company_house_number, $address_contact_info, $company_email, $company_mobile, $company_logo, $company_logo_preview, $registered_domain, $calendar_year = 'english', $billing_plan_id, $subscription_status, $subscription_start, $subscription_end, $status;
 
     public $billingPlans;
     public $perPage = 10;
@@ -73,6 +74,7 @@ class ManageCompanies extends BaseComponent
         $this->address_contact_info = '';
         $this->company_email = '';
         $this->company_mobile = '';
+        $this->calendar_year = 'english';
         $this->company_logo = null;
         $this->company_logo_preview = null;
         $this->resetErrorBag();
@@ -90,6 +92,9 @@ class ManageCompanies extends BaseComponent
             return;
         }
 
+
+        $this->company->load('calendarYearSetting');
+
         $this->company_name = $this->company->company_name;
         $this->company_house_number = $this->company->company_house_number;
         $this->company_email = $this->company->company_email;
@@ -97,7 +102,7 @@ class ManageCompanies extends BaseComponent
         $this->business_type = $this->company->business_type;
         $this->address_contact_info = $this->company->address_contact_info;
         $this->registered_domain = $this->company->registered_domain;
-        $this->calendar_year = $this->company->calendar_year;
+        $this->calendar_year = $this->company->calendarYearSetting->calendar_year ?? null;
         $this->subscription_status = $this->company->subscription_status;
         $this->subscription_start = $this->company->subscription_start
             ? Carbon::parse($this->company->subscription_start)->format('Y-m-d')
@@ -140,7 +145,7 @@ class ManageCompanies extends BaseComponent
                 'regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,6}$/',
                 Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
-            'calendar_year' => 'required|in:english,hmrc',
+            'calendar_year' => 'nullable|in:english,hmrc',
             'subscription_status' => 'required|in:active,trial,expired,suspended',
             'subscription_start' => 'nullable|date',
             'subscription_end' => 'nullable|date|after:subscription_start',
@@ -157,10 +162,9 @@ class ManageCompanies extends BaseComponent
             'business_type' => $this->business_type,
             'address_contact_info' => $this->address_contact_info,
             'registered_domain' => $this->registered_domain,
-            'calendar_year' => $this->calendar_year,
             'subscription_status' => $this->subscription_status,
             'subscription_start' => $this->subscription_start,
-            'subscription_end' => $this->subscription_end,
+            'subscription_end' => $this->subscription_end !== '' ? $this->subscription_end : null,
             'status' => $this->status ? 'Active' : 'Inactive',
         ];
 
@@ -169,6 +173,16 @@ class ManageCompanies extends BaseComponent
         }
 
         $this->companyService->updateCompany($this->company, $data);
+
+
+
+        if ($this->calendar_year) {
+            CalendarYearSetting::updateOrCreate(
+                ['company_id' => $this->company->id],
+                ['calendar_year' => $this->calendar_year]
+            );
+        }
+
 
         $this->resetInputFields();
         $this->editMode = false;
@@ -246,7 +260,15 @@ class ManageCompanies extends BaseComponent
     /* Delete company */
     public function deleteCompany($id)
     {
-        $this->companyService->deleteCompany($id);
+        $company = Company::findOrFail($id);
+
+        if ($company->user) {
+            $company->user->delete();
+        }
+
+        $company->delete();
+
+
         $this->toast('Company deleted successfully!', 'success');
         $this->resetLoaded();
     }

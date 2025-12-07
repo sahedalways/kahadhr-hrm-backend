@@ -615,14 +615,17 @@
                                 {{ $training->to_date ?? '-' }}</li>
                             <li class="list-group-item d-flex justify-content-between"><strong>Expiry Date:</strong>
                                 {{ $training->expiry_date ?? '-' }}</li>
-                            <li class="list-group-item d-flex justify-content-between"><strong>Required Proof:</strong>
-                                {{ $training->required_proof ? 'Yes' : 'No' }}</li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Required Proof:</strong>
+                                {{ $training ? ($training->required_proof ? 'Yes' : 'No') : 'N/A' }}
+                            </li>
+
                             <li class="list-group-item d-flex justify-content-between"><strong>Content Type:</strong>
                                 {{ ucfirst($training->content_type ?? '-') }}</li>
                         </ul>
                     </div>
 
-                    @if ($training->description)
+                    @if ($training && $training->description)
                         <div class="mb-4">
                             <h6 class="text-muted mb-2">Training Description</h6>
                             <div class="p-3 bg-light rounded shadow-sm" style="max-height: 150px; overflow-y:auto;">
@@ -631,11 +634,18 @@
                         </div>
                     @endif
 
+
                     <!-- Summary Boxes -->
                     @php
-                        $totalAssigned = $training->assignments->count();
-                        $completedCount = $training->assignments->where('status', 'completed')->count();
-                        $incompleteCount = $totalAssigned - $completedCount;
+                        if ($training) {
+                            $totalAssigned = $training->assignments->count();
+                            $completedCount = $training->assignments->where('status', 'completed')->count();
+                            $incompleteCount = $totalAssigned - $completedCount;
+                        } else {
+                            $totalAssigned = 0;
+                            $completedCount = 0;
+                            $incompleteCount = 0;
+                        }
                     @endphp
                     <div class="row text-center mb-4 g-3">
                         <div class="col-md-4">
@@ -689,7 +699,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($training->assignments as $assignment)
+                                    @foreach ($training?->assignments ?? [] as $assignment)
                                         <tr>
                                             <td>{{ $assignment->user->full_name ?? '-' }}</td>
                                             <td>{{ $assignment->user->email ?? '-' }}</td>

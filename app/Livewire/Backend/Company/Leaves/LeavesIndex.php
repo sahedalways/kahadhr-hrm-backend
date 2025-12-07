@@ -42,6 +42,7 @@ class LeavesIndex extends BaseComponent
 
 
         $this->employees = Employee::where('company_id', $this->company->id)
+            ->whereNotNull('user_id')
             ->orderBy('f_name')
             ->get();
 

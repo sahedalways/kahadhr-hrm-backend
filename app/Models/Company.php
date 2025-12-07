@@ -116,6 +116,11 @@ class Company extends Model
                     'name'       => $type,
                 ]);
             }
+
+            CalendarYearSetting::create([
+                'company_id'    => $company->id,
+                'calendar_year' => 'english',
+            ]);
         });
 
         static::deleted(function ($company) {

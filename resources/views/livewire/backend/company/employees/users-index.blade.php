@@ -364,7 +364,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Title <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="title" required>
+                            <select class="form-select" wire:model="title">
                                 <option value="" selected>Select Title</option>
                                 <option value="Mr">Mr</option>
                                 <option value="Mrs">Mrs</option>
@@ -375,7 +375,7 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">First Name </label>
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" wire:model="f_name">
                             @error('f_name')
                                 <span class="text-danger">{{ $message }}</span>
@@ -384,7 +384,7 @@
 
                         <!-- Last Name -->
                         <div class="col-md-6">
-                            <label class="form-label">Last Name </label>
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" wire:model="l_name">
                             @error('l_name')
                                 <span class="text-danger">{{ $message }}</span>

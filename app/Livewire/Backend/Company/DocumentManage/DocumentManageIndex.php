@@ -30,7 +30,11 @@ class DocumentManageIndex extends BaseComponent
 
     public function mount()
     {
-        $this->employees = Employee::where('company_id', auth()->user()->company->id)->get();
+        $this->employees = Employee::where('company_id', auth()->user()->company->id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name')
+            ->get();
+
         $this->company_id = auth()->user()->company->id;
         $this->loaded = collect();
         $this->loadMore();
@@ -144,7 +148,8 @@ class DocumentManageIndex extends BaseComponent
             'name'       => $this->name,
             'emp_id'     => $this->emp_id,
             'status'     => $this->status,
-            'expires_at' => $this->expires_at,
+            'expires_at' => $this->expires_at !== '' ? $this->expires_at : null,
+
             'file_path'  => $newFilePath,
         ]);
 

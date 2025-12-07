@@ -18,7 +18,7 @@ trait FilterByUserType
             }
 
             if ($user->user_type === 'superAdmin') {
-                return $builder->whereNull('company_id');
+                return;
             }
 
             if ($user->user_type === 'company') {

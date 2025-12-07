@@ -316,14 +316,14 @@ class UsersIndex extends BaseComponent
 
         // Validation rules
         $rules = [
-            'f_name' => 'nullable|string|max:255',
-            'l_name' => 'nullable|string|max:255',
-            'title' => 'required|in:Mr,Mrs',
+            'f_name' => 'required|string|max:255',
+            'l_name' => 'required|string|max:255',
+            'title' => 'nullable|in:Mr,Mrs',
             'job_title' => 'nullable|string|max:255',
             'team_id' => 'required|exists:teams,id',
             'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => 'required|in:hourly,monthly',
-            'start_date' => 'required|date',
+            'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'avatar' => 'nullable|image|max:2048',
 

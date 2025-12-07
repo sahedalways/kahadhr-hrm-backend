@@ -303,7 +303,7 @@
                             {{-- Calendar Year --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Calendar Year</label>
-                                <select class="form-control" wire:model="calendar_year">
+                                <select class="form-control" wire:model.live="calendar_year">
                                     <option value="english">English</option>
                                     <option value="hmrc">HMRC</option>
                                 </select>
@@ -351,7 +351,8 @@
                             {{-- Company Logo --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Company Logo</label>
-                                <input type="file" class="form-control" wire:model="company_logo">
+                                <input type="file" class="form-control" wire:model="company_logo"
+                                    accept="image/*">
 
 
                                 @if ($company_logo)

@@ -89,7 +89,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Document Name</th>
-                                    <th>Employee (Name/Email)</th>
+                                    <th>Employee Name</th>
                                     <th>File</th>
                                     <th>Expires At</th>
                                     <th>Status</th>

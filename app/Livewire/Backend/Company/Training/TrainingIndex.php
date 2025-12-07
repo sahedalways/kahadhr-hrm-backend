@@ -64,8 +64,8 @@ class TrainingIndex extends BaseComponent
         $this->company_id = app('authUser')->company->id;
         $this->loaded = collect();
 
-
         $this->employees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
             ->orderBy('f_name')
             ->get();
 

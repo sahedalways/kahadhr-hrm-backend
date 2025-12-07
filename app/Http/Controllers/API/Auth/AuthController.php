@@ -38,13 +38,15 @@ class AuthController extends BaseController
         ]));
 
 
+        $subDomain = $user->company->sub_domain;
         $baseDomain = config('app.base_domain');
-        $subdomain = "company.{$baseDomain}";
+
+        $fullDomain = "{$subDomain}.{$baseDomain}";
 
 
         return $this->sendResponse([
             'company_name'     => $user->company->company_name,
-            'subdomain'    => $subdomain,
+            'subdomain'    => $fullDomain,
         ], 'Company registered successfully.');
     }
 

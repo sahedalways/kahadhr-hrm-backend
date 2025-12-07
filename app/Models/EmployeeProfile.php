@@ -30,6 +30,17 @@ class EmployeeProfile extends Model
         'passport_expiry_date',
     ];
 
+
+
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'brp_expiry_date' => 'date',
+        'right_to_work_expiry_date' => 'date',
+        'passport_expiry_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'emp_id');

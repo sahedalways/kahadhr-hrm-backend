@@ -407,7 +407,7 @@ class UsersIndex extends BaseComponent
                 'country' => $this->country,
                 'nationality' => $this->nationality,
                 'home_phone' => $this->home_phone,
-                'mobile_phone' => $this->mobile_phone,
+                'mobile_phone' => $this->employee->user->phone_no,
                 'personal_email' => $this->personal_email,
                 'gender' => $this->gender,
                 'marital_status' => $this->marital_status,

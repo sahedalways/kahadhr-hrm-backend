@@ -15,7 +15,7 @@ class EmployeeController extends Controller
     use ToastTrait;
     public function empDetails($company, $id, Request $request)
     {
-        $details = Employee::with('documents', 'documents.documentType')->findOrFail($id);
+        $details = Employee::with('documents', 'documents.documentType', 'profile')->findOrFail($id);
 
 
         $types = DocumentType::all();

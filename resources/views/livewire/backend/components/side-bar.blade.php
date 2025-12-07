@@ -1,6 +1,7 @@
 <aside
-    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-end me-4 rotate-caret sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 ps ps--active-y"
+    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 my-3 fixed-end me-4 rotate-caret fixed-start ps ps--active-y"
     id="sidenav-main" data-color="primary">
+
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
@@ -524,10 +525,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('employee.dashboard.index') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
-                        </div>
+                     <i class="fa-solid fa-gauge"></i>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
@@ -586,10 +584,7 @@
                     <a data-bs-toggle="collapse" href="#documents"
                         class="nav-link {{ Request::is('employee/dashboard/documents*') ? 'active' : '' }}"
                         aria-controls="documents" role="button" aria-expanded="false">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="ni ni-folder-17 text-danger text-sm opacity-10"></i>
-                        </div>
+                         <i class="ni ni-folder-17 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Documents</span>
                     </a>
 
@@ -666,10 +661,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
-                        </div>
+                       <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Settings</span>
                     </a>
 
@@ -713,10 +705,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" wire:click.prevent="logout" href="#">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
-                        </div>
+                       <i class="fa-solid fa-right-from-bracket"></i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
                 </li>

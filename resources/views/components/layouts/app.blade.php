@@ -45,12 +45,16 @@
     </div>
 
 
-    <div class="min-height-60 bg-white shadow-sm position-absolute w-100">
+    <div class="min-height-60 bg-white position-absolute w-100">
 
     </div>
-    @livewire('backend.components.side-bar')
-    <main class="main-content position-relative border-radius-lg ">
-        @livewire('backend.components.header')
+    <div class="fixed-sidebar">
+        @livewire('backend.components.side-bar')
+    </div>
+    <main class="main-content position-relative border-radius-lg content-wrapper">
+        <div class="fixed-header border-bottom">
+            @livewire('backend.components.header')
+        </div>
 
         <div class="container-fluid py-2">
             {{ $slot }}

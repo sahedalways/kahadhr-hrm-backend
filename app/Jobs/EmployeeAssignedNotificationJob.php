@@ -3,13 +3,11 @@
 namespace App\Jobs;
 
 use App\Models\CompanyDocument;
-use App\Models\EmailSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 
 class EmployeeAssignedNotificationJob implements ShouldQueue

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendContactMessageJob implements ShouldQueue
@@ -32,9 +33,14 @@ class SendContactMessageJob implements ShouldQueue
     {
         $siteEmail = getSiteEmail();
 
+        try {
+            Mail::to($siteEmail)->send(new ContactMessageMail($this->contact));
+        } catch (\Exception $e) {
 
-        // You can send email or do other processing here
-        Mail::to($siteEmail)
-            ->send(new ContactMessageMail($this->contact));
+            Log::error('Failed to send contact message email', [
+                'contact_id' => $this->contact->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

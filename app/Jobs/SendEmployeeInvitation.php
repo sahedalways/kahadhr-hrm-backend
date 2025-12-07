@@ -3,14 +3,13 @@
 namespace App\Jobs;
 
 use App\Mail\EmployeeInvitationMail;
-use App\Models\EmailSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class SendEmployeeInvitation implements ShouldQueue
 {
@@ -27,7 +26,16 @@ class SendEmployeeInvitation implements ShouldQueue
 
     public function handle()
     {
-        Mail::to($this->employee->email)
-            ->send(new EmployeeInvitationMail($this->employee, $this->inviteUrl));
+        try {
+            Mail::to($this->employee->email)
+                ->send(new EmployeeInvitationMail($this->employee, $this->inviteUrl));
+        } catch (\Exception $e) {
+
+            Log::error('Failed to send employee invitation email', [
+                'employee_id' => $this->employee->id,
+                'email' => $this->employee->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

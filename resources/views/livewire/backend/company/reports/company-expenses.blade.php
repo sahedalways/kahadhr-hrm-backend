@@ -3,7 +3,7 @@
 
         {{-- LEFT: Title --}}
         <div class="col-auto">
-            <h5 class="fw-500 text-white m-0">Expense Management (Company Admin)</h5>
+            <h5 class="fw-500 text-primary m-0">Expense Management</h5>
         </div>
 
         {{-- RIGHT: Export --}}

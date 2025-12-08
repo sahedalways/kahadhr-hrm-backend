@@ -213,12 +213,13 @@
                             <div class="card-header bg-white py-3 border-0">
                                 <h4 class="mb-0 fw-bold">Personal Information</h4>
                             </div>
+
                             <div class="card-body">
                                 <div class="row g-3">
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Date of Birth:</strong>
-                                            {{ $details->profile->date_of_birth
+                                            {{ $details->profile?->date_of_birth
                                                 ? \Carbon\Carbon::parse($details->profile->date_of_birth)->format('d F, Y')
                                                 : 'N/A' }}
                                         </p>
@@ -226,104 +227,120 @@
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Gender:</strong>
-                                            {{ $details->profile->gender ?? 'N/A' }}</p>
+                                            {{ $details->profile?->gender ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Marital Status:</strong>
-                                            {{ $details->profile->marital_status ?? 'N/A' }}</p>
+                                            {{ $details->profile?->marital_status ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Nationality:</strong>
-                                            {{ $details->profile->nationality ?? 'N/A' }}</p>
+                                            {{ $details->profile?->nationality ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Street 1:</strong>
-                                            {{ $details->profile->street_1 ?? 'N/A' }}</p>
+                                            {{ $details->profile?->street_1 ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Street 2:</strong>
-                                            {{ $details->profile->street_2 ?? 'N/A' }}</p>
+                                            {{ $details->profile?->street_2 ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-4">
                                         <p class="mb-1"><strong>City:</strong>
-                                            {{ $details->profile->city ?? 'N/A' }}</p>
+                                            {{ $details->profile?->city ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-4">
                                         <p class="mb-1"><strong>State:</strong>
-                                            {{ $details->profile->state ?? 'N/A' }}</p>
+                                            {{ $details->profile?->state ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-4">
                                         <p class="mb-1"><strong>Postcode:</strong>
-                                            {{ $details->profile->postcode ?? 'N/A' }}</p>
+                                            {{ $details->profile?->postcode ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Country:</strong>
-                                            {{ $details->profile->country ?? 'N/A' }}</p>
+                                            {{ $details->profile?->country ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Home Phone:</strong>
-                                            {{ $details->profile->home_phone ?? 'N/A' }}</p>
+                                            {{ $details->profile?->home_phone ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Mobile Phone:</strong>
-                                            {{ $details->profile->mobile_phone ?? 'N/A' }}</p>
+                                            {{ $details->profile?->mobile_phone ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Personal Email:</strong>
-                                            {{ $details->profile->personal_email ?? 'N/A' }}</p>
+                                            {{ $details->profile?->personal_email ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Tax Reference No:</strong>
-                                            {{ $details->profile->tax_reference_number ?? 'N/A' }}</p>
+                                            {{ $details->profile?->tax_reference_number ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Immigration Status / Visa Type:</strong>
-                                            {{ $details->profile->immigration_status ?? 'N/A' }}</p>
+                                            {{ $details->profile?->immigration_status ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>BRP Number:</strong>
-                                            {{ $details->profile->brp_number ?? 'N/A' }}</p>
+                                            {{ $details->profile?->brp_number ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>BRP Expiry Date:</strong>
-                                            {{ $details->profile->brp_expiry_date
-                                                ? \Carbon\Carbon::parse($details->profile->brp_expiry_date)->format('d F, Y')
+                                            {{ $details->profile?->brp_expiry_date
+                                                ? Carbon\Carbon::parse($details->profile->brp_expiry_date)->format('d F, Y')
                                                 : 'N/A' }}
                                         </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Right to Work Expiry:</strong>
-                                            {{ $details->profile->right_to_work_expiry
-                                                ? \Carbon\Carbon::parse($details->profile->right_to_work_expiry)->format('d F, Y')
+                                            {{ $details->profile?->right_to_work_expiry
+                                                ? Carbon\Carbon::parse($details->profile->right_to_work_expiry)->format('d F, Y')
                                                 : 'N/A' }}
                                         </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Passport Number:</strong>
-                                            {{ $details->profile->passport_number ?? 'N/A' }}</p>
+                                            {{ $details->profile?->passport_number ?? 'N/A' }}
+                                        </p>
                                     </div>
 
                                     <div class="col-md-6">
                                         <p class="mb-1"><strong>Passport Expiry:</strong>
-                                            {{ $details->profile->passport_expiry
-                                                ? \Carbon\Carbon::parse($details->profile->passport_expiry)->format('d F, Y')
+                                            {{ $details->profile?->passport_expiry
+                                                ? Carbon\Carbon::parse($details->profile->passport_expiry)->format('d F, Y')
                                                 : 'N/A' }}
                                         </p>
                                     </div>
@@ -332,6 +349,7 @@
                             </div>
                         </div>
                     </div>
+
 
 
 

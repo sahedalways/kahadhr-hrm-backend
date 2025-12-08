@@ -2,7 +2,7 @@
     <div class="card-body p-3">
         <form class="row g-3" wire:submit.prevent="save">
 
-            <h5 class="fw-bold mb-2">Bank Information</h5>
+            <h5 class="fw-bold mb-2 text-primary">Bank Information</h5>
             <hr>
 
             <!-- Bank Name -->

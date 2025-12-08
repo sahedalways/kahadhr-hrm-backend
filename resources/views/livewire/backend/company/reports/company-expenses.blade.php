@@ -22,6 +22,14 @@
             </button>
 
         </div>
+
+
+        <div class="col-auto">
+            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
+                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+                <i class="fa fa-plus me-2"></i> Add New Expense
+            </a>
+        </div>
     </div>
 
 
@@ -179,6 +187,14 @@
 
                                         {{-- Only Delete for Company Admin --}}
                                         <td>
+                                            <a href="#" class="badge bg-info text-white"
+                                                wire:click="editExpense({{ $row->id }})" data-bs-toggle="modal"
+                                                data-bs-target="#editExpenseModal">
+                                                Edit
+                                            </a>
+
+
+
                                             <a href="#" class="badge bg-danger text-white"
                                                 wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
                                                 Delete
@@ -196,6 +212,18 @@
 
                         </table>
 
+                        <div class="mt-4 d-flex justify-content-end">
+                            <div class="card shadow-sm border-0 rounded-4 p-3"
+                                style="max-width: 300px; background-color: #f8f9fa;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-muted">Total Expenses:</span>
+                                    <span class="fw-bold text-dark">
+                                        £ {{ number_format($totalAmount ?? 0, 2) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
 
                         {{-- Load More --}}
                         @if ($hasMore)
@@ -212,6 +240,290 @@
             </div>
         </div>
     </div>
+
+
+    <div wire:ignore.self class="modal fade" id="add" data-bs-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">Add Expense</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i
+                            class="fas fa-times"></i></button>
+                </div>
+
+                <form wire:submit.prevent="save">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category<span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="category">
+                                <option value="">Select</option>
+
+                                <option value="Travel">Travel</option>
+                                <option value="Meals & Entertainment">Meals & Entertainment</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="IT & Software">IT & Software</option>
+                                <option value="Equipment & Hardware">Equipment & Hardware</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Training & Development">Training & Development</option>
+                                <option value="Marketing & Advertising">Marketing & Advertising</option>
+                                <option value="Professional Services">Professional Services</option>
+                                <option value="Employee Welfare">Employee Welfare</option>
+                                <option value="Utilities & Facilities">Utilities & Facilities</option>
+                                <option value="Other">Other</option>
+
+                            </select>
+                            @error('category')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label mt-2">Amount (£) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" wire:model="amount">
+                            @error('amount')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label mt-2">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" wire:model="description"></textarea>
+
+                            @error('description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+
+                        {{-- Hidden File Input --}}
+                        <div class="mb-3">
+                            <input type="file" class="d-none" id="fileInput" wire:model="newAttachment"
+                                accept="application/pdf,image/*">
+
+                            {{-- Add Attachment Button --}}
+                            <div>
+                                <button type="button" class="btn btn-sm btn-primary mt-1"
+                                    @if (count($attachments) >= 3) disabled @endif
+                                    onclick="document.getElementById('fileInput').click();">
+                                    Add Attachment (Max: 3)
+                                </button>
+                            </div>
+
+                            @error('attachments')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+
+                            @if ($errors->has('newAttachment'))
+                                <span class="text-danger">{{ $errors->first('newAttachment') }}</span>
+                            @endif
+
+
+
+
+                            @if ($attachments)
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    @foreach ($attachments as $index => $file)
+                                        @php
+                                            $isObject = is_object($file);
+                                            $extension = $isObject
+                                                ? $file->getClientOriginalExtension()
+                                                : pathinfo($file, PATHINFO_EXTENSION);
+                                            $fileUrl = $isObject ? $file->temporaryUrl() : asset('storage/' . $file);
+                                            $fileName = $isObject ? $file->getClientOriginalName() : basename($file);
+                                            $shortName = shortFileName($fileName);
+                                        @endphp
+
+                                        <div class="border rounded p-2 position-relative"
+                                            style="width: 120px; text-align:center;">
+                                            @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                                <img src="{{ $fileUrl }}" class="img-fluid rounded"
+                                                    style="height:80px; object-fit:cover;">
+                                            @else
+                                                <a href="{{ $fileUrl }}" target="_blank"
+                                                    class="d-block mt-2 text-decoration-none">
+                                                    <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                                    <p class="small mb-0">{{ $shortName }}</p>
+                                                </a>
+                                            @endif
+
+                                            <button type="button"
+                                                class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                wire:click="removeAttachment({{ $index }})"
+                                                style="padding: 0 6px; font-size: 12px;">×
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+
+
+                        </div>
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="save">
+                            <span wire:loading wire:target="save"><i
+                                    class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                            <span wire:loading.remove wire:target="save">Save</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div wire:ignore.self class="modal fade" id="editExpenseModal" data-bs-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">Edit Expense</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="update">
+                    <div class="modal-body">
+
+                        {{-- Category --}}
+                        <div class="mb-3">
+                            <label class="form-label">Category<span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="category">
+                                <option value="">Select</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Meals & Entertainment">Meals & Entertainment</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="IT & Software">IT & Software</option>
+                                <option value="Equipment & Hardware">Equipment & Hardware</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Training & Development">Training & Development</option>
+                                <option value="Marketing & Advertising">Marketing & Advertising</option>
+                                <option value="Professional Services">Professional Services</option>
+                                <option value="Employee Welfare">Employee Welfare</option>
+                                <option value="Utilities & Facilities">Utilities & Facilities</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            @error('category')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Amount --}}
+                        <div class="mb-3">
+                            <label class="form-label mt-2">Amount (£) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" wire:model="amount">
+                            @error('amount')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Description --}}
+                        <div class="mb-3">
+                            <label class="form-label mt-2">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" wire:model="description"></textarea>
+                            @error('description')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Attachments --}}
+                        <div class="mb-3">
+                            {{-- Hidden File Input --}}
+                            <input type="file" class="d-none" id="editFileInput" wire:model="newAttachment"
+                                accept="application/pdf,image/*">
+
+                            {{-- Add Attachment Button --}}
+                            <div>
+                                <button type="button" class="btn btn-sm btn-primary mt-1"
+                                    @if (count($attachments) >= 3) disabled @endif
+                                    onclick="document.getElementById('editFileInput').click();">
+                                    Add Attachment (Max: 3)
+                                </button>
+                            </div>
+
+                            @error('attachments')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+
+                            @if ($errors->has('newAttachment'))
+                                <span class="text-danger">{{ $errors->first('newAttachment') }}</span>
+                            @endif
+
+
+
+                            @if ($attachments)
+                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                    @foreach ($attachments as $index => $file)
+                                        @php
+                                            $isObject = is_object($file);
+                                            $extension = $isObject
+                                                ? $file->getClientOriginalExtension()
+                                                : pathinfo($file, PATHINFO_EXTENSION);
+                                            $fileUrl = $isObject ? $file->temporaryUrl() : asset('storage/' . $file);
+                                            $fileName = $isObject ? $file->getClientOriginalName() : basename($file);
+                                            $shortName = shortFileName($fileName);
+                                        @endphp
+
+                                        <div class="border rounded p-2 position-relative"
+                                            style="width: 120px; text-align:center;">
+                                            @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                                <img src="{{ $fileUrl }}" class="img-fluid rounded"
+                                                    style="height:80px; object-fit:cover;">
+                                            @else
+                                                <a href="{{ $fileUrl }}" target="_blank"
+                                                    class="d-block mt-2 text-decoration-none">
+                                                    <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                                    <p class="small mb-0">{{ $shortName }}</p>
+                                                </a>
+                                            @endif
+
+                                            <button type="button"
+                                                class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                wire:click="removeAttachment({{ $index }})"
+                                                style="padding: 0 6px; font-size: 12px;">×
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="update">
+                            <span wire:loading wire:target="update"><i
+                                    class="fas fa-spinner fa-spin me-2"></i>Updating...</span>
+                            <span wire:loading.remove wire:target="update">Update</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
 
 
     {{-- Attachments Modal --}}
@@ -272,4 +584,9 @@
             })
         }
     });
+</script>
+<script>
+    function openFileInput() {
+        document.getElementById('fileInput').click();
+    }
 </script>

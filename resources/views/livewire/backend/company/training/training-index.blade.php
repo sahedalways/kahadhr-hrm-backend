@@ -104,7 +104,7 @@
                                     <td>
                                         @if ($training->content_type == 'video')
                                             <span class="badge bg-danger">Video</span>
-                                        @elseif($training->content_type == 'pdf')
+                                        @elseif($training->content_type == 'file')
                                             <span class="badge bg-info">PDF</span>
                                         @elseif($training->content_type == 'image')
                                             <span class="badge bg-warning">Image</span>

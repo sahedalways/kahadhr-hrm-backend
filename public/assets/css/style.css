@@ -462,8 +462,8 @@ span.icon-position {
 }
 
 .input-counter {
-    max-width: 80px;
-     !important
+    max-width: 80px !important;
+    
 }
 
 .sidenav.fixed-end+.main-content {
@@ -487,7 +487,8 @@ span.icon-position {
 
 
 .chat-app-container {
-    margin: 20px auto;
+    height: 85vh;
+    overflow-x: auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -495,6 +496,8 @@ span.icon-position {
 }
 
 .sidebar {
+    width: 350px;
+    min-width: 350px;
     background-color: #fff;
     border-right: 1px solid #e0e0e0;
 }
@@ -516,7 +519,6 @@ span.icon-position {
 
 .main-chat-area {
     background-color: #e6ebf1;
-    min-height: 500px;
 }
 
 .message-bubble {
@@ -550,21 +552,29 @@ span.icon-position {
 }
 
 #message_input {
-    padding-left: 130px !important;
-    padding-right: 60px !important;
+    box-shadow: none !important;
     border-radius: 25px;
-    border-color: #ddd;
+    border-color: transparent;
 }
 
 #message_input:-webkit-autofill,
 #message_input:-webkit-autofill:hover,
 #message_input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
-    box-shadow: 0 0 0 1000px #fff inset !important;
     background-color: #fff !important;
     transition: background-color 9999s ease-in-out 0s;
     -webkit-text-fill-color: #000 !important;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Dropdown scroll */
@@ -574,19 +584,24 @@ span.icon-position {
     scrollbar-width: thin;
 }
 
+
+.hover-bg-light:hover {
+    background: #f8f9fa;
+}
+
 /* Left buttons container */
-.left-actions {
+/*.left-actions {
     top: 50%;
     transform: translateY(-50%);
     z-index: 50;
-}
+}*/
 
 /* Search icon container */
-.search-icon {
+/*.search-icon {
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
-}
+}*/
 
 /* Attachment popup position */
 #attachmentPopup {
@@ -610,9 +625,6 @@ span.icon-position {
 
 /* For mobile (<= 576px) */
 @media (max-width: 576px) {
-    #message_input {
-        padding-left: 120px !important;
-    }
 
     #attachmentPopup {
         left: -20px;

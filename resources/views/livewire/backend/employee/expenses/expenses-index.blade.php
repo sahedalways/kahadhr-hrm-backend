@@ -264,19 +264,7 @@
                             @endif
 
 
-                            {{-- Preview List --}}
-                            @php
-                                function shortFileName($name, $length = 15)
-                                {
-                                    if (strlen($name) <= $length) {
-                                        return $name;
-                                    }
-                                    $ext = pathinfo($name, PATHINFO_EXTENSION);
-                                    $start = substr($name, 0, 4);
-                                    $end = substr($name, -4, 4);
-                                    return $start . '...' . $end . ($ext ? '.' . $ext : '');
-                                }
-                            @endphp
+
 
                             @if ($attachments)
                                 <div class="mt-2 d-flex flex-wrap gap-2">

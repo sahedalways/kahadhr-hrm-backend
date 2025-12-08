@@ -5,7 +5,7 @@
         <div class="page-header min-vh-100" style="background-image: url('assets/img/login-bg.jpg');">
             <span class="mask bg-gradient-dark opacity-6"></span>
             <div class="container">
-                <div class="row justify-content-center">
+                <div class="row justify-content-center py-5">
 
                     <div class="col-lg-4 col-md-7">
                         <div class="card border-0 mb-0">
@@ -32,8 +32,8 @@
                             </div>
                             <div class="card-body px-lg-5 pt-0" x-transition.fade>
                                 <div class="">
-                                    <div class="text-muted mb-4">
-                                        <small>Login to Continue</small>
+                                     <div class="text-muted mb-3">
+                                        <small class="fw-bold">Login to Continue</small>
                                     </div>
                                     <form role="form" class="text-start" wire:submit.prevent="login">
                                         <div class="mb-3">
@@ -43,15 +43,17 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                        <div class="mb-3 position-relative">
-                                            <input type="password" id="password" class="form-control"
+                                       <div class="mb-3">
+                                            <div class="position-relative">
+                                                <input type="password" id="password" class="form-control"
                                                 placeholder="Password" wire:model="password">
 
                                             <span
-                                                class="position-absolute top-50 end-3 translate-middle-y cursor-pointer"
+                                                class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
                                                 onclick="togglePassword()">
                                                 <i id="passwordEye" class="fas fa-eye"></i>
                                             </span>
+                                            </div>
 
                                             @error('password')
                                                 <span class="text-danger">{{ $message }}</span>

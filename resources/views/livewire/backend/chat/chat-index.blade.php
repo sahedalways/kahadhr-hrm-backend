@@ -45,27 +45,27 @@
                 {{-- Search --}}
 
                 <div class="input-group mb-2 position-relative">
-                    <input type="text" class="form-control ps-5" placeholder="Search" wire:model="searchTerm"
+                    <input type="text" class="form-control" placeholder="Search" wire:model="searchTerm"
                         wire:keyup="set('searchTerm', $event.target.value)"
-                        style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
+                        >
                 </div>
 
                 {{-- Tabs --}}
-                <div class="d-flex" id="chat-filters">
+                <div class="d-flex flex-wrap mt-3" id="chat-filters">
                     <button wire:click="$set('tab', 'all')"
-                        class="btn btn-sm me-2 fw-bold {{ $tab == 'all' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
+                        class="btn px-3 btn-sm me-2 fw-bold {{ $tab == 'all' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
                         style="border-radius: 15px;">All</button>
                     <button wire:click="$set('tab', 'unread')"
-                        class="btn btn-sm me-2 fw-bold {{ $tab == 'unread' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
+                        class="btn px-3 btn-sm me-2 fw-bold {{ $tab == 'unread' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
                         style="border-radius: 15px;">Unread</button>
                     <button wire:click="$set('tab', 'teams')"
-                        class="btn btn-sm me-2 fw-bold {{ $tab == 'teams' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
+                        class="btn px-3 btn-sm me-2 fw-bold {{ $tab == 'teams' ? 'btn-primary text-white' : 'btn-light text-muted' }}"
                         style="border-radius: 15px;">Teams</button>
                 </div>
             </div>
 
             {{-- Sidebar User List --}}
-            <div class="flex-grow-1 overflow-auto mt-2">
+            <div class="flex-grow-1 overflow-auto mt-2 pe-3 ps-1">
                 @if ($tab == 'all')
                     {{-- Always show All users' team chat first --}}
                     <div class="chat-list-item {{ $receiverId === 'group' ? 'active-chat border-start border-3 border-primary' : '' }}"
@@ -76,7 +76,7 @@
      ">
 
                         <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center flex-wrap">
                                 <div class="rounded-circle p-2 me-3"
                                     style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                     <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
@@ -126,7 +126,7 @@
          ">
 
                             <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center flex-wrap">
                                     <div class="rounded-circle p-2 me-3"
                                         style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                         <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
@@ -229,7 +229,7 @@
      ">
 
                         <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center flex-wrap">
                                 <div class="rounded-circle p-2 me-3"
                                     style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                     <img src="{{ asset('/assets/img/chat/group-icon.png') }}" alt="Group Icon"
@@ -288,7 +288,7 @@
 
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
-                                    <div class="rounded-circle p-2 me-3"
+                                    <div class="rounded-circle p-2 me-3 flex-wrap"
                                         style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                         <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
                                             alt="{{ $group->name }}"
@@ -419,7 +419,7 @@
         <div class="col-md-8 col-lg-9 d-flex flex-column p-0">
 
             {{-- Chat Header --}}
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <div style="min-height: 90px" class="p-3 border-bottom d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
 
 
@@ -602,126 +602,112 @@
 
             {{-- Message Input --}}
             <div class="p-3 border-top" style="background: #fff;">
-                <div class="input-group position-relative">
-
-                    <div class="input-group mb-2 position-relative">
-                        <input type="text" id="message_input" class="form-control ps-5"
-                            placeholder="Write something..." wire:model.defer="messageText"
-                            wire:keydown.enter="sendMessage" wire:loading.attr="readonly" wire:target="sendMessage"
-                            style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
-
-                        <span wire:loading wire:target="sendMessage"
-                            class="position-absolute end-0 top-50 translate-middle-y me-2">
-                            <span class="spinner-border spinner-border-sm"></span>
-                        </span>
-
-                        <span class="input-group-text bg-white border-0 position-absolute end-0"
-                            style="z-index: 10; padding: 0.375rem 1rem;">
-                            <i class="bi bi-search text-muted"></i>
-                        </span>
-                    </div>
-
-                    <!-- LEFT ACTIONS -->
-                    <div class="d-flex position-absolute start-0 top-50 translate-middle-y ms-2 align-items-center">
-
-                        <!-- Attachment Button -->
-                        <div class="position-relative me-2">
-                            <button type="button" class="btn btn-light rounded-circle p-2" id="attachmentBtn"
-                                title="Attachment">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-
-                            <!-- Attachment Popup -->
-                            <!-- Attachment Popup -->
-                            <div id="attachmentPopup" class="bg-white border rounded shadow-sm p-2 position-absolute"
-                                style="bottom: 50px; left: 0; display: {{ $showAttachmentPopup ? 'block' : 'none' }}; width: 220px; z-index:1000;">
-                                <div class="d-flex justify-content-between">
-                                    <!-- Image -->
-                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                        <i class="fas fa-image fa-lg mb-1"></i>
-                                        <small>Image</small>
-                                        <input type="file" wire:model="attachment" accept="image/*" hidden>
-                                    </label>
-
-                                    <!-- Video -->
-                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                        <i class="fas fa-video fa-lg mb-1"></i>
-                                        <small>Video</small>
-                                        <input type="file" wire:model="attachment" accept="video/*" hidden>
-                                    </label>
-
-                                    <!-- GIF -->
-                                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                        <i class="fas fa-file-video fa-lg mb-1"></i>
-                                        <small>GIF</small>
-                                        <input type="file" wire:model="attachment" accept=".gif" hidden>
-                                    </label>
-
-                                    <!-- File -->
-                                    <label class="btn btn-light d-flex flex-column align-items-center p-2">
-                                        <i class="fas fa-file-alt fa-lg mb-1"></i>
-                                        <small>File</small>
-                                        <input type="file" wire:model="attachment" hidden accept=".pdf">
-                                    </label>
-                                </div>
 
 
-                            </div>
+<div class="position-relative">
 
+    <!-- Left Actions -->
+    <div class="d-flex position-absolute start-0 left-actions ms-2 align-items-center gap-2">
 
+        <!-- Attachment Button -->
+        <div class="position-relative">
+            <button type="button" class="btn btn-light rounded-circle icon-30" id="attachmentBtn">
+                <i class="fas fa-paperclip"></i>
+            </button>
 
+            <!-- Attachment Popup -->
+            <div id="attachmentPopup"
+                class="bg-white border rounded shadow-sm p-2 position-absolute"
+                style="display: {{ $showAttachmentPopup ? 'block' : 'none' }};">
+                <div class="d-flex justify-content-between">
+                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                        <i class="fas fa-image fa-lg mb-1"></i>
+                        <small>Image</small>
+                        <input type="file" wire:model="attachment" accept="image/*" hidden>
+                    </label>
 
+                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                        <i class="fas fa-video fa-lg mb-1"></i>
+                        <small>Video</small>
+                        <input type="file" wire:model="attachment" accept="video/*" hidden>
+                    </label>
+
+                    <label class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
+                        <i class="fas fa-file-video fa-lg mb-1"></i>
+                        <small>GIF</small>
+                        <input type="file" wire:model="attachment" accept=".gif" hidden>
+                    </label>
+
+                    <label class="btn btn-light d-flex flex-column align-items-center p-2">
+                        <i class="fas fa-file-alt fa-lg mb-1"></i>
+                        <small>File</small>
+                        <input type="file" wire:model="attachment" accept=".pdf" hidden>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emoji -->
+        <button id="show_emoji_box" class="icon-30 btn btn-light rounded-circle"
+           >😊</button>
+
+        <!-- Mention Button -->
+        <button type="button" class="btn btn-light rounded-circle icon-30"
+            wire:click="toggleMentionBox">@</button>
+
+        <!-- Mention Dropdown -->
+        <div id="mentionWrapper" class="position-relative">
+            @if ($showMentionBox)
+                <div id="mentionBox"
+                    class="position-absolute bg-white border shadow-sm p-2 dropdown-scroll"
+                    style="top:-160px; left:0; width:200px; z-index:2000;">
+
+                    <input type="text" class="form-control mb-1" placeholder="Search..."
+                        wire:model="mentionSearch">
+
+                    @foreach ($mentionUsers as $user)
+                        @php
+                            $displayName =
+                                $user->user_type === 'company'
+                                ? 'Company Admin'
+                                : trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                            $displayName = $displayName ?: $user->email;
+                        @endphp
+
+                        <div class="p-2 hover-bg-light cursor-pointer"
+                            wire:click="selectMention({{ $user->id }})">
+                            {{ $displayName }}
                         </div>
+                    @endforeach
 
-                        <!-- Emoji Button -->
-                        <button id="show_emoji_box" style="width:40px;height:40px;">😊</button>
-
-
-
-                        <button type="button" class="btn btn-light rounded-circle p-2" wire:click="toggleMentionBox"
-                            title="Mention">@</button>
-
-                        <!-- Mention Dropdown -->
-                        <div id="mentionWrapper" class="position-relative">
-                            @if ($showMentionBox)
-                                <div id="mentionBox" class="position-absolute bg-white border shadow-sm p-2"
-                                    style="top:-150px; left:50px; z-index:1000; width:200px; 
-                   max-height:160px; overflow-y:auto;">
-
-                                    <input type="text" class="form-control mb-1" placeholder="Search..."
-                                        wire:model="mentionSearch"
-                                        wire:keyup="set('mentionSearch', $event.target.value)">
-
-                                    @foreach ($mentionUsers as $user)
-                                        @php
-                                            $displayName =
-                                                $user->user_type === 'company'
-                                                    ? 'Company Admin'
-                                                    : trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                            $displayName = $displayName ?: $user->email;
-                                        @endphp
-                                        <div class="p-2 hover-bg-light cursor-pointer"
-                                            wire:click="selectMention({{ $user->id }})">
-                                            {{ $displayName }}
-                                        </div>
-                                    @endforeach
-
-                                    @if (empty($mentionUsers))
-                                        <div class="text-muted p-2">No users found</div>
-                                    @endif
-                                </div>
-                            @endif
-                        </div>
-
-
-                    </div>
-
-                    <!-- INPUT FIELD -->
-
-
-
+                    @if (empty($mentionUsers))
+                        <div class="text-muted p-2">No users found</div>
+                    @endif
 
                 </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Input Field -->
+    <input type="text" id="message_input" class="form-control"
+        placeholder="Write something..." wire:model.defer="messageText"
+        wire:keydown.enter="sendMessage" wire:loading.attr="readonly"
+        wire:target="sendMessage">
+
+    <!-- Spinner -->
+    <span wire:loading wire:target="sendMessage"
+        class="position-absolute end-0 search-icon me-4">
+        <span class="spinner-border spinner-border-sm"></span>
+    </span>
+
+    <!-- Search icon -->
+    <span class="input-group-text bg-white border-0 position-absolute search-icon end-0 me-2">
+       <i class="fa-solid fa-paper-plane text-primary cursor-pointer"></i>
+    </span>
+
+</div>
+
             </div>
 
 
@@ -743,11 +729,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <input type="text" id="message_input" class="form-control ps-5"
+                        <input type="text" id="message_input" class="form-control"
                             placeholder="Write something..." wire:model.defer="messageText"
                             wire:keydown.enter="sendAttachmentMessage" wire:loading.attr="readonly"
                             wire:target="sendAttachmentMessage"
-                            style="border-radius: 25px; padding-right: 120px; border-color: #ddd;">
+                           >
                     </div>
                     @if ($attachment)
                         @php

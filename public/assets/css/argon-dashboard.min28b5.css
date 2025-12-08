@@ -7,14 +7,14 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root {
-    --bs-blue: #10862D;
-    --bs-indigo: #10862D;
+    --bs-blue: #50abff;
+    --bs-indigo: #50abff;
     --bs-purple: #6f42c1;
     --bs-pink: #d63384;
     --bs-red: #f56565;
     --bs-orange: #fd7e14;
     --bs-yellow: #fbd38d;
-    --bs-green: #10862D;
+    --bs-green: #50abff;
     --bs-teal: #20c997;
     --bs-cyan: #0fe745;
     --bs-gray: #6c757d;
@@ -31,7 +31,7 @@
     --bs-primary: #431086;
     --bs-secondary: #8392ab;
     --bs-success: #2dce89;
-    --bs-info: #10862D;
+    --bs-info: #50abff;
     --bs-warning: #faae42;
     --bs-danger: #f5365c;
     --bs-light: #e9ecef;
@@ -2736,7 +2736,7 @@ progress {
 .form-control:focus {
     color: #495057;
     background-color: #fff;
-    border-color: #09f143;
+    border-color: #2998ff;
     outline: 0;
     box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(0, 131, 255, .1)
 }
@@ -2914,7 +2914,7 @@ textarea.form-control-sm {
 }
 
 .form-select:focus {
-    border-color: #10862D;
+    border-color: #50abff;
     outline: 0;
     box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(0, 131, 255, .1)
 }
@@ -3010,11 +3010,11 @@ textarea.form-control-sm {
 
 .form-check-input:checked[type=checkbox],
 .form-check-input:checked[type=radio] {
-    background-image: linear-gradient(310deg, #10862D, #825ee4)
+    background-image: linear-gradient(310deg, #50abff, #825ee4)
 }
 
 .form-check-input[type=checkbox]:indeterminate {
-    background-color: #10862D;
+    background-color: #50abff;
     border-color: #0bf345;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/%3E%3C/svg%3E")
 }
@@ -3104,7 +3104,7 @@ textarea.form-control-sm {
     width: 1rem;
     height: 1rem;
     margin-top: -.25rem;
-    background-color: #10862D;
+    background-color: #50abff;
     border: 0;
     border-radius: 1rem;
     transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -3134,7 +3134,7 @@ textarea.form-control-sm {
 .form-range::-moz-range-thumb {
     width: 1rem;
     height: 1rem;
-    background-color: #10862D;
+    background-color: #50abff;
     border: 0;
     border-radius: 1rem;
     transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -3581,22 +3581,22 @@ fieldset:disabled .btn {
 
 .btn-primary {
     color: #000;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #2998ff;
+    border-color: #2998ff
 }
 
 .btn-check:focus+.btn-primary,
 .btn-primary:focus,
 .btn-primary:hover {
     color: #000;
-    background-color: #7687e8;
-    border-color: #6e80e7
+    background-color: #2998ff;
+    border-color: #2998ff
 }
 
-.btn-check:focus+.btn-primary,
+/*.btn-check:focus+.btn-primary,
 .btn-primary:focus {
     box-shadow: 0 0 0 .2rem rgba(80, 97, 194, .5)
-}
+}*/
 
 .btn-check:active+.btn-primary,
 .btn-check:checked+.btn-primary,
@@ -3619,8 +3619,8 @@ fieldset:disabled .btn {
 .btn-primary.disabled,
 .btn-primary:disabled {
     color: #000;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .btn-secondary {
@@ -3971,14 +3971,14 @@ fieldset:disabled .btn {
 }
 
 .btn-outline-primary {
-    color: #10862D;
-    border-color: #10862D
+    color: #50abff;
+    border-color: #50abff
 }
 
 .btn-outline-primary:hover {
     color: #000;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .btn-check:focus+.btn-outline-primary,
@@ -3992,8 +3992,8 @@ fieldset:disabled .btn {
 .btn-outline-primary.dropdown-toggle.show,
 .btn-outline-primary:active {
     color: #000;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .btn-check:active+.btn-outline-primary:focus,
@@ -4006,7 +4006,7 @@ fieldset:disabled .btn {
 
 .btn-outline-primary.disabled,
 .btn-outline-primary:disabled {
-    color: #10862D;
+    color: #50abff;
     background-color: transparent
 }
 
@@ -4332,7 +4332,7 @@ fieldset:disabled .btn {
 
 .btn-link {
     font-weight: 400;
-    color: #10862D;
+    color: #50abff;
     text-decoration: none
 }
 
@@ -4875,7 +4875,7 @@ fieldset:disabled .btn {
 .nav-link {
     display: block;
     padding: .5rem 1rem;
-    color: #10862D;
+    color: #50abff;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out
 }
 
@@ -5749,7 +5749,7 @@ fieldset:disabled .btn {
 
 .accordion-button:focus {
     z-index: 3;
-    border-color: #10862D;
+    border-color: #50abff;
     outline: 0;
     box-shadow: none
 }
@@ -5840,7 +5840,7 @@ fieldset:disabled .btn {
 .page-link {
     position: relative;
     display: block;
-    color: #10862D;
+    color: #50abff;
     background-color: #fff;
     border: 1px solid #dee2e6;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
@@ -5876,8 +5876,8 @@ fieldset:disabled .btn {
 .page-item.active .page-link {
     z-index: 3;
     color: #fff;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .page-item.disabled .page-link {
@@ -6096,7 +6096,7 @@ fieldset:disabled .btn {
     color: #fff;
     text-align: center;
     white-space: nowrap;
-    background-color: #10862D;
+    background-color: #50abff;
     transition: width .6s ease
 }
 
@@ -6187,8 +6187,8 @@ fieldset:disabled .btn {
 .list-group-item.active {
     z-index: 2;
     color: #fff;
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .list-group-item+.list-group-item {
@@ -7661,7 +7661,7 @@ fieldset:disabled .btn {
 }
 
 .link-primary {
-    color: #10862D
+    color: #50abff
 }
 
 .link-primary:focus,
@@ -8316,7 +8316,7 @@ fieldset:disabled .btn {
 }
 
 .border-primary {
-    border-color: #10862D !important
+    border-color: #50abff !important
 }
 
 .border-secondary {
@@ -10094,7 +10094,7 @@ fieldset:disabled .btn {
 }
 
 .text-primary {
-    color: #10862D !important
+    color: #2998ff !important
 }
 
 .text-secondary {
@@ -10169,7 +10169,7 @@ fieldset:disabled .btn {
 }
 
 .bg-primary {
-    background-color: #10862D !important
+    background-color: #50abff !important
 }
 
 .bg-secondary {
@@ -19628,7 +19628,7 @@ fieldset:disabled .btn {
 
 */
 .alert-primary {
-    background-image: linear-gradient(310deg, #10862D, #673bde)
+    background-image: linear-gradient(310deg, #50abff, #673bde)
 }
 
 .alert-secondary {
@@ -19764,7 +19764,7 @@ fieldset:disabled .btn {
 }
 
 .badge.bg-primary {
-    background: #10862D
+    background: #50abff
 }
 
 .badge.bg-secondary {
@@ -19909,13 +19909,13 @@ fieldset:disabled .btn {
 
 .btn-primary:hover,
 .btn.bg-gradient-primary:hover {
-    background-color: #10862D;
-    border-color: #10862D
+    background-color: #50abff;
+    border-color: #50abff
 }
 
 .btn-primary .btn.bg-outline-primary,
 .btn.bg-gradient-primary .btn.bg-outline-primary {
-    border: 1px solid #10862D
+    border: 1px solid #50abff
 }
 
 .btn-primary:not(:disabled):not(.disabled).active,
@@ -19924,8 +19924,8 @@ fieldset:disabled .btn {
 .btn.bg-gradient-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle,
 .show>.btn.bg-gradient-primary.dropdown-toggle {
-    color: color-yiq(#10862D);
-    background-color: #10862D
+    color: color-yiq(#50abff);
+    background-color: #50abff
 }
 
 .btn-primary.focus,
@@ -19943,7 +19943,7 @@ fieldset:disabled .btn {
     background-color: transparent;
     opacity: .75;
     box-shadow: none;
-    color: #10862D
+    color: #50abff
 }
 
 .btn-secondary:hover,
@@ -20424,7 +20424,7 @@ fieldset:disabled .btn {
 }
 
 .card.card-background.card-background-mask-primary:after {
-    background-image: linear-gradient(310deg, #10862D, #825ee4);
+    background-image: linear-gradient(310deg, #50abff, #825ee4);
     opacity: .85
 }
 
@@ -20902,8 +20902,8 @@ fieldset:disabled .btn {
 .fixed-plugin .btn.bg-gradient-primary:not(:disabled):not(.disabled):not(.active) {
     background-color: transparent;
     background-image: none;
-    border: 1px solid #10862D;
-    color: #10862D
+    border: 1px solid #50abff;
+    color: #50abff
 }
 
 .fixed-plugin.show .card {
@@ -20924,8 +20924,8 @@ fieldset:disabled .btn {
 }
 
 .input-group .form-control:focus {
-    border-left: 1px solid #10862D !important;
-    border-right: 1px solid #10862D !important
+    border-left: 1px solid #50abff !important;
+    border-right: 1px solid #50abff !important
 }
 
 .input-group .form-control:not(:first-child) {
@@ -20953,7 +20953,7 @@ fieldset:disabled .btn {
 }
 
 .input-group.focused .input-group-text {
-    border-color: #10862D !important
+    border-color: #50abff !important
 }
 
 .form-control.form-control-alternative {
@@ -21113,7 +21113,7 @@ label {
 }
 
 .bg-gradient-primary {
-    background-image: linear-gradient(310deg, #10862D, #825ee4)
+    background-image: linear-gradient(310deg, #50abff, #825ee4)
 }
 
 .bg-gradient-secondary {
@@ -21181,7 +21181,7 @@ label {
 }
 
 .bg-gradient-faded-primary-vertical {
-    background-image: radial-gradient(200px circle at 50% 70%, rgba(0, 131, 255, .3) 0, #10862D 100%)
+    background-image: radial-gradient(200px circle at 50% 70%, rgba(0, 131, 255, .3) 0, #50abff 100%)
 }
 
 .bg-gradient-faded-secondary-vertical {
@@ -21335,7 +21335,7 @@ label {
 }
 
 svg.text-primary .color-foreground {
-    fill: #10862D
+    fill: #50abff
 }
 
 svg.text-primary .color-background {
@@ -21451,7 +21451,7 @@ svg.text-dark .color-background {
 }
 
 .gradient-animation {
-    background: linear-gradient(-45deg, #1171ef, #f5365c, #faae42, #10862D, #535560);
+    background: linear-gradient(-45deg, #1171ef, #f5365c, #faae42, #50abff, #535560);
     background-size: 400% 400% !important;
     animation: j 10s ease infinite
 }
@@ -22030,7 +22030,7 @@ hr.horizontal.gray-light {
 .navbar-vertical.navbar-expand-xs .lavalamp-object {
     width: calc(100% - 1rem) !important;
     background: theme-color("primary");
-    color: color-yiq(#10862D);
+    color: color-yiq(#50abff);
     margin-right: .5rem;
     margin-left: .5rem;
     padding-left: 1rem;
@@ -22130,7 +22130,7 @@ hr.horizontal.gray-light {
     .navbar-vertical.navbar-expand-sm .lavalamp-object {
         width: calc(100% - 1rem) !important;
         background: theme-color("primary");
-        color: color-yiq(#10862D);
+        color: color-yiq(#50abff);
         margin-right: .5rem;
         margin-left: .5rem;
         padding-left: 1rem;
@@ -22231,7 +22231,7 @@ hr.horizontal.gray-light {
     .navbar-vertical.navbar-expand-md .lavalamp-object {
         width: calc(100% - 1rem) !important;
         background: theme-color("primary");
-        color: color-yiq(#10862D);
+        color: color-yiq(#50abff);
         margin-right: .5rem;
         margin-left: .5rem;
         padding-left: 1rem;
@@ -22332,7 +22332,7 @@ hr.horizontal.gray-light {
     .navbar-vertical.navbar-expand-lg .lavalamp-object {
         width: calc(100% - 1rem) !important;
         background: theme-color("primary");
-        color: color-yiq(#10862D);
+        color: color-yiq(#50abff);
         margin-right: .5rem;
         margin-left: .5rem;
         padding-left: 1rem;
@@ -22433,7 +22433,7 @@ hr.horizontal.gray-light {
     .navbar-vertical.navbar-expand-xl .lavalamp-object {
         width: calc(100% - 1rem) !important;
         background: theme-color("primary");
-        color: color-yiq(#10862D);
+        color: color-yiq(#50abff);
         margin-right: .5rem;
         margin-left: .5rem;
         padding-left: 1rem;
@@ -22534,7 +22534,7 @@ hr.horizontal.gray-light {
     .navbar-vertical.navbar-expand-xxl .lavalamp-object {
         width: calc(100% - 1rem) !important;
         background: theme-color("primary");
-        color: color-yiq(#10862D);
+        color: color-yiq(#50abff);
         margin-right: .5rem;
         margin-left: .5rem;
         padding-left: 1rem;
@@ -23115,8 +23115,8 @@ hr.horizontal.gray-light {
 }
 
 .nav.nav-pills.nav-pills-primary .moving-tab .nav-link.active {
-    background: #10862D;
-    color: #10862D
+    background: #50abff;
+    color: #50abff
 }
 
 .nav.nav-pills.nav-pills-info {
@@ -23236,7 +23236,7 @@ hr.horizontal.gray-light {
 .pagination.pagination-primary .page-item.active>.page-link,
 .pagination.pagination-primary .page-item.active>.page-link:focus,
 .pagination.pagination-primary .page-item.active>.page-link:hover {
-    background-image: linear-gradient(310deg, #10862D, #825ee4);
+    background-image: linear-gradient(310deg, #50abff, #825ee4);
     border: none
 }
 
@@ -24392,7 +24392,7 @@ p {
 }
 
 .text-gradient.text-primary {
-    background-image: linear-gradient(310deg, #10862D, #825ee4)
+    background-image: linear-gradient(310deg, #50abff, #825ee4)
 }
 
 .text-gradient.text-info {
@@ -24623,7 +24623,7 @@ p {
 }
 
 .card.card-profile .card-before.mask-primary:before {
-    background: linear-gradient(180deg, hsla(0, 0%, 6%, 0), #10862D)
+    background: linear-gradient(180deg, hsla(0, 0%, 6%, 0), #50abff)
 }
 
 .card.card-profile .card-before.mask-info:before {
@@ -24739,7 +24739,7 @@ p {
 }
 
 .badge-primary {
-    color: #10862D;
+    color: #50abff;
     background-color: #bfe0ff
 }
 
@@ -24747,7 +24747,7 @@ p {
 .badge-primary:hover {
     color: #fff;
     text-decoration: none;
-    background-color: #10862D
+    background-color: #50abff
 }
 
 .badge-secondary {
@@ -26391,7 +26391,7 @@ span.flatpickr-weekday {
 .flatpickr-calendar .flatpickr-day.selected,
 .flatpickr-calendar .flatpickr-day.startRange,
 .flatpickr-calendar .flatpickr-day.today {
-    background: #10862D !important;
+    background: #50abff !important;
     color: #fff;
     border: none
 }
@@ -26421,7 +26421,7 @@ span.flatpickr-weekday {
 .flatpickr-day.endRange.startRange+.endRange:not(:nth-child(7n+1)),
 .flatpickr-day.selected.startRange+.endRange:not(:nth-child(7n+1)),
 .flatpickr-day.startRange.startRange+.endRange:not(:nth-child(7n+1)) {
-    box-shadow: -10px 0 0 #10862D
+    box-shadow: -10px 0 0 #50abff
 }
 
 /*! nouislider - 15.5.0 - 11/19/2020 */
@@ -26543,7 +26543,7 @@ span.flatpickr-weekday {
 }
 
 .noUi-connect {
-    background: #10862D
+    background: #50abff
 }
 
 .noUi-draggable {
@@ -26556,7 +26556,7 @@ span.flatpickr-weekday {
 
 .noUi-handle {
     border-radius: 100%;
-    background: #10862D;
+    background: #50abff;
     cursor: default;
     webkit-transition: .3s ease 0s;
     -moz-transition: .3s ease 0s;
@@ -26885,7 +26885,7 @@ pre[class*=language-] {
 .ps .ps__rail-y.ps--clicking,
 .ps .ps__rail-y:focus,
 .ps .ps__rail-y:hover {
-    background-color: #10862D;
+    background-color: #50abff;
     opacity: .1
 }
 
@@ -26898,7 +26898,7 @@ pre[class*=language-] {
 
 .ps__thumb-x,
 .ps__thumb-y {
-    background-color: #10862D;
+    background-color: #50abff;
     opacity: .5;
     border-radius: 10px;
     position: absolute
@@ -26914,7 +26914,7 @@ pre[class*=language-] {
 .ps__rail-x.ps--clicking .ps__thumb-x,
 .ps__rail-x:focus>.ps__thumb-x,
 .ps__rail-x:hover>.ps__thumb-x {
-    background-color: #10862D;
+    background-color: #50abff;
     opacity: .5;
     height: 11px
 }
@@ -26922,7 +26922,7 @@ pre[class*=language-] {
 .ps__rail-y.ps--clicking .ps__thumb-y,
 .ps__rail-y:focus>.ps__thumb-y,
 .ps__rail-y:hover>.ps__thumb-y {
-    background-color: #10862D;
+    background-color: #50abff;
     opacity: .5;
     width: 4px;
      !important
@@ -28828,7 +28828,7 @@ Github: https://github.com/fiduswriter/Simple-DataTables
 
 .dataTable-wrapper .dataTable-bottom .dataTable-pagination .dataTable-pagination-list .active a {
     background: transparent;
-    background-image: linear-gradient(310deg, #10862D, #825ee4);
+    background-image: linear-gradient(310deg, #50abff, #825ee4);
     box-shadow: 0 7px 14px rgba(50, 50, 93, .1), 0 3px 6px rgba(0, 0, 0, .08);
     color: #fff;
     border: none;
@@ -28836,7 +28836,7 @@ Github: https://github.com/fiduswriter/Simple-DataTables
 }
 
 .dataTable-wrapper .dataTable-bottom .dataTable-pagination .dataTable-pagination-list .active a:hover {
-    background-image: linear-gradient(310deg, #10862D, #825ee4)
+    background-image: linear-gradient(310deg, #50abff, #825ee4)
 }
 
 .dataTable-wrapper.no-footer .dataTable-container {
@@ -32377,11 +32377,11 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-right {
 .is-focused .choices__inner,
 .is-open .choices__inner {
     box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(0, 131, 255, .1);
-    border-color: #10862D
+    border-color: #50abff
 }
 
 .choices-primary {
-    background-color: #10862D
+    background-color: #50abff
 }
 
 .choices-secondary {
@@ -33486,13 +33486,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 }
 
 .order-tab:hover {
-    color: #10862D;
+    color: #50abff;
     background: #fff;
     border-radius: .5rem;
 }
 
 .order-tab.active {
-    color: #10862D;
+    color: #50abff;
     background: #fff;
     border-radius: .5rem;
 }
@@ -33534,12 +33534,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #10862D;
+    background: #50abff;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #10862D;
+    background: #50abff;
 }
 
 

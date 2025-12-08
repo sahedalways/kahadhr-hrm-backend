@@ -10,36 +10,84 @@ body {
     width: fit-content;
 }
 
-/* PROFILE DROPDOWN STYLE */
-.profile-dropdown {
+/* COMMON STYLES FOR BOTH DROPDOWNS */
+.profile-dropdown,
+.notification-dropdown {
     position: absolute;
-    top: 60px;
+    top: 55px;
     right: 0;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 10px 0;
-    width: 160px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    min-height: 60px;          /* MIN HEIGHT */
+    max-height: 250px;         /* MAX HEIGHT */
+    overflow-y: auto;          /* ENABLE SCROLL */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     display: none;
     z-index: 2000;
+    scrollbar-width: thin;     /* Firefox small scrollbar */
 }
 
-.profile-dropdown ul {
+/* For chrome scrollbars */
+.profile-dropdown::-webkit-scrollbar,
+.notification-dropdown::-webkit-scrollbar {
+    width: 7px;
+}
+
+.profile-dropdown::-webkit-scrollbar-thumb,
+.notification-dropdown::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+/* Notification dropdown sits under the bell */
+.notification-dropdown {
+    right: 55px;
+}
+
+/* LIST ITEMS */
+.profile-dropdown ul,
+.notification-dropdown ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.profile-dropdown li {
+.profile-dropdown li,
+.notification-dropdown li {
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
+    white-space: nowrap;
 }
 
-.profile-dropdown li:hover {
+.profile-dropdown li:hover,
+.notification-dropdown li:hover {
     background-color: #f5f5f5;
 }
 
+
+/* ------------------ MOBILE RESPONSIVE ------------------ */
+@media (max-width: 576px) {
+    .profile-dropdown,
+    .notification-dropdown {
+        right: -100% !important;   
+        width: 180px;
+        top: 50px;
+    }
+
+    .notification-dropdown {
+        right: -100% !important;  
+    }
+}
+
+
+@media (max-width: 767px) {
+	.sidebar {
+    border-right: 0 !important;
+}
+}
 
 
 

@@ -20,25 +20,47 @@
             </div>
 
             <!-- RIGHT SIDE ICON + PROFILE -->
-            <div class="d-flex align-items-center gap-2 position-relative">
+            <div class="d-flex align-items-center gap-3 position-relative">
 
-                <span class="d-flex">
+                <!-- NOTIFICATION ICON -->
+                <span class="d-flex cursor-pointer" id="notificationBell">
                     <i class="fa-regular fa-bell fs-5"></i>
                 </span>
 
+                <!-- NOTIFICATION DROPDOWN -->
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <ul>
+                        <li>No new notifications</li>
+                        <li>Message from admin</li>
+                        <li>New user registered</li>
+                        <li>System alert</li>
+                        <li>Update available</li>
+                        <li>Server restarted</li>
+                        <li>User updated profile</li>
+                        <li>Extra Data...</li>
+                    </ul>
+                </div>
+
+                <!-- PROFILE IMAGE -->
                 <img src="/assets/img/default-avatar.png" alt="Avatar" class="rounded-circle cursor-pointer"
                     width="40" height="40" id="profileImage">
 
                 <!-- PROFILE DROPDOWN -->
                 <div class="profile-dropdown" id="profileDropdown">
                     <ul>
-                        <li><a href="#">Profile</a></li>
-                        <li><a href="#">Settings</a></li>
+                        <li><a href="#">My Profile</a></li>
+                        <li><a href="#">Account Settings</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Privacy</a></li>
                         <li><a href="#">Logout</a></li>
                     </ul>
                 </div>
 
             </div>
+
+
 
             <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                 <ul class="ms-auto navbar-nav justify-content-end">
@@ -60,23 +82,62 @@
 
 
 <script>
-    // PROFILE DROPDOWN JS
     document.addEventListener("DOMContentLoaded", function() {
+
         const profileImage = document.getElementById("profileImage");
         const profileDropdown = document.getElementById("profileDropdown");
 
-        // Toggle dropdown
-        profileImage.addEventListener("click", () => {
+        const notificationBell = document.getElementById("notificationBell");
+        const notificationDropdown = document.getElementById("notificationDropdown");
+
+        // Toggle profile dropdown
+        profileImage.addEventListener("click", (e) => {
+            e.stopPropagation();
             profileDropdown.style.display =
                 profileDropdown.style.display === "block" ? "none" : "block";
+            notificationDropdown.style.display = "none"; // hide notification dropdown if open
         });
 
-        // Hide when clicking outside
+        // Toggle notification dropdown
+        notificationBell.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notificationDropdown.style.display =
+                notificationDropdown.style.display === "block" ? "none" : "block";
+            profileDropdown.style.display = "none"; // hide profile dropdown if open
+        });
+
+        // Close both when clicking outside
         document.addEventListener("click", (event) => {
-            if (!profileImage.contains(event.target) &&
-                !profileDropdown.contains(event.target)) {
+            if (!profileDropdown.contains(event.target) &&
+                !profileImage.contains(event.target)) {
                 profileDropdown.style.display = "none";
             }
+
+            if (!notificationDropdown.contains(event.target) &&
+                !notificationBell.contains(event.target)) {
+                notificationDropdown.style.display = "none";
+            }
         });
+
+        // Prevent background scroll when scrolling inside dropdown
+        ['profileDropdown', 'notificationDropdown'].forEach(id => {
+            const dropdown = document.getElementById(id);
+
+            dropdown.addEventListener('wheel', function(e) {
+                const atTop = dropdown.scrollTop === 0;
+                const atBottom = dropdown.scrollTop + dropdown.clientHeight >= dropdown
+                    .scrollHeight;
+
+                // Prevent scrolling the page
+                if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+                    e.preventDefault();
+                }
+                e.stopPropagation();
+            }, {
+                passive: false
+            });
+        });
+
+
     });
 </script>

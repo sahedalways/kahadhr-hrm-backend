@@ -12,7 +12,7 @@
                 <span class="mask bg-gradient-dark opacity-6"></span>
 
                 <div class="container">
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center py-5">
                         <div class="col-lg-4 col-md-7">
 
                             <div class="card border-0 mb-0">

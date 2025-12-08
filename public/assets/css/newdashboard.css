@@ -1,7 +1,9 @@
 body {
     background: #f6f6f6;
 }
-
+.main-content{
+	height: 100% !important;
+}
 .min-height-60 {
     min-height: 60px;
 }
@@ -146,6 +148,8 @@ html {
     margin-left: 77px;
 }
 
+
+
 @media (max-width: 1199px) {
     .g-sidenav-hidden .content-wrapper {
         margin-left: 0;
@@ -153,4 +157,14 @@ html {
 	.content-wrapper{
 		margin-left: 0;
 	}
+}
+@media (max-width: 900px) {
+    body {
+        zoom: .8;
+    }
+
+    .sidebar {
+        width: 300px;
+        min-width: 300px;
+    }
 }

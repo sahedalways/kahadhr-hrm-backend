@@ -93,4 +93,29 @@ if (!function_exists('getFileUrl')) {
       return $directory . '/' . $filename;
     }
   }
+
+
+  if (!function_exists('shortFileName')) {
+    /**
+     * Shorten a file name while keeping the extension.
+     *
+     * @param string $name
+     * @param int $length
+     * @return string
+     */
+    function shortFileName(string $name, int $length = 15): string
+    {
+      $ext = pathinfo($name, PATHINFO_EXTENSION);
+      $filenameWithoutExt = pathinfo($name, PATHINFO_FILENAME);
+
+      if (strlen($filenameWithoutExt) <= $length) {
+        return $name;
+      }
+
+      $start = substr($filenameWithoutExt, 0, 4);
+      $end = substr($filenameWithoutExt, -4);
+
+      return $start . '...' . $end . ($ext ? '.' . $ext : '');
+    }
+  }
 }

@@ -322,17 +322,66 @@
                             @enderror
                         </div>
 
-                        @if ($content_type === 'video')
-                            <input type="file" class="form-control" wire:model="instruction_file"
-                                accept="video/*">
-                        @elseif ($content_type === 'file')
-                            <input type="file" class="form-control" wire:model="instruction_file"
-                                accept="application/pdf">
-                        @endif
+                        <div class="mb-3">
+                            @if ($content_type === 'video')
+                                <input type="file" class="form-control" wire:model="instruction_file"
+                                    accept="video/*">
+                            @elseif ($content_type === 'file')
+                                <input type="file" class="form-control" wire:model="instruction_file"
+                                    accept="application/pdf">
+                            @endif
 
-                        @error('instruction_file')
-                            <div class="text-danger mt-1" style="font-size: 0.875rem;">{{ $message }}</div>
-                        @enderror
+                            @error('instruction_file')
+                                <div class="text-danger mt-1" style="font-size: 0.875rem;">{{ $message }}</div>
+                            @enderror
+
+                            <div wire:loading wire:target="instruction_file" class="small text-primary mt-1">
+                                <i class="fas fa-spinner fa-spin"></i> Uploading...
+                            </div>
+
+
+                            {{-- Preview --}}
+                            @if ($instruction_file)
+                                @php
+                                    $isObject = is_object($instruction_file);
+                                    $extension = $isObject
+                                        ? $instruction_file->getClientOriginalExtension()
+                                        : pathinfo($instruction_file, PATHINFO_EXTENSION);
+                                    $fileUrl = $isObject
+                                        ? $instruction_file->temporaryUrl()
+                                        : asset('storage/' . $instruction_file);
+                                    $fileName = $isObject
+                                        ? $instruction_file->getClientOriginalName()
+                                        : basename($instruction_file);
+
+                                    $shortName = shortFileName($fileName);
+                                @endphp
+
+                                <div class="border rounded p-2 position-relative mt-2"
+                                    style="width: 180px; text-align:center;">
+                                    @if (strtolower($extension) === 'pdf')
+                                        <a href="{{ $fileUrl }}" target="_blank"
+                                            class="d-block text-decoration-none">
+                                            <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        </a>
+                                    @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
+                                        <video width="100%" height="100" controls>
+                                            <source src="{{ $fileUrl }}"
+                                                type="video/{{ strtolower($extension) }}">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        <p class="small mb-0">{{ $shortName }}</p>
+                                    @else
+                                        {{-- fallback for unsupported type --}}
+                                        <p class="small mb-0">{{ $shortName }}</p>
+                                    @endif
+
+
+                                </div>
+                            @endif
+                        </div>
+
 
                         <hr class="my-4">
 
@@ -497,41 +546,10 @@
                             @error('content_type')
                                 <div class="text-danger mt-1" style="font-size: 0.875rem;">{{ $message }}</div>
                             @enderror
+
                         </div>
 
-                        {{-- Existing File / Video Preview --}}
-                        @if ($training && $training->file_path)
-                            <div class="mb-3 mt-2 p-3 border rounded bg-light">
-                                <span class="fw-bold">Existing File:</span>
-                                @if ($content_type === 'video')
-                                    <video width="100%" height="200" controls class="mt-2 rounded">
-                                        <source src="{{ asset('storage/' . $training->file_path) }}"
-                                            type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                @elseif($content_type === 'file')
-                                    <div class="mt-2 d-flex align-items-center gap-2">
-                                        @php
-                                            $extension = pathinfo($training->file_path, PATHINFO_EXTENSION);
-                                        @endphp
 
-                                        @if (in_array($extension, ['mp4', 'mov', 'avi', 'wmv']))
-                                            <i class="fas fa-video text-primary fs-4"></i>
-                                        @elseif($extension === 'pdf')
-                                            <i class="fas fa-file-pdf text-danger fs-4"></i>
-                                        @else
-                                            <i class="fas fa-file text-secondary fs-4"></i>
-                                        @endif
-
-                                        <a href="{{ asset('storage/' . $training->file_path) }}" target="_blank"
-                                            class="fw-bold text-decoration-none">
-                                            View {{ strtoupper($extension) }}
-                                        </a>
-                                    </div>
-
-                                @endif
-                            </div>
-                        @endif
 
                         {{-- Upload New File --}}
                         @if ($content_type === 'video')
@@ -545,6 +563,50 @@
                         @error('instruction_file')
                             <div class="text-danger mt-1" style="font-size: 0.875rem;">{{ $message }}</div>
                         @enderror
+
+                        <div wire:loading wire:target="instruction_file" class="small text-primary mt-1">
+                            <i class="fas fa-spinner fa-spin"></i> Uploading...
+                        </div>
+
+                        {{-- Existing File / Video Preview --}}
+                        @if ($instruction_file)
+                            @php
+                                $isObject = is_object($instruction_file);
+                                $extension = $isObject
+                                    ? $instruction_file->getClientOriginalExtension()
+                                    : pathinfo($instruction_file, PATHINFO_EXTENSION);
+                                $fileUrl = $isObject
+                                    ? $instruction_file->temporaryUrl()
+                                    : asset('storage/' . $instruction_file);
+                                $fileName = $isObject
+                                    ? $instruction_file->getClientOriginalName()
+                                    : basename($instruction_file);
+
+                                $shortName = shortFileName($fileName);
+                            @endphp
+
+                            <div class="border rounded p-2 position-relative mt-2"
+                                style="width: 180px; text-align:center;">
+                                @if (strtolower($extension) === 'pdf')
+                                    <a href="{{ $fileUrl }}" target="_blank"
+                                        class="d-block text-decoration-none">
+                                        <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                        <p class="small mb-0">{{ $shortName }}</p>
+                                    </a>
+                                @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
+                                    <video width="100%" height="100" controls>
+                                        <source src="{{ $fileUrl }}" type="video/{{ strtolower($extension) }}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <p class="small mb-0">{{ $shortName }}</p>
+                                @else
+                                    {{-- fallback for unsupported type --}}
+                                    <p class="small mb-0">{{ $shortName }}</p>
+                                @endif
+
+
+                            </div>
+                        @endif
 
                         <hr class="my-4">
 
@@ -624,6 +686,27 @@
                                 {{ ucfirst($training->content_type ?? '-') }}</li>
                         </ul>
                     </div>
+
+
+                    @if ($training && $training->file_path)
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Training Material</h6>
+                            <div class="p-3 bg-light rounded shadow-sm" style="max-height: 300px; overflow-y:auto;">
+                                @if ($training->content_type === 'video')
+                                    <video width="100%" height="auto" controls>
+                                        <source src="{{ asset('storage/' . $training->file_path) }}"
+                                            type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                @elseif($training->content_type === 'file')
+                                    <a href="{{ asset('storage/' . $training->file_path) }}" target="_blank"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="fas fa-file-pdf me-1"></i> View PDF
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                     @if ($training && $training->description)
                         <div class="mb-4">
@@ -766,26 +849,50 @@
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
 <script>
+    // Initialize Quill Editors
     const quillDetails = new Quill('#editorDetails', {
         theme: 'snow'
     });
 
-    const quillDetails2 = new Quill('#editorDetails2', {
+    const editorDetailsEdit = new Quill('#editorDetails2', {
         theme: 'snow'
     });
 
 
-    quillDetails.root.innerHTML = @json($description ?? '');
-    quillDetails2.root.innerHTML = @json($description2 ?? '');
+    Livewire.on('load-description-add', data => {
+        quillDetails.root.innerHTML = data.description ?? '';
+    });
 
 
+    Livewire.on('load-description-edit', data => {
+        editorDetailsEdit.root.innerHTML = data.description ?? '';
+    });
 
+    // ---------- SYNC ADD MODAL EDITOR ----------
     quillDetails.on('text-change', function() {
         @this.set('description', quillDetails.root.innerHTML);
     });
 
-    quillDetails2.on('text-change', function() {
-        @this.set('description', quillDetails2.root.innerHTML);
+    // ---------- SYNC EDIT MODAL EDITOR ----------
+    editorDetailsEdit.on('text-change', function() {
+        @this.set('description', editorDetailsEdit.root.innerHTML);
+    });
+
+    // ---------- RESET ADD MODAL WHEN OPEN ----------
+    Livewire.on('reset-editor', () => {
+        quillDetails.root.innerHTML = '';
+    });
+
+    Livewire.on('load-description-edit', data => {
+
+        if (Array.isArray(data) && data.length > 0) {
+            editorDetailsEdit.root.innerHTML = data[0].description ?? '';
+        } else {
+            editorDetailsEdit.root.innerHTML = '';
+        }
+
+        const editModal = new bootstrap.Modal(document.getElementById('editAnnouncement'));
+        editModal.show();
     });
 </script>
 

@@ -17,7 +17,7 @@ class OnboardingIndex extends BaseComponent
     use Exportable, WithPagination, WithFileUploads;
 
     public $announcements, $announcement;
-    public $announcement_id, $title, $description, $media;
+    public $announcement_id, $title, $description, $mediaFile;
     public $company_id;
 
     public $perPage = 10;
@@ -31,7 +31,7 @@ class OnboardingIndex extends BaseComponent
 
     public $editMode = false;
 
-    public $editId, $oldMedia;
+    public $editId;
 
     protected $listeners = ['deleteAnnouncement', 'sortUpdated' => 'handleSort'];
 
@@ -55,12 +55,15 @@ class OnboardingIndex extends BaseComponent
         $this->announcement_id = null;
         $this->title = '';
         $this->description = '';
-        $this->media = null;
-        $this->oldMedia = null;
+        if ($this->mediaFile instanceof TemporaryUploadedFile) {
+            $this->mediaFile->delete();
+        }
+        $this->mediaFile = null;
 
 
         $this->editMode = false;
         $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function save()
@@ -73,10 +76,10 @@ class OnboardingIndex extends BaseComponent
                 'unique:announcements',
             ],
             'description' => 'required|string',
-            'media' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav|max:50000',
+            'mediaFile' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav|max:50000',
         ]);
 
-        $mediaPath = $this->media ? $this->media->store('announcements', 'public') : null;
+        $mediaPath = $this->mediaFile ? $this->mediaFile->store('announcements', 'public') : null;
 
         Announcement::create([
             'company_id' => $this->company_id,
@@ -106,12 +109,13 @@ class OnboardingIndex extends BaseComponent
         $this->announcement_id = $this->announcement->id;
         $this->title = $this->announcement->title;
         $this->description = $this->announcement->description;
-        $this->oldMedia = $this->announcement->media;
+        $this->mediaFile = $this->announcement->media;
 
         $this->dispatch('load-description-edit', [
             'description' => $this->description,
         ]);
     }
+
 
     public function update()
     {
@@ -129,34 +133,39 @@ class OnboardingIndex extends BaseComponent
                     ->ignore($this->announcement_id),
             ],
             'description' => 'required|string',
-            'media' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mp3,wav|max:20480',
 
         ]);
 
+        if ($this->mediaFile instanceof TemporaryUploadedFile) {
+            $rules['mediaFile'] = 'file|mimes:jpg,jpeg,png,mp4,mp3,wav|max:20480';
+        }
+
         $announcement = Announcement::find($this->announcement_id);
-        if ($this->media) {
+
+        $mediaPath = $announcement->media;
+
+        if ($this->mediaFile) {
+
 
             if ($announcement->media && Storage::disk('public')->exists($announcement->media)) {
                 Storage::disk('public')->delete($announcement->media);
             }
 
 
-            if ($this->media instanceof TemporaryUploadedFile) {
-                $mediaPath = $this->media->store('announcements', 'public');
-            } else {
-                $mediaPath = $announcement->media;
+            if ($this->mediaFile instanceof TemporaryUploadedFile) {
+                $extension = $this->mediaFile->getClientOriginalExtension();
+
+
+                $randomName = rand(10000000, 99999999) . now()->format('is') . '.' . $extension;
+
+                $mediaPath = $this->mediaFile->storeAs('announcements', $randomName, 'public');
             }
-        } else {
-            $mediaPath = $announcement->media;
         }
-
-
 
         $announcement->update([
             'title' => $this->title,
             'description' => $this->description,
             'media' => $mediaPath,
-
         ]);
 
         $this->toast('Announcement updated successfully!', 'success');
@@ -165,6 +174,7 @@ class OnboardingIndex extends BaseComponent
         $this->resetInputFields();
         $this->resetLoaded();
     }
+
 
     public function deleteAnnouncement($id)
     {

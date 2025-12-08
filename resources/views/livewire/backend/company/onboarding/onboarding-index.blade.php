@@ -203,15 +203,65 @@
                             {{-- Media --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Media (Image / Video / Audio)</label>
-                                <input type="file" class="form-control" wire:model="media"
+                                <input type="file" class="form-control" wire:model="mediaFile"
                                     accept="image/*,video/*,audio/*">
-                                @error('media')
+                                @error('mediaFile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <div wire:loading wire:target="media" class="small text-primary mt-1">
+                                <div wire:loading wire:target="mediaFile" class="small text-primary mt-1">
                                     <i class="fas fa-spinner fa-spin"></i> Uploading...
                                 </div>
+
+                                @if ($mediaFile)
+                                    @php
+                                        $isObject = is_object($mediaFile);
+                                        $extension = $isObject
+                                            ? $mediaFile->getClientOriginalExtension()
+                                            : pathinfo($mediaFile, PATHINFO_EXTENSION);
+                                        $fileUrl = $isObject
+                                            ? $mediaFile->temporaryUrl()
+                                            : asset('storage/' . $mediaFile);
+                                        $fileName = $isObject
+                                            ? $mediaFile->getClientOriginalName()
+                                            : basename($mediaFile);
+
+                                        $shortName = shortFileName($fileName);
+
+                                    @endphp
+
+                                    <div class="border rounded p-2 position-relative mt-2"
+                                        style="width: 180px; text-align:center;">
+                                        @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                            <img src="{{ $fileUrl }}" class="img-fluid rounded"
+                                                style="height: 100px; object-fit: cover;">
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @elseif (strtolower($extension) === 'pdf')
+                                            <a href="{{ $fileUrl }}" target="_blank"
+                                                class="d-block text-decoration-none">
+                                                <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                                <p class="small mb-0">{{ $shortName }}</p>
+                                            </a>
+                                        @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
+                                            <video width="100%" height="100" controls>
+                                                <source src="{{ $fileUrl }}"
+                                                    type="video/{{ strtolower($extension) }}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @elseif (in_array(strtolower($extension), ['mp3', 'wav', 'ogg']))
+                                            <audio controls class="w-100 mt-1">
+                                                <source src="{{ $fileUrl }}"
+                                                    type="audio/{{ strtolower($extension) }}">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @else
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
+
 
 
                         </div>
@@ -221,10 +271,14 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary btn-sm"
                             data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success btn-sm" wire:loading.attr="disabled"
-                            wire:target="save,media">
-                            <span wire:loading wire:target="save"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+
+
+
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="save">
+                            <span wire:loading wire:target="save">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                            </span>
                             <span wire:loading.remove wire:target="save">Save</span>
                         </button>
                     </div>
@@ -232,9 +286,6 @@
             </div>
         </div>
     </div>
-
-
-
 
 
 
@@ -280,18 +331,64 @@
                             {{-- Media --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Media (Image / Video / Audio)</label>
-                                <input type="file" class="form-control" wire:model="media"
+                                <input type="file" class="form-control" wire:model="mediaFile"
                                     accept="image/*,video/*,audio/*">
-                                @error('media')
+                                @error('mediaFile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <div wire:loading wire:target="media" class="small text-primary mt-1">
+                                <div wire:loading wire:target="mediaFile" class="small text-primary mt-1">
                                     <i class="fas fa-spinner fa-spin"></i> Uploading...
                                 </div>
 
 
 
+                                @if ($mediaFile)
+                                    @php
+                                        $isObject = is_object($mediaFile);
+                                        $extension = $isObject
+                                            ? $mediaFile->getClientOriginalExtension()
+                                            : pathinfo($mediaFile, PATHINFO_EXTENSION);
+                                        $fileUrl = $isObject
+                                            ? $mediaFile->temporaryUrl()
+                                            : asset('storage/' . $mediaFile);
+                                        $fileName = $isObject
+                                            ? $mediaFile->getClientOriginalName()
+                                            : basename($mediaFile);
 
+                                        $shortName = shortFileName($fileName);
+                                    @endphp
+
+                                    <div class="border rounded p-2 position-relative mt-2"
+                                        style="width: 180px; text-align:center;">
+                                        @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
+                                            <img src="{{ $fileUrl }}" class="img-fluid rounded"
+                                                style="height: 100px; object-fit: cover;">
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @elseif (strtolower($extension) === 'pdf')
+                                            <a href="{{ $fileUrl }}" target="_blank"
+                                                class="d-block text-decoration-none">
+                                                <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                                <p class="small mb-0">{{ $shortName }}</p>
+                                            </a>
+                                        @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
+                                            <video width="100%" height="100" controls>
+                                                <source src="{{ $fileUrl }}"
+                                                    type="video/{{ strtolower($extension) }}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @elseif (in_array(strtolower($extension), ['mp3', 'wav', 'ogg']))
+                                            <audio controls class="w-100 mt-1">
+                                                <source src="{{ $fileUrl }}"
+                                                    type="audio/{{ strtolower($extension) }}">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @else
+                                            <p class="small mb-0">{{ $shortName }}</p>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

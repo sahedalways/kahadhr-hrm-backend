@@ -85,7 +85,7 @@ class ExpensesIndex extends BaseComponent
         $files = [];
         foreach ($this->attachments as $file) {
             $extension = $file->getClientOriginalExtension();
-            $randomName = mt_rand(1000000, 9999999) . '.' . $extension;
+            $randomName = rand(10000000, 99999999) . now()->format('is') . '.' . $extension;
             $files[] = $file->storeAs('company/expenses', $randomName, 'public');
         }
 
@@ -150,7 +150,7 @@ class ExpensesIndex extends BaseComponent
 
         foreach ($newFiles as $file) {
             $extension = $file->getClientOriginalExtension();
-            $randomName = rand(10000000, 99999999) . '.' . $extension;
+            $randomName = rand(10000000, 99999999) . now()->format('is') . '.' . $extension;
             $uploadedFiles[] = $file->storeAs('company/expenses', $randomName, 'public');
         }
 

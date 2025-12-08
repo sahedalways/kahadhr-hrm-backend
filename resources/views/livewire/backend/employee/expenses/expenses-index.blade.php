@@ -418,18 +418,7 @@
                                 <span class="text-danger">{{ $errors->first('newAttachment') }}</span>
                             @endif
 
-                            @php
-                                function shortFileName2($name, $length = 15)
-                                {
-                                    if (strlen($name) <= $length) {
-                                        return $name;
-                                    }
-                                    $ext = pathinfo($name, PATHINFO_EXTENSION);
-                                    $start = substr($name, 0, 4);
-                                    $end = substr($name, -4, 4);
-                                    return $start . '...' . $end . ($ext ? '.' . $ext : '');
-                                }
-                            @endphp
+
 
                             @if ($attachments)
                                 <div class="mt-2 d-flex flex-wrap gap-2">
@@ -441,7 +430,7 @@
                                                 : pathinfo($file, PATHINFO_EXTENSION);
                                             $fileUrl = $isObject ? $file->temporaryUrl() : asset('storage/' . $file);
                                             $fileName = $isObject ? $file->getClientOriginalName() : basename($file);
-                                            $shortName = shortFileName2($fileName);
+                                            $shortName = shortFileName($fileName);
                                         @endphp
 
                                         <div class="border rounded p-2 position-relative"

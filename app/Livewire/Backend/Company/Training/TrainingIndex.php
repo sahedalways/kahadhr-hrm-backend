@@ -91,10 +91,13 @@ class TrainingIndex extends BaseComponent
         $this->from_date = null;
         $this->to_date = null;
         $this->expiry_date = null;
+        $this->instruction_file = null;
+        $this->instruction_text = null;
         $this->require_proof = false;
         $this->selectedEmployees = [];
 
         $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     /* Load more trainings */
@@ -191,7 +194,13 @@ class TrainingIndex extends BaseComponent
         ]);
 
 
-        $filePath = $this->instruction_file->store('training', 'public');
+        if ($this->instruction_file) {
+            $extension = $this->instruction_file->getClientOriginalExtension();
+            $randomName = rand(10000000, 99999999) . now()->format('is') . '.' . $extension;
+
+            $filePath = $this->instruction_file->storeAs('training', $randomName, 'public');
+        }
+
 
 
 
@@ -201,9 +210,9 @@ class TrainingIndex extends BaseComponent
             'description'      => $this->description,
             'content_type'     => $this->content_type,
             'file_path'        => $filePath,
-            'from_date'        => $this->from_date,
-            'to_date'          => $this->to_date,
-            'expiry_date'      => $this->expiry_date,
+            'from_date'    => $this->from_date !== '' ? $this->from_date : null,
+            'to_date'    => $this->to_date !== '' ? $this->to_date : null,
+            'expiry_date'    => $this->expiry_date !== '' ? $this->expiry_date : null,
             'required_proof'   => $this->require_proof ?? 0,
             'send_email'       => $this->send_email ?? 0,
         ]);
@@ -240,6 +249,8 @@ class TrainingIndex extends BaseComponent
 
     public function edit($id)
     {
+        $this->resetErrorBag();
+        $this->resetValidation();
         $this->training_id = $id;
         $this->training = Training::with('assignments')->where('company_id', $this->company_id)->find($id);
 
@@ -250,12 +261,18 @@ class TrainingIndex extends BaseComponent
         $this->to_date = $this->training->to_date;
         $this->expiry_date = $this->training->expiry_date;
         $this->content_type = $this->training->content_type;
+        $this->instruction_file = $this->training->file_path ?? null;
         $this->require_proof = (bool) $this->training->required_proof;
 
 
         $this->selectedEmployees = $this->training->assignments->map(function ($a) {
             return ['id' => $a->user_id, 'name' => $a->user->full_name];
         })->toArray();
+
+
+        $this->dispatch('load-description-edit', [
+            'description' => $this->description,
+        ]);
     }
 
 
@@ -263,44 +280,41 @@ class TrainingIndex extends BaseComponent
 
     public function updateTraining()
     {
-
         $rules = $this->rules;
 
 
         if ($this->instruction_file instanceof UploadedFile) {
-            if ($this->content_type === 'video') {
-                $rules['instruction_file'] = 'file|mimes:mp4,mov,avi,wmv|max:212000';
-            } else {
-                $rules['instruction_file'] = 'file|mimes:pdf|max:10480';
-            }
-        } else {
-            unset($rules['instruction_file']);
+            $rules['instruction_file'] = $this->content_type === 'video'
+                ? 'file|mimes:mp4,mov,avi,wmv|max:212000'
+                : 'file|mimes:pdf|max:10480';
         }
 
         $this->validate($rules);
 
-
-
         $training = Training::findOrFail($this->training_id);
 
-        if ($this->instruction_file) {
+
+        if ($this->instruction_file instanceof UploadedFile) {
+
             if ($training->file_path && \Storage::disk('public')->exists($training->file_path)) {
                 \Storage::disk('public')->delete($training->file_path);
             }
 
+            // Store new file with random 8-digit name
+            $extension = $this->instruction_file->getClientOriginalExtension();
+            $randomName = rand(10000000, 99999999) . now()->format('is') . '.' . $extension;
+            $filePath = $this->instruction_file->storeAs('training', $randomName, 'public');
 
-            $filePath = $this->instruction_file->store('training', 'public');
             $training->file_path = $filePath;
         }
 
-        // Update training details
         $training->update([
-            'course_name' => $this->course_name,
-            'description' => $this->description,
-            'from_date' => $this->from_date,
-            'to_date' => $this->to_date,
-            'expiry_date' => $this->expiry_date,
-            'content_type' => $this->content_type,
+            'course_name'    => $this->course_name,
+            'description'    => $this->description,
+            'from_date'    => $this->from_date !== '' ? $this->from_date : null,
+            'to_date'    => $this->to_date !== '' ? $this->to_date : null,
+            'expiry_date'    => $this->expiry_date !== '' ? $this->expiry_date : null,
+            'content_type'   => $this->content_type,
             'required_proof' => $this->require_proof,
         ]);
 
@@ -308,19 +322,21 @@ class TrainingIndex extends BaseComponent
         $currentIds = $training->assignments->pluck('user_id')->toArray();
         $newIds = collect($this->selectedEmployees)->pluck('id')->toArray();
 
+        // Remove unassigned users
         $toRemove = array_diff($currentIds, $newIds);
-        TrainingAssignment::whereIn('user_id', $toRemove)->where('training_id', $training->id)->delete();
+        TrainingAssignment::whereIn('user_id', $toRemove)
+            ->where('training_id', $training->id)
+            ->delete();
 
-
+        // Add newly assigned users
         $toAdd = array_diff($newIds, $currentIds);
         foreach ($toAdd as $userId) {
             TrainingAssignment::create([
                 'training_id' => $training->id,
-                'user_id' => $userId,
-                'status' => 'assigned',
+                'user_id'     => $userId,
+                'status'      => 'assigned',
             ]);
         }
-
 
         $this->toast('Training updated successfully!', 'success');
         $this->dispatch('closemodal');

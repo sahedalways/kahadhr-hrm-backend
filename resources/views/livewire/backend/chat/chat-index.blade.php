@@ -592,7 +592,7 @@
                 <span id="typingUser"></span> is typing...
             </div> --}}
 
-            <div class="text-center" wire:loading.flex wire:target="sendMessage, loadMore">
+            <div class="text-center my-2 d-flex align-items-center px-4" wire:loading.flex wire:target="sendMessage, loadMore">
                 <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading...
             </div>
 

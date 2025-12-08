@@ -6640,7 +6640,8 @@ fieldset:disabled .btn {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    outline: 0
+    outline: 0;
+    padding: 0;
 }
 
 .modal-dialog {
@@ -20949,11 +20950,11 @@ fieldset:disabled .btn {
 
 .input-group> :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
     border-left: #fff !important;
-    border-right: #fff !important
+    /*border-right: #fff !important;*/
 }
 
 .input-group.focused .input-group-text {
-    border-color: #50abff !important
+    border-color: #50abff !important;
 }
 
 .form-control.form-control-alternative {

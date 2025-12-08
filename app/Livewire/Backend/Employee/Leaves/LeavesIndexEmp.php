@@ -167,9 +167,10 @@ class LeavesIndexEmp extends BaseComponent
 
         $leaveBalance = LeaveBalance::where('user_id', $user->id)->first();
 
-        $this->remainingHours = $leaveBalance->carry_over_hours;
-        $this->entitlementHours = $leaveBalance->total_hours;
-        $this->usedHours = $leaveBalance->used_hours;
+
+        $this->entitlementHours = $leaveBalance->total_hours ?? 0;
+        $this->usedHours = $leaveBalance->used_hours ?? 0;
+        $this->remainingHours = $leaveBalance->carry_over_hours ?? 0;
     }
 
 

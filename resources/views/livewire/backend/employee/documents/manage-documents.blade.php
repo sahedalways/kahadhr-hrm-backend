@@ -3,7 +3,7 @@
         <div class="col-12">
             <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-3">
                 <!-- Title -->
-                <h4 class="fw-bold text-white mb-0 d-flex align-items-center">
+                <h4 class="fw-bold mb-0 d-flex align-items-center">
                     <i class="fas fa-folder-open me-2"></i> Manage Documents
                 </h4>
 
@@ -31,7 +31,7 @@
             </div>
 
 
-            <p class="text-white mb-0">View and upload documents for each category. Click a PDF to view or the plus
+            <p class="mb-0">View and upload documents for each category. Click a PDF to view or the plus
                 button to upload.</p>
         </div>
     </div>

@@ -8,7 +8,7 @@
 
 
         <div class="col-auto">
-            <h5 class="fw-500 text-white m-0">My Trainings</h5>
+            <h5 class="fw-500 m-0">My Trainings</h5>
         </div>
 
 
@@ -37,8 +37,8 @@
                     <div class="row g-3 align-items-center">
                         <div class="col-md-8">
                             <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" class="form-control form-control-lg"
                                     placeholder="Search by course or title..." wire:model="search"
                                     wire:keyup="set('search', $event.target.value)" />
                             </div>
@@ -66,8 +66,9 @@
 
             <!-- Training Table -->
             <div class="card">
-                <div class="table-responsive">
-                    <table class="table table-bordered mt-0 text-center align-middle">
+              <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered m-0 text-center align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
@@ -163,6 +164,7 @@
                         </div>
                     @endif
                 </div>
+              </div>
             </div>
 
         </div>
@@ -191,10 +193,10 @@
                             <ul class="list-group list-group-flush mt-2">
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Status:</strong>
-                                    <span
-                                        class="badge {{ $assignment->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
-                                        {{ $assignment->status === 'assigned' ? 'Pending' : ucfirst($assignment->status ?? 'Pending') }}
-                                    </span>
+                                   <span class="badge {{ $assignment?->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
+    {{ $assignment?->status === 'assigned' ? 'Pending' : ucfirst($assignment?->status ?? 'Pending') }}
+</span>
+
 
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between"><strong>Course Name:</strong>
@@ -205,8 +207,10 @@
                                     {{ $training->to_date ?? '-' }}</li>
                                 <li class="list-group-item d-flex justify-content-between"><strong>Expiry:</strong>
                                     {{ $training->expiry_date ?? '-' }}</li>
-                                <li class="list-group-item d-flex justify-content-between"><strong>Required
-                                        Proof:</strong> {{ $training->required_proof ? 'Yes' : 'No' }}</li>
+                               <li class="list-group-item d-flex justify-content-between">
+    <strong>Required Proof:</strong> {{ $training?->required_proof ? 'Yes' : 'No' }}
+</li>
+
                                 <li class="list-group-item d-flex justify-content-between"><strong>Content
                                         Type:</strong> {{ ucfirst($training->content_type ?? '-') }}</li>
                             </ul>
@@ -214,25 +218,28 @@
                     </div>
 
                     {{-- Description --}}
-                    @if ($training->description)
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-body p-3" style="max-height: 150px; overflow-y:auto;">
-                                <h6 class="text-muted mb-2">Description</h6>
-                                {!! $training->description !!}
-                            </div>
-                        </div>
-                    @endif
+                @if ($training?->description)
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body p-3" style="max-height: 150px; overflow-y:auto;">
+            <h6 class="text-muted mb-2">Description</h6>
+            {!! $training->description !!}
+        </div>
+    </div>
+@endif
+
 
 
                 </div>
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    @php
-                        $today = \Carbon\Carbon::today();
-                        $fromDate = \Carbon\Carbon::parse($training->from_date);
-                        $toDate = \Carbon\Carbon::parse($training->to_date);
-                    @endphp
+                   @php
+    $today = \Carbon\Carbon::today();
+
+    $fromDate = $training?->from_date ? \Carbon\Carbon::parse($training->from_date) : null;
+    $toDate = $training?->to_date ? \Carbon\Carbon::parse($training->to_date) : null;
+@endphp
+
 
                     @if ($assignment && $assignment->status === 'assigned' && $today->between($fromDate, $toDate))
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -269,19 +276,20 @@
                 <!-- Modal Body -->
                 <div class="modal-body">
 
-                    @if ($training->content_type === 'video' && $training->file_path)
-                        <div class="mb-3 shadow-sm rounded">
-                            <video id="trainingVideo" class="w-100 rounded" controls>
-                                <source src="{{ asset('storage/' . $training->file_path) }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    @elseif ($training->content_type === 'file' && $training->file_path)
-                        <div id="pdfContainer" class="mb-3 shadow-sm rounded" style="height:600px; overflow-y:auto;">
-                            <iframe src="{{ asset('storage/' . $training->file_path) }}"
-                                class="w-100 h-100 rounded"></iframe>
-                        </div>
-                    @endif
+            @if ($training?->content_type === 'video' && $training?->file_path)
+    <div class="mb-3 shadow-sm rounded">
+        <video id="trainingVideo" class="w-100 rounded" controls>
+            <source src="{{ asset('storage/' . $training->file_path) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+@elseif ($training?->content_type === 'file' && $training?->file_path)
+    <div id="pdfContainer" class="mb-3 shadow-sm rounded" style="height:600px; overflow-y:auto;">
+        <iframe src="{{ asset('storage/' . $training->file_path) }}"
+            class="w-100 h-100 rounded"></iframe>
+    </div>
+@endif
+
 
                 </div>
 
@@ -319,8 +327,10 @@
             <div class="modal-content">
 
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title text-white" id="proofModalLabel">Upload Proof for
-                        {{ $training->course_name }}</h5>
+                   <h5 class="modal-title text-white" id="proofModalLabel">
+    Upload Proof for {{ $training?->course_name ?? 'Training' }}
+</h5>
+
                     <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>

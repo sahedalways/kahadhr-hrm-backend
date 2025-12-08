@@ -59,8 +59,9 @@
 
     <!-- Leave Requests Table -->
     <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-bordered text-center align-middle">
+        <div class="card-body">
+            <div class="table-responsive">
+            <table class="table mb-0 table-bordered text-center align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>#</th>
@@ -99,6 +100,7 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
         </div>
         @if ($hasMore)
             <div class="text-center mt-4">
@@ -170,7 +172,7 @@
                             <div class="text-danger mb-2">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="modal-footer">
+                  
 
 
 
@@ -184,7 +186,7 @@
                                 <span wire:loading.remove wire:target="save">Submit Request</span>
                             </button>
                         </div>
-                    </div>
+                    
                 </form>
             </div>
         </div>

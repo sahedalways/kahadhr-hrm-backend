@@ -1,5 +1,5 @@
 <aside
-    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 my-3 fixed-end me-4 rotate-caret fixed-start ps ps--active-y"
+    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start ps ps--active-y"
     id="sidenav-main" data-color="primary">
 
     <div class="sidenav-header">

@@ -67,66 +67,68 @@
                 </div>
 
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered text-center align-middle text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Topic</th>
-                                    <th>Description</th>
-                                    <th>Sent At</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $i = 1; @endphp
-                                @forelse($contacts as $row)
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-bordered text-center align-middle text-center">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ $i++ }}</td>
-                                        <td>{{ $row->first_name }} {{ $row->last_name }}</td>
-                                        <td>{{ $row->phone }}</td>
-                                        <td>{{ $row->email ?? 'N/A' }}</td>
-                                        <td>{{ $row->topic ?? 'N/A' }}</td>
-                                        <td>
-                                            <div x-data="{ expanded: false }">
-                                                <span
-                                                    x-text="expanded ? '{{ addslashes($row->description ?? '-') }}' : '{{ addslashes(strlen($row->description ?? '-') > 55 ? substr($row->description, 0, 55) . '...' : $row->description ?? '-') }}'"></span>
-                                                <template x-if="{{ strlen($row->description ?? '') }} > 55">
-                                                    <a href="javascript:;" @click="expanded = !expanded"
-                                                        class="btn btn-link p-0 mt-1"
-                                                        style="font-size: 0.75rem; text-decoration: underline;">
-                                                        <span x-text="expanded ? 'See less' : 'See more'"></span>
-                                                    </a>
-                                                </template>
-                                            </div>
-                                        </td>
-                                        <td>{{ $row->created_at?->format('d M, Y h:i A') }}</td>
-                                        <td>
-                                            <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
-                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
-                                                Delete
-                                            </a>
-                                        </td>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Topic</th>
+                                        <th>Description</th>
+                                        <th>Sent At</th>
+                                        <th>Action</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="text-center">No contacts found!</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @php $i = 1; @endphp
+                                    @forelse($contacts as $row)
+                                        <tr>
+                                            <td>{{ $i++ }}</td>
+                                            <td>{{ $row->first_name }} {{ $row->last_name }}</td>
+                                            <td>{{ $row->phone }}</td>
+                                            <td>{{ $row->email ?? 'N/A' }}</td>
+                                            <td>{{ $row->topic ?? 'N/A' }}</td>
+                                            <td>
+                                                <div x-data="{ expanded: false }">
+                                                    <span
+                                                        x-text="expanded ? '{{ addslashes($row->description ?? '-') }}' : '{{ addslashes(strlen($row->description ?? '-') > 55 ? substr($row->description, 0, 55) . '...' : $row->description ?? '-') }}'"></span>
+                                                    <template x-if="{{ strlen($row->description ?? '') }} > 55">
+                                                        <a href="javascript:;" @click="expanded = !expanded"
+                                                            class="btn btn-link p-0 mt-1"
+                                                            style="font-size: 0.75rem; text-decoration: underline;">
+                                                            <span x-text="expanded ? 'See less' : 'See more'"></span>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td>{{ $row->created_at?->format('d M, Y h:i A') }}</td>
+                                            <td>
+                                                <a href="#" class="badge badge-xs badge-danger fw-600 text-xs"
+                                                    wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                                    Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center">No contacts found!</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
 
-                        @if ($hasMore)
-                            <div class="text-center mt-4">
-                                <button wire:click="loadMore"
-                                    class="btn btn-sm btn-outline-primary rounded-pill px-4 py-2">
-                                    Load More
-                                </button>
-                            </div>
-                        @endif
+                            @if ($hasMore)
+                                <div class="text-center mt-4">
+                                    <button wire:click="loadMore"
+                                        class="btn btn-sm btn-outline-primary rounded-pill px-4 py-2">
+                                        Load More
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

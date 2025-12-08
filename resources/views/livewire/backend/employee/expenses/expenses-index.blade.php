@@ -3,7 +3,7 @@
 
         <!-- LEFT: Title -->
         <div class="col-auto">
-            <h5 class="fw-500 text-white m-0">Expense Management</h5>
+            <h5 class="fw-500 m-0">Expense Management</h5>
         </div>
 
         <!-- RIGHT: Export Buttons -->
@@ -33,62 +33,63 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="row g-3 align-items-center mb-3">
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-center mb-3">
 
 
-                            <!-- Sort -->
-                            <div class="col-md-3">
-                                <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
-                                    <option value="desc">Newest First</option>
-                                    <option value="asc">Oldest First</option>
-                                </select>
-                            </div>
-
-                            <!-- Category Filter -->
-                            <div class="col-md-3">
-                                <select class="form-select" wire:change="handleCategoryFilter($event.target.value)">
-
-                                    <option value="">Select</option>
-
-                                    <option value="Travel">Travel</option>
-                                    <option value="Meals & Entertainment">Meals & Entertainment</option>
-                                    <option value="Office Supplies">Office Supplies</option>
-                                    <option value="IT & Software">IT & Software</option>
-                                    <option value="Equipment & Hardware">Equipment & Hardware</option>
-                                    <option value="Communication">Communication</option>
-                                    <option value="Training & Development">Training & Development</option>
-                                    <option value="Marketing & Advertising">Marketing & Advertising</option>
-                                    <option value="Professional Services">Professional Services</option>
-                                    <option value="Employee Welfare">Employee Welfare</option>
-                                    <option value="Utilities & Facilities">Utilities & Facilities</option>
-                                    <option value="Other">Other</option>
-
-
-                                </select>
-                            </div>
-
+                        <!-- Sort -->
+                        <div class="col-md-3">
+                            <select class="form-select form-select-lg" wire:change="handleSort($event.target.value)">
+                                <option value="desc">Newest First</option>
+                                <option value="asc">Oldest First</option>
+                            </select>
                         </div>
 
-                        <!-- Search Summary -->
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <p class="text-muted small mb-0">
-                                Showing: <strong>{{ $search ?: 'All Expenses' }}</strong>
-                            </p>
-                            <div wire:loading wire:target="search">
-                                <span class="spinner-border spinner-border-sm text-primary"></span>
-                                <span class="text-primary small">Searching...</span>
-                            </div>
+                        <!-- Category Filter -->
+                        <div class="col-md-3">
+                            <select class="form-select" wire:change="handleCategoryFilter($event.target.value)">
+
+                                <option value="">Select</option>
+
+                                <option value="Travel">Travel</option>
+                                <option value="Meals & Entertainment">Meals & Entertainment</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="IT & Software">IT & Software</option>
+                                <option value="Equipment & Hardware">Equipment & Hardware</option>
+                                <option value="Communication">Communication</option>
+                                <option value="Training & Development">Training & Development</option>
+                                <option value="Marketing & Advertising">Marketing & Advertising</option>
+                                <option value="Professional Services">Professional Services</option>
+                                <option value="Employee Welfare">Employee Welfare</option>
+                                <option value="Utilities & Facilities">Utilities & Facilities</option>
+                                <option value="Other">Other</option>
+
+
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Search Summary -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <p class="text-muted small mb-0">
+                            Showing: <strong>{{ $search ?: 'All Expenses' }}</strong>
+                        </p>
+                        <div wire:loading wire:target="search">
+                            <span class="spinner-border spinner-border-sm text-primary"></span>
+                            <span class="text-primary small">Searching...</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Table -->
-                <div class="card-body p-0">
+        <div class="col-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <!-- Table -->
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center align-middle">
+                        <table class="table mb-0 table-bordered text-center align-middle">
 
                             <thead class="table-light">
                                 <tr>
@@ -178,7 +179,6 @@
                         @endif
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

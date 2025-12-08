@@ -30,7 +30,9 @@
         </div>
     </div>
 
-    <!-- Remaining Hours Info -->
+    <div class="card">
+        <div class="card-body">
+                <!-- Remaining Hours Info -->
     <div class="mb-3">
         <span class="badge bg-success me-2">Total Hours: {{ $entitlementHours }}</span>
         <span class="badge bg-warning me-2">Used Hours: {{ number_format($usedHours, 2) }}</span>
@@ -42,7 +44,7 @@
         <div class="col-md-4">
 
 
-            <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+            <input type="text" class="form-control form-control-lg"
                 placeholder="Search by leave type" wire:model="search"
                 wire:keyup="set('search', $event.target.value)" />
 
@@ -56,9 +58,11 @@
 
         </div>
     </div>
+        </div>
+    </div>
 
     <!-- Leave Requests Table -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mt-4">
         <div class="card-body">
             <div class="table-responsive">
             <table class="table mb-0 table-bordered text-center align-middle">

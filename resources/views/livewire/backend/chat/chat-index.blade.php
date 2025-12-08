@@ -5,7 +5,7 @@
     $lastDate = null;
 @endphp
 
-<div class="container-fluid chat-app-container">
+<div class="container-fluid chat-app-container h-100">
     <div class="d-flex h-100">
 
         {{-- SIDEBAR --}}
@@ -14,7 +14,7 @@
             {{-- Add new --}}
             <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
                 <div class="dropdown">
-                    <button class="btn btn-primary d-flex align-items-center dropdown-toggle" type="button"
+                    <button class="mb-0 btn btn-primary d-flex align-items-center dropdown-toggle" type="button"
                         id="addNewDropdown" data-bs-toggle="dropdown" style="border-radius: 20px; font-weight: 600;">
                         <i class="bi bi-plus me-1"></i> Add new
                     </button>
@@ -418,7 +418,7 @@
         <div class= "d-flex flex-column p-0 flex-grow-1">
 
             {{-- Chat Header --}}
-            <div style="min-height: 90px" class="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <div style="min-height: 75px" class="p-3 border-bottom d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
 
 

@@ -14,6 +14,7 @@ use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
 use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
+use App\Livewire\Backend\Company\Reports\CompanyExpenses;
 use App\Livewire\Backend\Company\Reports\ReportsIndex;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
@@ -111,8 +112,9 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', OnboardingIndex::class)->name('index');
     });
 
+
     Route::prefix('reports')->name('reports.')->group(function () {
-      Route::get('/', ReportsIndex::class)->name('index');
+      Route::get('/expenses', CompanyExpenses::class)->name('expenses');
     });
 
 

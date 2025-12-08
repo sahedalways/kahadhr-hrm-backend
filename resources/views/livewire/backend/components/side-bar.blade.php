@@ -401,12 +401,30 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
-                        href="{{ route('company.dashboard.reports.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                    <a data-bs-toggle="collapse" href="#reports"
+                        class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
+                        aria-controls="reports" role="button" aria-expanded="false">
+
                         <i class="fas fa-chart-line"></i>
                         <span class="nav-link-text ms-1">Reports</span>
                     </a>
+
+                    <div class="collapse {{ Request::is('dashboard/reports*') ? 'show' : '' }}" id="reports">
+                        <ul class="nav ms-4">
+
+                            <!-- Expenses -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/expenses') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.reports.expenses', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-money-bill-wave sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Expenses </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </li>
+
 
 
 
@@ -525,7 +543,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('employee.dashboard.index') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                     <i class="fa-solid fa-gauge"></i>
+                        <i class="fa-solid fa-gauge"></i>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
@@ -584,7 +602,7 @@
                     <a data-bs-toggle="collapse" href="#documents"
                         class="nav-link {{ Request::is('employee/dashboard/documents*') ? 'active' : '' }}"
                         aria-controls="documents" role="button" aria-expanded="false">
-                         <i class="ni ni-folder-17 text-danger text-sm opacity-10"></i>
+                        <i class="ni ni-folder-17 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Documents</span>
                     </a>
 
@@ -661,7 +679,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                       <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
+                        <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Settings</span>
                     </a>
 
@@ -705,7 +723,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" wire:click.prevent="logout" href="#">
-                       <i class="fa-solid fa-right-from-bracket"></i>
+                        <i class="fa-solid fa-right-from-bracket"></i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
                 </li>

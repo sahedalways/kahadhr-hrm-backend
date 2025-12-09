@@ -15,7 +15,7 @@ Route::get('/clear', function () {
 
 // for migrating db
 Route::get('/migrate-db', function () {
-  Artisan::call('migrate:refresh', [
+  Artisan::call('migrate:fresh', [
     '--force' => true,
   ]);
 

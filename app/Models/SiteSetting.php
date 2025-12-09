@@ -61,7 +61,6 @@ class SiteSetting extends Model
             $user = auth()->check() ? app('authUser') : null;
 
             if (!$user) {
-                // Guest see only superAdmin/global employees (if any)
                 $builder->whereNull('company_id');
                 return;
             }

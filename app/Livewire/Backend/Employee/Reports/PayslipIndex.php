@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Employee\Reports;
 
+use App\Jobs\PayslipRequestNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use Livewire\WithPagination;
 use App\Models\PaySlip;
@@ -129,12 +130,14 @@ class PayslipIndex extends BaseComponent
         }
 
         // Create new request
-        PaySlipRequest::create([
+        $request = PaySlipRequest::create([
             'user_id' => $userId,
             'company_id' => $companyId,
             'period' => $period,
             'status' => 'pending',
         ]);
+
+        PayslipRequestNotificationJob::dispatch($request->id)->onConnection('sync')->onQueue('urgent');;
 
         $this->dispatch('closemodal');
         $this->resetInput();

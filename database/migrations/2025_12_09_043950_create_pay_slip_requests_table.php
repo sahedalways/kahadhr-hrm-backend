@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('period');
             $table->enum('status', ['pending', 'uploaded', 'rejected'])
                 ->default('pending');
-            $table->foreignId('payslip_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('payslip_id')->nullable();
+            $table->foreign('payslip_id')->references('id')->on('pay_slips')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

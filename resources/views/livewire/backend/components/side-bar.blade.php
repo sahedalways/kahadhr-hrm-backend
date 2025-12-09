@@ -39,10 +39,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}"
                         href="{{ route('super-admin.home') }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
-                        </div>
+                        <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
@@ -55,10 +52,8 @@
                         class="nav-link {{ Request::is('dashboard/companies*') ? 'active' : '' }}"
                         aria-controls="companiesMenu" role="button"
                         aria-expanded="{{ Request::is('dashboard/companies*') ? 'true' : 'false' }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-building text-primary text-sm opacity-10"></i>
-                        </div>
+
+                        <i class="fas fa-building text-primary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Manage Companies</span>
 
                     </a>
@@ -93,10 +88,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/billing*') ? 'active' : '' }}"
                         href="{{ route('super-admin.billing') }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-credit-card text-success text-sm opacity-10"></i>
-                        </div>
+                        <i class="fas fa-credit-card text-success text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Billing & Payments</span>
                     </a>
                 </li>
@@ -104,10 +96,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
                         href="{{ route('super-admin.reports') }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-chart-line text-warning text-sm opacity-10"></i>
-                        </div>
+                        <i class="fas fa-chart-line text-warning text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Reports</span>
                     </a>
                 </li>
@@ -115,10 +104,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"
                         href="{{ route('super-admin.support') }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-life-ring text-danger text-sm opacity-10"></i>
-                        </div>
+                     <i class="fas fa-life-ring text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Support Tickets</span>
                     </a>
                 </li>
@@ -130,10 +116,7 @@
                     <a class="nav-link {{ Request::is('dashboard/contact-info*') ? 'active' : '' }}"
                         href="{{ route('super-admin.contact-info.index') }}">
 
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-envelope text-primary text-sm opacity-10"></i>
-                        </div>
+                         <i class="fa-solid fa-envelope text-primary text-sm opacity-10"></i>
 
                         <span class="nav-link-text ms-1">Contact Inquiries</span>
 
@@ -150,10 +133,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
-                        </div>
+                         <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">System Settings</span>
                     </a>
                     <div class="collapse {{ Request::is('dashboard/settings*') ? 'show' : '' }}" id="settings">
@@ -232,10 +212,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" wire:click.prevent="logout" href="#">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
-                        </div>
+                        <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
                 </li>
@@ -246,10 +223,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('company.dashboard.index') ? 'active' : '' }}"
                         href="{{ route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
-                        </div>
+                      <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
@@ -310,10 +284,7 @@
                         class="nav-link {{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'active' : '' }}"
                         aria-controls="leaves" role="button"
                         aria-expanded="{{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'true' : 'false' }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-plane-departure text-primary text-sm opacity-10"></i>
-                        </div>
+                       <i class="fas fa-plane-departure text-primary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Leaves</span>
                     </a>
 
@@ -349,10 +320,7 @@
                         class="nav-link {{ Request::is('dashboard/document-types*') || Request::is('dashboard/document-manage*') ? 'active' : '' }}"
                         aria-controls="documents" role="button"
                         aria-expanded="{{ Request::is('dashboard/document-types*') || Request::is('dashboard/document-manage*') ? 'true' : 'false' }}">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fas fa-file-alt text-primary text-sm opacity-10"></i>
-                        </div>
+                        <i class="fas fa-file-alt text-primary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Documents</span>
                     </a>
 
@@ -433,10 +401,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
-                        </div>
+                       <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Settings</span>
                     </a>
 
@@ -528,10 +493,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" wire:click.prevent="logout" href="#">
-                        <div
-                            class="icon icon-shape icon-sm text-center d-flex align-items-center justify-content-center">
-                            <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
-                        </div>
+                    <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
                 </li>

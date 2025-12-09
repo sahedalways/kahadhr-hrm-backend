@@ -32,15 +32,14 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card shadow-sm border-0">
+                <div class="card border-0">
                     <div class="card-body p-4">
                         <div class="row g-3 align-items-center mb-3">
                             <!-- Search Input -->
                             <div class="col-md-8">
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i
-                                            class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                    <input type="text" class="form-control form-control-lg border-start-0"
                                         placeholder="Search by team name" wire:model="search"
                                         wire:keyup="set('search', $event.target.value)" />
                                 </div>
@@ -70,8 +69,16 @@
                     </div>
                 </div>
 
-                <!-- Teams Table -->
-                <div class="card-body p-0">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                                <!-- Teams Table -->
+                <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered text-center align-middle">
                             <thead class="table-light">
@@ -137,10 +144,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Add Team</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i class="fas fa-times"></i>
+                        </button>
                 </div>
 
                 <form wire:submit.prevent="save">

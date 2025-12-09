@@ -7,14 +7,13 @@ use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
 use App\Livewire\Backend\Employee\ClockIn\ClockInIndex;
 use App\Livewire\Backend\Employee\Documents\AssignedDocuments;
 use App\Livewire\Backend\Employee\Documents\ManageDocuments;
-use App\Livewire\Backend\Employee\Expenses\ExpensesIndex;
 use App\Livewire\Backend\Employee\Leaves\LeavesIndexEmp;
 use App\Livewire\Backend\Employee\Onboarding\OnboardingIndex;
-use App\Livewire\Backend\Employee\Reports\ReportsIndex;
+use App\Livewire\Backend\Employee\Reports\ExpensesIndex;
+use App\Livewire\Backend\Employee\Reports\PayslipIndex;
 use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Employee\Settings\ProfileSettings;
 use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
-use App\Livewire\Backend\Employee\Training\TrainingIndex;
 use App\Livewire\Backend\Employee\Training\TrainingIndexEmp;
 use App\Livewire\Backend\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Route;
@@ -90,9 +89,9 @@ Route::domain('{company}.' . config('app.base_domain'))
     });
 
 
-    // EXPENSES
-    Route::prefix('expenses')->name('expenses.')->group(function () {
-      Route::get('/', ExpensesIndex::class)->name('index');
+    Route::prefix('reports')->name('reports.')->group(function () {
+      Route::get('/expenses', ExpensesIndex::class)->name('expenses');
+      Route::get('/pay-slips', PayslipIndex::class)->name('payslips');
     });
 
 
@@ -100,12 +99,6 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::prefix('onboarding')->name('onboarding.')->group(function () {
       Route::get('/', OnboardingIndex::class)->name('index');
     });
-
-    // REPORTS
-    Route::prefix('reports')->name('reports.')->group(function () {
-      Route::get('/', ReportsIndex::class)->name('index');
-    });
-
 
 
     // documents manage

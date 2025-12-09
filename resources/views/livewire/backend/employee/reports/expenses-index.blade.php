@@ -3,7 +3,7 @@
 
         <!-- LEFT: Title -->
         <div class="col-auto">
-            <h5 class="fw-500 m-0">Expense Management</h5>
+            <h5 class="fw-500 m-0">My Expenses</h5>
         </div>
 
         <!-- RIGHT: Export Buttons -->

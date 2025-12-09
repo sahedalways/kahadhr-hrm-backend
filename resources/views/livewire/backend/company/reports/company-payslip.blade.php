@@ -410,13 +410,14 @@
     </div>
 
     <div wire:ignore.self class="modal fade" id="requestPayslipModal" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Requested Payslips</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i
-                            class="fas fa-times"></i></button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
                 <div class="modal-body">
@@ -440,56 +441,27 @@
                                         <td>{{ $req->user->full_name ?? 'N/A' }}</td>
                                         <td>{{ $req->period }}</td>
                                         <td>
-                                            @php $status = ucfirst($req->status); @endphp
                                             <span
                                                 class="badge {{ $req->status === 'pending' ? 'bg-warning text-dark' : 'bg-success' }}">
-                                                {{ $status }}
+                                                {{ ucfirst($req->status) }}
                                             </span>
                                         </td>
                                         <td>
-                                            @php
-                                                $existingFile = $req->payslip->file_path ?? null;
-                                                $existingFileName = $existingFile ? basename($existingFile) : null;
-                                            @endphp
-
-                                            <div x-data="{ isUploading: false }"
-                                                class="d-flex flex-column align-items-center">
-
-                                                {{-- Existing file / Upload / Replace --}}
-                                                @if ($existingFileName)
-                                                    <a href="{{ asset('storage/' . $existingFile) }}" target="_blank"
-                                                        class="badge bg-success mb-1 text-decoration-none">
-                                                        {{ $existingFileName }}
-                                                    </a>
-                                                    <span x-show="!isUploading"
-                                                        class="badge bg-info mb-1">Replace</span>
-                                                @else
-                                                    <span x-show="!isUploading"
-                                                        class="badge bg-secondary mb-1">Upload</span>
-                                                @endif
-
-                                                <input type="file" accept="application/pdf"
-                                                    wire:change="uploadRequestFile({{ $req->id }}, $event.target.files)"
-                                                    wire:loading.attr="disabled"
-                                                    x-on:livewire-upload-start="isUploading = true"
-                                                    x-on:livewire-upload-finish="isUploading = false"
-                                                    x-on:livewire-upload-error="isUploading = false"
-                                                    x-bind:disabled="isUploading"
-                                                    class="form-control form-control-sm mb-1">
-
-                                                <div x-show="isUploading">
-                                                    <span class="badge bg-warning text-dark mt-1">
-                                                        <i class="fas fa-spinner fa-spin me-1"></i> Uploading...
-                                                    </span>
-                                                </div>
-
-                                                {{-- Delete button --}}
-                                                <button type="button" class="btn btn-sm btn-danger mt-1"
-                                                    wire:click.prevent="$dispatch('confirmRequestDelete', {{ $req->id }})">
-                                                    Delete
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <button class="btn btn-sm btn-info"
+                                                    wire:click="openUploadModal({{ $req->id }})">
+                                                    {{ $req->payslip?->file_path ? 'Replace' : 'Upload' }}
                                                 </button>
+
+
+                                                <button class="btn btn-sm btn-danger"
+                                                    wire:click.prevent="$emit('confirmRequestDelete', {{ $req->id }})">
+                                                    <i class="fas fa-trash-alt me-1"></i> Delete
+                                                </button>
+
                                             </div>
                                         </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -502,6 +474,66 @@
     </div>
 
 
+
+    <div wire:ignore.self class="modal fade" id="uploadRequestedPayslipFile" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Upload Payslip</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form wire:submit.prevent="confirmUpload">
+                    <div class="modal-body">
+                        <input type="file" wire:model="file" accept="application/pdf">
+                        @error('file')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+
+
+                        @if ($file)
+                            @php
+                                $isObject = is_object($file);
+                                $extension = $isObject
+                                    ? $file->getClientOriginalExtension()
+                                    : pathinfo($file, PATHINFO_EXTENSION);
+                                $fileUrl = $isObject ? $file->temporaryUrl() : asset('storage/' . $file);
+                                $fileName = $isObject ? $file->getClientOriginalName() : basename($file);
+
+                                $shortName = shortFileName($fileName);
+                            @endphp
+
+                            <div class="border rounded p-2 position-relative mt-2"
+                                style="width: 180px; text-align:center;">
+                                @if (strtolower($extension) === 'pdf')
+                                    <a href="{{ $fileUrl }}" target="_blank"
+                                        class="d-block text-decoration-none">
+                                        <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                        <p class="small mb-0">{{ $shortName }}</p>
+                                    </a>
+                                @else
+                                    {{-- fallback for unsupported type --}}
+                                    <p class="small mb-0">{{ $shortName }}</p>
+                                @endif
+
+
+                            </div>
+                        @endif
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                                wire:target="confirmUpload">
+                                <span wire:loading wire:target="confirmUpload"><i
+                                        class="fas fa-spinner fa-spin me-2"></i>Uploading...</span>
+                                <span wire:loading.remove wire:target="confirmUpload">Upload</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
 
 
 
@@ -524,5 +556,29 @@
         if (confirm("Are you sure you want to delete this requested payslip?")) {
             Livewire.emit('deleteRequest', id);
         }
+    });
+</script>
+
+
+<script>
+    window.addEventListener('show-upload-modal', event => {
+
+        const requestModal = bootstrap.Modal.getInstance(document.getElementById('requestPayslipModal'));
+        if (requestModal) requestModal.hide();
+
+
+        const uploadModalEl = document.getElementById('uploadRequestedPayslipFile');
+        const uploadModal = new bootstrap.Modal(uploadModalEl);
+        uploadModal.show();
+    });
+
+    window.addEventListener('hide-upload-modal', event => {
+
+        const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadRequestedPayslipFile'));
+        if (uploadModal) uploadModal.hide();
+
+        const requestModalEl = document.getElementById('requestPayslipModal');
+        const requestModal = new bootstrap.Modal(requestModalEl);
+        requestModal.show();
     });
 </script>

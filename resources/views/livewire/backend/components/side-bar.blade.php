@@ -104,7 +104,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"
                         href="{{ route('super-admin.support') }}">
-                     <i class="fas fa-life-ring text-danger text-sm opacity-10"></i>
+                        <i class="fas fa-life-ring text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Support Tickets</span>
                     </a>
                 </li>
@@ -116,7 +116,7 @@
                     <a class="nav-link {{ Request::is('dashboard/contact-info*') ? 'active' : '' }}"
                         href="{{ route('super-admin.contact-info.index') }}">
 
-                         <i class="fa-solid fa-envelope text-primary text-sm opacity-10"></i>
+                        <i class="fa-solid fa-envelope text-primary text-sm opacity-10"></i>
 
                         <span class="nav-link-text ms-1">Contact Inquiries</span>
 
@@ -133,7 +133,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                         <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
+                        <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">System Settings</span>
                     </a>
                     <div class="collapse {{ Request::is('dashboard/settings*') ? 'show' : '' }}" id="settings">
@@ -223,7 +223,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('company.dashboard.index') ? 'active' : '' }}"
                         href="{{ route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                      <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
+                        <i class="fa-solid fa-gauge text-info text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
@@ -284,7 +284,7 @@
                         class="nav-link {{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'active' : '' }}"
                         aria-controls="leaves" role="button"
                         aria-expanded="{{ Request::is('dashboard/leaves*') || Request::is('dashboard/leaves-settings*') ? 'true' : 'false' }}">
-                       <i class="fas fa-plane-departure text-primary text-sm opacity-10"></i>
+                        <i class="fas fa-plane-departure text-primary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Leaves</span>
                     </a>
 
@@ -410,7 +410,7 @@
                     <a data-bs-toggle="collapse" href="#settings"
                         class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
                         aria-controls="settings" role="button" aria-expanded="false">
-                       <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
+                        <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Settings</span>
                     </a>
 
@@ -502,7 +502,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" wire:click.prevent="logout" href="#">
-                    <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
+                        <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Logout</span>
                     </a>
                 </li>
@@ -608,14 +608,7 @@
                 </li>
 
 
-                {{-- Expenses --}}
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('employee/dashboard/expenses*') ? 'active' : '' }}"
-                        href="{{ route('employee.dashboard.expenses.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                        <i class="fa-solid fa-wallet"></i>
-                        <span class="nav-link-text ms-1">Expenses</span>
-                    </a>
-                </li>
+
 
                 {{-- Training --}}
                 <li class="nav-item">
@@ -635,14 +628,43 @@
                     </a>
                 </li>
 
-                {{-- Reports --}}
+
+
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('employee/dashboard/reports*') ? 'active' : '' }}"
-                        href="{{ route('employee.dashboard.reports.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                    <a data-bs-toggle="collapse" href="#employeeReports"
+                        class="nav-link {{ Request::is('employee/dashboard/reports*') ? 'active' : '' }}"
+                        aria-controls="employeeReports" role="button"
+                        aria-expanded="{{ Request::is('employee/dashboard/reports*') ? 'true' : 'false' }}">
                         <i class="fa-solid fa-chart-line"></i>
                         <span class="nav-link-text ms-1">Reports</span>
                     </a>
+
+                    <div class="collapse {{ Request::is('employee/dashboard/reports*') ? 'show' : '' }}"
+                        id="employeeReports">
+                        <ul class="nav ms-4">
+
+                            <!-- Expenses -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/reports/expenses*') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.reports.expenses', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fa-solid fa-wallet sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Expenses </span>
+                                </a>
+                            </li>
+
+                            <!-- Payslips -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('employee/dashboard/reports/pay-slips*') ? 'active' : '' }}"
+                                    href="{{ route('employee.dashboard.reports.payslips', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                    <i class="fa-solid fa-file-invoice-dollar sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Pay Slips </span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </li>
+
 
 
 

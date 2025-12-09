@@ -43,6 +43,8 @@ class CompanyPayslip extends BaseComponent
     public $filterMonth = '';
     public $filterYear = '';
 
+    public $uploadRequestId;
+
     protected $listeners = [
         'deletePayslip' => 'deletePayslip',
         'deleteRequest' => 'deleteRequest',
@@ -252,6 +254,7 @@ class CompanyPayslip extends BaseComponent
 
     public function loadRequests()
     {
+        $this->resetFields();
         $this->requests = PaySlipRequest::where('company_id', $this->company_id)
             ->where('status', 'pending')
             ->get();
@@ -259,48 +262,53 @@ class CompanyPayslip extends BaseComponent
 
 
 
-    public function uploadRequestFile($requestId, $files)
+    public function openUploadModal($requestId)
     {
-        $request = PaySlipRequest::find($requestId);
+        $this->uploadRequestId = $requestId;
+        $this->file = null;
 
+        $this->dispatch('show-upload-modal');
+    }
+
+    public function confirmUpload()
+    {
+        if (!$this->uploadRequestId) return;
+
+        $request = PaySlipRequest::find($this->uploadRequestId);
         if (!$request) return;
 
-
-        $file = is_array($files) ? reset($files) : $files;
-
         $this->validate([
-            'file' => 'file|mimes:pdf|max:2048'
+            'file' => 'required|file|mimes:pdf|max:2048',
         ]);
 
-        // Generate file name
-        $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.pdf';
-        $path = $file->storeAs('company/payslips', $fileName, 'public');
+        $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.' . $this->file->getClientOriginalExtension();
+        $filePath = $this->file->storeAs('payslips', $fileName, 'public');
 
-        // If a payslip already exists, delete old file
-        if ($request->payslip && $request->payslip->file_path && file_exists(storage_path('app/public/' . $request->payslip->file_path))) {
+        if ($request->payslip?->file_path && file_exists(storage_path('app/public/' . $request->payslip->file_path))) {
             unlink(storage_path('app/public/' . $request->payslip->file_path));
         }
 
-        // Create or update the payslip
         $payslip = $request->payslip ?? new PaySlip();
-        $payslip->company_id = $this->company_id;
+        $payslip->company_id = $request->company_id;
         $payslip->user_id = $request->user_id;
         $payslip->period = $request->period;
-        $payslip->file_path = $path;
+        $payslip->file_path = $filePath;
         $payslip->save();
-
 
         $request->update([
             'status' => 'uploaded',
             'payslip_id' => $payslip->id,
         ]);
 
+        $this->file = null;
+        $this->uploadRequestId = null;
+        $this->loadRequests();
+        $this->resetLoaded();
+
         $this->toast('Payslip uploaded successfully!', 'success');
 
-        // Reload requests to update table
-        $this->loadRequests();
+        $this->dispatch('hide-upload-modal');
     }
-
 
 
 

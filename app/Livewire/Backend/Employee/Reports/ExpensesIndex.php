@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Backend\Employee\Expenses;
+namespace App\Livewire\Backend\Employee\Reports;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Expenses;
@@ -53,7 +53,7 @@ class ExpensesIndex extends BaseComponent
 
     public function render()
     {
-        return view('livewire.backend.employee.expenses.expenses-index', [
+        return view('livewire.backend.employee.reports.expenses-index', [
             'infos' => $this->loaded
         ]);
     }

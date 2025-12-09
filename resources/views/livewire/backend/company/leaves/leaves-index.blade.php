@@ -24,7 +24,7 @@
                             <div class="input-group mb-4 shadow-sm">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
                                         class="fas fa-search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0"
+                                <input type="text" class="form-control border-start-0 ps-2"
                                     placeholder="Search by name, department, or title..." wire:model="search"
                                     wire:keyup="set('search', $event.target.value)">
                             </div>
@@ -32,23 +32,23 @@
                             <div class="list-container" style="max-height: 380px; overflow-y: auto;">
                                 <ul class="list-group list-group-flush">
                                     @forelse ($employees as $employee)
-                                        <li class="list-group-item list-group-item-action d-flex align-items-center p-3 border-bottom-0
+                                        <li class="list-group-item gap-2 list-group-item-action d-flex align-items-center p-3 border-bottom-0
         {{ $activeEmployeeId == $employee->user_id ? 'active-employee' : '' }}"
                                             style="cursor: pointer;"
                                             wire:click="showEmployeeLeave({{ $employee->user_id }})">
 
                                             <img src="{{ $employee->avatar_url }}"
-                                                class="rounded-circle me-3 border border-2 border-primary-subtle"
+                                                class="rounded-circle border border-2 border-primary-subtle"
                                                 style="width: 50px; height: 50px; object-fit: cover;"
                                                 alt="{{ $employee->full_name }}">
 
                                             <div class="flex-grow-1">
-                                                <div class="fw-bold text-dark">{{ $employee->full_name }}</div>
+                                                <h6 class="fw-bold text-dark lh-sm">{{ $employee->full_name }}</h6>
                                                 <small
                                                     class="text-secondary d-block">{{ $employee->job_title ?? null }}</small>
                                             </div>
 
-                                            <div class="text-end ms-auto">
+                                            <div class="text-end ms-auto d-flex align-items-center">
                                                 <span
                                                     class="badge bg-light text-primary border border-primary-subtle fw-medium text-uppercase"
                                                     style="font-size: 0.75rem;">

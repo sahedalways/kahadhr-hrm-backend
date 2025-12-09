@@ -9,8 +9,8 @@
         data-scroll="false">
         <div class="container-fluid py-1 px-3 position-relative">
 
-            <div class="sidenav-toggler sidenav-toggler-inner d-xl-block d-none w-100">
-                <a href="javascript:;" class="nav-link p-0 w-fitcontent">
+            <div class=" sidenav-toggler-inner d-xl-block d-none w-100">
+                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
                     <div class="sidenav-toggler-inner">
                         <i class="sidenav-toggler-line bg-dark"></i>
                         <i class="sidenav-toggler-line bg-dark"></i>

@@ -29,53 +29,55 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="row g-3 align-items-center mb-3">
-                            <!-- Search Input -->
-                            <div class="col-md-8">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i
-                                            class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
-                                        placeholder="Search by department name" wire:model="search"
-                                        wire:keyup="set('search', $event.target.value)" />
-                                </div>
-                            </div>
-
-                            <!-- Sort & Filter -->
-                            <div class="col-md-4 d-flex gap-2">
-                                <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
-                                    <option value="desc">Newest First</option>
-                                    <option value="asc">Oldest First</option>
-                                </select>
-
-
+            <div class="card ">
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-center mb-3">
+                        <!-- Search Input -->
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" class="form-control form-control-lg border-start-0"
+                                    placeholder="Search by department name" wire:model="search"
+                                    wire:keyup="set('search', $event.target.value)" />
                             </div>
                         </div>
 
-                        <!-- Live Search Result Indicator -->
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <p class="text-muted small mb-0">
-                                Showing results for: <strong>{{ $search ?: 'All Departments' }}</strong>
-                            </p>
-                            <div wire:loading wire:target="search">
-                                <span class="spinner-border spinner-border-sm text-primary" role="status"
-                                    aria-hidden="true"></span>
-                                <span class="text-primary small">Searching...</span>
-                            </div>
+                        <!-- Sort & Filter -->
+                        <div class="col-md-4 d-flex gap-2">
+                            <select class="form-select form-select-lg" wire:change="handleSort($event.target.value)">
+                                <option value="desc">Newest First</option>
+                                <option value="asc">Oldest First</option>
+                            </select>
+
+
+                        </div>
+                    </div>
+
+                    <!-- Live Search Result Indicator -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <p class="text-muted small mb-0">
+                            Showing results for: <strong>{{ $search ?: 'All Departments' }}</strong>
+                        </p>
+                        <div wire:loading wire:target="search">
+                            <span class="spinner-border spinner-border-sm text-primary" role="status"
+                                aria-hidden="true"></span>
+                            <span class="text-primary small">Searching...</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <!-- Departments Table -->
-                <div class="card-body p-0">
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center align-middle">
+                        <table class="table table-bordered text-center align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>

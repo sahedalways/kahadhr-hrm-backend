@@ -22,13 +22,13 @@ body {
     border-radius: 10px;
     padding: 10px 0;
     width: 200px;
-    min-height: 60px;          /* MIN HEIGHT */
-    max-height: 250px;         /* MAX HEIGHT */
-    overflow-y: auto;          /* ENABLE SCROLL */
+    min-height: 60px;          
+    max-height: 250px;       
+    overflow-y: auto;          
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     display: none;
     z-index: 2000;
-    scrollbar-width: thin;     /* Firefox small scrollbar */
+    scrollbar-width: thin;     
 }
 
 /* For chrome scrollbars */
@@ -92,25 +92,6 @@ body {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-body,
-html {
-    height: 100%;
-    overflow: hidden;
-    /* Prevent full-page scroll */
-}
-
 .fixed-header {
     position: fixed;
     top: 0;
@@ -148,7 +129,20 @@ html {
     margin-left: 77px;
 }
 
-
+.btn[data-bs-dismiss="modal"][aria-label="Close"] {
+	padding: 0;
+	width: 30px;
+	min-width: 30px;
+	height: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	-ms-border-radius: 50%;
+	-o-border-radius: 50%;
+}
 
 @media (max-width: 1199px) {
     .g-sidenav-hidden .content-wrapper {

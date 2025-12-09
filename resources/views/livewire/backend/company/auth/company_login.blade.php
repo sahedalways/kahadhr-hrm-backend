@@ -32,7 +32,7 @@
                             </div>
                             <div class="card-body px-lg-5 pt-0" x-transition.fade>
                                 <div class="">
-                                     <div class="text-muted mb-3">
+                                    <div class="text-muted mb-3">
                                         <small class="fw-bold">Login to Continue</small>
                                     </div>
                                     <form role="form" class="text-start" wire:submit.prevent="login">
@@ -43,16 +43,16 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                       <div class="mb-3">
+                                        <div class="mb-3">
                                             <div class="position-relative">
                                                 <input type="password" id="password" class="form-control"
-                                                placeholder="Password" wire:model="password">
+                                                    placeholder="Password" wire:model="password">
 
-                                            <span
-                                                class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
-                                                onclick="togglePassword()">
-                                                <i id="passwordEye" class="fas fa-eye"></i>
-                                            </span>
+                                                <span
+                                                    class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
+                                                    onclick="togglePassword()">
+                                                    <i id="passwordEye" class="fas fa-eye"></i>
+                                                </span>
                                             </div>
 
                                             @error('password')

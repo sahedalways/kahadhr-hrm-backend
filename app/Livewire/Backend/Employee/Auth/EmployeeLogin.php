@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 
 class EmployeeLogin extends BaseComponent
 {
-    public $email;
-    public $password;
+    public $email = "emp@xyz.com";
+    public $password = "12345678";
     public $company;
     public $rememberMe = false;
 

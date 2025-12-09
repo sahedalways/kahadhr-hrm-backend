@@ -50,13 +50,13 @@
                                         <div class="mb-3">
                                             <div class="position-relative">
                                                 <input type="password" id="password" class="form-control"
-                                                placeholder="Password" wire:model="password">
+                                                    placeholder="Password" wire:model="password">
 
-                                            <span
-                                                class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
-                                                onclick="togglePassword()">
-                                                <i id="passwordEye" class="fas fa-eye"></i>
-                                            </span>
+                                                <span
+                                                    class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
+                                                    onclick="togglePassword()">
+                                                    <i id="passwordEye" class="fas fa-eye"></i>
+                                                </span>
                                             </div>
 
                                             @error('password')

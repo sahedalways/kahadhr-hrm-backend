@@ -282,7 +282,7 @@ class CompanyPayslip extends BaseComponent
         ]);
 
         $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.' . $this->file->getClientOriginalExtension();
-        $filePath = $this->file->storeAs('payslips', $fileName, 'public');
+        $filePath = $this->file->storeAs('company/payslips', $fileName, 'public');
 
         if ($request->payslip?->file_path && file_exists(storage_path('app/public/' . $request->payslip->file_path))) {
             unlink(storage_path('app/public/' . $request->payslip->file_path));

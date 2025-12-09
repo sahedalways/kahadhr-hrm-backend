@@ -1,14 +1,12 @@
 <div>
-    <div class="row align-items-center justify-content-between mb-4">
-        <div class="col">
-            <h5 class="fw-500 text-white">Social Settings</h5>
-        </div>
-    </div>
+
 
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body p-3">
+                <div class="card-body">
+                    <h5 class="fw-500 text-primary mb-0">Social Settings</h5>
+                    <hr>
                     <form class="row g-3 align-items-center" wire:submit.prevent="save">
 
                         <!-- Facebook -->

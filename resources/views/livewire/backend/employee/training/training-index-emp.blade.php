@@ -220,7 +220,7 @@
                     {{-- Description --}}
                 @if ($training?->description)
     <div class="card mb-3 shadow-sm">
-        <div class="card-body p-3" style="max-height: 150px; overflow-y:auto;">
+        <div class="card-body" style="max-height: 150px; overflow-y:auto;">
             <h6 class="text-muted mb-2">Description</h6>
             {!! $training->description !!}
         </div>

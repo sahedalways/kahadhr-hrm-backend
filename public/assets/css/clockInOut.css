@@ -1,0 +1,80 @@
+#AppClockModal .modal-dialog {
+    max-width: 470px;
+    transform: translateY(20px);
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#AppClockModal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.app-clock-card-refined {
+    background-color: #0d2240;
+    border-radius: 18px;
+    border: none;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    padding: 10px 5px;
+}
+
+.app-clock-time-main {
+    color: #ffffff;
+    font-size: 2.8rem;
+    font-weight: 800 !important;
+}
+.app-clock-date-text {
+    color: #d0d7e1;
+    font-size: 0.95rem;
+}
+
+.btn-app-clock-in,
+.btn-app-clock-out {
+    padding: 14px 22px;
+    font-weight: 600;
+    border-radius: 12px;
+    font-size: 1rem;
+    border: none;
+    transition: 0.2s ease-in-out;
+}
+
+.btn-app-clock-in {
+    background-color: #28a745;
+    color: #fff;
+}
+.btn-app-clock-in:hover {
+    background-color: #1e7e34;
+    transform: translateY(-2px);
+    color: #0d2240;
+}
+
+.btn-app-clock-out {
+    background-color: #dc3545;
+    color: #fff;
+}
+.btn-app-clock-out:hover {
+    background-color: #bd2130;
+    transform: translateY(-2px);
+    color: #0d2240;
+}
+
+.app-clock-location-display {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+}
+.app-clock-location-display small {
+    font-size: 0.75rem;
+    color: #d0d7e1;
+    font-weight: 500;
+}
+.app-clock-location-display p {
+    color: #ffffff;
+}
+
+.app-clock-location-status {
+    width: 12px;
+    height: 12px;
+    background-color: #28a745;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.3);
+}

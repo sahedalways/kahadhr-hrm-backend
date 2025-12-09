@@ -27,6 +27,8 @@
                     <i class="fa-regular fa-bell fs-5"></i>
                 </span>
 
+
+
                 <!-- NOTIFICATION DROPDOWN -->
                 <div class="notification-dropdown" id="notificationDropdown">
                     <ul>
@@ -58,6 +60,10 @@
                     </ul>
                 </div>
 
+                <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
+                    <i class="fa-regular fa-clock fs-4"></i>
+                </span>
+
             </div>
 
 
@@ -78,6 +84,8 @@
 
         </div>
     </nav>
+
+
 </div>
 
 

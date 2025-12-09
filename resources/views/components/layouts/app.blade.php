@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
+    <link href="{{ asset('assets/css/clockInOut.css') }}" rel="stylesheet" />
+
     @vite('resources/js/app.js')
     @stack('styles')
 
@@ -75,6 +77,9 @@
 
 
 
+
+
+
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/bootstrap.min.js') }}"></script>
@@ -83,6 +88,7 @@
     <script src="{{ asset('assets/js/plugins/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/dragula/dragula.min.js') }}"></script>
     <script src="{{ asset('assets/js/argon-dashboard.min.js') }}"></script>
+
 
 
     <script>
@@ -192,6 +198,7 @@
     </script>
 
 
+    <livewire:backend.employee.clock-modal.clock-modal />
 
     @stack('js')
 

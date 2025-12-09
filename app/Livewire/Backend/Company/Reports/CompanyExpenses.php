@@ -58,6 +58,7 @@ class CompanyExpenses extends BaseComponent
         $this->company_id = auth()->user()->company->id;
 
         $this->employees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
             ->orderBy('f_name')
             ->get();
 

@@ -421,6 +421,15 @@
                                 </a>
                             </li>
 
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/pay-slips') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.reports.payslips', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-file-invoice-dollar sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Pay Slips </span>
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                 </li>

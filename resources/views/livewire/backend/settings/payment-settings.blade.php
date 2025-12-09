@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-body p-3">
+                <div class="card-body">
                     <form class="row g-3" wire:submit.prevent="save">
 
                         <!-- Gateway -->

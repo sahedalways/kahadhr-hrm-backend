@@ -31,15 +31,14 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
+               
+                    <div class="card-body">
                         <div class="row g-3 align-items-center mb-3">
                             <!-- Search Input -->
                             <div class="col-md-8">
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i
-                                            class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                    <input type="text" class="form-control form-control-lg border-start-0"
                                         placeholder="Search by company name, email, or phone" wire:model="search"
                                         wire:keyup="set('search', $event.target.value)" />
                                 </div>
@@ -76,11 +75,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
+             
+            </div>
+        </div>
+    </div>
 
-
-
-                <div class="card-body p-0">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                                <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered text-center align-middle">
                             <thead class="table-light">

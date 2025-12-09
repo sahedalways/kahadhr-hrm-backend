@@ -1,5 +1,5 @@
 <div class="card">
-    <div class="card-body p-3">
+    <div class="card-body">
         <form class="row g-3" wire:submit.prevent="save">
 
             <h5 class="fw-bold mb-0 text-primary">Bank Information</h5>

@@ -1,7 +1,7 @@
 <div>
     <div class="row align-items-center justify-content-between mb-4">
         <div class="col">
-            <h5 class="fw-500 text-white">Company Profile Settings</h5>
+            <h5 class="fw-500">Company Profile Settings</h5>
         </div>
     </div>
 
@@ -10,14 +10,13 @@
 
             <div class="card">
                 <div class="card-body p-lg-5 p-4 shadow-sm border rounded-3 bg-white">
-                    <form class="row g-4 align-items-center"
-                        wire:submit.prevent="save">
+                    <form class="row g-4 align-items-center" wire:submit.prevent="save">
 
                         <h5 class="fw-bold mb-0">Company Information</h5>
                         <hr class="mt-2">
 
                         <!-- Company Name -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Company Name <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control shadow-sm" wire:model="company_name"
@@ -28,7 +27,7 @@
                         </div>
 
                         <!-- Subdomain -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Subdomain</label>
 
                             <div class="input-group shadow-sm" style="height: 34px;">
@@ -38,11 +37,12 @@
                                     value="{{ $sub_domain ? $sub_domain . '.' . config('app.base_domain') : '' }}"
                                     readonly>
 
-                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                <button class="border btn btn-outline-secondary btn-sm btn-no-hover shadow-none" type="button"
                                     onclick="copyFullDomain()"
                                     style="height: 100%; padding: 2px 10px; font-size: 13px;">
                                     Copy
                                 </button>
+
 
                             </div>
 
@@ -53,7 +53,7 @@
 
 
                         <!-- House Number -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Company House Number <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control shadow-sm" wire:model="company_house_number"
@@ -64,7 +64,7 @@
                         </div>
 
                         <!-- Business Type -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Business Type</label>
                             <input type="text" class="form-control shadow-sm" wire:model="business_type"
                                 placeholder="Business Type">

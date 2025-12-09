@@ -41,8 +41,8 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i
-                                            class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                            class="fa-solid fa-magnifying-glass"></i></span>
+                                    <input type="text" class="form-control form-control-lg border-start-0"
                                         placeholder="Search by document name" wire:model="search"
                                         wire:keyup="set('search', $event.target.value)" />
                                 </div>
@@ -80,97 +80,103 @@
                     </div>
                 </div>
 
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <!-- Table -->
-                <div class="card-body p-0">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-center align-middle">
 
-                                <thead class="table-light">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Document Name</th>
+                                    <th>Employee Name</th>
+                                    <th>File</th>
+                                    <th>Expires At</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @php $i = 1; @endphp
+                                @forelse($infos as $row)
                                     <tr>
-                                        <th>#</th>
-                                        <th>Document Name</th>
-                                        <th>Employee Name</th>
-                                        <th>File</th>
-                                        <th>Expires At</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
+                                        <td>{{ $i++ }}</td>
+
+                                        <td>
+                                            <span onclick="copyToClipboard('{{ $row->name ?? '' }}')"
+                                                style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to copy">
+                                                {{ $row->name ?? 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{ trim(($row->employee->f_name ?? '') . ' ' . ($row->employee->l_name ?? '')) ?: $row->employee->email ?? 'N/A' }}
+                                        </td>
+
+
+
+                                        <td>
+                                            @if ($row->document_url)
+                                                <a href="{{ $row->document_url }}" target="_blank"
+                                                    class="text-primary">View</a>
+                                            @else
+                                                <span class="text-muted">No File</span>
+                                            @endif
+                                        </td>
+
+                                        <td>{{ $row->expires_at ? date('d M, Y', strtotime($row->expires_at)) : 'N/A' }}
+                                        </td>
+
+                                        <td>
+                                            @if ($row->status == 'pending')
+                                                <span class="badge bg-warning">Pending</span>
+                                            @elseif($row->status == 'signed')
+                                                <span class="badge bg-success">Signed</span>
+                                            @else
+                                                <span class="badge bg-danger">Expired</span>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#edit"
+                                                wire:click="edit({{ $row->id }})"
+                                                class="badge badge-info badge-xs fw-600 text-xs"
+                                                style="background-color:#4ba3f7;color:#fff;">
+                                                Edit
+                                            </a>
+
+                                            <a href="#" class="badge badge-danger badge-xs fw-600 text-xs"
+                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                                Delete
+                                            </a>
+                                        </td>
                                     </tr>
-                                </thead>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">No documents found</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
 
-                                <tbody>
-                                    @php $i = 1; @endphp
-                                    @forelse($infos as $row)
-                                        <tr>
-                                            <td>{{ $i++ }}</td>
+                        </table>
 
-                                            <td>
-                                                <span onclick="copyToClipboard('{{ $row->name ?? '' }}')"
-                                                    style="cursor:pointer;" data-bs-toggle="tooltip"
-                                                    title="Click to copy">
-                                                    {{ $row->name ?? 'N/A' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {{ trim(($row->employee->f_name ?? '') . ' ' . ($row->employee->l_name ?? '')) ?: $row->employee->email ?? 'N/A' }}
-                                            </td>
-
-
-
-                                            <td>
-                                                @if ($row->document_url)
-                                                    <a href="{{ $row->document_url }}" target="_blank"
-                                                        class="text-primary">View</a>
-                                                @else
-                                                    <span class="text-muted">No File</span>
-                                                @endif
-                                            </td>
-
-                                            <td>{{ $row->expires_at ? date('d M, Y', strtotime($row->expires_at)) : 'N/A' }}
-                                            </td>
-
-                                            <td>
-                                                @if ($row->status == 'pending')
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @elseif($row->status == 'signed')
-                                                    <span class="badge bg-success">Signed</span>
-                                                @else
-                                                    <span class="badge bg-danger">Expired</span>
-                                                @endif
-                                            </td>
-
-                                            <td>
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#edit"
-                                                    wire:click="edit({{ $row->id }})"
-                                                    class="badge badge-info badge-xs fw-600 text-xs"
-                                                    style="background-color:#4ba3f7;color:#fff;">
-                                                    Edit
-                                                </a>
-
-                                                <a href="#" class="badge badge-danger badge-xs fw-600 text-xs"
-                                                    wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
-                                                    Delete
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center">No documents found</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-
-                            </table>
-
-                            @if ($hasMore)
-                                <div class="text-center mt-4">
-                                    <button wire:click="loadMore"
-                                        class="btn btn-outline-primary rounded-pill px-4 py-2">
-                                        Load More
-                                    </button>
-                                </div>
-                            @endif
-                        </div>
+                        @if ($hasMore)
+                            <div class="text-center mt-4">
+                                <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    Load More
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

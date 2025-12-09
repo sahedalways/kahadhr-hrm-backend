@@ -38,13 +38,13 @@
     <!-- Search + Filters -->
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card mb-4">
                 <div class="card-body p-4">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-8">
                             <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control shadow-sm form-control-lg border-start-0"
+                                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" class="form-control form-control-lg border-start-0"
                                     placeholder="Search by course or title..." wire:model="search"
                                     wire:keyup="set('search', $event.target.value)" />
                             </div>
@@ -70,8 +70,13 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card">
             <!-- Training Table -->
-            <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered mt-0 text-center align-middle">
                         <thead class="table-light">
@@ -194,11 +199,8 @@
                     @endif
                 </div>
             </div>
-
         </div>
     </div>
-
-
 
 
     <div wire:ignore.self class="modal fade" id="addTraining" data-bs-backdrop="static" tabindex="-1"

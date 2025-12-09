@@ -36,11 +36,10 @@
     {{-- Search + Sort + Category Filter + Employee Filter --}}
     <div class="row">
         <div class="col-12">
-
             <div class="card mb-4">
-                <div class="card shadow-sm border-0">
+                <div class="card">
 
-                    <div class="card-body p-4">
+                    <div class="card-body">
                         <div class="row g-3 align-items-center mb-3">
 
                             {{-- Employee Filter (Admin Only) --}}
@@ -82,9 +81,6 @@
                                     <option value="Other">Other</option>
                                 </select>
                             </div>
-
-
-
 
                             <div class="col-md-3">
                                 <select class="form-select form-select-lg"
@@ -130,11 +126,15 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-
-
-                {{-- TABLE --}}
-                <div class="card-body p-0">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                                {{-- TABLE --}}
+                <div class="card-body">
                     <div class="table-responsive">
 
                         <table class="table table-bordered text-center align-middle">
@@ -236,11 +236,9 @@
 
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
 
     <div wire:ignore.self class="modal fade" id="add" data-bs-backdrop="static">
         <div class="modal-dialog modal-md">

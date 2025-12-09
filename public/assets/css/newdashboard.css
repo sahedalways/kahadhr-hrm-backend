@@ -129,7 +129,7 @@ body {
     margin-left: 77px;
 }
 
-.btn[data-bs-dismiss="modal"][aria-label="Close"] {
+.modal-header [data-bs-dismiss="modal"] {
 	padding: 0;
 	width: 30px;
 	min-width: 30px;
@@ -143,6 +143,16 @@ body {
 	-ms-border-radius: 50%;
 	-o-border-radius: 50%;
 }
+.btn-no-hover:hover,
+.btn-no-hover:focus,
+.btn-no-hover:active {
+    transform: translateY(0) !important;
+    -webkit-transform: translateY(0) !important;
+    -moz-transform: translateY(0) !important;
+    -ms-transform: translateY(0) !important;
+    -o-transform: translateY(0) !important;
+}
+
 
 @media (max-width: 1199px) {
     .g-sidenav-hidden .content-wrapper {

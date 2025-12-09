@@ -7,57 +7,67 @@
 
     <div class="container py-5">
 
-        {{-- 🔍 Search + Sort + Add Section --}}
-        <div class="row g-3 align-items-center mb-4">
+        <div class="card">
+            <div class="card-body">
+                {{-- 🔍 Search + Sort + Add Section --}}
+                <div class="row g-3 align-items-center mb-4">
 
-            {{-- Search --}}
-            <div class="col-md-8">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control form-control-lg shadow-sm border-start-0"
-                        placeholder="Search by title" wire:model="search"
-                        wire:keyup="set('search', $event.target.value)">
+                    {{-- Search --}}
+                    <div class="col-xl-8 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" placeholder="Search by title"
+                                wire:model="search" wire:keyup="set('search', $event.target.value)">
+                        </div>
+                    </div>
+
+                    {{-- Sort + Add --}}
+                    <div
+                        class="col-xl-4 col-md-6 d-flex justify-content-end gap-3 align-items-center flex-column flex-md-row">
+
+
+                        <select class="form-select ps-4" wire:change="handleSort($event.target.value)">
+                            <option value="desc">Newest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+
+
+
+                        <button data-bs-toggle="modal" data-bs-target="#addAnnouncement" wire:click="resetInputFields"
+                            class="btn btn-primary d-flex align-items-center w-100 justify-content-center">
+                            <i class="fa fa-plus me-2"></i>
+                            <span class="text-nowrap"> Add Onboarding</span>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <p class="text-muted small mb-0">
+                        Showing results for: <strong>{{ $search ?: 'All Onboardings' }}</strong>
+                    </p>
+
+                    <div wire:loading wire:target="search">
+                        <span class="spinner-border spinner-border-sm text-primary"></span>
+                        <span class="text-primary small ms-1">Searching...</span>
+                    </div>
                 </div>
             </div>
-
-            {{-- Sort + Add --}}
-            <div class="col-md-4 d-flex justify-content-end gap-2">
-
-                <select class="form-select form-select-lg w-auto" wire:change="handleSort($event.target.value)">
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
-                </select>
-
-                <button data-bs-toggle="modal" data-bs-target="#addAnnouncement" wire:click="resetInputFields"
-                    class="btn btn-primary btn-lg d-flex align-items-center">
-                    <i class="fa fa-plus me-2"></i>
-                    Add Onboarding
-                </button>
-            </div>
-        </div>
-
-
-        <div class="d-flex justify-content-between align-items-center mt-2">
-            <p class="text-muted small mb-0">
-                Showing results for: <strong>{{ $search ?: 'All Onboardings' }}</strong>
-            </p>
-
-            <div wire:loading wire:target="search">
-                <span class="spinner-border spinner-border-sm text-primary"></span>
-                <span class="text-primary small ms-1">Searching...</span>
-            </div>
         </div>
 
 
 
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold text-white">📢 Onboarding Announcements</h1>
-            <p class="lead text-white">All onboarding-related media and instructions are listed below.</p>
-        </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="text-center ">
+                    <h1 class="display-5 fw-bold ">📢 Onboarding Announcements</h1>
+                    <p class="lead ">All onboarding-related media and instructions are listed below.</p>
+                </div>
 
-        <div class="row g-4">
+
+                <div class="row g-4">
 
             @forelse ($infos as $item)
                 <div class="col-md-6 col-lg-4 d-flex">
@@ -143,11 +153,15 @@
                 </div>
 
             @empty
-                <div class="col-12 text-center text-white">
+                <div class="col-12 text-center ">
                     <h4>No announcements found.</h4>
                 </div>
             @endforelse
         </div>
+            </div>
+        </div>
+
+        
 
 
         {{-- Load More --}}
@@ -169,7 +183,7 @@
                 {{-- Modal Header --}}
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Add New Announcement</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -297,7 +311,7 @@
                 {{-- Header --}}
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Edit Announcement</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -395,8 +409,7 @@
 
                     {{-- Footer --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm"
-                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-success btn-sm" wire:loading.attr="disabled"
                             wire:target="update,media">
                             <span wire:loading wire:target="update"><i

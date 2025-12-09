@@ -7,7 +7,7 @@
             <div class="container">
                 <div class="row justify-content-center py-5">
 
-                    <div class="col-lg-4 col-md-7">
+                    <div class="col-xl-4 col-md-5 col-md-7">
                         <div class="card border-0 mb-0">
 
                             <div class="position-absolute top-0 end-0 p-2">

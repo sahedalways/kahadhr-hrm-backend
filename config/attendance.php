@@ -4,7 +4,7 @@ return [
   'grace_minutes' => 15,
 
   'scheduled_shift' => [
-    'start' => '9:00',
-    'end' => '17:00',
+    'start' => '23:10',
+    'end' => '24:00',
   ],
 ];

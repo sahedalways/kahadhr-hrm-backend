@@ -91,17 +91,92 @@
 
 
 
-                    <div class="app-clock-location-display text-start mt-4 p-3">
+                    <div class="app-clock-location-display text-start mt-4 p-3 mb-3">
                         <small class="d-block mb-1">
-                            <i class="bi bi-geo-alt-fill me-1"></i> CURRENT LOCATION
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            CURRENT LOCATION
                         </small>
 
                         <div class="d-flex justify-content-between align-items-center">
                             <p id="userLocation" class="mb-0 fs-6 fw-bold text-white" wire:ignore>Detecting location...
                             </p>
-                            <span class="app-clock-location-status"></span>
+
                         </div>
                     </div>
+                    <div
+                        style="
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background-color: #121212;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 0.85rem;
+    color: #ffffff;
+">
+                        <h3
+                            style="
+        color: #ffffff;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #333;
+        padding-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+    ">
+                            📅 Attendance History
+                        </h3>
+
+                        @if (!empty($previousAttendances) && count($previousAttendances) > 0)
+                            @foreach ($previousAttendances as $attendance)
+                                @php
+                                    $status = strtolower($attendance['status']);
+                                    $bgColor =
+                                        $status == 'approved'
+                                            ? '#388e3c'
+                                            : ($status == 'pending'
+                                                ? '#fbc02d'
+                                                : '#d32f2f');
+                                    $textColor = $status == 'pending' ? '#333' : '#fff';
+                                @endphp
+
+                                <div
+                                    style="
+                margin-bottom: 0.75rem;
+                padding: 0.75rem 1rem;
+                background-color: #1c1c1c;
+                border-radius: 0.5rem;
+                border: 1px solid #2c2c2c;
+            ">
+                                    <!-- First line: Date - Clock In -->
+                                    <div style="font-weight: 600; font-size: 0.9rem; color: #fff;">
+                                        {{ $attendance['date_label'] }} - {{ $attendance['clock_in'] }} (Clock In)
+                                    </div>
+
+                                    <!-- Second line: Location -->
+                                    <div style="font-size: 0.8rem; color: #aaa; margin-top: 0.25rem;">
+                                        From {{ $attendance['location'] ?? 'Unknown Location' }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div
+                                style="
+            padding: 1rem;
+            text-align: center;
+            color: #888;
+            background-color: #1c1c1c;
+            border-radius: 0.5rem;
+            border: 1px dashed #333;
+        ">
+                                <p style="margin: 0; font-size: 0.85rem;">No attendance history available.</p>
+                            </div>
+                        @endif
+                    </div>
+
+
+
+
+
 
                 </div>
             </div>
@@ -113,8 +188,6 @@
 <script>
     function updateClock() {
         const now = new Date();
-
-
 
 
         // TODAY DATE

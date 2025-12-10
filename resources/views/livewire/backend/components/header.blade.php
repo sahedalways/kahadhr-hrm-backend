@@ -20,72 +20,75 @@
             </div>
 
             <!-- RIGHT SIDE ICON + PROFILE -->
-           <div class="d-flex align-items-center gap-3 position-relative w-100">
+            <div class="d-flex align-items-center gap-3 position-relative w-100">
 
-    <!-- LEFT SECTION (Mobile menu icon) -->
-    <div class="d-flex align-items-center">
-        <a href="javascript:;" class="nav-link text-dark p-0 d-xl-none" id="iconNavbarSidenav">
-            <div class="sidenav-toggler-inner">
-                <i class="sidenav-toggler-line bg-dark"></i>
-                <i class="sidenav-toggler-line bg-dark"></i>
-                <i class="sidenav-toggler-line bg-dark"></i>
+                <!-- LEFT SECTION (Mobile menu icon) -->
+                <div class="d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-dark p-0 d-xl-none" id="iconNavbarSidenav">
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                            <i class="sidenav-toggler-line bg-dark"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="timer-box">
+                    <span class="timer-time">{{ $headerTimer }}</span>
+
+                    @if ($isRunning)
+                        <div class="timer-running-dot"></div>
+                    @endif
+                </div>
+
+
+                <!-- RIGHT SECTION (Everything else) -->
+                <div class="d-flex align-items-center gap-3 ms-auto">
+
+                    <!-- NOTIFICATION ICON -->
+                    <span class="d-flex cursor-pointer" id="notificationBell">
+                        <i class="fa-regular fa-bell fs-4"></i>
+                    </span>
+
+                    <!-- NOTIFICATION DROPDOWN -->
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <ul>
+                            <li>No new notifications</li>
+                            <li>Message from admin</li>
+                            <li>New user registered</li>
+                            <li>System alert</li>
+                            <li>Update available</li>
+                            <li>Server restarted</li>
+                            <li>User updated profile</li>
+                            <li>Extra Data...</li>
+                        </ul>
+                    </div>
+
+                    <!-- PROFILE IMAGE -->
+                    <img src="/assets/img/default-avatar.png" alt="Avatar" class="rounded-circle cursor-pointer"
+                        width="40" height="40" id="profileImage">
+
+                    <!-- PROFILE DROPDOWN -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <ul>
+                            <li><a href="#">My Profile</a></li>
+                            <li><a href="#">Account Settings</a></li>
+                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Support</a></li>
+                            <li><a href="#">Privacy</a></li>
+                            <li><a href="#">Logout</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- CLOCK ICON -->
+                    <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
+                        <i class="fa-regular fa-clock fs-4"></i>
+                    </span>
+
+                </div>
+
             </div>
-        </a>
-    </div>
-
-    <!-- RIGHT SECTION (Everything else) -->
-    <div class="d-flex align-items-center gap-3 ms-auto">
-
-        <!-- NOTIFICATION ICON -->
-        <span class="d-flex cursor-pointer" id="notificationBell">
-            <i class="fa-regular fa-bell fs-4"></i>
-        </span>
-
-        <!-- NOTIFICATION DROPDOWN -->
-        <div class="notification-dropdown" id="notificationDropdown">
-            <ul>
-                <li>No new notifications</li>
-                <li>Message from admin</li>
-                <li>New user registered</li>
-                <li>System alert</li>
-                <li>Update available</li>
-                <li>Server restarted</li>
-                <li>User updated profile</li>
-                <li>Extra Data...</li>
-            </ul>
-        </div>
-
-        <!-- PROFILE IMAGE -->
-        <img src="/assets/img/default-avatar.png" alt="Avatar"
-             class="rounded-circle cursor-pointer"
-             width="40" height="40" id="profileImage">
-
-        <!-- PROFILE DROPDOWN -->
-        <div class="profile-dropdown" id="profileDropdown">
-            <ul>
-                <li><a href="#">My Profile</a></li>
-                <li><a href="#">Account Settings</a></li>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Help Center</a></li>
-                <li><a href="#">Support</a></li>
-                <li><a href="#">Privacy</a></li>
-                <li><a href="#">Logout</a></li>
-            </ul>
-        </div>
-
-        <!-- CLOCK ICON -->
-        <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
-            <i class="fa-regular fa-clock fs-4"></i>
-        </span>
-
-    </div>
-
-</div>
-
-
-
-
-
 
         </div>
     </nav>
@@ -132,25 +135,15 @@
             }
         });
 
-        // Prevent background scroll when scrolling inside dropdown
-        //['profileDropdown', 'notificationDropdown'].forEach(id => {
-        //    const dropdown = document.getElementById(id);
 
-        //    dropdown.addEventListener('wheel', function(e) {
-        //        const atTop = dropdown.scrollTop === 0;
-        //        const atBottom = dropdown.scrollTop + dropdown.clientHeight >= dropdown
-        //            .scrollHeight;
+    });
+</script>
 
 
-        //        if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
-        //            e.preventDefault();
-        //        }
-        //        e.stopPropagation();
-        //    }, {
-        //        passive: false
-        //    });
-        //});
-
-
+<script>
+    document.addEventListener('livewire:init', () => {
+        setInterval(() => {
+            Livewire.dispatch('tick');
+        }, 1000);
     });
 </script>

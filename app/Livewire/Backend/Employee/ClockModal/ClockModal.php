@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ClockModal extends BaseComponent
 {
@@ -31,6 +32,8 @@ class ClockModal extends BaseComponent
     public $attendance;
     public $elapsedTime = 0;
     public $userTimezone = 'UTC';
+    public $previousAttendances = [];
+
 
     protected $listeners = [
         'setLocation' => 'setLocation',
@@ -88,18 +91,26 @@ class ClockModal extends BaseComponent
             ]);
 
 
+            $this->clockInReason = '';
+            $this->showClockInReason = false;
+            $this->updateWorkingHoursCount();
+            $this->dispatch('closemodal');
+            $this->dispatch('reloadPage');
+
             $this->toast("Late Clock-In recorded, pending approval.", 'warning');
         } else {
+
+            $this->clockInReason = '';
+            $this->showClockInReason = false;
+            $this->updateWorkingHoursCount();
+            $this->dispatch('closemodal');
+            $this->dispatch('reloadPage');
+
             $this->toast("Clock In successful!", 'success');
         }
-
-
-        $this->clockInReason = '';
-        $this->showClockInReason = false;
-        $this->updateWorkingHoursCount();
-        $this->dispatch('closemodal');
-        $this->dispatch('reloadPage');
     }
+
+
 
     public function clockOut()
     {
@@ -160,16 +171,22 @@ class ClockModal extends BaseComponent
                 'reason' => $this->clockOutReason ?? '',
                 'status' => 'pending',
             ]);
+
+            $this->clockOutReason = '';
+            $this->showClockOutReason = false;
+            $this->updateWorkingHoursCount();
+            $this->dispatch('closemodal');
+            $this->dispatch('reloadPage');
             $this->toast("Clock Out requires approval", 'warning');
         } else {
+
+            $this->clockOutReason = '';
+            $this->showClockOutReason = false;
+            $this->updateWorkingHoursCount();
+            $this->dispatch('closemodal');
+            $this->dispatch('reloadPage');
             $this->toast("Clock Out successful!", 'success');
         }
-
-        $this->clockOutReason = '';
-        $this->showClockOutReason = false;
-        $this->updateWorkingHoursCount();
-        $this->dispatch('closemodal');
-        $this->dispatch('reloadPage');
     }
 
 
@@ -191,6 +208,7 @@ class ClockModal extends BaseComponent
     {
 
         $this->updateWorkingHoursCount();
+        $this->fetchPreviousAttendances();
 
         // Shift info from config
         $this->shiftStartTime = config('attendance.scheduled_shift.start');
@@ -210,14 +228,57 @@ class ClockModal extends BaseComponent
 
 
 
+    public function fetchPreviousAttendances()
+    {
+
+
+        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
+
+        $dates = [
+            now()->setTimezone($userTimeZone)->toDateString(),
+            now()->setTimezone($userTimeZone)->subDay(1)->toDateString(),
+            now()->setTimezone($userTimeZone)->subDay(2)->toDateString(),
+        ];
+
+        $this->previousAttendances = Attendance::where('user_id', Auth::id())
+            ->whereIn(DB::raw('DATE(clock_in)'), $dates)
+            ->orderBy('clock_in', 'desc')
+            ->get()
+            ->map(function ($attendance) use ($userTimeZone) {
+
+                $attendanceDate = Carbon::parse($attendance->clock_in, $userTimeZone)->toDateString();
+                $today = now()->setTimezone($userTimeZone)->toDateString();
+                $yesterday = now()->setTimezone($userTimeZone)->subDay()->toDateString();
+
+                if ($attendanceDate == $today) {
+                    $label = 'Today';
+                } elseif ($attendanceDate == $yesterday) {
+                    $label = 'Yesterday';
+                } else {
+                    $label = Carbon::parse($attendance->clock_in, $userTimeZone)->format('D, M d');
+                }
+
+                return [
+                    'date_label' => $label,
+                    'clock_in' => Carbon::parse($attendance->clock_in, $userTimeZone)->format('h:i A'),
+                    'clock_out' => $attendance->clock_out
+                        ? Carbon::parse($attendance->clock_out, $userTimeZone)->format('h:i A')
+                        : 'N/A',
+                    'location' => $attendance->clock_in_location ?? 'Unknown',
+                    'status' => $attendance->status,
+                ];
+            });
+    }
+
+
+
 
     public function updateWorkingHoursCount()
     {
         $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
 
-
-        $userTodayStart = now()->setTimezone($userTimeZone)->startOfDay()->setTimezone('UTC');
-        $userTodayEnd = now()->setTimezone($userTimeZone)->endOfDay()->setTimezone('UTC');
+        $userTodayStart = now()->setTimezone('Asia/Dhaka')->startOfDay();
+        $userTodayEnd   = now()->setTimezone('Asia/Dhaka')->endOfDay();
 
         $this->attendance = Attendance::where('user_id', Auth::id())
             ->whereBetween('clock_in', [$userTodayStart, $userTodayEnd])
@@ -254,6 +315,8 @@ class ClockModal extends BaseComponent
         } else {
             $this->elapsedTime = '00:00:00';
         }
+
+        $this->dispatch('update-header-timer', $this->elapsedTime, !$this->attendance->clock_out);
     }
 
 

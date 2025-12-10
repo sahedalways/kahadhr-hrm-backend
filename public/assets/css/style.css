@@ -8,14 +8,54 @@
     transition: all 0.3s ease;
 }
 
-
 .view-bills {
     font-weight: 550;
 }
 
 .table-wrapper-scroll-y {
     display: block;
+}
 
+.timer-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+}
+
+.timer-time {
+    font-size: 18px;
+    color: #198754;
+    letter-spacing: 1px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.timer-running-dot {
+    width: 10px;
+    height: 10px;
+    background: #28a745;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #28a745;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.4);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .my-custom-scrollbar {
@@ -23,14 +63,13 @@
     height: 320px;
     overflow: auto;
     width: 100%;
-    min-height: 41vh !important
+    min-height: 41vh !important;
 }
 
 .my-custom-scrollbar::-webkit-scrollbar {
     width: 3px !important;
     height: 5px !important;
 }
-
 
 .preloader {
     background: rgba(10, 10, 10, 0.9);
@@ -81,7 +120,6 @@
     }
 }
 
-
 @keyframes rotation {
     0% {
         transform: rotate(0deg);
@@ -97,8 +135,6 @@
     display: none;
 }
 
-
-
 span.icon-position {
     position: absolute;
     top: 50%;
@@ -106,7 +142,6 @@ span.icon-position {
     z-index: 11;
     transform: translateY(-50%);
 }
-
 
 .extra-padding {
     padding-right: 40px;
@@ -123,8 +158,6 @@ span.icon-position {
     transform: scale(1.05);
     transition: all 0.2s ease-in-out;
 }
-
-
 
 .input-sm {
     height: 30px;
@@ -151,7 +184,7 @@ span.icon-position {
     height: 380px;
     overflow: auto;
     width: 100%;
-    min-height: 53vh !important
+    min-height: 53vh !important;
 }
 
 .status-container {
@@ -165,13 +198,12 @@ span.icon-position {
     height: 5px !important;
 }
 
-
 .my-custom-scrollbar-ledger {
     position: relative;
     height: 450px;
     overflow: auto;
     width: 100%;
-    min-height: 65vh !important
+    min-height: 65vh !important;
 }
 
 .my-custom-scrollbar-ledger::-webkit-scrollbar {
@@ -179,13 +211,12 @@ span.icon-position {
     height: 5px !important;
 }
 
-
 .my-custom-scrollbar-bill2 {
     position: relative;
     height: 300px;
     overflow: auto;
     width: 100%;
-    min-height: 50vh !important
+    min-height: 50vh !important;
 }
 
 .my-custom-scrollbar-bill2::-webkit-scrollbar {
@@ -202,25 +233,22 @@ span.icon-position {
     font-size: 13px;
 }
 
-
-.pos-card:active+.pos-card,
-.pos-card:checked+.pos-card,
+.pos-card:active + .pos-card,
+.pos-card:checked + .pos-card,
 .pos-card.active,
 .pos-card:active,
 .pos-card:focus {
-    color: #FFF;
-    background-color: rgba(0, 204, 189, .5);
+    color: #fff;
+    background-color: rgba(0, 204, 189, 0.5);
 }
 
 .pos-card:hover:not(.disabled):not(:disabled) {
-    color: #FFF;
-    background-color: rgba(0, 204, 189, .5);
+    color: #fff;
+    background-color: rgba(0, 204, 189, 0.5);
 }
-
 
 .pos-card-wrapper-scroll-y {
     display: block;
-
 }
 
 .my-custom-scrollbar-pos-card {
@@ -230,14 +258,12 @@ span.icon-position {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    min-height: 55vh !important
+    min-height: 55vh !important;
 }
 
 .my-custom-scrollbar-pos-card::-webkit-scrollbar {
     width: 3px !important;
-
 }
-
 
 .my-custom-scrollbar-pos-card::-webkit-scrollbar-track {
     background: transparent;
@@ -251,12 +277,8 @@ span.icon-position {
     background: transparent;
 }
 
-
-
-
 .order-list-wrapper-scroll-y {
     display: block;
-
 }
 
 .my-custom-scrollbar-order-list {
@@ -266,14 +288,12 @@ span.icon-position {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    min-height: 30vh !important
+    min-height: 30vh !important;
 }
 
 .my-custom-scrollbar-order-list::-webkit-scrollbar {
     width: 3px !important;
-
 }
-
 
 .my-custom-scrollbar-order-list::-webkit-scrollbar-track {
     background: transparent;
@@ -287,14 +307,10 @@ span.icon-position {
     background: transparent;
 }
 
-
-
-
 .btn-counter {
     max-height: 30px;
     max-width: 30px;
 }
-
 
 .customer-badge {
     height: 30px;
@@ -310,9 +326,7 @@ span.icon-position {
     font-size: 13px;
 }
 
-
-
-.match-height>[class*=col] {
+.match-height > [class*="col"] {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -321,20 +335,19 @@ span.icon-position {
     -webkit-box-direction: normal;
     -webkit-flex-flow: column;
     -ms-flex-flow: column;
-    flex-flow: column
+    flex-flow: column;
 }
 
-.match-height>[class*=col]>.card {
+.match-height > [class*="col"] > .card {
     -webkit-box-flex: 1;
     -webkit-flex: 1 1 auto;
     -ms-flex: 1 1 auto;
-    flex: 1 1 auto
+    flex: 1 1 auto;
 }
 
 .login-logo {
     width: 60px !important;
 }
-
 
 .board-title {
     background-color: #f1f1f1;
@@ -358,14 +371,11 @@ span.icon-position {
     border-left: 1px solid #ddd;
 }
 
-
-
-
 .scrum-task-pending {
     position: relative;
     display: block;
     padding: 10px;
-    border: .5px solid #8392ab;
+    border: 0.5px solid #8392ab;
     border-left: 5px solid #8392ab;
     margin-bottom: 10px;
     border-radius: 15px;
@@ -373,12 +383,11 @@ span.icon-position {
     cursor: all-scroll;
 }
 
-
 .scrum-task-processing {
     position: relative;
     display: block;
     padding: 10px;
-    border: .5px solid #faae42;
+    border: 0.5px solid #faae42;
     border-left: 5px solid #faae42;
     margin-bottom: 10px;
     border-radius: 15px;
@@ -386,12 +395,11 @@ span.icon-position {
     cursor: all-scroll;
 }
 
-
 .scrum-task-ready {
     position: relative;
     display: block;
     padding: 10px;
-    border: .5px solid #2dce89;
+    border: 0.5px solid #2dce89;
     border-left: 5px solid #2dce89;
     margin-bottom: 10px;
     border-radius: 15px;
@@ -399,40 +407,33 @@ span.icon-position {
     cursor: all-scroll;
 }
 
-
-
-
-
-
 .today-task-pending {
     position: relative;
     display: block;
     padding: 5px;
-    border: .5px solid #8392ab;
+    border: 0.5px solid #8392ab;
     border-left: 5px solid #8392ab;
     margin-bottom: 5px;
     border-radius: 15px;
     background-color: #fff;
 }
 
-
 .today-task-processing {
     position: relative;
     display: block;
     padding: 5px;
-    border: .5px solid #faae42;
+    border: 0.5px solid #faae42;
     border-left: 5px solid #faae42;
     margin-bottom: 5px;
     border-radius: 15px;
     background-color: #fff;
 }
 
-
 .today-task-ready {
     position: relative;
     display: block;
     padding: 5px;
-    border: .5px solid #2dce89;
+    border: 0.5px solid #2dce89;
     border-left: 5px solid #2dce89;
     margin-bottom: 5px;
     border-radius: 15px;
@@ -443,8 +444,8 @@ span.icon-position {
     position: relative;
     display: block;
     padding: 5px;
-    border: .5px solid #10862D;
-    border-left: 5px solid #10862D;
+    border: 0.5px solid #10862d;
+    border-left: 5px solid #10862d;
     margin-bottom: 5px;
     border-radius: 15px;
     background-color: #fff;
@@ -454,7 +455,7 @@ span.icon-position {
     position: relative;
     display: block;
     padding: 5px;
-    border: .5px solid #f5365c;
+    border: 0.5px solid #f5365c;
     border-left: 5px solid #f5365c;
     margin-bottom: 5px;
     border-radius: 15px;
@@ -463,10 +464,9 @@ span.icon-position {
 
 .input-counter {
     max-width: 80px !important;
-
 }
 
-.sidenav.fixed-end+.main-content {
+.sidenav.fixed-end + .main-content {
     margin-right: 0 !important;
 }
 
@@ -485,14 +485,13 @@ span.icon-position {
     font-size: 1.5rem;
 }
 
-
 .chat-app-container {
     height: 87vh;
     overflow-x: auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar {
@@ -548,7 +547,6 @@ span.icon-position {
 .mention {
     font-weight: bold;
     color: rgb(255, 255, 255);
-
 }
 
 #message_input {
@@ -565,25 +563,12 @@ span.icon-position {
     -webkit-text-fill-color: #000 !important;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* Dropdown scroll */
 .dropdown-scroll {
     max-height: 160px;
     overflow-y: auto;
     scrollbar-width: thin;
 }
-
 
 .hover-bg-light:hover {
     background: #f8f9fa;
@@ -625,7 +610,6 @@ span.icon-position {
 
 /* For mobile (<= 576px) */
 @media (max-width: 576px) {
-
     #attachmentPopup {
         left: -20px;
     }

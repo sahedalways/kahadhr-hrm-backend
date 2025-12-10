@@ -204,13 +204,6 @@
 
     <livewire:backend.employee.clock-modal.clock-modal />
 
-    <script>
-        document.addEventListener("livewire:init", () => {
-
-            let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            Livewire.dispatch('setUserTimezone', timezone);
-        });
-    </script>
 
     @stack('js')
 

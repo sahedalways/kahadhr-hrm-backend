@@ -17,7 +17,7 @@ body {
 .notification-dropdown {
     position: absolute;
     top: 55px;
-    right: 0;
+    right: 40px;
     background: #fff;
     border-radius: 10px;
     padding: 10px 0;
@@ -45,7 +45,7 @@ body {
 
 /* Notification dropdown sits under the bell */
 .notification-dropdown {
-    right: 55px;
+    right: 88px;
 }
 
 /* LIST ITEMS */
@@ -73,14 +73,9 @@ body {
 /* ------------------ MOBILE RESPONSIVE ------------------ */
 @media (max-width: 576px) {
     .profile-dropdown,
-    .notification-dropdown {
-        right: -100% !important;   
+    .notification-dropdown {  
         width: 180px;
         top: 50px;
-    }
-
-    .notification-dropdown {
-        right: -100% !important;  
     }
 }
 

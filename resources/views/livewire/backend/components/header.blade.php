@@ -38,7 +38,7 @@
 
         <!-- NOTIFICATION ICON -->
         <span class="d-flex cursor-pointer" id="notificationBell">
-            <i class="fa-regular fa-bell fs-5"></i>
+            <i class="fa-regular fa-bell fs-4"></i>
         </span>
 
         <!-- NOTIFICATION DROPDOWN -->

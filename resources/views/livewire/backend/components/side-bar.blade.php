@@ -26,8 +26,8 @@
 
 
         <a class="navbar-brand m-0 flex-column d-flex gap-2" href="{{ $logoHref }}">
-            <img src="{{ $logoUrl }}" class="navbar-brand-img h-100 scale-200" alt="main_logo">
-            <span class="ms-2 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
+            <img src="{{ $logoUrl }}" width="100px" class="navbar-brand-img h-100 scale-200 mx-auto" alt="main_logo">
+            <span class="mb-0 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
         </a>
     </div>
 

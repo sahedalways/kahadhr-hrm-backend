@@ -5,12 +5,12 @@
 
 
 <div class="position-relative">
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur" data-scroll="false">
-        <div class="container-fluid py-1 px-3 position-relative d-flex align-items-center justify-content-between">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur"
+        data-scroll="false">
+        <div class="container-fluid py-1 px-3 position-relative">
 
-            <!-- LEFT SIDE : MOBILE MENU BUTTON -->
-            <div class="d-xl-none d-flex align-items-center">
-                <a href="javascript:;" class="nav-link text-dark p-0" id="iconNavbarSidenav">
+            <div class=" sidenav-toggler-inner d-xl-block d-none w-100">
+                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
                     <div class="sidenav-toggler-inner">
                         <i class="sidenav-toggler-line bg-dark"></i>
                         <i class="sidenav-toggler-line bg-dark"></i>
@@ -19,56 +19,79 @@
                 </a>
             </div>
 
-            <!-- RIGHT SIDE ICONS -->
-            <div class="d-flex align-items-center gap-3 position-relative">
+            <!-- RIGHT SIDE ICON + PROFILE -->
+           <div class="d-flex align-items-center gap-3 position-relative w-100">
 
-                <!-- NOTIFICATION ICON -->
-                <span class="d-flex cursor-pointer" id="notificationBell">
-                    <i class="fa-regular fa-bell fs-5"></i>
-                </span>
-
-                <!-- NOTIFICATION DROPDOWN -->
-                <div class="notification-dropdown" id="notificationDropdown">
-                    <ul>
-                        <li>No new notifications</li>
-                        <li>Message from admin</li>
-                        <li>New user registered</li>
-                        <li>System alert</li>
-                        <li>Update available</li>
-                        <li>Server restarted</li>
-                        <li>User updated profile</li>
-                        <li>Extra Data...</li>
-                    </ul>
-                </div>
-
-                <!-- PROFILE IMAGE -->
-                <img src="/assets/img/default-avatar.png" alt="Avatar" class="rounded-circle cursor-pointer"
-                    width="40" height="40" id="profileImage">
-
-                <!-- PROFILE DROPDOWN -->
-                <div class="profile-dropdown" id="profileDropdown">
-                    <ul>
-                        <li><a href="#">My Profile</a></li>
-                        <li><a href="#">Account Settings</a></li>
-                        <li><a href="#">Dashboard</a></li>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Support</a></li>
-                        <li><a href="#">Privacy</a></li>
-                        <li><a href="#">Logout</a></li>
-                    </ul>
-                </div>
-
-                <!-- CLOCK -->
-                <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
-                    <i class="fa-regular fa-clock fs-4"></i>
-                </span>
-
+    <!-- LEFT SECTION (Mobile menu icon) -->
+    <div class="d-flex align-items-center">
+        <a href="javascript:;" class="nav-link text-dark p-0 d-xl-none" id="iconNavbarSidenav">
+            <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line bg-dark"></i>
+                <i class="sidenav-toggler-line bg-dark"></i>
+                <i class="sidenav-toggler-line bg-dark"></i>
             </div>
+        </a>
+    </div>
+
+    <!-- RIGHT SECTION (Everything else) -->
+    <div class="d-flex align-items-center gap-3 ms-auto">
+
+        <!-- NOTIFICATION ICON -->
+        <span class="d-flex cursor-pointer" id="notificationBell">
+            <i class="fa-regular fa-bell fs-5"></i>
+        </span>
+
+        <!-- NOTIFICATION DROPDOWN -->
+        <div class="notification-dropdown" id="notificationDropdown">
+            <ul>
+                <li>No new notifications</li>
+                <li>Message from admin</li>
+                <li>New user registered</li>
+                <li>System alert</li>
+                <li>Update available</li>
+                <li>Server restarted</li>
+                <li>User updated profile</li>
+                <li>Extra Data...</li>
+            </ul>
+        </div>
+
+        <!-- PROFILE IMAGE -->
+        <img src="/assets/img/default-avatar.png" alt="Avatar"
+             class="rounded-circle cursor-pointer"
+             width="40" height="40" id="profileImage">
+
+        <!-- PROFILE DROPDOWN -->
+        <div class="profile-dropdown" id="profileDropdown">
+            <ul>
+                <li><a href="#">My Profile</a></li>
+                <li><a href="#">Account Settings</a></li>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Support</a></li>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- CLOCK ICON -->
+        <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
+            <i class="fa-regular fa-clock fs-4"></i>
+        </span>
+
+    </div>
+
+</div>
+
+
+
+
+
 
         </div>
     </nav>
-</div>
 
+
+</div>
 
 
 <script>
@@ -110,7 +133,23 @@
         });
 
         // Prevent background scroll when scrolling inside dropdown
+        //['profileDropdown', 'notificationDropdown'].forEach(id => {
+        //    const dropdown = document.getElementById(id);
 
+        //    dropdown.addEventListener('wheel', function(e) {
+        //        const atTop = dropdown.scrollTop === 0;
+        //        const atBottom = dropdown.scrollTop + dropdown.clientHeight >= dropdown
+        //            .scrollHeight;
+
+
+        //        if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+        //            e.preventDefault();
+        //        }
+        //        e.stopPropagation();
+        //    }, {
+        //        passive: false
+        //    });
+        //});
 
 
     });

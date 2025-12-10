@@ -123,6 +123,10 @@
 
 
 
+
+
+
+
     <script>
         document.addEventListener("livewire:init", () => {
             Livewire.on("toast", (event) => {
@@ -133,7 +137,7 @@
                 }
             });
 
-            // Set Toastr options
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,
@@ -199,6 +203,14 @@
 
 
     <livewire:backend.employee.clock-modal.clock-modal />
+
+    <script>
+        document.addEventListener("livewire:init", () => {
+
+            let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            Livewire.dispatch('setUserTimezone', timezone);
+        });
+    </script>
 
     @stack('js')
 

@@ -18,3 +18,5 @@ Schedule::command('documents:update-expired')->dailyAt('00:00');
 Schedule::command('chat:clean-temp')->dailyAt('00:00');
 
 Schedule::command('leave:reset-carry-over')->dailyAt('00:00');
+
+Schedule::command('attendance:auto-clock-out')->dailyAt('00:01');

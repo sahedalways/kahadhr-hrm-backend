@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('profile_completed')->default(false);
             $table->json('permissions')->nullable();
+            $table->string('timezone')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

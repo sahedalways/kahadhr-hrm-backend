@@ -31,7 +31,8 @@ class User extends Authenticatable
         'phone_verified_at',
         'remember_token',
         'user_type',
-        'is_active'
+        'is_active',
+        'timezone'
     ];
 
 

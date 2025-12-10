@@ -538,17 +538,6 @@
 
 
 
-
-
-                {{-- Clock In --}}
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('employee/dashboard/clock-in*') ? 'active' : '' }}"
-                        href="{{ route('employee.dashboard.clockin.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                        <i class="fa-regular fa-clock"></i>
-                        <span class="nav-link-text ms-1">Clock In</span>
-                    </a>
-                </li>
-
                 {{-- Schedule --}}
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('employee/dashboard/schedule*') ? 'active' : '' }}"

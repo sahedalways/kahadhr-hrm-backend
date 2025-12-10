@@ -73,11 +73,6 @@ Route::domain('{company}.' . config('app.base_domain'))
     });
 
 
-    // CLOCK IN
-    Route::prefix('clock-in')->name('clockin.')->group(function () {
-      Route::get('/', ClockInIndex::class)->name('index');
-    });
-
     // SCHEDULE
     Route::prefix('schedule')->name('schedule.')->group(function () {
       Route::get('/', ScheduleIndex::class)->name('index');

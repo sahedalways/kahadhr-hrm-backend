@@ -41,7 +41,7 @@
 
                         <!-- Sort Dropdown -->
                         <div class="col-md-4 d-flex gap-2">
-                            <select class="form-select form-select-lg" wire:change="handleSort($event.target.value)">
+                            <select class="form-select" wire:change="handleSort($event.target.value)">
                                 <option value="desc">Newest First</option>
                                 <option value="asc">Oldest First</option>
                             </select>

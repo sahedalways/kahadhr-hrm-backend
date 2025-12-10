@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SetPasswordController;
 use App\Livewire\Backend\Chat\ChatIndex;
+use App\Livewire\Backend\Employee\ClockInOut\ClockInOutEmpIndex;
 use App\Livewire\Backend\Employee\Dashboard;
 use App\Livewire\Backend\Employee\Auth\EmployeeLogin;
 use App\Livewire\Backend\Employee\ClockIn\ClockInIndex;
@@ -70,6 +71,12 @@ Route::domain('{company}.' . config('app.base_domain'))
 
     Route::prefix('training')->name('training.')->group(function () {
       Route::get('/', TrainingIndexEmp::class)->name('index');
+    });
+
+
+    // clock in/out history
+    Route::prefix('clock-in-out-history')->name('clock.')->group(function () {
+      Route::get('/', ClockInOutEmpIndex::class)->name('index');
     });
 
 

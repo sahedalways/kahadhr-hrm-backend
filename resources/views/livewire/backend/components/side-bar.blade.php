@@ -26,7 +26,8 @@
 
 
         <a class="navbar-brand m-0 flex-column d-flex gap-2" href="{{ $logoHref }}">
-            <img src="{{ $logoUrl }}" width="100px" class="navbar-brand-img h-100 scale-200 mx-auto" alt="main_logo">
+            <img src="{{ $logoUrl }}" width="100px" class="navbar-brand-img h-100 scale-200 mx-auto"
+                alt="main_logo">
             <span class="mb-0 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
         </a>
     </div>
@@ -533,6 +534,14 @@
                         href="{{ route('employee.dashboard.chat.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                         <i class="fas fa-comments"></i>
                         <span class="nav-link-text ms-1">Group / Chat</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('employee/dashboard/clock-in-out-history*') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard.clock.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                        <i class="fa-solid fa-clock"></i>
+                        <span class="nav-link-text ms-1">Clock In/Out</span>
                     </a>
                 </li>
 

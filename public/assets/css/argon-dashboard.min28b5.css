@@ -6707,8 +6707,8 @@ fieldset:disabled .btn {
     top: 0;
     left: 0;
     z-index: 1040;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: #000
 }
 
@@ -21911,7 +21911,6 @@ hr.horizontal.gray-light {
 .navbar-vertical .navbar-brand-img,
 .navbar-vertical .navbar-brand>img {
     max-width: 100%;
-    max-height: 2rem
 }
 
 .navbar-vertical .navbar-nav .nav-link {
@@ -21960,7 +21959,7 @@ hr.horizontal.gray-light {
 .navbar-vertical.navbar-expand-xs {
     display: block;
     position: fixed;
-    top: 48px;
+    top: 65px;
     bottom: 0;
     width: 100%;
     max-width: 15.625rem !important;
@@ -22720,9 +22719,9 @@ hr.horizontal.gray-light {
     padding: 1.5rem 2rem
 }
 
-.sidenav-header {
+/*.sidenav-header {
     height: 4.875rem
-}
+}*/
 
 .sidenav-footer .card.card-background:after {
     opacity: .65

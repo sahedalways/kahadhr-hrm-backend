@@ -125,7 +125,7 @@
                                     @for ($i = 0; $i < 6; $i++)
                                         <input type="text" wire:model="otp.{{ $i }}"
                                             class="form-control text-center otp-field" maxlength="1" placeholder="-"
-                                            style="width: 50px; font-size: 1.5rem; height: 50px;"
+                                            
                                             oninput="handleOtpInput(this, {{ $i }})"
                                             onkeydown="handleOtpBackspace(event, {{ $i }})"
                                             inputmode="numeric" autocomplete="one-time-code">

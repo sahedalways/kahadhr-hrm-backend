@@ -99,7 +99,8 @@ body {
         font-size: 16px;
         padding: 4px 6px;
     }
-    .modal-title{
+
+    .modal-title {
         font-size: 18px;
     }
 }
@@ -183,6 +184,10 @@ body {
 @media (max-width: 900px) {
     body {
         zoom: .8;
+    }
+
+    .chat-app-container {
+        height: 113vh !important;
     }
 
     .sidebar {

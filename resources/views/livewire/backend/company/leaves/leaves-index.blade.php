@@ -275,7 +275,7 @@
                             <img src="{{ $requestDetails->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
                                 class="rounded-circle me-3 border border-1"
                                 alt="{{ $requestDetails->user->full_name }}"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                             <div class="fw-bold text-dark flex-grow-1">{{ $requestDetails->user->full_name }}</div>
                             <i class="fas fa-chevron-right text-muted"></i>
                         </div>
@@ -404,7 +404,7 @@
                             <img src="{{ $calendarLeaveInfo->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
                                 class="rounded-circle me-3 border border-1"
                                 alt="{{ $calendarLeaveInfo->user->full_name }}"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                             <div class="fw-bold text-dark flex-grow-1">{{ $calendarLeaveInfo->user->full_name }}</div>
 
                         </div>

@@ -427,13 +427,13 @@
 
                         @if ($receiverInfo && $receiverInfo['type'] === 'group')
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                style="min-width: 40px; min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                         @elseif($receiverInfo && $receiverInfo['type'] === 'teamGroup')
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                         @else
                             <img src="{{ $receiverInfo['photo'] }}" alt="User Icon"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                         @endif
                     </div>
 

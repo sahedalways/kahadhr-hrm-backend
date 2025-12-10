@@ -5,12 +5,12 @@
 
 
 <div class="position-relative">
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur"
-        data-scroll="false">
-        <div class="container-fluid py-1 px-3 position-relative">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur" data-scroll="false">
+        <div class="container-fluid py-1 px-3 position-relative d-flex align-items-center justify-content-between">
 
-            <div class=" sidenav-toggler-inner d-xl-block d-none w-100">
-                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
+            <!-- LEFT SIDE : MOBILE MENU BUTTON -->
+            <div class="d-xl-none d-flex align-items-center">
+                <a href="javascript:;" class="nav-link text-dark p-0" id="iconNavbarSidenav">
                     <div class="sidenav-toggler-inner">
                         <i class="sidenav-toggler-line bg-dark"></i>
                         <i class="sidenav-toggler-line bg-dark"></i>
@@ -19,15 +19,13 @@
                 </a>
             </div>
 
-            <!-- RIGHT SIDE ICON + PROFILE -->
+            <!-- RIGHT SIDE ICONS -->
             <div class="d-flex align-items-center gap-3 position-relative">
 
                 <!-- NOTIFICATION ICON -->
                 <span class="d-flex cursor-pointer" id="notificationBell">
                     <i class="fa-regular fa-bell fs-5"></i>
                 </span>
-
-
 
                 <!-- NOTIFICATION DROPDOWN -->
                 <div class="notification-dropdown" id="notificationDropdown">
@@ -60,33 +58,17 @@
                     </ul>
                 </div>
 
+                <!-- CLOCK -->
                 <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
                     <i class="fa-regular fa-clock fs-4"></i>
                 </span>
 
             </div>
 
-
-
-            <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                <ul class="ms-auto navbar-nav justify-content-end">
-                    <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                        <a href="javascript:;" class="nav-link text-dark p-0" id="iconNavbarSidenav">
-                            <div class="sidenav-toggler-inner">
-                                <i class="sidenav-toggler-line bg-dark"></i>
-                                <i class="sidenav-toggler-line bg-dark"></i>
-                                <i class="sidenav-toggler-line bg-dark"></i>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
         </div>
     </nav>
-
-
 </div>
+
 
 
 <script>
@@ -128,23 +110,7 @@
         });
 
         // Prevent background scroll when scrolling inside dropdown
-        ['profileDropdown', 'notificationDropdown'].forEach(id => {
-            const dropdown = document.getElementById(id);
 
-            dropdown.addEventListener('wheel', function(e) {
-                const atTop = dropdown.scrollTop === 0;
-                const atBottom = dropdown.scrollTop + dropdown.clientHeight >= dropdown
-                    .scrollHeight;
-
-                // Prevent scrolling the page
-                if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
-                    e.preventDefault();
-                }
-                e.stopPropagation();
-            }, {
-                passive: false
-            });
-        });
 
 
     });

@@ -592,7 +592,7 @@ span.icon-position {
 #attachmentPopup {
     bottom: 50px;
     left: 0;
-    width: 220px;
+    width: max-content;
     z-index: 2000;
 }
 

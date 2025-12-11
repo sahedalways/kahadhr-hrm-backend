@@ -170,6 +170,14 @@ body {
     -o-transform: translateY(0) !important;
 }
 
+.icon-50 {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+}
 
 @media (max-width: 1199px) {
     .g-sidenav-hidden .content-wrapper {
@@ -181,7 +189,7 @@ body {
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 991px) {
     body {
         zoom: .8;
     }
@@ -194,4 +202,8 @@ body {
         width: 300px;
         min-width: 300px;
     }
+     .current-time {
+        font-size: 2rem !important;
+    }
 }
+

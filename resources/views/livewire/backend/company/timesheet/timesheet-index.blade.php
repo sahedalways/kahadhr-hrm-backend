@@ -74,7 +74,7 @@
                                     : $record->clock_out_location;
                         @endphp
 
-                        <div class="request-item mb-2 border-bottom pb-2">
+                        <div class="request-item mb-2 border-bottom pb-2 gap-4">
                             {{-- Header (clickable) --}}
                             <div class="request-info d-flex justify-content-between align-items-center"
                                 wire:click="toggleReason({{ $req->id }})" style="cursor: pointer;">
@@ -103,11 +103,7 @@
                                 </div>
                             </div>
 
-                            {{-- Reason (FAQ style) --}}
-                            <div class="request-reason mt-2 ps-3 transition-all duration-300 overflow-hidden"
-                                style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
-                                <small class="text-light d-block">Reason: {{ $req->reason }}</small>
-                            </div>
+
 
                             {{-- Action Buttons --}}
                             <div class="request-actions mt-2">
@@ -134,6 +130,16 @@
                                         <i class="fas fa-times"></i>
                                     </span>
                                 </button>
+                            </div>
+                        </div>
+
+                        {{-- Reason (FAQ style) --}}
+                        <div class="request-reason mt-2 transition-all duration-300 overflow-hidden"
+                            style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
+                            <div class="card">
+                                <div class="card-body py-2 px-3">
+                                    <small class="d-block fw-bold">Reason: {{ $req->reason }}</small>
+                                </div>
                             </div>
                         </div>
                     @endforeach

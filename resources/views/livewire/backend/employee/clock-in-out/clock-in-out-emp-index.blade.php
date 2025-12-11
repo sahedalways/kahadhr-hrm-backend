@@ -66,18 +66,52 @@
                             <th>Clock Out</th>
                             <th>Location</th>
                             <th>Status</th>
-                            <th>Request Type</th>
-                            <th>Reason</th>
+                            <th>Late In Request</th>
+                            <th>Late In Reason</th>
+
+                            <th>Early Out Request</th>
+                            <th>Early Out Reason</th>
+
+                            <th>Late Out Request</th>
+                            <th>Late Out Reason</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($infos as $i => $attendance)
+                            @php
+                                $clockInRequest = \App\Models\AttendanceRequest::where(
+                                    'attendance_id',
+                                    $attendance['id'],
+                                )
+                                    ->where('type', 'late_clock_in')
+                                    ->latest()
+                                    ->first();
+
+                                $earlyClockOutRequest = \App\Models\AttendanceRequest::where(
+                                    'attendance_id',
+                                    $attendance['id'],
+                                )
+                                    ->where('type', 'early_clock_out')
+                                    ->latest()
+                                    ->first();
+
+                                $lateClockOutRequest = \App\Models\AttendanceRequest::where(
+                                    'attendance_id',
+                                    $attendance['id'],
+                                )
+                                    ->where('type', 'late_clock_out')
+                                    ->latest()
+                                    ->first();
+                            @endphp
+
                             <tr>
                                 <td>{{ $i + 1 }}</td>
                                 <td>{{ $attendance['date'] }}</td>
                                 <td>{{ $attendance['clock_in'] }}</td>
                                 <td>{{ $attendance['clock_out'] }}</td>
                                 <td>{{ $attendance['location'] ?? 'Unknown' }}</td>
+
+                                <!-- Attendance Status -->
                                 <td>
                                     @php
                                         $status = strtolower($attendance['status']);
@@ -90,35 +124,27 @@
                                     @endphp
                                     <span class="badge bg-{{ $bgColor }}">{{ ucfirst($status) }}</span>
                                 </td>
-                                <td>
-                                    @if (!empty($attendance['needs_approval']) && $attendance['needs_approval'])
-                                        @php
-                                            $request = \App\Models\AttendanceRequest::where(
-                                                'attendance_id',
-                                                $attendance['id'],
-                                            )
-                                                ->where('status', 'pending')
-                                                ->first();
-                                        @endphp
-                                        {{ $request->type ?? 'N/A' }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    @if (!empty($attendance['needs_approval']) && $attendance['needs_approval'])
-                                        {{ $request->reason ?? 'N/A' }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
+
+                                <!-- Late Clock In -->
+                                <td>{{ $clockInRequest->type ?? 'N/A' }}</td>
+                                <td>{{ $clockInRequest->reason ?? 'N/A' }}</td>
+
+                                <!-- Early Clock Out -->
+                                <td>{{ $earlyClockOutRequest->type ?? 'N/A' }}</td>
+                                <td>{{ $earlyClockOutRequest->reason ?? 'N/A' }}</td>
+
+                                <!-- Late Clock Out -->
+                                <td>{{ $lateClockOutRequest->type ?? 'N/A' }}</td>
+                                <td>{{ $lateClockOutRequest->reason ?? 'N/A' }}</td>
                             </tr>
+
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">No attendance history found</td>
+                                <td colspan="12" class="text-center">No attendance records found</td>
                             </tr>
                         @endforelse
                     </tbody>
+
                 </table>
             </div>
 

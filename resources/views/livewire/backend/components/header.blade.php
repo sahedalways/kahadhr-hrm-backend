@@ -33,13 +33,16 @@
                     </a>
                 </div>
 
-                <div class="timer-box">
-                    <span class="timer-time">{{ $headerTimer }}</span>
+                @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
+                    <div class="timer-box">
+                        <span class="timer-time">{{ $headerTimer }}</span>
 
-                    @if ($isRunning)
-                        <div class="timer-running-dot"></div>
-                    @endif
-                </div>
+                        @if ($isRunning)
+                            <div class="timer-running-dot"></div>
+                        @endif
+                    </div>
+                @endif
+
 
 
                 <!-- RIGHT SECTION (Everything else) -->
@@ -82,9 +85,13 @@
                     </div>
 
                     <!-- CLOCK ICON -->
-                    <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
-                        <i class="fa-regular fa-clock fs-4"></i>
-                    </span>
+
+                    @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
+                        <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
+                            <i class="fa-regular fa-clock fs-4"></i>
+                        </span>
+                    @endif
+
 
                 </div>
 

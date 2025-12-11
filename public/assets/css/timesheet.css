@@ -1,0 +1,121 @@
+/* Left Panel Styling */
+.left-panel {
+    background-color: #293e91e8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.current-time {
+    font-size: 4rem;
+    font-weight: 700;
+}
+
+.current-date {
+    font-size: 1.25rem;
+    opacity: 0.8;
+}
+
+/* Action Cards */
+.action-card {
+    width: 100%;
+    background-color: #182252;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.action-link {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 1.2rem;
+    text-decoration: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.action-link:hover {
+    background-color: #3b415b;
+    color: white;
+    text-decoration: none;
+}
+
+.action-link i {
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+/* Right Panel Styling */
+.right-panel {
+    background-color: #162266;
+}
+
+.requests-header {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* Request Item Styling */
+.request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000000c0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+.request-info {
+    flex-grow: 1;
+    color: white;
+}
+
+.request-name {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.request-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.approve-btn {
+    background-color: #4caf50;
+}
+
+.reject-btn {
+    background-color: #f44336;
+}
+
+/* Settings Card */
+.settings-card {
+    background-color: #2f344a;
+    border-radius: 8px;
+}
+
+.settings-text {
+    color: #cccccc;
+    font-size: 0.9rem;
+}
+
+.request-reason {
+    transition: all 0.3s ease-in-out;
+}

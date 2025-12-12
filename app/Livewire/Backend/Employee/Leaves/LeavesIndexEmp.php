@@ -27,9 +27,13 @@ class LeavesIndexEmp extends BaseComponent
     public $hasMore = true;
 
     public $leaveTypes;
-    public $entitlementHours;
-    public $usedHours;
-    public $remainingHours;
+    public $totalAnnualHours = 0;
+    public $usedAnnualHours = 0;
+    public $remainingAnnualHours = 0;
+
+    public $totalLeaveInLiewHours = 0;
+    public $usedLeaveInLiewHours = 0;
+    public $remainingLeaveInLiewHours = 0;
     public $other_leave_reason;
 
     protected $listeners = ['deleteLeaveRequest'];
@@ -81,9 +85,16 @@ class LeavesIndexEmp extends BaseComponent
         $totalHours = $totalDays * $hoursPerDay;
 
 
-        if ($totalHours > $this->remainingHours) {
-            $this->toast('You do not have enough leave hours.', 'error');
-            return;
+        if ($this->leave_type_id == 1) {
+            if ($totalHours > $this->remainingAnnualHours) {
+                $this->toast('You do not have enough annual leave hours.', 'error');
+                return;
+            }
+        } elseif ($this->leave_type_id == 5) {
+            if ($totalHours > $this->remainingLeaveInLiewHours) {
+                $this->toast('You do not have enough leave in Liew hours.', 'error');
+                return;
+            }
         }
 
         // Create leave request
@@ -168,9 +179,15 @@ class LeavesIndexEmp extends BaseComponent
         $leaveBalance = LeaveBalance::where('user_id', $user->id)->first();
 
 
-        $this->entitlementHours = $leaveBalance->total_hours ?? 0;
-        $this->usedHours = $leaveBalance->used_hours ?? 0;
-        $this->remainingHours = $leaveBalance->carry_over_hours ?? 0;
+        $this->totalAnnualHours        = $leaveBalance->total_annual_hours ?? 0;
+        $this->usedAnnualHours         = $leaveBalance->used_annual_hours ?? 0;
+
+        $this->totalLeaveInLiewHours   = $leaveBalance->total_leave_in_liew ?? 0;
+        $this->usedLeaveInLiewHours    = $leaveBalance->used_leave_in_liew ?? 0;
+
+        // ➤ Calculate remaining hours
+        $this->remainingAnnualHours      = ($this->totalAnnualHours - $this->usedAnnualHours);
+        $this->remainingLeaveInLiewHours = ($this->totalLeaveInLiewHours - $this->usedLeaveInLiewHours);
     }
 
 

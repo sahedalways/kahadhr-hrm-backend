@@ -12,6 +12,6 @@ return [
     */
 
   'part_time_percentage' => 12.07,
-  'zero_hour_percentage' => 12.07,
+  'full_time_hours' => 224,
 
 ];

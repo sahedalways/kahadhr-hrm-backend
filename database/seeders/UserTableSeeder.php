@@ -128,8 +128,8 @@ class UserTableSeeder extends Seeder
         'email' => $emp['email'],
         'f_name' => $emp['f_name'],   // Added
         'l_name' => $emp['l_name'],   // Added
-        'contract_hours' => 50,
-        'salary_type' => 'hourly',
+        'contract_hours' => 0,
+        'salary_type' => 'monthly',
         'start_date' => now(),
       ]);
     }
@@ -154,7 +154,7 @@ class UserTableSeeder extends Seeder
         'email' => $emp['email'],
         'f_name' => $emp['f_name'],   // Added
         'l_name' => $emp['l_name'],   // Added
-        'contract_hours' => 40,
+        'contract_hours' => 50,
         'salary_type' => 'hourly',
         'start_date' => now(),
       ]);

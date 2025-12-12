@@ -98,10 +98,6 @@ class Company extends Model
             ]);
 
 
-            LeaveSetting::create([
-                'company_id'          => $company->id,
-                'full_time_hours'     => 224,
-            ]);
 
             $defaultTypes = [
                 'Passport',

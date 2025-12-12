@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->decimal('total_hours', 8, 2);
-            $table->decimal('used_hours', 8, 2)->default(0);
+            $table->decimal('total_leave_in_liew', 8, 2)->default(0);
+            $table->decimal('used_leave_in_liew', 8, 2)->default(0);
+            $table->decimal('total_annual_hours', 8, 2)->default(0);
+            $table->decimal('used_annual_hours', 8, 2)->default(0);
             $table->decimal('carry_over_hours', 8, 2)->default(0);
             $table->timestamps();
         });

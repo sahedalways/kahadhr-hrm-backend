@@ -34,7 +34,6 @@ return new class extends Migration
             $table->enum('salary_type', ['hourly', 'monthly'])->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-
             $table->string('invite_token')->nullable()->unique();
             $table->timestamp('invite_token_expires_at')->nullable();
             $table->boolean('verified')->default(false);

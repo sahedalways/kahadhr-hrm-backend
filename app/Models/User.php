@@ -32,7 +32,7 @@ class User extends Authenticatable
         'remember_token',
         'user_type',
         'is_active',
-        'timezone'
+        'timezone',
     ];
 
 
@@ -83,43 +83,5 @@ class User extends Authenticatable
     public function employee()
     {
         return $this->hasOne(Employee::class);
-    }
-
-
-
-    protected static function booted()
-    {
-        static::created(function ($user) {
-            if ($user->employee) {
-                $companyId = $user->employee->company_id;
-
-                // Monthly employees
-                if ($user->employee->salary_type === 'monthly') {
-                    $leaveSettings = LeaveSetting::where('company_id', $companyId)->get();
-
-                    foreach ($leaveSettings as $setting) {
-                        LeaveBalance::create([
-                            'user_id' => $user->id,
-                            'company_id' => $companyId,
-                            'total_hours' => $setting->full_time_hours,
-                            'used_hours' => 0,
-                            'carry_over_hours' => $setting->full_time_hours,
-                        ]);
-                    }
-                } elseif ($user->employee->salary_type === 'hourly') {
-                    $contractHours = $user->employee->contract_hours ?? 0;
-                    $partTimePercent = config('leave.part_time_percentage', 100);
-                    $totalHours = ($contractHours * 52) * ($partTimePercent / 100);
-
-                    LeaveBalance::create([
-                        'user_id' => $user->id,
-                        'company_id' => $companyId,
-                        'total_hours' => $totalHours,
-                        'used_hours' => 0,
-                        'carry_over_hours' => $totalHours,
-                    ]);
-                }
-            }
-        });
     }
 }

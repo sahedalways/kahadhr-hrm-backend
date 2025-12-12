@@ -88,9 +88,7 @@
 
             <div class="col-lg-4">
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">Leave Requests</h5>
-                    </div>
+
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-primary text-white border-0 py-3">
                             <h5 class="mb-0">⏳ Pending Leave Requests</h5>
@@ -204,6 +202,45 @@
 
 
 
+                                @php
+                                    $showPaidBlock = in_array($leave_type_id, [2, 3, 6]);
+                                @endphp
+
+                                @if ($showPaidBlock)
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Leave Payment Status <span
+                                                class="text-danger">*</span></label>
+
+                                        <select class="form-select" wire:model.live="paidStatus">
+                                            <option value="">Select Status</option>
+                                            <option value="paid">Paid</option>
+                                            <option value="unpaid">Unpaid</option>
+                                        </select>
+
+                                        @error('paidStatus')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    {{-- Show Hours only if PAID --}}
+                                    @if ($paidStatus === 'paid')
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Paid Hours <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" step="0.01" class="form-control"
+                                                wire:model="paidHours" placeholder="Enter hours">
+
+                                            @error('paidHours')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endif
+
+                                @endif
+
+
+
                                 {{-- Date Range --}}
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3 mb-md-0">
@@ -231,6 +268,9 @@
                                 @error('remaining')
                                     <div class="text-danger mb-2">{{ $message }}</div>
                                 @enderror
+
+
+
 
 
 
@@ -321,6 +361,29 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        @if (in_array($requestDetails->leave_type_id, [2, 3, 4, 6]))
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Leave Type Option <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" wire:model.live="paidStatus"
+                                    @if ($requestDetails->leave_type_id == 4) disabled @endif>
+                                    <option value="">Select Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                </select>
+                            </div>
+
+                            @if ($paidStatus === 'paid')
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Hours <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" min="0" step="0.25"
+                                        wire:model.defer="paidHours" placeholder="Enter leave hours">
+                                </div>
+                            @endif
+                        @endif
+
 
                         <!-- 5. Deduction Summary -->
                         <div class="text-center mt-3 pt-3 border-top">
@@ -450,6 +513,37 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        @if ($calendarLeaveInfo && !in_array($calendarLeaveInfo->leave_type_id, [1, 5]))
+
+                            <div class="mt-4 p-3 bg-light rounded-3 border shadow-sm">
+
+                                <h6 class="fw-bold text-dark mb-2">
+                                    <i class="fas fa-wallet me-2 text-primary"></i> Leave Payment Details
+                                </h6>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-medium text-muted">Type:</span>
+                                    <span class="fw-bold text-dark text-uppercase">
+                                        {{ $calendarLeaveInfo->paid_status ?? 'N/A' }}
+                                    </span>
+                                </div>
+
+                                @if ($calendarLeaveInfo->paid_status === 'paid')
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="fw-medium text-muted">Paid Hours:</span>
+                                        <span class="fw-bold text-success">
+                                            {{ number_format($calendarLeaveInfo->paid_hours, 2) }}
+                                        </span>
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        @endif
+
+
 
                         <!-- 5. Deduction Summary -->
                         <div class="text-center mt-3 pt-3 border-top">

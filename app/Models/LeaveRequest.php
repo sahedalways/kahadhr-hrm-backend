@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LeaveRequest extends Model
 {
     use FilterByUserType;
-    protected $fillable = ['company_id', 'user_id', 'leave_type_id', 'start_date', 'end_date', 'total_hours', 'status', 'other_reason'];
+    protected $fillable = ['company_id', 'user_id', 'leave_type_id', 'start_date', 'end_date', 'total_hours', 'status', 'other_reason', 'paid_hours', 'paid_status'];
 
     public function user()
     {

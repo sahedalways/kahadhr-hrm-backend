@@ -27,6 +27,9 @@ class LeavesIndex extends BaseComponent
 
     public $selectedEmployeeLeaves = [];
     public $activeEmployeeId = null;
+    public $paidStatus = null;
+    public $paidHours = null;
+
     protected $listeners = ['showLeaveRequestInfo'];
 
 
@@ -39,6 +42,7 @@ class LeavesIndex extends BaseComponent
         if (!$this->company) {
             abort(403, 'Company not found.');
         }
+
 
 
         $this->employees = Employee::where('company_id', $this->company->id)
@@ -76,13 +80,15 @@ class LeavesIndex extends BaseComponent
     public function viewRequestInfo($id)
     {
         $this->requestDetails = null;
-
+        $this->paidStatus = null;
+        $this->paidHours = null;
 
         if (!$this->company) {
             abort(403, 'Company not found.');
         }
 
         $this->requestDetails = LeaveRequest::with('leaveType', 'user.employee')->find($id);
+        $this->setPaidStatusDefault();
     }
 
 
@@ -90,32 +96,61 @@ class LeavesIndex extends BaseComponent
     public function approveRequest($id)
     {
         $request = LeaveRequest::with('user.employee')->find($id);
-
         if (!$request) return;
+
         $userId = $request->user_id;
         $hoursUsed = $request->total_hours ?? 0;
         $companyId = $request->user->employee->company_id;
 
 
+        if (in_array($request->leave_type_id, [1, 5])) {
+            $this->paidHours = $hoursUsed;
+            $this->paidStatus = 'paid';
+            $availableHours = $this->getAvailableLeaveHours($userId, $request->leave_type_id);
 
-        // 1️⃣ Check before approve
-        $availableHours = $this->getAvailableLeaveHours($userId);
-
-        if ($hoursUsed > $availableHours) {
-            $request->status = 'rejected';
-            $request->save();
-
-
-            $this->toast('User do not have enough leave hours available!', 'error');
-            $this->resetForm();
-
-            $this->mount();
-            $this->dispatch('closemodal');
-            return;
+            if ($hoursUsed > $availableHours) {
+                $this->toast('Employee does not have enough leave hours available!', 'error');
+                return;
+            }
         }
 
-        $request->status = 'approved';
-        $request->save();
+
+
+        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
+            $availableHours = $this->getAvailableLeaveHours($userId, $request->leave_type_id);
+
+            if ($this->paidHours > $availableHours) {
+                $this->toast('Employee does not have enough leave hours available!', 'error');
+                return;
+            }
+        }
+
+
+
+
+        if (in_array($request->leave_type_id, [2, 3, 4, 6])) {
+            if ($request->leave_type_id != 4) {
+                if (!$this->paidStatus || !in_array($this->paidStatus, ['paid', 'unpaid'])) {
+                    $this->toast('Please select Paid or Unpaid status.', 'error');
+                    return;
+                }
+
+                if ($this->paidStatus === 'paid' && (!$this->paidHours || $this->paidHours <= 0)) {
+                    $this->toast('Please enter valid hours for Paid leave.', 'error');
+                    return;
+                }
+            } else {
+                $this->paidStatus = 'unpaid';
+                $this->paidHours = null;
+            }
+        }
+
+
+        $request->update([
+            'status'      => 'approved',
+            'paid_status' => $this->paidStatus ?? null,
+            'paid_hours'  => $this->paidStatus === 'paid' ? $this->paidHours : null,
+        ]);
 
 
 
@@ -124,37 +159,33 @@ class LeavesIndex extends BaseComponent
             'company_id' => $companyId,
         ]);
 
-        if (!$leaveBalance->exists) {
-            $employee = $request->user->employee;
+        if ($request->leave_type_id == 1) {
 
-            if ($employee->salary_type === 'hourly') {
-                $contractHours = $employee->contract_hours ?? 0;
-                $partTimePercent = config('leave.part_time_percentage', 100);
-                $totalHours = $contractHours * 52 * ($partTimePercent / 100);
-            } else {
-                $totalHours = LeaveSetting::where('company_id', $companyId)
-                    ->value('full_time_hours') ?? 0;
-            }
+            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $hoursUsed;
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
+        }
 
-            $leaveBalance->total_hours = $totalHours;
+        if ($request->leave_type_id == 5) {
+
+            $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $hoursUsed;
         }
 
 
-        if (($leaveBalance->total_hours - ($leaveBalance->used_hours ?? 0)) > 0) {
-            $leaveBalance->used_hours = ($leaveBalance->used_hours ?? 0) + $hoursUsed;
-            $leaveBalance->carry_over_hours = max(0, $leaveBalance->total_hours - $leaveBalance->used_hours);
-            $leaveBalance->save();
+        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
+            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $this->paidHours;
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
         }
 
+
+        $leaveBalance->save();
 
         $this->resetForm();
-
         $this->mount();
-
 
         $this->toast('Request approved successfully!', 'success');
         $this->dispatch('closemodal');
     }
+
 
 
 
@@ -168,6 +199,16 @@ class LeavesIndex extends BaseComponent
             'start_date'    => 'required|date',
             'end_date'      => 'required|date|after_or_equal:start_date',
         ];
+
+
+        if (in_array($this->leave_type_id, [2, 3, 6])) {
+            $this->validate([
+                'paidStatus' => 'required|in:paid,unpaid',
+                'paidHours' => $this->paidStatus === 'paid' ? 'required|numeric|min:0.5' : 'nullable',
+            ]);
+        }
+
+
 
         if ($this->leave_type_id && optional($this->leaveTypes->firstWhere('id', $this->leave_type_id))->name === 'Others') {
             $rules['other_leave_reason'] = 'required|string|max:255';
@@ -186,13 +227,43 @@ class LeavesIndex extends BaseComponent
 
 
 
-        LeaveRequest::create([
+        if (in_array($this->leave_type_id, [1, 5])) {
+            $this->paidHours = $totalHours;
+            $this->paidStatus = 'paid';
+
+            $availableHours = $this->getAvailableLeaveHours($this->selectedEmployee, $this->leave_type_id);
+
+            if ($totalHours > $availableHours) {
+                $this->toast('Employee does not have enough leave hours available!', 'error');
+
+                return;
+            }
+        }
+
+
+
+        if (in_array($this->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
+            $availableHours = $this->getAvailableLeaveHours($this->selectedEmployee, $this->leave_type_id);
+
+            if ($this->paidHours > $availableHours) {
+                $this->toast('Employee does not have enough leave hours available!', 'error');
+
+
+                return;
+            }
+        }
+
+
+
+        $request =  LeaveRequest::create([
             'user_id'       => $this->selectedEmployee,
             'company_id'       => auth()->user()->company->id,
             'leave_type_id' => $this->leave_type_id,
-            'start_date'    => $this->start_date,
-            'end_date'      => $this->end_date,
+            'start_date' => $this->start_date !== '' ? $this->start_date : null,
+            'end_date'   => $this->end_date !== '' ? $this->end_date : null,
             'total_hours'   => $totalHours,
+            'paid_hours'   => $this->paidHours ?? 0,
+            'paid_status'   => $this->paidStatus ?? null,
             'other_reason'  => $this->other_leave_reason,
             'status'        => 'approved',
         ]);
@@ -205,29 +276,21 @@ class LeavesIndex extends BaseComponent
             'company_id' => auth()->user()->company->id,
         ]);
 
-        if (!$leaveBalance->exists) {
-            $employee = Employee::find($this->selectedEmployee);
 
-            if ($employee && $employee->salary_type === 'hourly') {
-                $contractHours = $employee->contract_hours ?? 0;
-                $partTimePercent = config('leave.part_time_percentage', 100);
-                $totalSettingHours = $contractHours * 52 * ($partTimePercent / 100);
-            } else {
-                $totalSettingHours = LeaveSetting::where('company_id', auth()->user()->company->id)
-                    ->value('full_time_hours') ?? 0;
-            }
 
-            $leaveBalance->total_hours = $totalSettingHours;
-            $leaveBalance->carry_over_hours = $totalSettingHours;
-            $leaveBalance->used_hours = 0;
-            $leaveBalance->save();
+        if ($request->leave_type_id == 1) {
+            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $totalHours;
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
+        }
+
+        if ($request->leave_type_id == 5) {
+            $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $totalHours;
         }
 
 
-        if (($leaveBalance->carry_over_hours ?? $leaveBalance->total_hours) > 0) {
-            $leaveBalance->used_hours = ($leaveBalance->used_hours ?? 0) + $totalHours;
-            $leaveBalance->carry_over_hours = max(0, $leaveBalance->total_hours - $leaveBalance->used_hours);
-            $leaveBalance->save();
+        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
+            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $this->paidHours;
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
         }
 
 
@@ -251,6 +314,8 @@ class LeavesIndex extends BaseComponent
         $this->start_date = null;
         $this->calendarLeaveInfo = null;
         $this->end_date = null;
+        $this->paidStatus = null;
+        $this->paidHours = null;
     }
 
 
@@ -275,11 +340,22 @@ class LeavesIndex extends BaseComponent
 
 
 
-    private function getAvailableLeaveHours($userId)
+    private function getAvailableLeaveHours($userId, $leaveTypeId)
     {
         $leaveBalance = LeaveBalance::where('user_id', $userId)->first();
 
-        return $leaveBalance->carry_over_hours ?? 0;
+        if (!$leaveBalance) {
+            return 0;
+        }
+
+        if (in_array($leaveTypeId, [1, 2, 3, 6])) {
+            return $leaveBalance->carry_over_hours ?? 0;
+        } elseif ($leaveTypeId == 5) {
+            return ($leaveBalance->total_leave_in_liew - $leaveBalance->used_leave_in_liew) ?? 0;
+        }
+
+
+        return 0;
     }
 
 
@@ -318,12 +394,30 @@ class LeavesIndex extends BaseComponent
 
     public function showLeaveRequestInfo($id)
     {
+        $this->paidStatus = null;
+        $this->paidHours = null;
+
+
         $this->calendarLeaveInfo = LeaveRequest::with('leaveType', 'user.employee')
             ->where('id', $id)
             ->where('status', 'approved')
             ->first();
 
         $this->dispatch('show-leave-modal');
+    }
+
+
+    private function setPaidStatusDefault()
+    {
+        if ($this->requestDetails) {
+            if ($this->requestDetails->leave_type_id == 4) {
+                $this->paidStatus = 'unpaid';
+            } else {
+                $this->paidStatus = null;
+            }
+
+            $this->paidHours = null;
+        }
     }
 
 

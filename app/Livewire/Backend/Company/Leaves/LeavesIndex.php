@@ -116,17 +116,6 @@ class LeavesIndex extends BaseComponent
 
 
 
-        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
-            $availableHours = $this->getAvailableLeaveHours($userId, $request->leave_type_id);
-
-            if ($this->paidHours > $availableHours) {
-                $this->toast('Employee does not have enough leave hours available!', 'error');
-                return;
-            }
-        }
-
-
-
 
         if (in_array($request->leave_type_id, [2, 3, 4, 6])) {
             if ($request->leave_type_id != 4) {
@@ -171,10 +160,6 @@ class LeavesIndex extends BaseComponent
         }
 
 
-        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
-            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $this->paidHours;
-            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
-        }
 
 
         $leaveBalance->save();
@@ -242,19 +227,6 @@ class LeavesIndex extends BaseComponent
 
 
 
-        if (in_array($this->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
-            $availableHours = $this->getAvailableLeaveHours($this->selectedEmployee, $this->leave_type_id);
-
-            if ($this->paidHours > $availableHours) {
-                $this->toast('Employee does not have enough leave hours available!', 'error');
-
-
-                return;
-            }
-        }
-
-
-
         $request =  LeaveRequest::create([
             'user_id'       => $this->selectedEmployee,
             'company_id'       => auth()->user()->company->id,
@@ -285,12 +257,6 @@ class LeavesIndex extends BaseComponent
 
         if ($request->leave_type_id == 5) {
             $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $totalHours;
-        }
-
-
-        if (in_array($request->leave_type_id, [2, 3, 6]) && $this->paidStatus === 'paid') {
-            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $this->paidHours;
-            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
         }
 
 
@@ -348,7 +314,7 @@ class LeavesIndex extends BaseComponent
             return 0;
         }
 
-        if (in_array($leaveTypeId, [1, 2, 3, 6])) {
+        if ($leaveTypeId == 1) {
             return $leaveBalance->carry_over_hours ?? 0;
         } elseif ($leaveTypeId == 5) {
             return ($leaveBalance->total_leave_in_liew - $leaveBalance->used_leave_in_liew) ?? 0;

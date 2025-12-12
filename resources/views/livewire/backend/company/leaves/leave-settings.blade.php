@@ -37,7 +37,7 @@
 
             <!-- Total Annual Hours -->
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Total Annual Hours</label>
+                <label class="form-label fw-semibold">Total Annual Hours <span class="text-danger">*</span></label>
                 <input type="number" class="form-control shadow-sm" wire:model="total_annual_hours" min="0"
                     step="0.01" placeholder="Enter total annual hours">
                 @error('total_annual_hours')
@@ -48,7 +48,7 @@
 
             <!-- Total Leave In Lieu -->
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Total Leave in Lieu</label>
+                <label class="form-label fw-semibold">Total Leave in Lieu <span class="text-danger">*</span></label>
                 <input type="number" class="form-control shadow-sm" wire:model="total_leave_in_liew" min="0"
                     step="0.01" placeholder="Enter total leave in lieu">
                 @error('total_leave_in_liew')

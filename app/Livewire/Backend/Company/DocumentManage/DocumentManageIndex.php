@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Backend\Company\DocumentManage;
 
+use App\Events\NotificationEvent;
 use App\Jobs\EmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\Employee;
+use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -85,6 +87,25 @@ class DocumentManageIndex extends BaseComponent
 
         if ($this->emp_id) {
             EmployeeAssignedNotificationJob::dispatch($doc->id)->onConnection('sync')->onQueue('urgent');
+
+            $userId = Employee::where('id', $this->emp_id)
+                ->select('user_id')
+                ->first()
+                ->user_id;
+
+
+
+            $notification = Notification::create([
+                'company_id' => $this->company_id,
+                'user_id' => $userId,
+                'type' => 'assigned_document',
+                'data' => [
+                    'message' => "A new document '{$this->name}' has been assigned to you."
+                ],
+            ]);
+
+
+            event(new NotificationEvent($notification));
         }
 
         $this->toast('Document created successfully!', 'success');

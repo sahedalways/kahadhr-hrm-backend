@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Backend\Company\Timesheet;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use App\Models\Employee;
+use App\Models\Notification;
 use Livewire\WithPagination;
 
 class TimesheetIndex extends BaseComponent
@@ -162,6 +164,21 @@ class TimesheetIndex extends BaseComponent
         }
 
 
+
+        $message = "Your attendance request has been approved.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->company->id,
+            'user_id'    => $request->user_id,
+            'type'       => 'attendance_request_approved',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
+
         $this->toast('Request approved successfully!', 'success');
 
 
@@ -188,6 +205,20 @@ class TimesheetIndex extends BaseComponent
             $attendance->save();
         }
 
+
+        $message = "Your attendance request has been rejected.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->company->id,
+            'user_id'    => $request->user_id,
+            'type'       => 'attendance_request_rejected',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
 
         $this->toast('Request rejected successfully!', 'error');
         $this->resetLoaded();
@@ -232,6 +263,20 @@ class TimesheetIndex extends BaseComponent
             'needs_approval' => 0,
             'status' => 'approved',
         ]);
+
+        $message = "Manual attendance has been submitted for {$this->manualDate}.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->company->id,
+            'user_id'    => $this->employeeId,
+            'type'       => 'manual_attendance_submitted',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
 
         $this->toast('Manual entry submitted successfully!', 'success');
 

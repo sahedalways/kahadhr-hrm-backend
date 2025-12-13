@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Backend\Company\Training;
 
+use App\Events\NotificationEvent;
 use App\Jobs\SendTrainingNotification;
 use App\Jobs\SendTrainingReminder;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
+use App\Models\Notification;
 use App\Models\Training;
 use App\Models\TrainingAssignment;
 use App\Models\User;
@@ -235,6 +237,23 @@ class TrainingIndex extends BaseComponent
                     SendTrainingNotification::dispatch($user, $training)->onConnection('sync')->onQueue('urgent');
                 }
             }
+
+
+
+            $message = "You have been assigned the training '{$training->course_name}'.";
+
+            // Create notification
+            $notification = Notification::create([
+                'company_id' => $this->company_id,
+                'user_id'    => $emp['id'],
+                'type'       => 'assigned_training',
+                'data'       => [
+                    'message' => $message
+                ],
+            ]);
+
+            // Fire real-time event
+            event(new NotificationEvent($notification));
         }
 
 

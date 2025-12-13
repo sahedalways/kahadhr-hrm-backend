@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Backend\Employee\Training;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\Notification;
 use App\Models\Training;
 use App\Traits\Exportable;
 use Livewire\WithPagination;
@@ -115,6 +117,26 @@ class TrainingIndexEmp extends BaseComponent
                 ]);
 
 
+                $submitterName = auth()->user()->full_name;
+                $trainingName = $this->training->course_name ?? 'Training';
+
+                $message = "Employee '{$submitterName}' has completed the training '{$trainingName}'.";
+
+                $notification = Notification::create([
+                    'company_id' => auth()->user()->employee->company_id,
+                    'user_id' => auth()->user()->employee->company->user_id,
+                    'type' => 'training_completed',
+
+                    'data' => [
+                        'message' => $message
+
+                    ],
+                ]);
+
+
+                event(new NotificationEvent($notification));
+
+
                 $this->dispatch('closemodal');
                 $this->toast('Training marked as completed!', 'success');
             }
@@ -137,6 +159,26 @@ class TrainingIndexEmp extends BaseComponent
         $this->assignment->completed_at = now();
 
         $this->assignment->save();
+
+
+        $submitterName = auth()->user()->full_name;
+        $trainingName = $this->training->course_name ?? 'Training';
+
+        $message = "Employee '{$submitterName}' has completed the training '{$trainingName}'.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->employee->company_id,
+            'user_id' => auth()->user()->employee->company->user_id,
+            'type' => 'training_completed',
+
+            'data' => [
+                'message' => $message
+
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
 
         $this->reset('proofFile');
         $this->dispatch('closemodal');

@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Backend\Employee\Leaves;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\LeaveSetting;
+use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
 use Livewire\WithPagination;
@@ -98,7 +100,7 @@ class LeavesIndexEmp extends BaseComponent
         }
 
         // Create leave request
-        LeaveRequest::create([
+        $leave =  LeaveRequest::create([
             'user_id'       => auth()->id(),
             'company_id'       => auth()->user()->employee->company_id,
             'leave_type_id' => $this->leave_type_id,
@@ -108,6 +110,30 @@ class LeavesIndexEmp extends BaseComponent
             'other_reason'  => $this->other_leave_reason,
             'status'        => 'pending',
         ]);
+
+
+        $submitterName = auth()->user()->full_name;
+        $leaveTypeName = optional($leave->leaveType)->name ?? 'Leave';
+        $startDate = Carbon::parse($this->start_date)->format('d M Y');
+        $endDate   = Carbon::parse($this->end_date)->format('d M Y');
+
+        $message = "Employee '{$submitterName}' has submitted a leave request for {$leaveTypeName}";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->employee->company_id,
+            'user_id' => auth()->user()->employee->company->user_id,
+            'type' => 'submitted_leave_request',
+
+            'data' => [
+                'message' => $message
+
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
+
+
 
         $this->toast('Leave request submitted successfully!', 'success');
 

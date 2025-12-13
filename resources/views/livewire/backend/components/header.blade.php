@@ -22,6 +22,12 @@
                 </a>
             </div>
 
+            <input type="hidden" id="pusher_key" value="{{ config('broadcasting.connections.pusher.key') }}">
+            <input type="hidden" id="pusher_cluster"
+                value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+            <input type="hidden" id="current_company_id" value="{{ currentCompanyId() }}">
+            <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
+
             <!-- RIGHT SIDE ICON + PROFILE -->
             <div class="d-flex align-items-center gap-3 position-relative w-100">
 
@@ -52,23 +58,24 @@
                 <div class="d-flex align-items-center gap-3 ms-auto">
 
                     <!-- NOTIFICATION ICON -->
-                    <span class="d-flex cursor-pointer" id="notificationBell">
+                    <span class="d-flex position-relative cursor-pointer" id="notificationBell"
+                        wire:click="markAllAsRead">
                         <i class="fa-regular fa-bell fs-4"></i>
+
+                        @if ($unreadCount > 0)
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1 fs-6">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
                     </span>
 
+
                     <!-- NOTIFICATION DROPDOWN -->
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <ul>
-                            <li>No new notifications</li>
-                            <li>Message from admin</li>
-                            <li>New user registered</li>
-                            <li>System alert</li>
-                            <li>Update available</li>
-                            <li>Server restarted</li>
-                            <li>User updated profile</li>
-                            <li>Extra Data...</li>
-                        </ul>
+                    <div class="notification-dropdown" id="notificationDropdown" wire:ignore style="width: 550px;">
+                        @livewire('backend.components.notifications')
                     </div>
+
 
                     @if ($userType !== 'superAdmin')
                         <div class="dropdown">
@@ -168,9 +175,11 @@
                                     </div>
                                 </li>
 
+
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
+
 
                                 {{-- Main Navigation Links --}}
                                 @php
@@ -191,7 +200,8 @@
                                         <i class="fas fa-columns me-2"></i> Dashboard
                                     </a>
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>
+                                <li><a class="dropdown-item" href="#"><i
+                                            class="fas fa-question-circle me-2"></i>
                                         Help
                                         Center</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-headset me-2"></i>
@@ -233,6 +243,7 @@
 </div>
 
 
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 
 
 <script>
@@ -294,11 +305,42 @@
                 icon.style.transform = 'rotate(0deg)';
             });
         });
+
+
+        var pusherKey = document.getElementById("pusher_key").value;
+        var pusherCluster = document.getElementById("pusher_cluster").value;
+        var companyId = parseInt(
+            document.getElementById("current_company_id").value
+        );
+
+        // Initialize Pusher
+        var pusher = new Pusher(pusherKey, {
+            cluster: pusherCluster,
+            forceTLS: true,
+        });
+
+        var allUserChatChannel = pusher.subscribe("company." + companyId);
+
+
+        allUserChatChannel.bind("allNotifications", function(payload) {
+            Livewire.dispatch("allNotifications", {
+                notification: payload.notification
+            });
+        });
     });
 </script>
 
 
+<script>
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
 
+
+        if (!dropdown.contains(event.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+</script>
 
 <script>
     document.addEventListener('livewire:init', () => {

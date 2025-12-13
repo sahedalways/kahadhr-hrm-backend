@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Backend\Company\Leaves;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveSetting;
 use App\Models\LeaveType;
+use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -160,6 +162,20 @@ class LeavesIndex extends BaseComponent
         }
 
 
+        $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
+        $message = "{$leaveTypeName} request approved for you.";
+
+        $notification = Notification::create([
+            'company_id' => $companyId,
+            'user_id'    => $userId,
+            'type'       => 'leave_request_approved',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
 
 
         $leaveBalance->save();
@@ -258,7 +274,25 @@ class LeavesIndex extends BaseComponent
         if ($request->leave_type_id == 5) {
             $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $totalHours;
         }
+        $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
+        $message = "{$leaveTypeName} request approved for you.";
 
+        // ✅ Notification
+        $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
+
+        $message = "{$leaveTypeName} approved by company for you.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->company->id,
+            'user_id'    => $this->selectedEmployee,
+            'type'       => 'manual_leave_approved',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
 
 
         $this->toast('Leave has been submitted successfully.', 'success');
@@ -298,6 +332,23 @@ class LeavesIndex extends BaseComponent
             $this->resetForm();
             $this->mount();
         }
+
+        $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
+
+
+        $message = "{$leaveTypeName} request has been rejected.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->company->id,
+            'user_id'    => $request->user_id,
+            'type'       => 'manual_leave_rejected',
+            'data'       => [
+                'message' => $message
+            ],
+        ]);
+
+        // Fire real-time event
+        event(new NotificationEvent($notification));
 
 
         $this->toast('Request rejected successfully!', 'info');

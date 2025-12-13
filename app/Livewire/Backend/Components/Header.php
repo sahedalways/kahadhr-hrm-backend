@@ -2,14 +2,30 @@
 
 namespace App\Livewire\Backend\Components;
 
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+
 
 class Header extends Component
 {
+    public $unreadCount = 0;
+
+    public $perPage = 10;
+    public $loadingMore = false;
+
     protected $listeners = [
         'update-header-timer' => 'updateTimer',
-        'tick' => 'increaseOneSecond'
+        'tick' => 'increaseOneSecond',
     ];
+
+    protected function getListeners(): array
+    {
+
+        return [
+            'allNotifications' => 'newNotification',
+        ];
+    }
 
 
     public $headerTimer = '00:00:00';
@@ -19,6 +35,35 @@ class Header extends Component
     {
         $this->headerTimer = $time;
         $this->isRunning = $running;
+    }
+
+
+
+    public function markAllAsRead()
+    {
+
+        $this->unreadCount = 0;
+    }
+
+
+
+
+    public function newNotification($notification)
+    {
+        $authId = auth()->id();
+
+
+        if (
+            isset($notification['user_id']) &&
+            ($notification['user_id'] == $authId || $notification['user_id'] === null)
+        ) {
+            $this->unreadCount++;
+        }
+    }
+
+    public function mount()
+    {
+        $this->loadUnreadCount();
     }
 
 
@@ -42,6 +87,23 @@ class Header extends Component
     {
         return view('livewire.backend.components.header');
     }
+
+
+    public function loadUnreadCount()
+    {
+        $userId = Auth::id();
+
+        $this->unreadCount = Notification::where('company_id', currentCompanyId())
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                    ->orWhereNull('user_id');
+            })
+            ->where('is_read', 0)
+            ->count();
+    }
+
+
+
 
 
     public function logout()

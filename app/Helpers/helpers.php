@@ -71,7 +71,7 @@ function currentCompanyId()
     return $user->company->id;
   }
 
-  if ($user->user_type === 'employee') {
+  if ($user->user_type === 'employee' || $user->user_type === 'manager') {
     return $user->employee->company_id;
   }
 

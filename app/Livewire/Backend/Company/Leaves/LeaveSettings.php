@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Backend\Company\Leaves;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
-
+use App\Models\Notification;
 
 class LeaveSettings extends BaseComponent
 {
@@ -93,6 +94,22 @@ class LeaveSettings extends BaseComponent
 
         // Save
         $leaveBalance->save();
+
+        $employeeName = optional($leaveBalance->user)->full_name ?? 'Employee';
+
+        $message = "Congrats! Your leave hours updated: {$leaveBalance->total_annual_hours}h, Lieu: {$leaveBalance->total_leave_in_liew}h.";
+
+        $notification = Notification::create([
+            'company_id' => $this->company_id,
+            'user_id' => $userId,
+            'type' => 'increased_leave_hours',
+            'data' => [
+                'message' => $message
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
 
         $this->toast('Leave Settings Updated Successfully!', 'success');
     }

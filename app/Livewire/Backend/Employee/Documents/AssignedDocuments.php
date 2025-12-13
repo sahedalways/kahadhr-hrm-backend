@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Backend\Employee\Documents;
 
+use App\Events\NotificationEvent;
 use App\Jobs\EmployeeSignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use Livewire\WithPagination;
 use App\Models\CompanyDocument;
+use App\Models\Notification;
 use Carbon\Carbon;
 use setasign\Fpdi\Fpdi;
 
@@ -142,7 +144,29 @@ class AssignedDocuments extends BaseComponent
             'status' => 'signed'
         ]);
 
+
         EmployeeSignedNotificationJob::dispatch($this->currentDocument->id)->onConnection('sync')->onQueue('urgent');
+
+
+        $documentName = $this->currentDocument->name;
+        $submitterName = $employee->full_name;
+        $message = "Employee '{$submitterName}' has submitted the document '{$documentName}'.";
+
+        $notification = Notification::create([
+            'company_id' => $employee->company_id,
+            'user_id' => $employee->company->user_id,
+            'type' => 'added_signature',
+
+            'data' => [
+                'message' => $message
+
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
+
+
 
         $this->toast('Signature added to PDF successfully!', 'success');
         $this->resetLoaded();

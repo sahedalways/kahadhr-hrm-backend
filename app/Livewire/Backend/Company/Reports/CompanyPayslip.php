@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Backend\Company\Reports;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
+use App\Models\Notification;
 use App\Models\PaySlip;
 use App\Models\PaySlipRequest;
 use Livewire\WithFileUploads;
@@ -178,6 +180,23 @@ class CompanyPayslip extends BaseComponent
             'period' => $this->month . ' ' . $this->year,
             'file_path' => $path,
         ]);
+
+
+        $period = $this->month . ' ' . $this->year;
+
+        $message = "Payslip for {$period} has been uploaded for you.";
+
+        $notification = Notification::create([
+            'company_id' => $this->company_id,
+            'user_id' => $this->user_id,
+            'type' => 'submitted_payslip',
+            'data' => [
+                'message' => $message
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
 
 
         $this->toast('Payslip uploaded successfully!', 'success');

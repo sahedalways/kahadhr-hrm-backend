@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Backend\Employee\Reports;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Expenses;
+use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -98,6 +100,24 @@ class ExpensesIndex extends BaseComponent
             'attachments' => $files,
             'submitted_at' => now(),
         ]);
+
+
+        $submitterName = auth()->user()->full_name;
+        $message = "Employee '{$submitterName}' submitted an expense report.";
+
+        $notification = Notification::create([
+            'company_id' => auth()->user()->employee->company_id,
+            'user_id' => auth()->user()->employee->company->user_id,
+            'type' => 'submitted_expense',
+
+            'data' => [
+                'message' => $message
+
+            ],
+        ]);
+
+
+        event(new NotificationEvent($notification));
 
 
 

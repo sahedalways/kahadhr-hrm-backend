@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Backend\Employee\ClockModal;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
+use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +93,24 @@ class ClockModal extends BaseComponent
             ]);
 
 
+            $submitterName = auth()->user()->full_name;
+            $message = "Employee '{$submitterName}' clocked in late.";
+
+            $notification = Notification::create([
+                'company_id' => auth()->user()->employee->company_id,
+                'user_id' => auth()->user()->employee->company->user_id,
+                'type' => 'late_clock_in',
+
+                'data' => [
+                    'message' => $message
+
+                ],
+            ]);
+
+
+            event(new NotificationEvent($notification));
+
+
             $this->clockInReason = '';
             $this->showClockInReason = false;
             $this->updateWorkingHoursCount();
@@ -171,6 +191,24 @@ class ClockModal extends BaseComponent
                 'reason' => $this->clockOutReason ?? '',
                 'status' => 'pending',
             ]);
+
+
+            $submitterName = auth()->user()->full_name;
+            $message = "Employee '{$submitterName}' clocked out late.";
+
+            $notification = Notification::create([
+                'company_id' => auth()->user()->employee->company_id,
+                'user_id' => auth()->user()->employee->company->user_id,
+                'type' => 'late_clock_out',
+
+                'data' => [
+                    'message' => $message
+
+                ],
+            ]);
+
+
+            event(new NotificationEvent($notification));
 
             $this->clockOutReason = '';
             $this->showClockOutReason = false;

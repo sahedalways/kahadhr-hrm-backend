@@ -42,4 +42,29 @@ class Header extends Component
     {
         return view('livewire.backend.components.header');
     }
+
+
+    public function logout()
+    {
+        $user = auth()->user();
+
+        if ($user && $user->user_type == 'employee' && $user->employee) {
+            $sub = $user->employee->company->sub_domain;
+            auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+
+            return redirect()->route('employee.auth.empLogin', [
+                'company' => $sub
+            ]);
+        }
+
+
+        auth()->logout();
+        session()->invalidate();
+        session()->regenerateToken();
+
+
+        return redirect('/');
+    }
 }

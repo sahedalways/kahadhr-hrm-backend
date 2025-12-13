@@ -28,6 +28,7 @@
     <link href="{{ asset('assets/css/clockInOut.css') }}" rel="stylesheet" />
 
     @vite('resources/js/app.js')
+
     @stack('styles')
 
     @livewireStyles

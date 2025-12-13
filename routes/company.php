@@ -16,7 +16,6 @@ use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\CompanyExpenses;
 use App\Livewire\Backend\Company\Reports\CompanyPayslip;
-use App\Livewire\Backend\Company\Reports\ReportsIndex;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
 use App\Livewire\Backend\Company\Settings\CalendarYearSettings;
@@ -26,7 +25,6 @@ use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
 use App\Livewire\Backend\Company\Training\TrainingIndex;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\PasswordSettings;
-use App\Livewire\Backend\Settings\SmsSettings;
 use Illuminate\Support\Facades\Route;
 
 
@@ -63,6 +61,7 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('password', PasswordSettings::class)->name('password');
       Route::get('profile', ProfileSettings::class)->name('profile');
       Route::get('bank-info', BankInfoSettings::class)->name('bank-info');
+      Route::get('mail', MailSettings::class)->name('mail');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
       Route::get('calendar-year', CalendarYearSettings::class)->name('calendar-year');
     });

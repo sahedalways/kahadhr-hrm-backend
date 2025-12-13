@@ -402,111 +402,6 @@
                         </ul>
                     </div>
                 </li>
-
-
-
-
-
-                <li class="nav-item">
-                    <a data-bs-toggle="collapse" href="#settings"
-                        class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
-                        aria-controls="settings" role="button" aria-expanded="false">
-                        <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
-                        <span class="nav-link-text ms-1">Settings</span>
-                    </a>
-
-
-
-
-                    <div class="collapse {{ Request::is('dashboard/settings*') ? 'show' : '' }}" id="settings">
-                        <ul class="nav ms-4">
-
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/profile') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-user sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Profile Settings </span>
-                                </a>
-                            </li>
-
-                            <!-- Bank Info Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/bank-info') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-university sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Bank Info Settings </span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/verification-center') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.verification-center', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-shield-alt sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Verification Center </span>
-                                </a>
-                            </li>
-
-
-                            {{-- <!-- Mail Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/mail') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-envelope sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Mail Settings </span>
-                                </a>
-                            </li>
- --}}
-
-
-                            {{-- <!-- SMS Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/sms') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.sms', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-comment-alt sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> SMS Settings </span>
-                                </a>
-                            </li> --}}
-
-
-                            <!-- Calendar Year Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/calendar-year') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.calendar-year', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-calendar-alt sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Calendar Year Settings </span>
-                                </a>
-                            </li>
-
-
-
-
-                            <!-- Password Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/password') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
-                                    <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Password Settings </span>
-                                </a>
-                            </li>
-
-
-
-                        </ul>
-                    </div>
-
-                </li>
-
-
-
-
-
-                <li class="nav-item">
-                    <a class="nav-link" wire:click.prevent="logout" href="#">
-                        <i class="fa-solid fa-right-from-bracket text-secondary text-sm opacity-10"></i>
-                        <span class="nav-link-text ms-1">Logout</span>
-                    </a>
-                </li>
             @endif
 
 
@@ -520,13 +415,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('employee/dashboard/profile*') ? 'active' : '' }}"
-                        href="{{ route('employee.dashboard.profile.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                        <i class="fas fa-user"></i>
-                        <span class="nav-link-text ms-1">Profile</span>
-                    </a>
-                </li>
 
 
                 <li class="nav-item">
@@ -661,62 +549,6 @@
 
                         </ul>
                     </div>
-                </li>
-
-
-
-
-                <li class="nav-item">
-                    <a data-bs-toggle="collapse" href="#settings"
-                        class="nav-link {{ Request::is('dashboard/settings*') ? 'active' : '' }}"
-                        aria-controls="settings" role="button" aria-expanded="false">
-                        <i class="ni ni-single-copy-04 text-danger text-sm opacity-10"></i>
-                        <span class="nav-link-text ms-1">Settings</span>
-                    </a>
-
-
-
-
-                    <div class="collapse {{ Request::is('employee/dashboard/settings*') ? 'show' : '' }}"
-                        id="settings">
-                        <ul class="nav ms-4">
-
-
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('employee/dashboard/settings/verification-center') ? 'active' : '' }}"
-                                    href="{{ route('employee.dashboard.settings.verification-center', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                                    <i class="fas fa-shield-alt sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Verification Center </span>
-                                </a>
-                            </li>
-
-
-
-                            <!-- Password Settings -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('employee/dashboard/settings/password') ? 'active' : '' }}"
-                                    href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                                    <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Password Settings </span>
-                                </a>
-                            </li>
-
-
-
-                        </ul>
-                    </div>
-
-                </li>
-
-
-
-
-                <li class="nav-item">
-                    <a class="nav-link" wire:click.prevent="logout" href="#">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span class="nav-link-text ms-1">Logout</span>
-                    </a>
                 </li>
             @endif
         </ul>

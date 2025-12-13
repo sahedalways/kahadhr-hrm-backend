@@ -1,5 +1,8 @@
 @php
     $user = app('authUser');
+
+    $userType = $user->user_type;
+
 @endphp
 
 
@@ -67,22 +70,148 @@
                         </ul>
                     </div>
 
-                    <!-- PROFILE IMAGE -->
-                    <img src="/assets/img/default-avatar.png" alt="Avatar" class="rounded-circle cursor-pointer"
-                        width="40" height="40" id="profileImage">
+                    @if ($userType !== 'superAdmin')
+                        <div class="dropdown">
 
-                    <!-- PROFILE DROPDOWN -->
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <ul>
-                            <li><a href="#">My Profile</a></li>
-                            <li><a href="#">Account Settings</a></li>
-                            <li><a href="#">Dashboard</a></li>
-                            <li><a href="#">Help Center</a></li>
-                            <li><a href="#">Support</a></li>
-                            <li><a href="#">Privacy</a></li>
-                            <li><a href="#">Logout</a></li>
-                        </ul>
-                    </div>
+                            <img src="{{ $userType === 'company'
+                                ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png'
+                                : $user->avatar_url ?? '/assets/img/default-avatar.png' }}"
+                                alt="Avatar" class="rounded-circle cursor-pointer dropdown-toggle" width="40"
+                                height="40" id="profileDropdownToggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+
+
+
+                            <ul class="dropdown-menu dropdown-menu-end profile-dropdown" id="profileDropdown"
+                                wire:ignore style="min-width: 280px; max-height: 400px; overflow-y: auto;">
+
+                                {{-- My Profile Link --}}
+                                @if (in_array($userType, ['employee', 'manager']))
+                                    <li>
+                                        <a class="dropdown-item"
+                                            href="{{ route('employee.dashboard.profile.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                            <i class="fas fa-user-circle me-2"></i> My Profile
+                                        </a>
+                                    </li>
+                                @endif
+
+
+                                <li class="dropdown-submenu">
+
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                        data-bs-toggle="collapse" href="#settingsCollapse" role="button"
+                                        aria-expanded="{{ Request::is('*dashboard/settings*') ? 'true' : 'false' }}"
+                                        aria-controls="settingsCollapse">
+                                        <span class="d-flex align-items-center"><i class="fas fa-cog me-2"></i>
+                                            Settings</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+
+
+                                    <div class="collapse {{ Request::is('*dashboard/settings*') ? 'show' : '' }} nested-settings-menu"
+                                        id="settingsCollapse" **wire:ignore.self**>
+
+
+                                        <ul class="list-unstyled ms-4 p-0">
+                                            @if ($userType === 'company')
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-user me-2"></i> Profile Settings
+                                                    </a>
+                                                </li>
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-university me-2"></i> Bank Info Settings
+                                                    </a>
+                                                </li>
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.verification-center', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-shield-alt me-2"></i> Verification Center
+                                                    </a>
+                                                </li>
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-envelope me-2"></i> Mail Settings
+                                                    </a>
+                                                </li>
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.calendar-year', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-calendar-alt me-2"></i> Calendar Year Settings
+                                                    </a>
+                                                </li>
+                                                <li class="p-0">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-lock me-2"></i> Password Settings
+                                                    </a>
+                                                </li>
+                                            @elseif(in_array($userType, ['employee', 'manager']))
+                                                <li class="p-0 mt-1">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('employee.dashboard.settings.verification-center', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                                        <i class="fas fa-shield-alt me-2"></i> Verification Center
+                                                    </a>
+                                                </li>
+                                                <li class="p-0 mt-1">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                                        <i class="fas fa-lock me-2"></i> Password Settings
+                                                    </a>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                {{-- Main Navigation Links --}}
+                                @php
+                                    $dashboardRoute = '';
+                                    if ($userType === 'company') {
+                                        $dashboardRoute = route('company.dashboard.index', [
+                                            'company' => app('authUser')->company->sub_domain,
+                                        ]);
+                                    } elseif (in_array($userType, ['employee', 'manager'])) {
+                                        $dashboardRoute = route('employee.dashboard.index', [
+                                            'company' => app('authUser')->employee->company->sub_domain,
+                                        ]);
+                                    }
+                                @endphp
+
+                                <li>
+                                    <a class="dropdown-item" href="{{ $dashboardRoute }}">
+                                        <i class="fas fa-columns me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>
+                                        Help
+                                        Center</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-headset me-2"></i>
+                                        Support</a>
+                                </li>
+
+                                {{-- Logout --}}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+
+                                    <a class="dropdown-item" href="#" wire:click.prevent="logout"><i
+                                            class="fas fa-sign-out-alt me-2"></i>
+                                        Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
+
 
                     <!-- CLOCK ICON -->
 
@@ -104,47 +233,71 @@
 </div>
 
 
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
-        const profileImage = document.getElementById("profileImage");
-        const profileDropdown = document.getElementById("profileDropdown");
 
         const notificationBell = document.getElementById("notificationBell");
         const notificationDropdown = document.getElementById("notificationDropdown");
 
-        // Toggle profile dropdown
-        profileImage.addEventListener("click", (e) => {
-            e.stopPropagation();
-            profileDropdown.style.display =
-                profileDropdown.style.display === "block" ? "none" : "block";
-            notificationDropdown.style.display = "none"; // hide notification dropdown if open
-        });
+
 
         // Toggle notification dropdown
         notificationBell.addEventListener("click", (e) => {
             e.stopPropagation();
             notificationDropdown.style.display =
                 notificationDropdown.style.display === "block" ? "none" : "block";
-            profileDropdown.style.display = "none"; // hide profile dropdown if open
+            profileDropdown.style.display = "none";
         });
-
-        // Close both when clicking outside
-        document.addEventListener("click", (event) => {
-            if (!profileDropdown.contains(event.target) &&
-                !profileImage.contains(event.target)) {
-                profileDropdown.style.display = "none";
-            }
-
-            if (!notificationDropdown.contains(event.target) &&
-                !notificationBell.contains(event.target)) {
-                notificationDropdown.style.display = "none";
-            }
-        });
-
 
     });
 </script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileDropdown = document.getElementById("profileDropdown");
+        const profileToggle = document.getElementById("profileDropdownToggle");
+
+
+        profileToggle.addEventListener("click", function(e) {
+            e.stopPropagation();
+            profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" :
+                "block";
+        });
+
+
+        profileDropdown.addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
+
+        document.addEventListener("click", function() {
+            profileDropdown.style.display = "none";
+        });
+
+
+        const collapses = profileDropdown.querySelectorAll('[data-bs-toggle="collapse"]');
+        collapses.forEach(trigger => {
+            const icon = trigger.querySelector('i.fas.fa-chevron-right');
+            const targetId = trigger.getAttribute('href');
+            const collapseEl = document.querySelector(targetId);
+
+            if (!collapseEl || !icon) return;
+
+            collapseEl.addEventListener('shown.bs.collapse', () => {
+                icon.style.transform = 'rotate(90deg)';
+                icon.style.transition = 'transform 0.3s';
+            });
+
+            collapseEl.addEventListener('hidden.bs.collapse', () => {
+                icon.style.transform = 'rotate(0deg)';
+            });
+        });
+    });
+</script>
+
+
 
 
 <script>

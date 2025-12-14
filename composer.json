@@ -17,6 +17,7 @@
         "pusher/pusher-php-server": "^7.2",
         "setasign/fpdi": "^2.6",
         "setasign/fpdi-fpdf": "^2.3",
+        "stripe/stripe-php": "^19.0",
         "twilio/sdk": "^8.8"
     },
     "require-dev": {

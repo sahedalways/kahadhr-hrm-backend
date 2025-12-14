@@ -28,41 +28,50 @@ class ChargeCompanies extends Command
 
             $amount = $company->monthlyAmount();
 
-            // Charge via your payment gateway
-            // $result = PaymentGateway::charge($company->card, $monthlyAmount);
+            $card = $company->defaultCard();
 
-            // if ($result->success) {
-            // Update subscription dates
-            $company->subscription_start = Carbon::now();
-            $company->subscription_end = Carbon::now()->addMonth();
-            $company->subscription_status = 'active';
-            $company->save();
+            if (!$card || !$card->stripe_payment_method_id) {
+                $this->error("No valid card for {$company->company_name}");
+                continue;
+            }
 
-            $this->info("Charged {$company->company_name} successfully: {$amount}");
-            // } else {
-            //     $this->error("Failed to charge {$company->company_name}");
-            //     // Optionally log errors or notify admin
-            // }
+            $result = PaymentGateway::charge(
+                $card->stripe_payment_method_id,
+                $amount
+            );
+
+
+            if ($result->success) {
+                // Update subscription dates
+                $company->subscription_start = Carbon::now();
+                $company->subscription_end = Carbon::now()->addMonth();
+                $company->subscription_status = 'active';
+                $company->save();
+
+                $this->info("Charged {$company->company_name} successfully: {$amount}");
+            } else {
+                $this->error("Failed to charge {$company->company_name}");
+            }
         }
 
 
-        // if ($result->success) {
-        //     $company->subscription_start = now();
-        //     $company->subscription_end = now()->addMonth();
-        //     $company->subscription_status = 'active';
-        //     $company->payment_status = 'paid';
-        //     $company->payment_failed_count = 0;
-        //     $company->save();
-        // } else {
-        //     $company->payment_status = 'failed';
-        //     $company->payment_failed_count += 1;
-        //     $company->save();
+        if ($result->success) {
+            $company->subscription_start = now();
+            $company->subscription_end = now()->addMonth();
+            $company->subscription_status = 'active';
+            $company->payment_status = 'paid';
+            $company->payment_failed_count = 0;
+            $company->save();
+        } else {
+            $company->payment_status = 'failed';
+            $company->payment_failed_count += 1;
+            $company->save();
 
-        //     if ($company->payment_failed_count >= 3) {
-        //         $company->subscription_status = 'suspended';
-        //         $company->save();
-        //     }
-        // }
+            if ($company->payment_failed_count >= 3) {
+                $company->subscription_status = 'suspended';
+                $company->save();
+            }
+        }
 
         $this->info('Company charges completed.');
     }

@@ -14,10 +14,7 @@ return new class extends Migration
         Schema::create('company_bank_infos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->string('bank_name');
-            $table->string('card_number');
-            $table->string('expiry_date');
-            $table->string('cvv');
+            $table->string('stripe_payment_method_id');
             $table->timestamps();
         });
     }

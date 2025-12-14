@@ -10,10 +10,7 @@ class CompanyBankInfo extends Model
     use FilterByUserType;
     protected $fillable = [
         'company_id',
-        'bank_name',
-        'card_number',
-        'expiry_date',
-        'cvv',
+        'stripe_payment_method_id',
     ];
 
     // Bank info belongs to a Company

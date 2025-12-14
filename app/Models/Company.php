@@ -243,4 +243,10 @@ class Company extends Model
     {
         return $this->hasOne(CalendarYearSetting::class, 'company_id', 'id');
     }
+
+
+    public function defaultCard()
+    {
+        return $this->bankInfos()->latest()->first();
+    }
 }

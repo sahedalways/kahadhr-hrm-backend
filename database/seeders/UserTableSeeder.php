@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Company;
-use App\Models\CompanyBankInfo;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Team;
@@ -56,13 +55,7 @@ class UserTableSeeder extends Seeder
       'subscription_end' => now()->addDays(14),
     ]);
 
-    CompanyBankInfo::create([
-      'company_id' => $company1->id,
-      'bank_name' => 'BRAC Bank',
-      'card_number' => '5500000000000004',
-      'expiry_date' => '11/28',
-      'cvv' => '321',
-    ]);
+
 
     $companyUser2 = User::create([
       'f_name' => 'ABC Tech Ltd',
@@ -86,13 +79,6 @@ class UserTableSeeder extends Seeder
       'subscription_end' => now()->addDays(14),
     ]);
 
-    CompanyBankInfo::create([
-      'company_id' => $company2->id,
-      'bank_name' => 'Dutch-Bangla Bank',
-      'card_number' => '5500000000000005',
-      'expiry_date' => '09/27',
-      'cvv' => '123',
-    ]);
 
 
     // --------------------------

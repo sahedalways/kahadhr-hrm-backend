@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Backend\Admin;
+namespace App\Livewire\Backend\Company\Reports;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Invoice;
@@ -8,12 +8,13 @@ use App\Traits\Exportable;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
-
-class BillingPayments extends BaseComponent
+class CompanyInvoice extends BaseComponent
 {
     use WithPagination, Exportable;
 
+    public $company_id;
     public $search;
 
     // Filters
@@ -31,13 +32,14 @@ class BillingPayments extends BaseComponent
 
     public function mount()
     {
+        $this->company_id = auth()->user()->company->id;
         $this->loaded = collect();
         $this->loadMore();
     }
 
     public function render()
     {
-        return view('livewire.backend.admin.billing-payments', [
+        return view('livewire.backend.company.reports.company-invoice', [
             'invoices' => $this->loaded,
         ]);
     }
@@ -46,14 +48,10 @@ class BillingPayments extends BaseComponent
     {
         if (!$this->hasMore) return;
 
-        $query = Invoice::query(); // No company_id filter => all invoices
+        $query = Invoice::where('company_id', $this->company_id);
 
         if ($this->search) {
             $query->where('invoice_number', 'like', "%{$this->search}%");
-        }
-
-        if ($this->filterStatus) {
-            $query->where('status', $this->filterStatus);
         }
 
         // Date Filter
@@ -149,6 +147,7 @@ class BillingPayments extends BaseComponent
         }
     }
 
+
     public function downloadInvoice($invoiceId)
     {
         $invoice = Invoice::find($invoiceId);
@@ -170,13 +169,13 @@ class BillingPayments extends BaseComponent
         ]);
     }
 
+    // ─── EXPORT ───────────────────────────────────────────────────────
     public function exportInvoices($type)
     {
-        $data = Invoice::query()
+        $data = Invoice::where('company_id', $this->company_id)
             ->get()
             ->map(function ($d) {
                 return [
-                    'Company' => $d->company->company_name ?? 'N/A',
                     'Invoice #' => $d->invoice_number,
                     'Billing Period' => $d->billing_period_start->format('d M, Y') . ' - ' . $d->billing_period_end->format('d M, Y'),
                     'Employee Fee' => number_format($d->employee_fee, 2),
@@ -192,12 +191,12 @@ class BillingPayments extends BaseComponent
         return $this->export(
             $data,
             $type,
-            'super-admin-company-invoices',
+            'company-invoices',
             'exports.generic-table-pdf',
             [
-                'title' => 'All Company Invoices Report',
-                'columns' => ['Company', 'Invoice #', 'Billing Period', 'Employee Fee', 'Total Employees', 'Subtotal', 'VAT', 'Total', 'Status', 'Invoice Date'],
-                'keys' => ['Company', 'Invoice #', 'Billing Period', 'Employee Fee', 'Total Employees', 'Subtotal', 'VAT', 'Total', 'Status', 'Invoice Date'],
+                'title' => 'Company Invoices Report',
+                'columns' => ['Invoice #', 'Billing Period', 'Employee Fee', 'Total Employees', 'Subtotal', 'VAT', 'Total', 'Status', 'Invoice Date'],
+                'keys' => ['Invoice #', 'Billing Period', 'Employee Fee', 'Total Employees', 'Subtotal', 'VAT', 'Total', 'Status', 'Invoice Date'],
             ]
         );
     }

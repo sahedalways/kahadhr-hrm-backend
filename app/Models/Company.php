@@ -61,6 +61,17 @@ class Company extends Model
         return $this->hasMany(Employee::class);
     }
 
+
+    public function activeEmployees()
+    {
+        return $this->hasMany(Employee::class)
+            ->where('is_active', 1)
+            ->whereNotNull('user_id')
+            ->whereHas('user', function ($q) {
+                $q->where('created_at', '<=', Carbon::now()->subDays(3));
+            });
+    }
+
     // Company belongs to a billing plan
     public function billingPlan()
     {

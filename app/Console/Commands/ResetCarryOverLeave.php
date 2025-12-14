@@ -34,9 +34,11 @@ class ResetCarryOverLeave extends Command
                         $leaveBalance->total_leave_in_liew = $leaveBalance->total_leave_in_liew + $leaveBalance->carry_over_hours;
                         $leaveBalance->used_annual_hours = 0;
                         $leaveBalance->used_leave_in_liew = 0;
+                        $leaveBalance->carry_over_hours = 0;
                     } else {
                         $leaveBalance->used_annual_hours = 0;
                         $leaveBalance->used_leave_in_liew = 0;
+                        $leaveBalance->carry_over_hours = 0;
                     }
 
                     $leaveBalance->save();

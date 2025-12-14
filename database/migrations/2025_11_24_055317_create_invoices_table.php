@@ -16,12 +16,13 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->date('billing_period_start');
             $table->date('billing_period_end');
-            $table->decimal('admin_fee', 10, 2);
             $table->decimal('employee_fee', 10, 2);
             $table->integer('total_employees_billed');
             $table->decimal('subtotal', 10, 2);
+            $table->decimal('total', 8, 2);
             $table->decimal('vat', 10, 2)->default(0);
-            $table->decimal('total', 10, 2);
+            $table->string('invoice_number')->unique();
+            $table->string('currency', 3)->default('GBP');
             $table->enum('status', ['paid', 'pending', 'failed'])->default('pending');
             $table->string('pdf_path')->nullable();
             $table->timestamps();

@@ -25,7 +25,7 @@
         @endphp
 
 
-        <a class="navbar-brand m-0 flex-column d-flex gap-2" href="{{ $logoHref }}">
+        <a class="navbar-brand m-0 flex-column d-flex gap-2 text-center" href="{{ $logoHref }}">
             <img src="{{ $logoUrl }}" width="100px" class="navbar-brand-img h-100 scale-200 mx-auto"
                 alt="main_logo">
             <span class="mb-0 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
@@ -396,6 +396,15 @@
                                     href="{{ route('company.dashboard.reports.payslips', ['company' => app('authUser')->company->sub_domain]) }}">
                                     <i class="fas fa-file-invoice-dollar sidenav-mini-icon"></i>
                                     <span class="sidenav-normal"> Pay Slips </span>
+                                </a>
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/invoices*') || Request::is('dashboard/reports/invoices*') ? 'active' : '' }}"
+                                    href="{{ route('company.dashboard.reports.invoices', ['company' => app('authUser')->company->sub_domain]) }}">
+                                    <i class="fas fa-file-invoice sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Invoices </span>
                                 </a>
                             </li>
 

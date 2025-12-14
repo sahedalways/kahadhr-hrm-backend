@@ -117,6 +117,7 @@ class Employee extends Model
                 // get related user
                 $user = $employee->user;
 
+
                 if ($user) {
                     $user->update([
                         'email' => $employee->email,

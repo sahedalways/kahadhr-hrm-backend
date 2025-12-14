@@ -13,16 +13,42 @@ class Invoice extends Model
         'company_id',
         'billing_period_start',
         'billing_period_end',
-        'admin_fee',
         'employee_fee',
         'total_employees_billed',
         'subtotal',
-        'vat',
         'total',
+        'vat',
+        'invoice_number',
+        'currency',
         'status',
         'pdf_path',
     ];
 
+
+    protected $casts = [
+        'billing_period_start' => 'date',
+        'billing_period_end' => 'date',
+        'employee_fee' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+        'total' => 'decimal:2',
+        'vat' => 'decimal:2',
+    ];
+
+
+    public function isPaid()
+    {
+        return $this->status === 'paid';
+    }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isFailed()
+    {
+        return $this->status === 'failed';
+    }
 
 
     public function company()

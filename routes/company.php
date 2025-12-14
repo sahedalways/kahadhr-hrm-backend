@@ -15,6 +15,7 @@ use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
 use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\CompanyExpenses;
+use App\Livewire\Backend\Company\Reports\CompanyInvoice;
 use App\Livewire\Backend\Company\Reports\CompanyPayslip;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
@@ -116,6 +117,7 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::prefix('reports')->name('reports.')->group(function () {
       Route::get('/expenses', CompanyExpenses::class)->name('expenses');
       Route::get('/pay-slips', CompanyPayslip::class)->name('payslips');
+      Route::get('/invoices', CompanyInvoice::class)->name('invoices');
     });
 
 

@@ -125,12 +125,13 @@
                                     @for ($i = 0; $i < 6; $i++)
                                         <input type="text" wire:model="otp.{{ $i }}"
                                             class="form-control text-center otp-field" maxlength="1" placeholder="-"
-                                            
+                                            inputmode="numeric" autocomplete="one-time-code"
+                                            @if ($i === 0) autofocus @endif
                                             oninput="handleOtpInput(this, {{ $i }})"
-                                            onkeydown="handleOtpBackspace(event, {{ $i }})"
-                                            inputmode="numeric" autocomplete="one-time-code">
+                                            onkeydown="handleOtpBackspace(event, {{ $i }})">
                                     @endfor
                                 </div>
+
 
                                 <!-- Countdown Polling -->
                                 @if ($otpCooldown > 0)
@@ -283,6 +284,30 @@
             passwordInput.type = 'password';
             eyeIcon.classList.remove('fa-eye-slash');
             eyeIcon.classList.add('fa-eye');
+        }
+    }
+</script>
+
+<script>
+    function handleOtpInput(el, index) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+
+        if (!el.value) return;
+
+        const inputs = document.querySelectorAll('.otp-field');
+
+        if (index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    }
+
+    function handleOtpBackspace(e, index) {
+        if (e.key !== 'Backspace') return;
+
+        const inputs = document.querySelectorAll('.otp-field');
+
+        if (!inputs[index].value && index > 0) {
+            inputs[index - 1].focus();
         }
     }
 </script>

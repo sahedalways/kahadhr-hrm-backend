@@ -48,7 +48,7 @@
     </div>
 
 
-    <div class="min-height-60 bg-white position-absolute w-100">
+    <div class=" bg-white position-absolute w-100">
 
     </div>
     <div class="fixed-sidebar">

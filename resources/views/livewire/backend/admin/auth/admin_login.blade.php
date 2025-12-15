@@ -34,16 +34,16 @@
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                       <div class="mb-3">
+                                        <div class="mb-3">
                                             <div class="position-relative">
                                                 <input type="password" id="password" class="form-control"
-                                                placeholder="Password" wire:model="password">
+                                                    placeholder="Password" wire:model="password">
 
-                                            <span
-                                                class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
-                                                onclick="togglePassword()">
-                                                <i id="passwordEye" class="fas fa-eye"></i>
-                                            </span>
+                                                <span
+                                                    class="d-flex position-absolute top-50 end-3 translate-middle-y cursor-pointer"
+                                                    onclick="togglePassword()">
+                                                    <i id="passwordEye" class="fas fa-eye"></i>
+                                                </span>
                                             </div>
 
                                             @error('password')
@@ -116,12 +116,13 @@
                                     @for ($i = 0; $i < 6; $i++)
                                         <input type="text" wire:model="otp.{{ $i }}"
                                             class="form-control text-center otp-field" maxlength="1" placeholder="-"
-                                            
+                                            inputmode="numeric" autocomplete="one-time-code"
+                                            @if ($i === 0) autofocus @endif
                                             oninput="handleOtpInput(this, {{ $i }})"
-                                            onkeydown="handleOtpBackspace(event, {{ $i }})"
-                                            inputmode="numeric" autocomplete="one-time-code">
+                                            onkeydown="handleOtpBackspace(event, {{ $i }})">
                                     @endfor
                                 </div>
+
 
                                 <!-- Countdown Polling -->
                                 @if ($otpCooldown > 0)
@@ -253,6 +254,24 @@
             passwordInput.type = 'password';
             eyeIcon.classList.remove('fa-eye-slash');
             eyeIcon.classList.add('fa-eye');
+        }
+    }
+</script>
+
+<script>
+    function handleOtpInput(el, index) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+
+        if (el.value && index < 5) {
+            const next = document.querySelectorAll('.otp-field')[index + 1];
+            next.focus();
+        }
+    }
+
+    function handleOtpBackspace(e, index) {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            const prev = document.querySelectorAll('.otp-field')[index - 1];
+            prev.focus();
         }
     }
 </script>

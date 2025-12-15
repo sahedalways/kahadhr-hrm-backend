@@ -37,7 +37,8 @@
                         <!-- Search Input -->
                         <div class="col-md-8">
                             <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="fa-solid fa-magnifying-glass"></i></span>
                                 <input type="text" class="form-control form-control-lg border-start-0"
                                     placeholder="Search by department name" wire:model="search"
                                     wire:keyup="set('search', $event.target.value)" />
@@ -190,10 +191,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Edit Department</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <i class="fas fa-times"></i>
+                    <button type="button"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                        data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
+                        <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>
+
                 </div>
 
                 <form wire:submit.prevent="update">

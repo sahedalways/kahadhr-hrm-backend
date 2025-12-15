@@ -91,9 +91,12 @@
                             Add Card
                         @endif
                     </h5>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                        <i class="fas fa-times" style="color:black;"></i>
+                    <button type="button"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                        data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
+                        <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>
+
                 </div>
                 <div class="modal-body">
                     <form id="bank-form" class="row g-3">

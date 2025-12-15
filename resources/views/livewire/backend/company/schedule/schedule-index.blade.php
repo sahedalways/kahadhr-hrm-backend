@@ -14,9 +14,12 @@
 
         <div class="card-body p-0">
             <div class="d-flex">
-                @include('livewire.backend.company.schedule.partials.sidebar')
+                @if ($viewMode === 'weekly')
+                    @include('livewire.backend.company.schedule.partials.sidebar')
+                @endif
 
-                <div class="flex-grow-1 schedule-grid-container mt-5" style="overflow-x: auto;">
+
+                <div class="flex-grow-1 schedule-grid-container " style="overflow-x: auto; margin-top: 5rem !important;">
                     @include('livewire.backend.company.schedule.partials.schedule-grid')
 
                 </div>

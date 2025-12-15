@@ -104,3 +104,131 @@
     object-fit: cover;
     border: 2px solid #fff;
 }
+
+.shift-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1040;
+
+    opacity: 0;
+    animation: overlayFadeIn 0.4s ease-out forwards;
+}
+
+.shift-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+
+    width: 500px !important;
+    max-width: 100%;
+
+    height: 100%;
+    background: #fff;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 12px 0 0 12px;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
+
+    animation: slideIn 0.35s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide animation */
+@keyframes panelSlideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.shift-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+}
+
+.shift-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.35s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.shift-panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.shift-tabs {
+    padding: 0 14px;
+}
+
+.shift-tabs .nav-link {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.shift-tabs .nav-link.active {
+    font-weight: 600;
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+}
+
+.shift-panel-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.shift-panel-footer {
+    padding: 14px;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+}
+
+input[type="date"].no-calendar-icon::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Firefox */
+input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
+    display: none;
+}

@@ -52,7 +52,7 @@
                     <!-- NOTIFICATION ICON -->
                     <span class="d-flex position-relative cursor-pointer" id="notificationBell"
                         wire:click="markAllAsRead">
-                        <i class="fa-regular fa-bell fs-4"></i>
+                        <i class="fa-regular fa-bell fs-4 text-white"></i>
 
                         @if ($unreadCount > 0)
                             <span

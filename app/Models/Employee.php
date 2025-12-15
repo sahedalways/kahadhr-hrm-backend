@@ -82,9 +82,20 @@ class Employee extends Model
     // Accessor for logo URL
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar
-            ? asset('storage/' . $this->avatar)
-            : asset('assets/img/default-avatar.png');
+        $initials = strtoupper(
+            substr($this->f_name, 0, 1) . substr($this->l_name, 0, 1)
+        );
+
+        return 'data:image/svg+xml;base64,' . base64_encode(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+            <rect width="100%" height="100%" fill="#0d6fc5ff"/>
+            <text x="50%" y="55%" font-size="36" fill="#ffffff"
+                  text-anchor="middle" dominant-baseline="middle"
+                  font-family="Arial, sans-serif" font-weight="bold">'
+                . $initials .
+                '</text>
+        </svg>'
+        );
     }
 
 

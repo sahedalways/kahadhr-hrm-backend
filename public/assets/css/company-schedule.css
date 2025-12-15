@@ -1,0 +1,106 @@
+.bg-primary-light {
+    background-color: #e9f0ff !important;
+}
+.text-primary {
+    color: #007bff !important;
+}
+.bg-primary-light-cell {
+    background-color: #f7f9ff;
+}
+.bg-purple {
+    background-color: #9c27b0;
+}
+
+.schedule-app .card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.schedule-table.table-bordered > :not(caption) > * > * {
+    border-width: 0 1px 1px 0;
+    border-color: #eee;
+}
+.schedule-table.table-bordered > :not(caption) > * > *:first-child {
+    border-left-width: 1px;
+}
+
+.schedule-table thead th {
+    vertical-align: top;
+    padding: 0.5rem;
+    border-top: none;
+    border-bottom-width: 1px !important;
+}
+
+.schedule-table tbody td {
+    vertical-align: top;
+    height: 90px;
+    padding: 0.5rem;
+    border-color: #eee;
+}
+
+.schedule-sidebar {
+    background-color: #fff;
+}
+.schedule-sidebar .employee-row {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+.schedule-sidebar .employee-row:hover {
+    background-color: #f8f9fa;
+}
+
+.unpaid-leave {
+    background-color: #ffeaea;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.unpaid-leave-highlight {
+    background-color: #ffcccc;
+}
+
+.schedule-table tbody tr:nth-child(4) ~ tr td {
+    border-top: none;
+    border-bottom: 1px solid #eee;
+}
+
+.schedule-sidebar .employee-list .employee-row {
+    min-height: 90px;
+    align-items: flex-start !important;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.schedule-table tbody td {
+    vertical-align: top;
+    height: 90px;
+    padding: 0.5rem;
+}
+
+.smaller {
+    font-size: 0.65rem;
+}
+
+.schedule-cell .shift-block,
+.schedule-cell .unpaid-leave {
+    padding: 2px !important;
+}
+
+.employee-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(3px);
+}
+.employee-row {
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.employee-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(3px);
+}
+.employee-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid #fff;
+}

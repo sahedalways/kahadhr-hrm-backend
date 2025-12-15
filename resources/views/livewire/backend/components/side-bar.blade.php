@@ -1,10 +1,18 @@
 <aside
-    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start ps ps--active-y"
+    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start"
     id="sidenav-main" data-color="primary">
 
     <div class="sidenav-header">
-        <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
-            aria-hidden="true" id="iconSidenav"></i>
+                  <div class=" sidenav-toggler-inner-wrapper w-100">
+                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
+                    {{--<div class="sidenav-toggler-inner">
+                        <i class="sidenav-toggler-line bg-dark"></i>
+                        <i class="sidenav-toggler-line bg-dark"></i>
+                        <i class="sidenav-toggler-line bg-dark"></i>
+                    </div>--}}
+                    <i class="fa-solid fa-angle-left sidebar-icon"></i>
+                </a>
+            </div>
 
         @php
             $authUser = app('authUser');
@@ -33,8 +41,8 @@
     </div>
 
 
-    <hr class="horizontal mt-0">
-    <div class="collapse navbar-collapse w-auto h-auto h-100" id="sidenav-collapse-main">
+
+    <div class="collapse navbar-collapse w-auto h-auto" id="sidenav-collapse-main">
         <ul class="navbar-nav">
             @if (app('authUser')->user_type == 'superAdmin')
                 <li class="nav-item">

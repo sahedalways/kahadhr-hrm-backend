@@ -12,15 +12,7 @@
         data-scroll="false">
         <div class="container-fluid py-1 px-3 position-relative">
 
-            <div class=" sidenav-toggler-inner d-xl-block d-none w-100">
-                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
-                    <div class="sidenav-toggler-inner">
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                    </div>
-                </a>
-            </div>
+
 
             <input type="hidden" id="pusher_key" value="{{ config('broadcasting.connections.pusher.key') }}">
             <input type="hidden" id="pusher_cluster"
@@ -32,7 +24,7 @@
             <div class="d-flex align-items-center gap-3 position-relative w-100">
 
                 <!-- LEFT SECTION (Mobile menu icon) -->
-                <div class="d-flex align-items-center">
+                {{--<div class="d-flex align-items-center">
                     <a href="javascript:;" class="nav-link text-dark p-0 d-xl-none" id="iconNavbarSidenav">
                         <div class="sidenav-toggler-inner">
                             <i class="sidenav-toggler-line bg-dark"></i>
@@ -40,7 +32,7 @@
                             <i class="sidenav-toggler-line bg-dark"></i>
                         </div>
                     </a>
-                </div>
+                </div>--}}
 
                 @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
                     <div class="timer-box">

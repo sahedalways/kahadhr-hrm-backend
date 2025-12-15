@@ -21959,10 +21959,8 @@ hr.horizontal.gray-light {
 .navbar-vertical.navbar-expand-xs {
     display: block;
     position: fixed;
-    top: 65px;
+    top: 50px;
     bottom: 0;
-    width: 100%;
-    max-width: 15.625rem !important;
     overflow-y: auto;
     padding: 0;
     box-shadow: none;
@@ -21993,10 +21991,6 @@ hr.horizontal.gray-light {
 
 .navbar-vertical.navbar-expand-xs.fixed-start {
     left: 0
-}
-
-.navbar-vertical.navbar-expand-xs.fixed-end {
-    right: 0
 }
 
 .navbar-vertical.navbar-expand-xs .navbar-nav .nav-link {
@@ -22743,14 +22737,12 @@ hr.horizontal.gray-light {
     opacity: 1
 }
 
-@media (max-width:1199.98px) {
+
     .g-sidenav-show.rtl .sidenav {
         transform: translateX(17.125rem)
     }
 
-    .g-sidenav-show:not(.rtl) .sidenav {
-        transform: translateX(-17.125rem)
-    }
+
 
     .g-sidenav-show .sidenav.fixed-start+.main-content {
         margin-left: 0 !important
@@ -22759,7 +22751,7 @@ hr.horizontal.gray-light {
     .g-sidenav-show.g-sidenav-pinned .sidenav {
         transform: translateX(0)
     }
-}
+
 
 .navbar-vertical.bg-white {
     box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15)
@@ -22779,10 +22771,10 @@ hr.horizontal.gray-light {
     -o-transition: .2s ease-in;
 }
 
-.fixed-sidebar .nav-link:hover {
+/*.fixed-sidebar .nav-link:hover {
     background-color: #f6f7f7;
      margin-left: 15px !important;
-}
+}*/
 
 .navbar-vertical .navbar-nav .nav-link.active {
     font-weight: 600;
@@ -22935,146 +22927,157 @@ hr.horizontal.gray-light {
     background-image: linear-gradient(90deg, hsla(0, 0%, 100%, 0), #fff, hsla(0, 0%, 100%, 0)) !important
 }
 
-.g-sidenav-show:not(.g-sidenav-hidden) .navbar-vertical .nav-item .nav-link span.sidenav-mini-icon {
+.g-sidenav-show:not(.g-sidenav-pinned) .navbar-vertical .nav-item .nav-link span.sidenav-mini-icon {
     opacity: 0
 }
 
-.g-sidenav-hidden .sidenav-footer {
+.g-sidenav-pinned .sidenav-footer {
     display: none
 }
 
-@media (min-width:1200px) {
-    .g-sidenav-hidden.rtl .main-content {
+
+
+ .g-sidenav-pinned.rtl .main-content {
         margin-right: 4rem !important
     }
 
-    .g-sidenav-hidden.rtl .main-content .navbar-vertical:hover {
+    .g-sidenav-pinned.rtl .main-content .navbar-vertical:hover {
         max-width: 15.625rem !important
     }
 
-    .g-sidenav-hidden.rtl .sidenav:hover+.main-content {
+    .g-sidenav-pinned.rtl .sidenav:hover+.main-content {
         margin-right: 17.125rem !important
     }
 
-    .g-sidenav-hidden .navbar-vertical {
-        max-width: 4rem !important
-    }
-
-    .g-sidenav-hidden .navbar-vertical.fixed-start+.main-content {
+    .g-sidenav-pinned .navbar-vertical.fixed-start+.main-content {
         margin-left: 7.5rem
     }
 
-    .g-sidenav-hidden .navbar-vertical .navbar-brand img {
+    .g-sidenav-pinned .navbar-vertical .navbar-brand img {
         width: auto !important
     }
 
-    .g-sidenav-hidden .navbar-vertical .navbar-brand span {
+    .g-sidenav-pinned .navbar-vertical .navbar-brand span {
         opacity: 0
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .nav-link .icon {
+    .g-sidenav-pinned .navbar-vertical .nav-item .nav-link .icon {
         padding: 10px
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .nav-link .nav-link-text,
-    .g-sidenav-hidden .navbar-vertical .nav-item .nav-link .sidenav-normal {
+    .g-sidenav-pinned .navbar-vertical .nav-item .nav-link .nav-link-text,
+    .g-sidenav-pinned .navbar-vertical .nav-item .nav-link .sidenav-normal {
         opacity: 0;
         width: 0
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .nav-link .sidenav-mini-icon {
+    .g-sidenav-pinned .navbar-vertical .nav-item .nav-link .sidenav-mini-icon {
         min-width: 1.8rem;
         margin-left: .15rem;
         opacity: 1
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .nav-link[data-bs-toggle=collapse]:after {
+    .g-sidenav-pinned .navbar-vertical .nav-item .nav-link[data-bs-toggle=collapse]:after {
         content: ""
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .collapse .nav {
+    .g-sidenav-pinned .navbar-vertical .nav-item .collapse .nav {
         margin-left: 0 !important;
         padding-left: 0 !important
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link {
+    .g-sidenav-pinned .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link {
         margin-left: .5rem
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link:before {
+    .g-sidenav-pinned .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link:before {
         content: none
     }
 
-    .g-sidenav-hidden .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link[data-bs-toggle=collapse]:after {
+    .g-sidenav-pinned .navbar-vertical .nav-item .collapse .nav .nav-item .nav-link[data-bs-toggle=collapse]:after {
         content: "⌵"
     }
 
-    .g-sidenav-hidden .navbar-vertical .card.card-background .icon-shape {
+    .g-sidenav-pinned .navbar-vertical .card.card-background .icon-shape {
         margin-bottom: 0 !important
     }
 
-    .g-sidenav-hidden .navbar-vertical .card.card-background .docs-info {
+    .g-sidenav-pinned .navbar-vertical .card.card-background .docs-info {
         opacity: 0;
         width: 0;
         height: 0
     }
 
-    /*.g-sidenav-hidden .navbar-vertical:hover {
+
+
+
+
+
+
+
+
+
+
+
+@media (min-width:1200px) {
+   
+
+    /*.g-sidenav-pinned .navbar-vertical:hover {
         max-width: 15.625rem !important
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover.fixed-start + .main-content {
+    .g-sidenav-pinned .navbar-vertical:hover.fixed-start + .main-content {
         margin-left: 17.125rem
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .navbar-brand span {
+    .g-sidenav-pinned .navbar-vertical:hover .navbar-brand span {
         opacity: 1
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .nav-link .nav-link-text,
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .nav-link .sidenav-normal {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .nav-link .nav-link-text,
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .nav-link .sidenav-normal {
         opacity: 1;
         width: auto
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .nav-link .sidenav-mini-icon {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .nav-link .sidenav-mini-icon {
         opacity: 0;
         width: 0;
         min-width: 0
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .nav-link[data-bs-toggle=collapse]:after {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .nav-link[data-bs-toggle=collapse]:after {
         content: "⌵"
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav {
         margin-left: 1.5rem !important
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .nav-link {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .nav-link {
         margin-left: 1.35rem
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .nav-link:before {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .nav-link:before {
         content: ""
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapse .nav,
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapsing .nav {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapse .nav,
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapsing .nav {
         margin-left: 0 !important;
         padding-left: 0 !important
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapse .nav .nav-item .nav-link:before,
-    .g-sidenav-hidden .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapsing .nav .nav-item .nav-link:before {
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapse .nav .nav-item .nav-link:before,
+    .g-sidenav-pinned .navbar-vertical:hover .nav-item .collapse .nav .nav-item .collapsing .nav .nav-item .nav-link:before {
         content: none
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .card.card-background .icon-shape {
+    .g-sidenav-pinned .navbar-vertical:hover .card.card-background .icon-shape {
         margin-bottom: 1rem !important
     }
 
-    .g-sidenav-hidden .navbar-vertical:hover .card.card-background .docs-info {
+    .g-sidenav-pinned .navbar-vertical:hover .card.card-background .docs-info {
         opacity: 1;
         width: auto;
         height: auto
@@ -25308,8 +25311,8 @@ round-slider.scaling:hover {
         left: auto !important
     }
 
-    .rtl.g-sidenav-hidden .navbar-vertical .navbar-nav .nav-item .collapse .nav,
-    .rtl.g-sidenav-hidden .navbar-vertical .navbar-nav .nav-item .collapsing .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical .navbar-nav .nav-item .collapse .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical .navbar-nav .nav-item .collapsing .nav,
     .rtl .navbar-vertical .navbar-nav .collapse .nav-item .collapse .nav,
     .rtl .navbar-vertical .navbar-nav .collapse .nav-item .collapsing .nav,
     .rtl .navbar-vertical .navbar-nav .collapsing .nav-item .collapse .nav,
@@ -25317,15 +25320,15 @@ round-slider.scaling:hover {
         padding-right: 0
     }
 
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav,
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav {
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav {
         padding-right: 2.5rem
     }
 
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav .nav-item .collapse .nav,
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav .nav-item .collapsing .nav,
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav .nav-item .collapse .nav,
-    .rtl.g-sidenav-hidden .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav .nav-item .collapsing .nav {
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav .nav-item .collapse .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapse .nav .nav-item .collapsing .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav .nav-item .collapse .nav,
+    .rtl.g-sidenav-pinned .navbar-vertical:hover .navbar-nav>.nav-item .collapsing .nav .nav-item .collapsing .nav {
         padding-right: 0 !important
     }
 }

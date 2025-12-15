@@ -540,11 +540,7 @@
                             @enderror
                         </div>
 
-
-                    </div>
-
-
-                    <!-- PROFILE INFORMATION -->
+  <!-- PROFILE INFORMATION -->
                     <hr class="my-3">
                     <h6 class="fw-bold">Profile Information</h6>
 
@@ -758,6 +754,10 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
+                    </div>
+
+
+                  
 
 
 

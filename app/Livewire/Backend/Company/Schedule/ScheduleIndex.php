@@ -122,6 +122,9 @@ class ScheduleIndex extends BaseComponent
                 'Last Friday',
                 'Last Saturday',
                 'End Of Month',
+                'First Of Month',
+                'Middle Of Month',
+                'Last Of Month',
             ];
 
 
@@ -244,7 +247,7 @@ class ScheduleIndex extends BaseComponent
 
     public function publishShift()
     {
-        $this->repeatOn = 'Third Sunday';
+        $this->repeatOn = 'First Of Month';
         // Validation
         $this->validate([
             'selectedDate' => ['required', 'date'],
@@ -667,44 +670,49 @@ class ScheduleIndex extends BaseComponent
             $targetDay = ucfirst(strtolower(trim($this->repeatOn ?? $date->format('l'))));
             $date->next($targetDay)->addWeeks($this->every - 1);
         } elseif ($this->frequency === 'Monthly') {
-            // Determine repeatOn type
+            $date->addMonths($this->every);
+
             if (preg_match('/^\d{1,2}(st|nd|rd|th)$/', $this->repeatOn)) {
-                // Numeric day
+
                 $day = intval($this->repeatOn);
-                $date->addMonths($this->every);
                 $date->day(min($day, $date->daysInMonth));
+            } elseif (in_array($this->repeatOn, ['End Of Month', 'First Of Month', 'Middle Of Month'])) {
+                // Special month days
+                if ($this->repeatOn === 'End Of Month') {
+                    $date->day($date->daysInMonth);
+                } elseif ($this->repeatOn === 'First Of Month') {
+                    $date->day(1);
+                } elseif ($this->repeatOn === 'Middle Of Month') {
+                    $date->day(intval($date->daysInMonth / 2));
+                }
             } else {
-                // 'First Monday', 'Second Tuesday', 'Last Sunday', etc.
-                $parts = explode(' ', trim($this->repeatOn)); // ['Last','Sunday']
+
+                $parts = array_values(array_filter(explode(' ', trim($this->repeatOn))));
                 $weekMap = ['First' => 1, 'Second' => 2, 'Third' => 3, 'Fourth' => 4, 'Last' => -1];
                 $weekNumber = $weekMap[$parts[0]] ?? 1;
-                $weekday = ucfirst(strtolower($parts[1] ?? 'Monday'));
-
-                // Jump months first
-                $date->addMonths($this->every);
+                $weekday = strtolower($parts[1] ?? 'monday');
 
                 if ($weekNumber === -1) {
-                    // Last weekday of the month
+
                     $date->day($date->daysInMonth);
-                    while (strtolower($date->format('l')) !== strtolower($weekday)) {
+                    while (strtolower($date->format('l')) !== $weekday) {
                         $date->subDay();
                     }
                 } else {
-                    // nth weekday of the month
+
                     $date->day(1);
                     $currentWeek = 0;
                     while (true) {
-                        if (strtolower($date->format('l')) === strtolower($weekday)) {
+                        if (strtolower($date->format('l')) === $weekday) {
                             $currentWeek++;
-                            if ($currentWeek === $weekNumber) {
-                                break;
-                            }
+                            if ($currentWeek === $weekNumber) break;
                         }
                         $date->addDay();
                     }
                 }
             }
         }
+
 
         return $date->format('Y-m-d');
     }

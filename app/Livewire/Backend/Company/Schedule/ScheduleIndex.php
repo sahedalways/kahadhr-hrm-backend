@@ -92,6 +92,8 @@ class ScheduleIndex extends Component
         $this->selectedDate = $date;
         $this->selectedEmployees[] = $employeeId;
         $this->showAddShiftPanel = true;
+
+        $this->dispatch('shift-panel-opened');
     }
     public function closeAddShiftPanel()
     {

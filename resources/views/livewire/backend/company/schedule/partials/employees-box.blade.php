@@ -1,6 +1,6 @@
 <div class="row g-2 mb-3 shift-form-row">
     <div class="col-3 pt-1">
-        <label class="fw-semibold">Employees</label>
+        <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
     </div>
     <div class="col-9">
 
@@ -43,8 +43,7 @@
                     <div class="input-group input-group-sm">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                         <input type="text" class="form-control" placeholder="Search employees "
-                            wire:model.debounce.300ms="employeeSearch"
-                            wire:keyup="set('employeeSearch', $event.target.value)">
+                            id="employeeSearchInput">
                     </div>
                 </div>
 

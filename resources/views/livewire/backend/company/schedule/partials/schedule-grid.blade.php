@@ -124,13 +124,32 @@
                                 @endif
 
 
-                                @if ($hoveredCell === $hoverKey)
+                                {{-- @if ($hoveredCell === $hoverKey)
                                     <button
                                         wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
                                         class="btn btn-sm btn-primary position-absolute d-flex justify-content-center align-items-center"
                                         style="width: 24px; height: 24px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; padding: 0;"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">+</button>
-                                @endif
+                                @endif --}}
+
+                                <button
+                                    wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
+                                    class="btn btn-sm btn-primary add-shift-btn position-absolute"
+                                    style="
+            width: 28px;
+            height: 28px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0;
+            z-index: 20;
+            border-radius: 50%;
+        "
+                                    title="Add Shift">
+                                    +
+                                </button>
+
+
 
                             </td>
                         @endforeach
@@ -185,7 +204,7 @@
                             {{-- DATE --}}
                             <div class="row align-items-center g-2 mb-3 shift-form-row">
                                 <div class="col-3">
-                                    <label class="fw-semibold">Date</label>
+                                    <label class="fw-semibold">Date <span class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-8 d-flex align-items-center">
                                     <div class="input-group input-group-sm me-3" style="max-width: 160px;">
@@ -212,7 +231,7 @@
                             {{-- TIME --}}
                             <div class="row align-items-center g-2 mb-1 shift-form-row">
                                 <div class="col-3">
-                                    <label class="fw-semibold">Time</label>
+                                    <label class="fw-semibold">Time <span class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-9 d-flex align-items-center gap-2">
                                     <input type="time" class="form-control form-control-sm"
@@ -250,10 +269,10 @@
                             {{-- TITLE --}}
                             <div class="row align-items-center g-2 mb-3 shift-form-row">
                                 <div class="col-3">
-                                    <label class="fw-semibold">Shift Title</label>
+                                    <label class="fw-semibold">Shift Title <span class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-9">
-                                    <input type="text" wire:model.defer="newShift.title"
+                                    <input type="text" id="shiftTitleInput" wire:model.defer="newShift.title"
                                         class="form-control form-control-sm" placeholder="Enter shift title…"
                                         required>
                                 </div>
@@ -262,13 +281,12 @@
                             {{-- JOB + COLOR --}}
                             <div class="row align-items-center g-2 mb-3 shift-form-row">
                                 <div class="col-3">
-                                    <label class="fw-semibold">Job</label>
+                                    <label class="fw-semibold">Job <span class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-9 d-flex align-items-center gap-2">
-                                    <select class="form-select form-select-sm flex-grow-1"
-                                        wire:model.defer="newShift.job">
-                                        <option value="">Select job</option>
-                                    </select>
+                                    <input type="text" class="form-control form-control-sm"
+                                        wire:model.defer="newShift.job" placeholder="Enter job…">
+
                                     <input type="color" wire:model="newShift.color"
                                         class="form-control form-control-color border-0"
                                         style="width: 38px; height: 31px;">
@@ -339,3 +357,15 @@
 
 
 </div>
+
+
+<script>
+    window.addEventListener('shift-panel-opened', () => {
+        setTimeout(() => {
+            const titleInput = document.getElementById('shiftTitleInput');
+            if (titleInput) {
+                titleInput.focus();
+            }
+        }, 50);
+    });
+</script>

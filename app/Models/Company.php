@@ -128,6 +128,35 @@ class Company extends Model
                 'company_id'    => $company->id,
                 'calendar_year' => 'english',
             ]);
+
+
+
+            $defaultBreaks = [
+                [
+                    'title'    => 'Rest Break',
+                    'type'     => 'Paid',
+                    'duration' => 0.10,
+                ],
+                [
+                    'title'    => 'Meal',
+                    'type'     => 'Unpaid',
+                    'duration' => 0.45,
+                ],
+                [
+                    'title'    => 'Meal Break',
+                    'type'     => 'Unpaid',
+                    'duration' => 0.30,
+                ],
+            ];
+
+            foreach ($defaultBreaks as $break) {
+                ShiftBreak::create([
+                    'company_id' => $company->id,
+                    'title'      => $break['title'],
+                    'type'       => $break['type'],
+                    'duration'   => $break['duration'],
+                ]);
+            }
         });
 
         static::deleted(function ($company) {

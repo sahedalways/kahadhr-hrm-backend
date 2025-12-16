@@ -145,7 +145,7 @@
             z-index: 20;
             border-radius: 50%;
         "
-                                    title="Add Shift">
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">
                                     +
                                 </button>
 
@@ -209,12 +209,15 @@
                                 <div class="col-8 d-flex align-items-center">
                                     <div class="input-group input-group-sm me-3" style="max-width: 160px;">
                                         <input type="date" class="form-control no-calendar-icon"
-                                            wire:model="selectedDate" id="shiftDate"
-                                            min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                            wire:model="selectedDate" id="shiftDate">
                                         <span class="input-group-text bg-white" style="cursor: pointer;"
                                             onclick="document.getElementById('shiftDate').showPicker()">
                                             <i class="far fa-calendar-alt text-muted"></i>
                                         </span>
+
+                                        @error('selectedDate')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
 
@@ -247,18 +250,27 @@
                                         {{ $newShift['total_hours'] ?? '08:00' }} hrs
                                     </span>
                                 </div>
+
+                                @error('newShift.start_time')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                                @error('newShift.end_time')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="d-flex align-items-center mb-3"
                                 style="color: rgb(0, 89, 255); font-size: 0.875rem;">
-                                <a href="#" class=" text-primary small me-3" style="color: rgb(0, 89, 255);">
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
+                                    wire:click="getDefaultBreaks()" class=" text-primary small me-3"
+                                    style="color: rgb(0, 89, 255);">
                                     <i class="fas fa-coffee me-2"></i> Add break
                                 </a>
                                 <a href="#" class="me-3 text-primary small ms-3"
                                     style="color: rgb(0, 89, 255);">
                                     <i class="fas fa-redo me-2"></i> Does not repeat
                                 </a>
-                                <a href="#" class="text-primary small ms-3" style="color: rgb(0, 89, 255);">
+                                <a class="text-primary small ms-3" style="color: rgb(0, 89, 255);">
                                     <i class="fas fa-globe me-2"></i> Europe/London
                                 </a>
                             </div>
@@ -275,8 +287,12 @@
                                     <input type="text" id="shiftTitleInput" wire:model.defer="newShift.title"
                                         class="form-control form-control-sm" placeholder="Enter shift title…"
                                         required>
+                                    @error('newShift.title')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
+
 
                             {{-- JOB + COLOR --}}
                             <div class="row align-items-center g-2 mb-3 shift-form-row">
@@ -291,6 +307,13 @@
                                         class="form-control form-control-color border-0"
                                         style="width: 38px; height: 31px;">
                                 </div>
+
+                                <div class="col-12" style="margin-left: 7.3rem;">
+                                    @error('newShift.job')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                             </div>
 
                             {{-- EMPLOYEES --}}
@@ -304,6 +327,9 @@
                                 <div class="col-9">
                                     <input type="text" wire:model.defer="newShift.address"
                                         class="form-control form-control-sm" placeholder="Enter address…">
+                                    @error('newShift.address')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -316,6 +342,10 @@
 
                                     <textarea wire:model.defer="newShift.note" class="form-control form-control-sm" rows="3"                      
                                                   placeholder="Add a note…"></textarea>
+
+                                    @error('newShift.note')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
 
 
                                 </div>
@@ -338,8 +368,24 @@
 
                 {{-- FOOTER --}}
                 <div class="shift-panel-footer d-flex align-items-center px-4 py-3 border-top bg-white">
-                    <button class="btn btn-primary" wire:click="publishShift"><i class="fas fa-upload"></i>
-                        Publish</button>
+                    <!-- Normal state -->
+                    <button class="btn btn-primary" wire:click="publishShift" wire:loading.attr="disabled"
+                        wire:target="publishShift">
+
+                        <!-- Normal content -->
+                        <span wire:loading.remove wire:target="publishShift">
+                            <i class="fas fa-upload"></i> Publish
+                        </span>
+
+                        <!-- Loading content -->
+                        <span wire:loading wire:target="publishShift">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"
+                                aria-hidden="true"></span>
+                            Publishing...
+                        </span>
+                    </button>
+
+
 
                     <div class="d-flex gap-2 ms-auto">
                         <button class="btn btn-light" wire:click="saveDraft"><i class="fas fa-save"></i></button>
@@ -354,7 +400,7 @@
     @endif
 
 
-
+    @include('livewire.backend.company.schedule.partials.break-modal')
 
 </div>
 
@@ -367,5 +413,15 @@
                 titleInput.focus();
             }
         }, 50);
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     });
 </script>

@@ -269,3 +269,107 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     opacity: 1;
     pointer-events: auto;
 }
+.custom-break-modal-icon-circle {
+    background-color: #e6f7ef;
+    color: #5cb85c;
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-break-modal-cup {
+    fill: currentColor;
+    width: 32px;
+    height: 32px;
+}
+
+.custom-break-modal-plus-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: white;
+    color: #5cb85c;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid var(--custom-light-green);
+}
+
+.custom-break-dropdown-btn {
+    background: linear-gradient(to right, #0d6efd, #3c82e6);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+}
+
+.custom-break-dropdown-btn.dropdown-toggle::after {
+    margin-left: 0.5em;
+    vertical-align: 0.1em;
+    border-top: 0.4em solid #fff;
+    border-right: 0.4em solid transparent;
+    border-bottom: 0;
+    border-left: 0.4em solid transparent;
+}
+
+.custom-confirm-btn {
+    background-color: white !important;
+    border: 1px solid #dee2e6 !important;
+    color: #495057 !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.custom-break-dropdown-menu {
+    min-width: 250px;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    padding: 0;
+}
+
+.custom-break-dropdown-menu .dropdown-header {
+    font-size: 0.85rem;
+    color: #6c757d;
+    padding: 0.75rem 1rem 0.25rem 1rem;
+}
+
+.custom-break-dropdown-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+.custom-break-dropdown-menu hr {
+    margin: 0.25rem 0;
+}
+
+.custom-break-modal-dialog {
+    max-width: 700px;
+}
+
+.dropdown-menu {
+    inset: auto auto -211px 73px !important;
+}
+
+.custom-break-dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-break-title {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+}
+
+.active-confirm-btn {
+    background-color: #2998ff;
+    color: #fff;
+    border-color: #2998ff;
+}

@@ -40,8 +40,12 @@ class ScheduleIndex extends BaseComponent
     public $unpaidBreaksDuration = '00:00';
 
     public $frequency = 'Monthly';
-    public $every = 1;
+    public $every = 5;
     public $everyOptions = [];
+    public $repeatOptions = [];
+    public $repeatOn = 'Last Sunday';
+    public $endRepeat = 'After';
+    public $occurrences = 10;
 
 
 
@@ -77,7 +81,71 @@ class ScheduleIndex extends BaseComponent
         } else {
             $this->everyOptions = range(1, 12);
         }
+
+        $this->repeatOn = null;
+        $this->updateRepeatOptions();
     }
+
+
+
+
+    protected function updateRepeatOptions()
+    {
+        if ($this->every === 'Monthly') {
+            $this->repeatOptions = [
+                'First Sunday',
+                'First Monday',
+                'First Tuesday',
+                'First Wednesday',
+                'First Thursday',
+                'First Friday',
+                'First Saturday',
+                'Second Sunday',
+                'Second Monday',
+                'Second Tuesday',
+                'Second Wednesday',
+                'Second Thursday',
+                'Second Friday',
+                'Second Saturday',
+                'Third Sunday',
+                'Third Monday',
+                'Third Tuesday',
+                'Third Wednesday',
+                'Third Thursday',
+                'Third Friday',
+                'Third Saturday',
+                'Last Sunday',
+                'Last Monday',
+                'Last Tuesday',
+                'Last Wednesday',
+                'Last Thursday',
+                'Last Friday',
+                'Last Saturday',
+                'End Of Month',
+            ];
+
+
+            for ($i = 1; $i <= 31; $i++) {
+                $this->repeatOptions[] = "{$i}" . $this->ordinal($i);
+            }
+        } elseif ($this->every === 'Weekly') {
+            $this->repeatOptions = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        } else {
+            $this->repeatOptions = [];
+        }
+    }
+
+
+    protected function ordinal($number)
+    {
+        $ends = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
+        if ((($number % 100) >= 11) && (($number % 100) <= 13)) {
+            return $number . 'th';
+        } else {
+            return $number . $ends[$number % 10];
+        }
+    }
+
 
 
 
@@ -176,6 +244,7 @@ class ScheduleIndex extends BaseComponent
 
     public function publishShift()
     {
+        $this->repeatOn = 'Third Sunday';
         // Validation
         $this->validate([
             'selectedDate' => ['required', 'date'],
@@ -228,24 +297,47 @@ class ScheduleIndex extends BaseComponent
             'note' => $this->newShift['note'],
         ]);
 
-        $shiftDate = $shift->dates()->create([
-            'date' => $this->selectedDate,
-            'start_time' => $this->newShift['start_time'],
-            'end_time' => $this->newShift['end_time'],
-            'total_hours' => $this->newShift['total_hours'],
-        ]);
-
-        $shiftDate->employees()->attach($this->newShift['employees']);
 
 
-        if (!empty($this->newBreaks)) {
-            foreach ($this->newBreaks as $break) {
-                if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-                    $shift->breaks()->create([
-                        'title' => $break['name'],
-                        'type' => $break['type'],
-                        'duration' => $break['duration'],
-                    ]);
+
+        $dates = [];
+        $currentDate = $this->selectedDate;
+        $count = 0;
+
+        while (true) {
+            $dates[] = $currentDate;
+            $count++;
+
+            if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
+                break;
+            }
+            if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
+                break;
+            }
+
+            $currentDate = $this->getNextOccurrence($currentDate);
+        }
+
+
+        foreach ($dates as $date) {
+            $shiftDate = $shift->dates()->create([
+                'date' => $date,
+                'start_time' => $this->newShift['start_time'],
+                'end_time' => $this->newShift['end_time'],
+                'total_hours' => $this->newShift['total_hours'],
+            ]);
+
+            $shiftDate->employees()->attach($this->newShift['employees']);
+
+            if (!empty($this->newBreaks)) {
+                foreach ($this->newBreaks as $break) {
+                    if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                        $shiftDate->breaks()->create([
+                            'title' => $break['name'],
+                            'type' => $break['type'],
+                            'duration' => $break['duration'],
+                        ]);
+                    }
                 }
             }
         }
@@ -562,6 +654,61 @@ class ScheduleIndex extends BaseComponent
 
         $this->dispatch('closemodal');
     }
+
+
+    public function getNextOccurrence($currentDate)
+    {
+
+        $date = \Carbon\Carbon::parse($currentDate);
+
+        if ($this->frequency === 'Daily') {
+            $date->addDays($this->every);
+        } elseif ($this->frequency === 'Weekly') {
+            $targetDay = ucfirst(strtolower(trim($this->repeatOn ?? $date->format('l'))));
+            $date->next($targetDay)->addWeeks($this->every - 1);
+        } elseif ($this->frequency === 'Monthly') {
+            // Determine repeatOn type
+            if (preg_match('/^\d{1,2}(st|nd|rd|th)$/', $this->repeatOn)) {
+                // Numeric day
+                $day = intval($this->repeatOn);
+                $date->addMonths($this->every);
+                $date->day(min($day, $date->daysInMonth));
+            } else {
+                // 'First Monday', 'Second Tuesday', 'Last Sunday', etc.
+                $parts = explode(' ', trim($this->repeatOn)); // ['Last','Sunday']
+                $weekMap = ['First' => 1, 'Second' => 2, 'Third' => 3, 'Fourth' => 4, 'Last' => -1];
+                $weekNumber = $weekMap[$parts[0]] ?? 1;
+                $weekday = ucfirst(strtolower($parts[1] ?? 'Monday'));
+
+                // Jump months first
+                $date->addMonths($this->every);
+
+                if ($weekNumber === -1) {
+                    // Last weekday of the month
+                    $date->day($date->daysInMonth);
+                    while (strtolower($date->format('l')) !== strtolower($weekday)) {
+                        $date->subDay();
+                    }
+                } else {
+                    // nth weekday of the month
+                    $date->day(1);
+                    $currentWeek = 0;
+                    while (true) {
+                        if (strtolower($date->format('l')) === strtolower($weekday)) {
+                            $currentWeek++;
+                            if ($currentWeek === $weekNumber) {
+                                break;
+                            }
+                        }
+                        $date->addDay();
+                    }
+                }
+            }
+        }
+
+        return $date->format('Y-m-d');
+    }
+
 
 
 

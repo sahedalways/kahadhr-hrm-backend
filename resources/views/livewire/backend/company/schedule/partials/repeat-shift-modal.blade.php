@@ -4,6 +4,7 @@
     <div class="modal-dialog modal-dialog-centered shift-modal-dialog">
         <div class="modal-content shift-modal-content">
 
+            <!-- Modal Header -->
             <div class="modal-header border-0 pb-2 pe-4 position-relative">
                 <h5 class="modal-title fs-6 text-secondary mx-auto" id="customRepeatShiftModalLabel">
                     Repeating shift settings
@@ -15,26 +16,25 @@
                 </button>
             </div>
 
+            <!-- Modal Body -->
             <div class="modal-body shift-modal-body p-3 pt-0">
 
+                <!-- Frequency & Every -->
                 <div class="mb-3 mt-5">
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center gap-3">
 
-
-
-
-                        <div class="dropdown" style="position: relative; display: inline-block;">
+                        <!-- Frequency Dropdown -->
+                        <div class="dropdown flex-grow-1">
                             <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
                                 data-bs-toggle="dropdown"
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $frequency ?? 'Select' }}
                             </button>
-
                             <div class="dropdown-menu p-2"
-                                style="max-height: 200px; overflow-y:auto; left: 0 !important; min-width: auto !important;">
+                                style="max-height: 200px; overflow-y:auto; min-width: 120px;">
                                 @foreach (['Monthly', 'Weekly', 'Daily'] as $option)
                                     <a href="#" class="dropdown-item text-center"
-                                        wire:change="handleChangeFrequency($event.target.value)"
+                                        wire:click.prevent="$set('frequency', '{{ $option }}')"
                                         style="color: #000; width: 100%; text-align: center;">
                                         {{ $option }}
                                     </a>
@@ -42,23 +42,18 @@
                             </div>
                         </div>
 
-
-
-
-
-                        <span class="text-muted me-2 ms-4">Every</span>
-                        <div class="dropdown" style="position: relative; display: inline-block;">
+                        <!-- Every Dropdown -->
+                        <span class="text-muted">Every</span>
+                        <div class="dropdown flex-grow-1" style="min-width: 70px;">
                             <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
                                 data-bs-toggle="dropdown"
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $every ?? 'Select' }}
                             </button>
-
-                            <div class="dropdown-menu p-2"
-                                style="max-height: 200px; overflow-y:auto; left: 0 !important; min-width: auto !important;">
+                            <div class="dropdown-menu p-2" style="max-height: 200px; overflow-y:auto; min-width: 70px;">
                                 @foreach ($everyOptions as $option)
                                     <a href="#" class="dropdown-item text-center"
-                                        wire:click.prevent="$set('every', {{ $option }})"
+                                        wire:click.prevent='$set("every", {{ $option }})'
                                         style="color: #000; width: 100%; text-align: center;">
                                         {{ $option }}
                                     </a>
@@ -66,11 +61,7 @@
                             </div>
                         </div>
 
-
-
-
-
-                        <span class="text-muted m-2">
+                        <span class="text-muted">
                             @if ($frequency === 'Monthly')
                                 Months
                             @elseif($frequency === 'Weekly')
@@ -81,18 +72,17 @@
                         </span>
 
                     </div>
-
                 </div>
-
 
                 <hr class="my-3">
 
+                <!-- Repeats On Dropdown -->
                 @if ($every !== 'Daily')
                     <div class="mb-3 mt-4">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center gap-3">
                             <span class="text-muted me-2">Repeats on</span>
 
-                            <div class="dropdown" style="position: relative; display: inline-block; min-width: 200px;">
+                            <div class="dropdown flex-grow-1" style="min-width: 200px;">
                                 <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
                                     data-bs-toggle="dropdown"
                                     style="border: none; background-color: transparent; color: #000; font-weight: 500;">
@@ -100,118 +90,37 @@
                                 </button>
 
                                 <div class="dropdown-menu p-2"
-                                    style="max-height: 250px; overflow-y:auto; left: 0 !important; min-width: auto !important;">
-
-                                    @php
-                                        $options = [];
-                                        if ($every == 'Monthly') {
-                                            $options = [
-                                                'First Sunday',
-                                                'First Monday',
-                                                'First Tuesday',
-                                                'First Wednesday',
-                                                'First Thursday',
-                                                'First Friday',
-                                                'First Saturday',
-                                                'Second Sunday',
-                                                'Second Monday',
-                                                'Second Tuesday',
-                                                'Second Wednesday',
-                                                'Second Thursday',
-                                                'Second Friday',
-                                                'Second Saturday',
-                                                'Third Sunday',
-                                                'Third Monday',
-                                                'Third Tuesday',
-                                                'Third Wednesday',
-                                                'Third Thursday',
-                                                'Third Friday',
-                                                'Third Saturday',
-                                                'Last Sunday',
-                                                'Last Monday',
-                                                'Last Tuesday',
-                                                'Last Wednesday',
-                                                'Last Thursday',
-                                                'Last Friday',
-                                                'Last Saturday',
-                                                'End Of Month',
-                                                '1st',
-                                                '2nd',
-                                                '3rd',
-                                                '4th',
-                                                '5th',
-                                                '6th',
-                                                '7th',
-                                                '8th',
-                                                '9th',
-                                                '10th',
-                                                '11th',
-                                                '12th',
-                                                '13th',
-                                                '14th',
-                                                '15th',
-                                                '16th',
-                                                '17th',
-                                                '18th',
-                                                '19th',
-                                                '20th',
-                                                '21st',
-                                                '22nd',
-                                                '23rd',
-                                                '24th',
-                                                '25th',
-                                                '26th',
-                                                '27th',
-                                                '28th',
-                                                '29th',
-                                                '30th',
-                                                '31st',
-                                            ];
-                                        } elseif ($every == 'Weekly') {
-                                            $options = [
-                                                'Sunday',
-                                                'Monday',
-                                                'Tuesday',
-                                                'Wednesday',
-                                                'Thursday',
-                                                'Friday',
-                                                'Saturday',
-                                            ];
-                                        }
-                                    @endphp
-
-                                    @foreach ($options as $option)
+                                    style="max-height: 250px; overflow-y:auto; min-width: 200px;">
+                                    @foreach ($repeatOptions as $option)
                                         <a href="#" class="dropdown-item text-center"
-                                            wire:click.prevent="$set('repeatOn', '{{ $option }}')"
+                                            wire:click.prevent='$set("repeatOn", "{{ $option }}")'
                                             style="color: #000; width: 100%; text-align: center;">
                                             {{ $option }}
                                         </a>
                                     @endforeach
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 @endif
 
-
-
                 <hr class="my-3">
 
+                <!-- End Repeat -->
                 <div class="mb-5">
-                    <div class="d-flex align-items-center">
-                        <span class="text-muted me-2">End repeat</span>
+                    <div class="d-flex align-items-center gap-2">
 
-                        <div class="dropdown me-2" style="position: relative; display: inline-block; width: 120px;">
+                        <span class="text-muted">End repeat</span>
+
+                        <!-- End Repeat Type -->
+                        <div class="dropdown" style="width: 120px;">
                             <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
                                 data-bs-toggle="dropdown"
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $endRepeat ?? 'Select' }}
                             </button>
-
                             <div class="dropdown-menu p-2"
-                                style="max-height: 200px; overflow-y:auto; left: 0 !important; min-width: auto !important;">
+                                style="max-height: 200px; overflow-y:auto; min-width: 120px;">
                                 @foreach (['After', 'On'] as $option)
                                     <a href="#" class="dropdown-item text-center"
                                         wire:click.prevent="$set('endRepeat', '{{ $option }}')"
@@ -221,9 +130,12 @@
                                 @endforeach
                             </div>
                         </div>
-                        <input type="number" class="form-control shift-input-control me-2 text-center" value="5"
-                            min="0" style="width: 70px;" oninput="this.value = Math.max(0, this.value)">
 
+                        <!-- Occurrences Input -->
+                        <div style="width: 70px;">
+                            <input type="number" class="form-control shift-input-control text-center" value="5"
+                                min="0" oninput="this.value = Math.max(0, this.value)" wire:model="occurrences">
+                        </div>
 
                         <span class="text-muted">occurrences</span>
                     </div>
@@ -231,6 +143,7 @@
 
             </div>
 
+            <!-- Modal Footer -->
             <div class="modal-footer shift-modal-footer p-3 justify-content-start border-top-0">
                 <a href="#" class="me-auto text-decoration-none text-secondary fs-5" aria-label="Help">
                     <i class="bi bi-question-circle"></i>
@@ -247,5 +160,4 @@
 
         </div>
     </div>
-
 </div>

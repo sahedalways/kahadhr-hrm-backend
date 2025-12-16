@@ -26,6 +26,7 @@ class ScheduleIndex extends BaseComponent
 
     public $hoveredCell;
     public $totalBreakMinutes = 0;
+    public $originalShiftTotalTime = 0;
 
     public $employeeSearch = '';
 
@@ -33,6 +34,16 @@ class ScheduleIndex extends BaseComponent
 
     public $breaks = [];
     public $newBreaks = [];
+    public $paidBreaksCount = 0;
+    public $unpaidBreaksCount = 0;
+    public $paidBreaksDuration = '00:00';
+    public $unpaidBreaksDuration = '00:00';
+
+    public $frequency = 'Monthly';
+    public $every = 1;
+    public $everyOptions = [];
+
+
 
     public $newShift = [
         'title' => '',
@@ -40,12 +51,33 @@ class ScheduleIndex extends BaseComponent
         'start_time' => '09:00',
         'end_time' => '17:00',
         'total_hours' => '08:00',
-        'color' => '',
+        'color' => '#0000',
         'address' => '',
         'note' => '',
         'all_day' => false,
         'employees' => [],
     ];
+
+
+
+    public function handleChangeFrequency($value)
+    {
+        $this->frequency = $value;
+        $this->setEveryOptions();
+        $this->every = reset($this->everyOptions);
+    }
+
+
+    private function setEveryOptions()
+    {
+        if ($this->frequency === 'Daily') {
+            $this->everyOptions = range(1, 30);
+        } elseif ($this->frequency === 'Weekly') {
+            $this->everyOptions = range(1, 2);
+        } else {
+            $this->everyOptions = range(1, 12);
+        }
+    }
 
 
 
@@ -100,10 +132,29 @@ class ScheduleIndex extends BaseComponent
         $this->selectedDate = $date;
         $this->newShift['employees'][] = (int) $employeeId;
         $this->selectedEmployees[] = $employeeId;
-        $this->showAddShiftPanel = true;
+        $this->resetFields();
 
         $this->dispatch('shift-panel-opened');
     }
+
+
+    public function resetFields()
+    {
+        $this->showAddShiftPanel = true;
+        $this->originalShiftTotalTime = '8:00';
+        $this->breaks = [];
+        $this->newBreaks = [];
+        $this->paidBreaksCount = 0;
+        $this->unpaidBreaksCount = 0;
+        $this->paidBreaksDuration = '00:00';
+        $this->unpaidBreaksDuration = '00:00';
+        $this->frequency = 'Monthly';
+        $this->every = 1;
+        $this->everyOptions = [];
+    }
+
+
+
     public function closeAddShiftPanel()
     {
         $this->showAddShiftPanel = false;
@@ -137,6 +188,7 @@ class ScheduleIndex extends BaseComponent
             'newShift.address' => 'nullable|string|max:255',
             'newShift.note' => 'nullable|string|max:500',
             'newShift.job' => 'required|string|max:100',
+            'newBreaks' => 'nullable|array',
         ], [
             'selectedDate.required' => 'Please select a date for the shift.',
             'selectedDate.date' => 'The selected date is not valid.',
@@ -185,6 +237,21 @@ class ScheduleIndex extends BaseComponent
 
         $shiftDate->employees()->attach($this->newShift['employees']);
 
+
+        if (!empty($this->newBreaks)) {
+            foreach ($this->newBreaks as $break) {
+                if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                    $shift->breaks()->create([
+                        'title' => $break['name'],
+                        'type' => $break['type'],
+                        'duration' => $break['duration'],
+                    ]);
+                }
+            }
+        }
+
+
+
         $this->closeAddShiftPanel();
         $this->dispatch('refreshSchedule');
         $this->toast('Shift has been published successfully!', 'success');
@@ -215,6 +282,7 @@ class ScheduleIndex extends BaseComponent
             ->orderBy('f_name')
             ->get();
 
+        $this->setEveryOptions();
         $this->startDate = Carbon::today();
         $this->endDate = Carbon::today()->copy()->addDays(6);
         $this->currentDate = Carbon::today();
@@ -326,6 +394,11 @@ class ScheduleIndex extends BaseComponent
         if ($value) {
             $this->newShift['start_time'] = '09:00';
             $this->newShift['end_time'] = '17:00';
+
+            $this->newShift['total_hours']  = '08:00';
+            $this->originalShiftTotalTime = $this->newShift['total_hours'];
+
+
             [$hours, $minutes] = explode(':', '08:00');
             $totalMinutes = ($hours * 60) + $minutes;
 
@@ -362,6 +435,7 @@ class ScheduleIndex extends BaseComponent
             $minutes = $diff % 60;
 
             $this->newShift['total_hours'] = sprintf('%02d:%02d', $hours, $minutes);
+            $this->originalShiftTotalTime = $this->newShift['total_hours'];
         }
     }
 
@@ -378,6 +452,8 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+
     public function addBreakRow()
     {
         $this->showAddBreakForm = true;
@@ -385,8 +461,7 @@ class ScheduleIndex extends BaseComponent
         $this->newBreaks[] = [
             'name' => '',
             'type' => '',
-            'duration' => '0.10',
-            'new' => true,
+            'duration' => '0.10'
         ];
     }
 
@@ -399,10 +474,6 @@ class ScheduleIndex extends BaseComponent
 
     public function getDefaultBreaks()
     {
-        $this->showAddBreakForm = false;
-
-        $this->newBreaks = [];
-
 
         $this->breaks = ShiftBreak::where('company_id', $this->company_id)
             ->orderBy('title')
@@ -431,20 +502,28 @@ class ScheduleIndex extends BaseComponent
     public function confirmBreaksAndSave()
     {
 
+        $this->totalBreakMinutes = 0;
+        $paidCount = 0;
+        $unpaidCount = 0;
+        $paidMinutes = 0;
+        $unpaidMinutes = 0;
 
         foreach ($this->newBreaks as $break) {
             if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
 
+                $duration = (float) $break['duration'];
+                $hours = floor($duration);
+                $minutes = ($duration - $hours) * 100;
+                $breakMinutes = $hours * 60 + $minutes;
 
                 if (strtolower($break['type']) == 'paid') {
-                    $duration = (float) $break['duration'];
-                    $hours = floor($duration);
-                    $minutes = ($duration - $hours) * 100;
-                    $breakMinutes = $hours * 60 + $minutes;
-
-                    $this->totalBreakMinutes += $breakMinutes;
+                    $this->totalBreakMinutes += $breakMinutes; // now safe
+                    $paidCount++;
+                    $paidMinutes += $breakMinutes;
+                } elseif (strtolower($break['type']) == 'unpaid') {
+                    $unpaidCount++;
+                    $unpaidMinutes += $breakMinutes;
                 }
-
 
                 $exists = ShiftBreak::where('company_id', $this->company_id)
                     ->where('title', $break['name'])
@@ -461,12 +540,18 @@ class ScheduleIndex extends BaseComponent
             }
         }
 
+        $this->paidBreaksCount = $paidCount;
+        $this->unpaidBreaksCount = $unpaidCount;
+        $this->paidBreaksDuration = sprintf('%02d:%02d', floor($paidMinutes / 60), $paidMinutes % 60);
+        $this->unpaidBreaksDuration = sprintf('%02d:%02d', floor($unpaidMinutes / 60), $unpaidMinutes % 60);
 
-        if ($this->totalBreakMinutes > 0 && $this->newShift['total_hours']) {
-            [$shiftHours, $shiftMinutes] = explode(':', $this->newShift['total_hours']);
+
+        if ($this->originalShiftTotalTime) {
+            [$shiftHours, $shiftMinutes] = explode(':', $this->originalShiftTotalTime);
             $shiftTotalMinutes = ($shiftHours * 60) + $shiftMinutes;
 
-            $shiftTotalMinutes -= $this->totalBreakMinutes;
+
+            $shiftTotalMinutes -= $paidMinutes;
             $shiftTotalMinutes = max(0, $shiftTotalMinutes);
 
             $newHours = floor($shiftTotalMinutes / 60);
@@ -475,14 +560,9 @@ class ScheduleIndex extends BaseComponent
             $this->newShift['total_hours'] = sprintf('%02d:%02d', $newHours, $newMinutes);
         }
 
-        // Clear newBreaks and hide form
-        $this->newBreaks = [];
-        $this->showAddBreakForm = false;
-
-        $this->getDefaultBreaks();
-
         $this->dispatch('closemodal');
     }
+
 
 
 

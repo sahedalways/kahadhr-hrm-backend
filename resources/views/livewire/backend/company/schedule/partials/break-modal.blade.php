@@ -18,7 +18,7 @@
             @else
                 <div class="modal-header border-0 pb-2 pe-4 position-relative">
                     <button type="button"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-0 top-50 translate-middle-y"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-3 top-50 translate-middle-y"
                         data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
                         <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>
@@ -76,7 +76,7 @@
                                     </select>
                                 </div>
                                 <div class="col-3">
-                                    <label class="form-label small text-secondary mb-1 text-center">
+                                    {{-- <label class="form-label small text-secondary mb-1 text-center">
                                         Duration
                                     </label>
                                     <select class="form-select form-select-sm text-center custom-duration-dropdown"
@@ -86,7 +86,23 @@
                                             <option value="{{ number_format($i, 2) }}">{{ number_format($i, 2) }}
                                             </option>
                                         @endfor
-                                    </select>
+                                    </select> --}}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
+                                            data-bs-toggle="dropdown">
+                                            {{ $newBreaks[$index]['duration'] ?? 'Select duration' }}
+                                        </button>
+
+
+                                        <div class="dropdown-menu p-2" style="max-height:200px; overflow-y:auto;">
+                                            @for ($i = 0; $i <= 23; $i += 0.05)
+                                                <button type="button" class="dropdown-item text-center"
+                                                    wire:click="$set('newBreaks.{{ $index }}.duration', '{{ number_format($i, 2) }}')">
+                                                    {{ number_format($i, 2) }}
+                                                </button>
+                                            @endfor
+                                        </div>
+                                    </div>
 
                                 </div>
 

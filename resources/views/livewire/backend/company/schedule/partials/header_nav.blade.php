@@ -1,5 +1,5 @@
 <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center gap-3">
 
 
         <div class="dropdown me-1">

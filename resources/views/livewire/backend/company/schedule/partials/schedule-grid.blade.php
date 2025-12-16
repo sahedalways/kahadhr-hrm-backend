@@ -259,21 +259,69 @@
                                 @enderror
                             </div>
 
-                            <div class="d-flex align-items-center mb-3"
-                                style="color: rgb(0, 89, 255); font-size: 0.875rem;">
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
-                                    wire:click="getDefaultBreaks()" class=" text-primary small me-3"
-                                    style="color: rgb(0, 89, 255);">
-                                    <i class="fas fa-coffee me-2"></i> Add break
-                                </a>
-                                <a href="#" class="me-3 text-primary small ms-3"
-                                    style="color: rgb(0, 89, 255);">
-                                    <i class="fas fa-redo me-2"></i> Does not repeat
-                                </a>
-                                <a class="text-primary small ms-3" style="color: rgb(0, 89, 255);">
-                                    <i class="fas fa-globe me-2"></i> Europe/London
-                                </a>
-                            </div>
+
+
+                            @if ($this->unpaidBreaksCount > 0 || $this->paidBreaksCount > 0)
+                                <div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
+                                    <i class="fas fa-coffee me-2"></i>
+
+                                    <span class="me-3 text-dark small">
+                                        @if ($this->unpaidBreaksCount > 0)
+                                            {{ $this->unpaidBreaksCount }} Unpaid
+                                            break{{ $this->unpaidBreaksCount > 1 ? 's' : '' }}
+                                            {{ $this->unpaidBreaksDuration }}
+                                        @endif
+
+                                        @if ($this->paidBreaksCount > 0)
+                                            @if ($this->unpaidBreaksCount > 0)
+                                                •
+                                            @endif
+                                            {{ $this->paidBreaksCount }} Paid
+                                            break{{ $this->paidBreaksCount > 1 ? 's' : '' }}
+                                            {{ $this->paidBreaksDuration }}
+                                        @endif
+                                    </span>
+
+                                    @if ($this->unpaidBreaksCount > 0 || $this->paidBreaksCount > 0)
+                                        <a href="#" data-bs-toggle="modal"
+                                            data-bs-target="#customAddBreakModal" wire:click="getDefaultBreaks()"
+                                            class="text-primary small ms-auto" style="font-size: 0.8rem;">
+                                            Edit Breaks
+                                        </a>
+                                    @endif
+                                </div>
+
+
+                                {{-- Repeat and Timezone links on new line --}}
+                                <div class="d-flex align-items-center mb-3">
+                                    <a href="#" class="me-3 text-primary small" data-bs-toggle="modal"
+                                        data-bs-target="#customRepeatShiftModal">
+                                        <i class="fas fa-redo me-2"></i> Does not repeat
+                                    </a>
+                                    <a class="text-primary small">
+                                        <i class="fas fa-globe me-2"></i> Europe/London
+                                    </a>
+                                </div>
+                            @else
+                                <div class="d-flex align-items-center mb-3 text-primary" style="font-size: 0.875rem;">
+
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
+                                        wire:click="getDefaultBreaks()" class="text-primary small me-3">
+                                        <i class="fas fa-coffee me-2"></i>
+                                        Add break
+                                    </a>
+
+                                    <a href="#" class="me-3 text-primary small" data-bs-toggle="modal"
+                                        data-bs-target="#customRepeatShiftModal">
+                                        <i class="fas fa-redo me-2"></i> Does not repeat
+                                    </a>
+                                    <a class="text-primary small">
+                                        <i class="fas fa-globe me-2"></i> Europe/London
+                                    </a>
+                                </div>
+                            @endif
+
+
 
 
 
@@ -401,6 +449,7 @@
 
 
     @include('livewire.backend.company.schedule.partials.break-modal')
+    @include('livewire.backend.company.schedule.partials.repeat-shift-modal')
 
 </div>
 

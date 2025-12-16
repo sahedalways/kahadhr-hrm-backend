@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shift_dates', function (Blueprint $table) {
+        Schema::create('breakof_shifts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shift_id')->constrained()->onDelete('cascade');
-            $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->string('total_hours')->nullable();
+            $table->string('title');
+            $table->enum('type', ['Paid', 'Unpaid'])->default('Unpaid');
+            $table->decimal('duration', 5, 2);
+            $table->foreignId('shift_id')->constrained('shifts')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shift_dates');
+        Schema::dropIfExists('breakof_shifts');
     }
 };

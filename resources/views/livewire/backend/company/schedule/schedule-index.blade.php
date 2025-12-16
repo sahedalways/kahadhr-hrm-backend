@@ -4,24 +4,31 @@
 
 
 <div class="container-fluid my-3 schedule-app">
-    <div class="card shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
-            @include('livewire.backend.company.schedule.partials.header_nav', [
-                'startDate' => $startDate ?? 'Oct 27',
-                'endDate' => $endDate ?? 'Nov 2',
-            ])
-        </div>
+    <div class="position-absolute start-0 top-0 ms-3 mt-2">
+        <h5 class="mb-0 fw-bold">Schedule</h5>
+    </div>
 
-        <div class="card-body p-0">
+    <div class="card shadow-sm">
+
+        <div class="card-body p-0 position-relative">
+
+
+
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2 position-absolute"
+                style="left: 60%; transform: translateX(-50%);">
+                @include('livewire.backend.company.schedule.partials.header_nav', [
+                    'startDate' => $startDate ?? 'Oct 27',
+                    'endDate' => $endDate ?? 'Nov 2',
+                ])
+            </div>
+
             <div class="d-flex">
                 @if ($viewMode === 'weekly')
                     @include('livewire.backend.company.schedule.partials.sidebar')
                 @endif
 
-
-                <div class="flex-grow-1 schedule-grid-container " style="overflow-x: auto; margin-top: 5rem !important;">
+                <div class="flex-grow-1 schedule-grid-container" style="overflow-x: auto; margin-top: 5rem !important;">
                     @include('livewire.backend.company.schedule.partials.schedule-grid')
-
                 </div>
             </div>
         </div>

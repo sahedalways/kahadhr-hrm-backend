@@ -79,7 +79,6 @@ body {
 
 /* ------------------ MOBILE RESPONSIVE ------------------ */
 @media (max-width: 576px) {
-
     .profile-dropdown,
     .notification-dropdown {
         width: 180px;
@@ -157,9 +156,9 @@ body {
 
 .sidenav-toggler-inner-wrapper {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     transition: transform 0.3s ease-in-out;
-    transform: translateX(0); 
+    transform: translateX(0);
 }
 
 .g-sidenav-pinned .sidenav-toggler-inner-wrapper {
@@ -169,9 +168,6 @@ body {
     -ms-transform: translateX(-30%);
     -o-transform: translateX(-30%);
 }
-
-
-
 
 .g-sidenav-pinned .content-wrapper {
     margin-left: 77px;
@@ -185,11 +181,11 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 0 0 0 6px;
-    transition: .3s;
-    -webkit-transition: .3s;
-    -moz-transition: .3s;
-    -ms-transition: .3s;
-    -o-transition: .3s;
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
 }
 
 .g-sidenav-pinned .nav-link .sidebar-icon {
@@ -238,8 +234,6 @@ body {
     align-items: center;
     font-size: 14px;
 }
-
-
 
 @media (max-width: 991px) {
     body {

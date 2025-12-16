@@ -27,8 +27,8 @@ class Shift extends Model
     }
 
 
-    public function break()
+    public function breaks()
     {
-        return $this->belongsTo(ShiftBreak::class);
+        return $this->hasMany(BreakofShift::class);
     }
 }

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->text('note')->nullable();
 
             $table->foreignId('template_id')->nullable()->constrained('shift_templates')->onDelete('set null');
-            $table->foreignId('break_id')->nullable()->constrained('shift_breaks')->onDelete('set null');
             $table->timestamps();
         });
     }

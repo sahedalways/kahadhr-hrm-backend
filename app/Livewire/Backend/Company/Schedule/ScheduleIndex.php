@@ -57,6 +57,8 @@ class ScheduleIndex extends BaseComponent
     public $showAddUserPanel = false;
 
 
+    public $multipleShifts = [];
+
 
     public $newShift = [
         'title' => '',
@@ -70,6 +72,34 @@ class ScheduleIndex extends BaseComponent
         'all_day' => false,
         'employees' => [],
     ];
+
+
+
+
+    public function addShiftRow()
+    {
+        $this->multipleShifts[] = [
+            'date' => null,
+            'all_day' => false,
+            'start_time' => '09:00',
+            'end_time' => '17:00',
+            'total_hours' => '08:00',
+            'title' => '',
+            'job' => '',
+            'color' => '#000000',
+            'employees' => [],
+            'address' => '',
+            'note' => '',
+        ];
+    }
+
+    public function removeShiftRow($index)
+    {
+        unset($this->multipleShifts[$index]);
+        $this->multipleShifts = array_values($this->multipleShifts);
+    }
+
+
 
     public function clickTempTab()
     {
@@ -321,6 +351,8 @@ class ScheduleIndex extends BaseComponent
         $this->isSavedRepeatShift = false;
         $this->isShiftTempTab = false;
         $this->showAddUserPanel = false;
+        $this->resetErrorBag();
+        $this->resetValidation();
     }
 
     public function resetRepeatFields()
@@ -567,7 +599,7 @@ class ScheduleIndex extends BaseComponent
         $this->company_id = auth()->user()->company->id;
         $this->loadEmployees();
         $this->shiftEmployees = $this->employees;
-
+        $this->addShiftRow();
 
         $this->setEveryOptions();
         $this->startDate = Carbon::today();

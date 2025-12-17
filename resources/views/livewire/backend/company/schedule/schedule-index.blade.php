@@ -4,7 +4,7 @@
 
 
 <div class="container-fluid my-3 schedule-app">
-    <div class="position-absolute start-0 top-0 ms-3 mt-2">
+    <div class="ms-3 mt-2">
         <h5 class="mb-0 fw-bold">Schedule</h5>
     </div>
 
@@ -12,10 +12,8 @@
 
         <div class="card-body p-0 position-relative">
 
-
-
             <div class="card-header bg-white d-flex justify-content-between align-items-center py-2 position-absolute"
-                style="left: 60%; transform: translateX(-50%);">
+                style="left: 50%">
                 @include('livewire.backend.company.schedule.partials.header_nav', [
                     'startDate' => $startDate ?? 'Oct 27',
                     'endDate' => $endDate ?? 'Nov 2',

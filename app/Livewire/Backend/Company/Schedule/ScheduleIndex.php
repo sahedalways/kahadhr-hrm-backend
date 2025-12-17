@@ -43,9 +43,12 @@ class ScheduleIndex extends BaseComponent
     public $every = 5;
     public $everyOptions = [];
     public $repeatOptions = [];
-    public $repeatOn = 'Last Sunday';
+    public $repeatOn = '';
     public $endRepeat = 'After';
-    public $occurrences = 10;
+    public $occurrences = 5;
+    public $isSavedRepeatShift = false;
+
+
 
 
 
@@ -91,7 +94,7 @@ class ScheduleIndex extends BaseComponent
 
     protected function updateRepeatOptions()
     {
-        if ($this->every === 'Monthly') {
+        if ($this->frequency === 'Monthly') {
             $this->repeatOptions = [
                 'First Sunday',
                 'First Monday',
@@ -126,12 +129,7 @@ class ScheduleIndex extends BaseComponent
                 'Middle Of Month',
                 'Last Of Month',
             ];
-
-
-            for ($i = 1; $i <= 31; $i++) {
-                $this->repeatOptions[] = "{$i}" . $this->ordinal($i);
-            }
-        } elseif ($this->every === 'Weekly') {
+        } elseif ($this->frequency === 'Weekly') {
             $this->repeatOptions = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         } else {
             $this->repeatOptions = [];
@@ -221,7 +219,7 @@ class ScheduleIndex extends BaseComponent
         $this->unpaidBreaksDuration = '00:00';
         $this->frequency = 'Monthly';
         $this->every = 1;
-        $this->everyOptions = [];
+        $this->isSavedRepeatShift = false;
     }
 
 
@@ -232,6 +230,20 @@ class ScheduleIndex extends BaseComponent
         $this->reset('newShift');
     }
 
+
+
+    public function saveRepeatShift()
+    {
+        $this->isSavedRepeatShift = true;
+    }
+
+
+    public function cancelRepeatShift()
+    {
+        $this->frequency = 'Monthly';
+        $this->every = 1;
+        $this->isSavedRepeatShift = false;
+    }
 
 
     public function getShiftsByDate()
@@ -247,7 +259,7 @@ class ScheduleIndex extends BaseComponent
 
     public function publishShift()
     {
-        $this->repeatOn = 'First Of Month';
+
         // Validation
         $this->validate([
             'selectedDate' => ['required', 'date'],

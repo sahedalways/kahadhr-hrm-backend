@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->enum('type', ['Paid', 'Unpaid'])->default('Unpaid');
             $table->decimal('duration', 5, 2);
-            $table->foreignId('shift_id')->constrained('shifts')->onDelete('cascade');
+            $table->foreignId('shift_date_id')->constrained('shift_dates')->onDelete('cascade');
             $table->timestamps();
         });
     }

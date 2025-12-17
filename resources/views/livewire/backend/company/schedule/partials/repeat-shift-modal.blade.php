@@ -10,7 +10,7 @@
                     Repeating shift settings
                 </h5>
                 <button type="button"
-                    class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-0 top-50 translate-middle-y"
+                    class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-3 top-50 translate-middle-y"
                     data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
                     <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                 </button>
@@ -26,7 +26,7 @@
                         <!-- Frequency Dropdown -->
                         <div class="dropdown flex-grow-1">
                             <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
-                                data-bs-toggle="dropdown"
+                                data-bs-toggle="dropdown" data-bs-display="static"
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $frequency ?? 'Select' }}
                             </button>
@@ -34,7 +34,7 @@
                                 style="max-height: 200px; overflow-y:auto; min-width: 120px;">
                                 @foreach (['Monthly', 'Weekly', 'Daily'] as $option)
                                     <a href="#" class="dropdown-item text-center"
-                                        wire:click.prevent="$set('frequency', '{{ $option }}')"
+                                        wire:click="handleChangeFrequency('{{ $option }}')"
                                         style="color: #000; width: 100%; text-align: center;">
                                         {{ $option }}
                                     </a>
@@ -50,6 +50,9 @@
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $every ?? 'Select' }}
                             </button>
+
+
+
                             <div class="dropdown-menu p-2" style="max-height: 200px; overflow-y:auto; min-width: 70px;">
                                 @foreach ($everyOptions as $option)
                                     <a href="#" class="dropdown-item text-center"
@@ -77,7 +80,7 @@
                 <hr class="my-3">
 
                 <!-- Repeats On Dropdown -->
-                @if ($every !== 'Daily')
+                @if ($frequency !== 'Daily')
                     <div class="mb-3 mt-4">
                         <div class="d-flex align-items-center gap-3">
                             <span class="text-muted me-2">Repeats on</span>
@@ -89,8 +92,10 @@
                                     {{ $repeatOn ?? 'Select' }}
                                 </button>
 
+
                                 <div class="dropdown-menu p-2"
                                     style="max-height: 250px; overflow-y:auto; min-width: 200px;">
+
                                     @foreach ($repeatOptions as $option)
                                         <a href="#" class="dropdown-item text-center"
                                             wire:click.prevent='$set("repeatOn", "{{ $option }}")'
@@ -115,7 +120,7 @@
                         <!-- End Repeat Type -->
                         <div class="dropdown" style="width: 120px;">
                             <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"
-                                data-bs-toggle="dropdown"
+                                data-bs-toggle="dropdown" data-bs-display="static"
                                 style="border: none; background-color: transparent; color: #000; font-weight: 500;">
                                 {{ $endRepeat ?? 'Select' }}
                             </button>
@@ -132,7 +137,7 @@
                         </div>
 
                         <!-- Occurrences Input -->
-                        <div style="width: 70px;">
+                        <div style="width: 70px; margin-left: 40px !important;">
                             <input type="number" class="form-control shift-input-control text-center" value="5"
                                 min="0" oninput="this.value = Math.max(0, this.value)" wire:model="occurrences">
                         </div>
@@ -149,13 +154,22 @@
                     <i class="bi bi-question-circle"></i>
                 </a>
 
-                <button type="button" class="btn btn-link text-decoration-none me-2" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-link text-decoration-none me-2" data-bs-dismiss="modal"
+                    wire:click="cancelRepeatShift">
                     Cancel repeat
                 </button>
 
-                <button type="button" class="btn btn-primary">
-                    Save repeat
+
+                <button data-bs-dismiss="modal" type="button" class="btn btn-success" wire:click="saveRepeatShift"
+                    wire:loading.attr="disabled" wire:target="saveRepeatShift">
+                    <span wire:loading.remove wire:target="saveRepeatShift">Save repeat</span>
+                    <span wire:loading wire:target="saveRepeatShift">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </span>
                 </button>
+
+
             </div>
 
         </div>

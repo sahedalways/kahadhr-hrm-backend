@@ -12,4 +12,10 @@ class ShiftBreak extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+
+    public function shiftDates()
+    {
+        return $this->belongsTo(ShiftDate::class);
+    }
 }

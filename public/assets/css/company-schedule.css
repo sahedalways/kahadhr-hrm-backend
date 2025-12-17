@@ -352,9 +352,9 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     max-width: 700px;
 }
 
-.dropdown-menu {
+/* .dropdown-menu {
     inset: auto auto -211px 73px !important;
-}
+} */
 
 .custom-break-dropdown-menu {
     max-height: 200px;
@@ -435,7 +435,7 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
 }
 
 .shift-modal-dialog {
-    max-width: 390px;
+    max-width: 450px;
 }
 
 .shift-modal-header {

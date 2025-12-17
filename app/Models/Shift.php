@@ -25,10 +25,4 @@ class Shift extends Model
     {
         return $this->belongsTo(Company::class);
     }
-
-
-    public function breaks()
-    {
-        return $this->hasMany(BreakofShift::class);
-    }
 }

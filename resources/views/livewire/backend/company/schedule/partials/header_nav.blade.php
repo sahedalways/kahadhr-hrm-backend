@@ -16,7 +16,7 @@
         </div>
 
 
-        <div class="d-flex align-items-center border rounded p-2 me-4">
+        <div class="d-flex align-items-center border rounded p-2 me-4 flex-nowrap">
 
 
             <button wire:click="goToPrevious" class="btn btn-sm btn-link text-dark p-0 me-2">
@@ -24,7 +24,7 @@
             </button>
 
 
-            <span class="fw-bold">{{ $this->displayDateRange }}</span>
+            <span class="fw-bold text-nowrap">{{ $this->displayDateRange }}</span>
 
             <button wire:click="goToNext" class="btn btn-sm btn-link text-dark p-0 ms-2">
                 <i class="fas fa-chevron-right"></i>

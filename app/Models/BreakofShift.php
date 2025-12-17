@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class BreakofShift extends Model
 {
-    protected $fillable = ['title', 'type', 'duration', 'shift_id'];
+    protected $fillable = ['title', 'type', 'duration', 'shift_date_id'];
 
-    public function shifts()
+    public function dates()
     {
-        return $this->hasMany(Shift::class);
+        return $this->hasMany(ShiftDate::class);
     }
 }

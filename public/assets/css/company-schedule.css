@@ -488,3 +488,16 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     max-height: 200px;
     overflow-y: auto;
 }
+
+/* button default hidden */
+.month-cell .add-shift-month-btn {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* only hovered cell shows button */
+.month-cell:hover .add-shift-month-btn {
+    opacity: 1;
+    pointer-events: auto;
+}

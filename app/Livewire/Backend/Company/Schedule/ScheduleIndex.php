@@ -283,6 +283,16 @@ class ScheduleIndex extends BaseComponent
 
 
 
+    public function openAddShiftPanelForMonth($date)
+    {
+        $this->selectedDate = $date;
+        $this->resetFields();
+
+        $this->dispatch('shift-panel-opened');
+    }
+
+
+
 
 
     public function openAddShiftPanel($date, $employeeId)

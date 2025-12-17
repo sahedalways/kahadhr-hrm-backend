@@ -62,32 +62,25 @@
                                             $isInCurrentMonth = $day->month == $dateInMonth->month;
                                         @endphp
 
-                                        <td class="schedule-cell {{ $day->equalTo(\Carbon\Carbon::today()) ? 'bg-primary-light-cell' : '' }}"
-                                            style="position: relative; height: 80px; width: 14.285%;"
-                                            wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
-                                            wire:mouseleave="$set('hoveredCell', null)">
+                                        <td class="schedule-cell month-cell {{ $day->equalTo(\Carbon\Carbon::today()) ? 'bg-primary-light-cell' : '' }}"
+                                            style="position: relative; height: 80px; width: 14.285%;">
 
                                             @if ($isInCurrentMonth)
-                                                {{-- Show date number only for current month --}}
                                                 <div class="small text-end p-1 text-dark {{ $day->equalTo(\Carbon\Carbon::today()) ? 'fw-bold' : '' }}"
                                                     style="font-size: 0.85rem;">
                                                     {{ $day->day }}
                                                 </div>
 
-                                                @if ($hoveredCell === $hoverKey)
-                                                    <button
-                                                        wire:click="openAddShiftPanel('{{ $day->format('Y-m-d') }}')"
-                                                        class="btn btn-sm btn-primary position-absolute d-flex justify-content-center align-items-center"
-                                                        style="width: 28px; height: 28px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; padding: 0; border-radius: 50%;"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Add Shift">
-                                                        +
-                                                    </button>
-                                                @endif
-                                            @else
-                                                <div style="height: 100%;"></div>
+                                                <button
+                                                    wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
+                                                    class="btn btn-sm btn-primary add-shift-month-btn position-absolute d-flex justify-content-center align-items-center"
+                                                    style="width: 28px; height: 28px; top: 50%; left: 50%;
+                   transform: translate(-50%, -50%);
+                   z-index: 10; padding: 0; border-radius: 50%;"
+                                                    title="Add Shift">
+                                                    +
+                                                </button>
                                             @endif
-
                                         </td>
                                     @endforeach
                                 </tr>
@@ -104,8 +97,7 @@
                                 $hoverKey = $employee['id'] . '_' . $day['full_date'];
                             @endphp
                             <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
-                                style="position: relative;"
-                                wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
+                                style="position: relative;" wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
                                 wire:mouseleave="$set('hoveredCell', null)">
 
                                 @if ($content && $content['type'] === 'Leave')
@@ -563,7 +555,7 @@
                             <div class="d-flex gap-2 ms-auto">
                                 <button class="btn btn-light" wire:click="saveAsTemplate"
                                     wire:loading.attr="disabled" wire:target="saveAsTemplate"
-                                    mattooltip="Save as template">
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Save as template">
                                     <span wire:loading.remove wire:target="saveAsTemplate">
                                         <i class="far fa-clone"></i>
                                     </span>

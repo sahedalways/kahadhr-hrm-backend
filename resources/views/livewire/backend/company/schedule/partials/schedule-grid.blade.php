@@ -180,24 +180,27 @@
 
                 {{-- TABS --}}
                 <ul class="nav nav-tabs shift-tabs px-3 pt-2">
-                    <li class="nav-item">
-                        <button class="nav-link active" data-bs-toggle="tab"
-                            data-bs-target="#shift-details">Details</button>
+                    <li class="nav-item" wire:click="clickShiftDetailsTab">
+                        <button class="nav-link {{ $isShiftTempTab ? '' : 'active' }}" data-bs-toggle="tab"
+                            data-bs-target="#shift-details">
+                            Details
+                        </button>
                     </li>
-                    <li class="nav-item ms-2">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#shift-tasks">Tasks</button>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <button class="nav-link" data-bs-toggle="tab"
-                            data-bs-target="#shift-templates">Templates</button>
+
+                    <li class="nav-item ms-2" wire:click="clickTempTab">
+                        <button class="nav-link {{ $isShiftTempTab ? 'active' : '' }}" data-bs-toggle="tab"
+                            data-bs-target="#shift-templates">
+                            Templates
+                        </button>
                     </li>
                 </ul>
 
                 {{-- BODY --}}
-                <div class="tab-content shift-panel-body px-4 py-3">
+
+                <div class="tab-content shift-panel-body px-4 py-3 ">
 
                     {{-- DETAILS TAB --}}
-                    <div class="tab-pane fade show active" id="shift-details">
+                    <div class="tab-pane fade {{ $isShiftTempTab ? '' : 'show active' }}" id="shift-details">
 
                         <form wire:submit.prevent="saveShift" class="d-flex flex-column gap-3">
 
@@ -261,6 +264,8 @@
 
 
 
+
+
                             @if ($this->unpaidBreaksCount > 0 || $this->paidBreaksCount > 0)
                                 <div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
                                     <i class="fas fa-coffee me-2"></i>
@@ -282,47 +287,84 @@
                                         @endif
                                     </span>
 
-                                    @if ($this->unpaidBreaksCount > 0 || $this->paidBreaksCount > 0)
-                                        <a href="#" data-bs-toggle="modal"
-                                            data-bs-target="#customAddBreakModal" wire:click="getDefaultBreaks()"
-                                            class="text-primary small ms-auto" style="font-size: 0.8rem;">
-                                            Edit Breaks
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
+                                        wire:click="getDefaultBreaks()" class="text-primary small ms-auto"
+                                        style="font-size: 0.8rem;">
+                                        Edit Breaks
+                                    </a>
+                                </div>
+
+                                {{-- Repeat + Timezone --}}
+                                <div class="d-flex align-items-center mb-3">
+                                    <a href="#"
+                                        class="me-3 text-primary small {{ $isSavedRepeatShift ? 'p-2 bg-light rounded' : '' }}"
+                                        data-bs-toggle="modal" data-bs-target="#customRepeatShiftModal">
+                                        <i class="fas fa-redo me-2"></i>
+                                        @if ($isSavedRepeatShift)
+
+                                            {{ $frequency }}
+                                            @if ($every)
+                                                every {{ $every }}
+                                            @endif
+                                            @if ($repeatOn)
+                                                on {{ $repeatOn }}
+                                            @endif
+                                            @if ($endRepeat === 'After')
+                                                ending after {{ $occurrences }} occurrences
+                                            @endif
+                                        @else
+                                            Does not repeat
+                                        @endif
+                                    </a>
+
+                                    @if (!$isSavedRepeatShift)
+                                        <a class="text-primary small">
+                                            <i class="fas fa-globe me-2"></i> Europe/London
                                         </a>
                                     @endif
                                 </div>
-
-
-                                {{-- Repeat and Timezone links on new line --}}
-                                <div class="d-flex align-items-center mb-3">
-                                    <a href="#" class="me-3 text-primary small" data-bs-toggle="modal"
-                                        data-bs-target="#customRepeatShiftModal">
-                                        <i class="fas fa-redo me-2"></i> Does not repeat
-                                    </a>
-                                    <a class="text-primary small">
-                                        <i class="fas fa-globe me-2"></i> Europe/London
-                                    </a>
-                                </div>
                             @else
                                 <div class="d-flex align-items-center mb-3 text-primary" style="font-size: 0.875rem;">
-
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
                                         wire:click="getDefaultBreaks()" class="text-primary small me-3">
-                                        <i class="fas fa-coffee me-2"></i>
-                                        Add break
+                                        <i class="fas fa-coffee me-2"></i> Add break
                                     </a>
 
                                     <a href="#" class="me-3 text-primary small" data-bs-toggle="modal"
                                         data-bs-target="#customRepeatShiftModal">
-                                        <i class="fas fa-redo me-2"></i> Does not repeat
+                                        <i class="fas fa-redo me-2"></i>
+                                        @if ($isSavedRepeatShift)
+                                            {{ $frequency }}
+                                            @if ($every)
+                                                every {{ $every }}
+                                            @endif
+                                            @if ($repeatOn)
+                                                on {{ $repeatOn }}
+                                            @endif
+                                            @if ($endRepeat === 'After')
+                                                ending after {{ $occurrences }} occurrences
+                                            @endif
+                                        @else
+                                            Does not repeat
+                                        @endif
                                     </a>
+
+                                    @if (!$isSavedRepeatShift)
+                                        <a class="text-primary small">
+                                            <i class="fas fa-globe me-2"></i> Europe/London
+                                        </a>
+                                    @endif
+
+                                </div>
+                            @endif
+
+                            @if ($isSavedRepeatShift)
+                                <div class="d-flex align-items-center mb-3 text-primary" style="font-size: 0.875rem;">
                                     <a class="text-primary small">
                                         <i class="fas fa-globe me-2"></i> Europe/London
                                     </a>
                                 </div>
                             @endif
-
-
-
 
 
 
@@ -402,46 +444,140 @@
                         </form>
                     </div>
 
-                    {{-- TASKS --}}
-                    <div class="tab-pane fade" id="shift-tasks">
-                        <p class="text-muted small">No tasks added yet.</p>
-                    </div>
+
 
                     {{-- TEMPLATES --}}
-                    <div class="tab-pane fade" id="shift-templates">
-                        <p class="text-muted small">Select a template to auto-fill shift details.</p>
+
+                    <div class="tab-pane fade {{ $isShiftTempTab ? 'show active' : '' }}" id="shift-templates">
+                        <div class="mb-4">
+
+                            @if (count($templates) > 0)
+                                <p class="text-dark-50 small">
+                                    Select a pre-defined template to quickly populate your shift details.
+                                </p>
+                            @endif
+
+                        </div>
+
+                        <div class="row g-3">
+                            @forelse($templates as $template)
+                                <div class="col-12 col-md-6">
+                                    <div class="card border-0 shadow-lg position-relative text-white"
+                                        style="background-color: #001f3f; width: 100%; min-height: 280px; border-radius: 12px;">
+
+                                        {{-- Delete Icon --}}
+                                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                                            wire:click="deleteTemplate({{ $template->id }})"
+                                            style="border-radius: 50%; width: 10px; height: 32px;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+
+                                        <div class="card-body d-flex flex-column p-4">
+
+                                            <div class="mb-3">
+                                                <h5 class="fw-bold mb-2 text-white">{{ $template->title }}</h5>
+                                                <span class="badge"
+                                                    style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;">
+                                                    {{ $template->job ?? 'Standard Shift' }}
+                                                </span>
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="far fa-clock text-info me-3" style="width: 16px;"></i>
+                                                    <div class="small">
+                                                        <span class="d-block fw-bold">
+                                                            {{ \Carbon\Carbon::parse($template->start_time)->format('h:i A') }}
+                                                        </span>
+                                                        <span class="d-block">
+                                                            {{ \Carbon\Carbon::parse($template->end_time)->format('h:i A') }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                @if ($template->address)
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <i class="fas fa-map-marker-alt text-warning me-3 mt-1"
+                                                            style="width: 16px;"></i>
+                                                        <span class="small">{{ $template->address }}</span>
+                                                    </div>
+                                                @endif
+
+                                                <div class="d-flex align-items-center mt-3">
+                                                    <i class="far fa-calendar-alt text-light me-3"
+                                                        style="width: 16px;"></i>
+                                                    <span class="small" style="font-size: 0.8rem;">
+                                                        {{ $template->created_at->format('d M Y') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-4">
+                                                <button class="btn btn-light w-100 py-2 fw-bold shadow-sm"
+                                                    wire:click="applyTemplate({{ $template->id }})"
+                                                    style="border-radius: 8px; font-size: 0.9rem;">
+                                                    <i class="fas fa-plus-circle me-2"></i> Use Template
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="col-12 py-5 text-center">
+                                    <p class="text-white-50">No templates saved yet.</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
 
+
                 </div>
+
+
 
                 {{-- FOOTER --}}
-                <div class="shift-panel-footer d-flex align-items-center px-4 py-3 border-top bg-white">
-                    <!-- Normal state -->
-                    <button class="btn btn-primary" wire:click="publishShift" wire:loading.attr="disabled"
-                        wire:target="publishShift">
 
-                        <!-- Normal content -->
-                        <span wire:loading.remove wire:target="publishShift">
-                            <i class="fas fa-upload"></i> Publish
-                        </span>
+                @if ($isShiftTempTab == false)
+                    <div class="shift-panel-footer d-flex align-items-center px-4 py-3 border-top bg-white">
+                        <!-- Normal state -->
+                        <button class="btn btn-primary" wire:click="publishShift" wire:loading.attr="disabled"
+                            wire:target="publishShift">
 
-                        <!-- Loading content -->
-                        <span wire:loading wire:target="publishShift">
-                            <span class="spinner-border spinner-border-sm me-2" role="status"
-                                aria-hidden="true"></span>
-                            Publishing...
-                        </span>
-                    </button>
+                            <!-- Normal content -->
+                            <span wire:loading.remove wire:target="publishShift">
+                                <i class="fas fa-upload me-2"></i> Publish
+                            </span>
+
+                            <!-- Loading content -->
+                            <span wire:loading wire:target="publishShift">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"
+                                    aria-hidden="true"></span>
+                                Publishing...
+                            </span>
+                        </button>
 
 
 
-                    <div class="d-flex gap-2 ms-auto">
-                        <button class="btn btn-light" wire:click="saveDraft"><i class="fas fa-save"></i></button>
-                        <button class="btn btn-light"><i class="fas fa-trash"></i></button>
-                        <button class="btn btn-light" wire:click="saveAsTemplate"><i
-                                class="far fa-clock"></i></button>
+                        <div class="d-flex gap-2 ms-auto">
+                            <div class="d-flex gap-2 ms-auto">
+                                <button class="btn btn-light" wire:click="saveAsTemplate"
+                                    wire:loading.attr="disabled" wire:target="saveAsTemplate"
+                                    mattooltip="Save as template">
+                                    <span wire:loading.remove wire:target="saveAsTemplate">
+                                        <i class="far fa-clone"></i>
+                                    </span>
+                                    <span wire:loading wire:target="saveAsTemplate">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        Saving...
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endif
+
 
             </div>
         </div>
@@ -471,6 +607,22 @@
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover',
+                delay: {
+                    "show": 200,
+                    "hide": 100
+                }
+            })
         })
     });
 </script>

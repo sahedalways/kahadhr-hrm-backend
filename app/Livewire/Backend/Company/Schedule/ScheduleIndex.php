@@ -6,6 +6,7 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\Shift;
 use App\Models\ShiftBreak;
+use App\Models\ShiftTemplates;
 use Carbon\Carbon;
 
 
@@ -15,6 +16,7 @@ class ScheduleIndex extends BaseComponent
     public $endDate;
     public $currentDate;
     public $employees;
+    public $shiftEmployees;
 
     public $company_id;
     public $search;
@@ -29,6 +31,7 @@ class ScheduleIndex extends BaseComponent
     public $originalShiftTotalTime = 0;
 
     public $employeeSearch = '';
+    public $shiftEmployeeSearch = '';
 
     public $showAddBreakForm = false;
 
@@ -47,8 +50,11 @@ class ScheduleIndex extends BaseComponent
     public $endRepeat = 'After';
     public $occurrences = 5;
     public $isSavedRepeatShift = false;
+    public $isShiftTempTab = false;
 
+    public $templates = [];
 
+    public $showAddUserPanel = false;
 
 
 
@@ -64,6 +70,53 @@ class ScheduleIndex extends BaseComponent
         'all_day' => false,
         'employees' => [],
     ];
+
+    public function clickTempTab()
+    {
+        $this->isShiftTempTab =  true;
+        $this->loadTemplates();
+    }
+
+    public function loadTemplates()
+    {
+        $this->templates = ShiftTemplates::where('company_id', $this->company_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+
+    public function clickShiftDetailsTab()
+    {
+        $this->isShiftTempTab =  false;
+    }
+
+
+
+
+    public function applyTemplate($id)
+    {
+
+        $template = ShiftTemplates::find($id);
+
+        if ($template) {
+            $this->newShift = [
+                'title'       => $template->title,
+                'job'         => $template->job ?? '',
+                'start_time'  => \Carbon\Carbon::parse($template->start_time)->format('H:i'),
+                'end_time'    => \Carbon\Carbon::parse($template->end_time)->format('H:i'),
+
+                'total_hours' => $this->calculateTotalHours(),
+                'color'       => $template->color ?? '#0000',
+                'address'     => $template->address ?? '',
+                'note'        => $template->note ?? '',
+                'all_day'     => $template->all_day ?? false,
+                'employees'   => $template->employees ?? [],
+            ];
+
+
+            $this->isShiftTempTab = false;
+        }
+    }
 
 
 
@@ -87,6 +140,35 @@ class ScheduleIndex extends BaseComponent
 
         $this->repeatOn = null;
         $this->updateRepeatOptions();
+    }
+
+
+    public function saveAsTemplate()
+    {
+        $this->validate([
+            'selectedDate'        => 'required|date',
+            'newShift.title'      => 'required|string|max:255',
+            'newShift.job'      => 'required|string|max:255',
+            'newShift.start_time' => 'required|date_format:H:i',
+            'newShift.end_time'   => 'required|date_format:H:i|after:newShift.start_time',
+        ], [
+            'selectedDate.required' => 'Please select a date for the template.',
+            'selectedDate.date'     => 'Selected date must be a valid date.',
+        ]);
+
+        ShiftTemplates::create([
+            'company_id' => $this->company_id,
+            'title'      => $this->newShift['title'],
+            'job'        => $this->newShift['job'],
+            'color'      => $this->newShift['color'],
+            'address'    => $this->newShift['address'],
+            'note'       => $this->newShift['note'],
+            'start_time' => $this->newShift['start_time'],
+            'end_time'   => $this->newShift['end_time'],
+            'created_at' => $this->selectedDate,
+        ]);
+
+        $this->toast('Template saved successfully!', 'success');
     }
 
 
@@ -149,6 +231,11 @@ class ScheduleIndex extends BaseComponent
 
 
 
+    public function toggleAddUserPanel()
+    {
+        $this->showAddUserPanel = !$this->showAddUserPanel;
+    }
+
 
 
     public function getSelectedShiftEmployeesProperty()
@@ -196,6 +283,8 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+
     public function openAddShiftPanel($date, $employeeId)
     {
         $this->selectedDate = $date;
@@ -220,7 +309,69 @@ class ScheduleIndex extends BaseComponent
         $this->frequency = 'Monthly';
         $this->every = 1;
         $this->isSavedRepeatShift = false;
+        $this->isShiftTempTab = false;
+        $this->showAddUserPanel = false;
     }
+
+    public function resetRepeatFields()
+    {
+        $this->frequency = 'Monthly';
+        $this->every = 1;
+        $this->isSavedRepeatShift = false;
+        $this->repeatOn = '';
+        $this->occurrences = 5;
+        $this->endRepeat = 'After';
+        $this->everyOptions = [];
+        $this->repeatOptions = [];
+    }
+
+
+
+
+    public function updatedShiftEmployeeSearch($value)
+    {
+        $this->shiftEmployeeSearch = $value;
+        $this->loadShiftEmployees();
+    }
+
+
+    protected function loadEmployees()
+    {
+        $query = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id');
+
+        if (!empty($this->employeeSearch)) {
+            $query->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->employeeSearch . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->employeeSearch . '%');
+            });
+        }
+
+        $this->employees = $query->orderBy('f_name')->get();
+    }
+
+
+
+
+
+
+
+
+    protected function loadShiftEmployees()
+    {
+        $query = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id');
+
+        if (!empty($this->shiftEmployeeSearch)) {
+            $query->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->shiftEmployeeSearch . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->shiftEmployeeSearch . '%');
+            });
+        }
+
+        $this->shiftEmployees = $query->orderBy('f_name')->get();
+    }
+
 
 
 
@@ -234,15 +385,32 @@ class ScheduleIndex extends BaseComponent
 
     public function saveRepeatShift()
     {
+        $rules = [
+            'frequency' => 'required|in:Daily,Weekly,Monthly',
+            'every'     => 'required|integer|min:1',
+            'endRepeat' => 'required|in:After,On',
+            'occurrences' => 'required_if:endRepeat,After|integer|min:1',
+        ];
+
+
+        if (in_array($this->frequency, ['Weekly', 'Monthly'])) {
+            $rules['repeatOn'] = 'required|string';
+        }
+
+        $this->validate($rules);
+
+
+
         $this->isSavedRepeatShift = true;
+
+        $this->dispatch('close-repeat-shift-modal');
     }
 
 
     public function cancelRepeatShift()
     {
-        $this->frequency = 'Monthly';
-        $this->every = 1;
-        $this->isSavedRepeatShift = false;
+        $this->resetRepeatFields();
+        $this->setEveryOptions();
     }
 
 
@@ -319,18 +487,20 @@ class ScheduleIndex extends BaseComponent
         $currentDate = $this->selectedDate;
         $count = 0;
 
-        while (true) {
-            $dates[] = $currentDate;
-            $count++;
+        if ($this->isSavedRepeatShift) {
+            while (true) {
+                $dates[] = $currentDate;
+                $count++;
 
-            if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
-                break;
-            }
-            if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
-                break;
-            }
+                if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
+                    break;
+                }
+                if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
+                    break;
+                }
 
-            $currentDate = $this->getNextOccurrence($currentDate);
+                $currentDate = $this->getNextOccurrence($currentDate);
+            }
         }
 
 
@@ -360,6 +530,7 @@ class ScheduleIndex extends BaseComponent
 
 
         $this->closeAddShiftPanel();
+        $this->cancelRepeatShift();
         $this->dispatch('refreshSchedule');
         $this->toast('Shift has been published successfully!', 'success');
     }
@@ -384,10 +555,9 @@ class ScheduleIndex extends BaseComponent
     public function mount()
     {
         $this->company_id = auth()->user()->company->id;
-        $this->employees = Employee::where('company_id', $this->company_id)
-            ->whereNotNull('user_id')
-            ->orderBy('f_name')
-            ->get();
+        $this->loadEmployees();
+        $this->shiftEmployees = $this->employees;
+
 
         $this->setEveryOptions();
         $this->startDate = Carbon::today();
@@ -731,8 +901,26 @@ class ScheduleIndex extends BaseComponent
 
 
 
+    public function deleteTemplate($id)
+    {
+
+        $template = ShiftTemplates::find($id);
+
+        if ($template) {
+            $template->delete();
 
 
+            $this->templates = ShiftTemplates::where('company_id', $this->company_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+
+            $this->toast('Template deleted successfully.', 'success');
+        } else {
+
+            $this->toast('Template not found..', 'success');
+        }
+    }
 
 
 

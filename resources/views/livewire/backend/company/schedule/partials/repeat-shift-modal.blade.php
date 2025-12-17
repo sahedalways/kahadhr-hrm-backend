@@ -106,6 +106,10 @@
                                 </div>
                             </div>
                         </div>
+                        @error('repeatOn')
+                            <span class="text-danger d-block text-end small mt-2">{{ $message }}</span>
+                        @enderror
+
                     </div>
                 @endif
 
@@ -144,6 +148,10 @@
 
                         <span class="text-muted">occurrences</span>
                     </div>
+                    @error('occurrences')
+                        <span class="text-danger d-block text-end small mt-2">{{ $message }}</span>
+                    @enderror
+
                 </div>
 
             </div>
@@ -160,7 +168,7 @@
                 </button>
 
 
-                <button data-bs-dismiss="modal" type="button" class="btn btn-success" wire:click="saveRepeatShift"
+                <button type="button" class="btn btn-success" wire:click="saveRepeatShift"
                     wire:loading.attr="disabled" wire:target="saveRepeatShift">
                     <span wire:loading.remove wire:target="saveRepeatShift">Save repeat</span>
                     <span wire:loading wire:target="saveRepeatShift">
@@ -175,3 +183,12 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    window.addEventListener('close-repeat-shift-modal', () => {
+        const modalEl = document.getElementById('customRepeatShiftModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+    });
+</script>

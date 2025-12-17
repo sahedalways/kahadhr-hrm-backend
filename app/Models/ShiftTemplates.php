@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShiftTemplates extends Model
 {
-    protected $fillable = ['title', 'job', 'color', 'address', 'note', 'start_time', 'end_time'];
+    protected $fillable = ['company_id', 'title', 'job', 'color', 'address', 'note', 'start_time', 'end_time'];
 
 
 

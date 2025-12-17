@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->text('note')->nullable();
 
+
             $table->foreignId('template_id')->nullable()->constrained('shift_templates')->onDelete('set null');
             $table->timestamps();
         });

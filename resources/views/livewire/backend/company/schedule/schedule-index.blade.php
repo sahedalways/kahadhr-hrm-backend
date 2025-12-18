@@ -35,4 +35,8 @@
             @include('livewire.backend.company.schedule.partials.footer_summary')
         </div>
     </div>
+
+    @include('livewire.backend.company.schedule.partials.multiple-shift-modal')
+    @include('livewire.backend.company.schedule.partials.repeat-shift-modal')
+    @include('livewire.backend.company.schedule.partials.break-modal')
 </div>

@@ -36,12 +36,12 @@
 
 
             <button class="btn btn-sm btn-outline-primary ms-3" title="Add multiple shift" data-bs-toggle="modal"
-                data-bs-target="#customAddMultipleShiftModal">
+                data-bs-target="#customAddMultipleShiftModal" wire:click="clickMultipleShiftModal">
                 <i class="fas fa-layer-group me-1"></i>
                 Add Multiple Shift
             </button>
 
         </div>
     </div>
-    @include('livewire.backend.company.schedule.partials.multiple-shift-modal')
+
 </div>

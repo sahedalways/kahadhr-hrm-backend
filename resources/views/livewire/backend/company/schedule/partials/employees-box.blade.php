@@ -1,7 +1,13 @@
 <div class="row g-2 mb-3 shift-form-row">
-    <div class="col-3 pt-1">
-        <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
-    </div>
+
+    @if (!$isClickMultipleShift)
+        <div class="col-3 pt-1">
+            <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
+        </div>
+    @endif
+
+
+
     <div class="col-9">
 
         <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2"

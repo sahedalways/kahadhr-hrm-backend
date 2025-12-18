@@ -17,6 +17,7 @@ class ScheduleIndex extends BaseComponent
     public $currentDate;
     public $employees;
     public $shiftEmployees;
+    public $multipleShiftEmployees;
 
     public $company_id;
     public $search;
@@ -32,6 +33,7 @@ class ScheduleIndex extends BaseComponent
 
     public $employeeSearch = '';
     public $shiftEmployeeSearch = '';
+    public $multipleShiftEmployeeSearch = [];
 
     public $showAddBreakForm = false;
 
@@ -55,9 +57,12 @@ class ScheduleIndex extends BaseComponent
     public $templates = [];
 
     public $showAddUserPanel = false;
+    public $isClickMultipleShift = false;
 
 
     public $multipleShifts = [];
+
+    public $showMultipleShiftAddUserPanel = [];
 
 
     public $newShift = [
@@ -84,14 +89,58 @@ class ScheduleIndex extends BaseComponent
             'start_time' => '09:00',
             'end_time' => '17:00',
             'total_hours' => '08:00',
+
             'title' => '',
             'job' => '',
             'color' => '#000000',
+
             'employees' => [],
+
+
+            'breaks' => [],
+            'newBreaks' => [],
+
             'address' => '',
             'note' => '',
         ];
+
+
+        $index = count($this->multipleShifts) - 1;
+
+
+        $this->multipleShiftEmployees[$index] = $this->employees;
+
+
+        $this->showMultipleShiftAddUserPanel[$index] = false;
+        $this->multipleShiftEmployeeSearch[$index] = '';
     }
+
+
+
+    public function addEmployeeToMultipleShift($shiftIndex, $employeeId)
+    {
+        $selected = $this->multipleShifts[$shiftIndex]['employees'] ?? [];
+
+        if (!in_array($employeeId, array_column($selected, 'id'))) {
+            $employee = Employee::find($employeeId);
+            $this->multipleShifts[$shiftIndex]['employees'][] = [
+                'id' => $employee->id,
+                'full_name' => $employee->full_name,
+                'avatar_url' => $employee->avatar_url,
+            ];
+        }
+    }
+
+
+    public function removeEmployeeFromMultipleShift($shiftIndex, $employeeId)
+    {
+        $this->multipleShifts[$shiftIndex]['employees'] = array_values(
+            array_filter($this->multipleShifts[$shiftIndex]['employees'], fn($e) => $e['id'] !== $employeeId)
+        );
+    }
+
+
+
 
     public function removeShiftRow($index)
     {
@@ -99,7 +148,10 @@ class ScheduleIndex extends BaseComponent
         $this->multipleShifts = array_values($this->multipleShifts);
     }
 
-
+    public function clickMultipleShiftModal()
+    {
+        $this->isClickMultipleShift =  true;
+    }
 
     public function clickTempTab()
     {
@@ -267,6 +319,14 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+    public function toggleMultipleShiftAddUserPanel($index)
+    {
+        $this->showMultipleShiftAddUserPanel[$index] = !($this->showMultipleShiftAddUserPanel[$index] ?? false);
+    }
+
+
+
+
 
     public function getSelectedShiftEmployeesProperty()
     {
@@ -296,6 +356,41 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+
+    public function getAvailableMultipleShiftEmployeesProperty()
+    {
+        $available = [];
+
+        foreach ($this->multipleShifts as $index => $shift) {
+            $selectedIds = collect($shift['employees'] ?? [])
+                ->map(fn($e) => $e['id'] ?? $e->id)
+                ->toArray();
+
+            $employees = collect($this->multipleShiftEmployees[$index] ?? []);
+
+            $search = $this->multipleShiftEmployeeSearch[$index] ?? null;
+
+            if ($search) {
+                $like = strtolower($search);
+                $employees = $employees->filter(function ($e) use ($selectedIds, $like) {
+                    $id = $e['id'] ?? $e->id;
+                    $fullName = strtolower($e['full_name'] ?? $e->full_name);
+                    return !in_array($id, $selectedIds) && str_contains($fullName, $like);
+                });
+            } else {
+                $employees = $employees->whereNotIn('id', $selectedIds);
+            }
+
+            $available[$index] = $employees->values();
+        }
+
+        return $available;
+    }
+
+
+
+
+
     public function addEmployeeToShift($employeeId)
     {
         if (!in_array($employeeId, $this->newShift['employees'])) {
@@ -318,6 +413,8 @@ class ScheduleIndex extends BaseComponent
         $this->selectedDate = $date;
         $this->resetFields();
 
+        $this->isClickMultipleShift =  false;
+
         $this->dispatch('shift-panel-opened');
     }
 
@@ -330,6 +427,9 @@ class ScheduleIndex extends BaseComponent
         $this->selectedDate = $date;
         $this->newShift['employees'][] = (int) $employeeId;
         $this->selectedEmployees[] = $employeeId;
+
+        $this->isClickMultipleShift =  false;
+
         $this->resetFields();
 
         $this->dispatch('shift-panel-opened');
@@ -973,6 +1073,7 @@ class ScheduleIndex extends BaseComponent
             'viewMode' => $this->viewMode,
             'employees' => $this->employees,
             'displayDateRange' => $this->displayDateRange,
+            'availableMultipleShiftEmployees' => $this->availableMultipleShiftEmployees,
         ]);
     }
 }

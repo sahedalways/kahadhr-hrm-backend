@@ -576,8 +576,8 @@
     @endif
 
 
-    @include('livewire.backend.company.schedule.partials.break-modal')
-    @include('livewire.backend.company.schedule.partials.repeat-shift-modal')
+
+
 
 </div>
 

@@ -1,10 +1,10 @@
 <div class="row g-2 mb-3 shift-form-row">
 
-    @if (!$isClickMultipleShift)
-        <div class="col-3 pt-1">
-            <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
-        </div>
-    @endif
+
+    <div class="col-3 pt-1">
+        <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
+    </div>
+
 
 
 

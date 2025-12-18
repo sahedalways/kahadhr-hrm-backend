@@ -46,17 +46,22 @@
                         <div class="col-2 d-flex gap-1">
                             <input type="time" class="form-control form-control-sm"
                                 wire:model="multipleShifts.{{ $index }}.start_time"
-                                @if ($shift['all_day']) disabled @endif>
+                                @if ($shift['all_day']) disabled @endif
+                                wire:change="calculateMultiTotalHours({{ $index }})">
 
                             <input type="time" class="form-control form-control-sm"
                                 wire:model="multipleShifts.{{ $index }}.end_time"
-                                @if ($shift['all_day']) disabled @endif>
+                                @if ($shift['all_day']) disabled @endif
+                                wire:change="calculateMultiTotalHours({{ $index }})">
                         </div>
 
                         {{-- ALL DAY --}}
                         <div class="col-1 text-center">
-                            <input type="checkbox" class="form-check-input"
-                                wire:model="multipleShifts.{{ $index }}.all_day">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="allDaySwitch{{ $index }}"
+                                    wire:model="multipleShifts.{{ $index }}.all_day"
+                                    wire:change="toggleMultiAllDayForShift({{ $index }}, $event.target.checked)">
+                            </div>
                         </div>
 
                         {{-- TOTAL HOURS --}}
@@ -83,11 +88,103 @@
 
                         {{-- BREAKS --}}
                         <div class="col-1 text-center">
-                            <a href="#" class="text-primary small" data-bs-toggle="modal"
-                                data-bs-target="#customAddBreakModal" wire:click="openBreaks({{ $index }})">
-                                Breaks
-                            </a>
+                            @if ($isShowMultiBreak[$index] ?? false)
+                                <button type="button" class="btn btn-link p-0 small text-primary"
+                                    wire:click.prevent="hideBreaksSection({{ $index }})">
+                                    Hide Breaks
+                                </button>
+                            @else
+                                <button type="button" class="btn btn-link p-0 small text-primary"
+                                    wire:click.prevent="showBreaksSection({{ $index }})">
+                                    Add Breaks
+                                </button>
+                            @endif
                         </div>
+
+                        {{-- Breaks section --}}
+                        @if ($isShowMultiBreak[$index] ?? false)
+                            <div class="row mb-2 ps-4 pe-4 bg-light rounded">
+                                @foreach ($multipleShiftNewBreaks[$index] ?? [] as $breakIndex => $break)
+                                    <div class="col-12 d-flex gap-2 align-items-center mb-1">
+
+
+                                        <div class="col-4">
+                                            <input type="text" class="form-control form-control-sm text-center"
+                                                wire:model.live="multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.name"
+                                                placeholder="Break name">
+                                            @error("multipleShiftNewBreaks.$index.$breakIndex.name")
+                                                <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+
+                                        <div class="col-3">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
+                                                    type="button" data-bs-toggle="dropdown">
+                                                    {{ $multipleShiftNewBreaks[$index][$breakIndex]['type'] ?? 'Select type' }}
+                                                </button>
+
+                                                <div class="dropdown-menu p-2 text-center">
+                                                    @foreach (['Paid', 'Unpaid'] as $type)
+                                                        <button type="button" class="dropdown-item text-center"
+                                                            wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.type', '{{ $type }}')">
+                                                            {{ $type }}
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+
+                                            @error("multipleShiftNewBreaks.$index.$breakIndex.type")
+                                                <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-3">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
+                                                    type="button" data-bs-toggle="dropdown">
+                                                    {{ $multipleShiftNewBreaks[$index][$breakIndex]['duration'] ?? 'Select duration' }}
+                                                </button>
+
+                                                <div class="dropdown-menu p-2"
+                                                    style="max-height: 200px; overflow-y:auto;">
+                                                    @for ($i = 0; $i <= 23; $i += 0.05)
+                                                        <button type="button" class="dropdown-item text-center"
+                                                            wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.duration', '{{ number_format($i, 2) }}')">
+                                                            {{ number_format($i, 2) }}
+                                                        </button>
+                                                    @endfor
+                                                </div>
+                                            </div>
+
+                                            @error("multipleShiftNewBreaks.$index.$breakIndex.duration")
+                                                <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <button type="button" class="btn btn-light btn-sm"
+                                            wire:click="removeMultipleBreakRow({{ $index }}, {{ $breakIndex }})">
+                                            ✕
+                                        </button>
+                                    </div>
+                                @endforeach
+
+                                <button type="button" class="btn btn-primary btn-sm"
+                                    wire:click="addMultipleBreakRow({{ $index }})">
+                                    + Add Break
+                                </button>
+
+
+                                <button type="button" class="btn btn-success btn-sm"
+                                    wire:click="confirmMultipleBreaksAndSave({{ $index }})">
+                                    Confirm Breaks
+                                </button>
+                            </div>
+                        @endif
+
+
+
 
                         {{-- REMOVE --}}
                         <div class="col-1 d-flex justify-content-center">
@@ -101,7 +198,8 @@
 
                         {{-- ADDRESS (FULL WIDTH BELOW ROW) --}}
                         <div class="col-12 ps-2 pe-2 mt-1">
-                            <input type="text" class="form-control form-control-sm" placeholder="Address (optional)"
+                            <input type="text" class="form-control form-control-sm"
+                                placeholder="Address (optional)"
                                 wire:model.defer="multipleShifts.{{ $index }}.address">
                         </div>
 
@@ -112,7 +210,39 @@
                         </div>
 
                     </div>
+
+
+                    @if (!empty($multipleShifts[$index]['breaks']))
+                        <div class="row mb-2 ps-4 pe-4 bg-light rounded">
+                            <div class="col-12 small text-dark">
+                                @php
+                                    $paidBreaks = collect($multipleShifts[$index]['breaks'])->where('type', 'Paid');
+                                    $unpaidBreaks = collect($multipleShifts[$index]['breaks'])->where('type', 'Unpaid');
+
+                                    $paidCount = $paidBreaks->count();
+                                    $unpaidCount = $unpaidBreaks->count();
+
+                                    $paidDuration = $paidBreaks->sum(fn($b) => (float) $b['duration']);
+                                    $unpaidDuration = $unpaidBreaks->sum(fn($b) => (float) $b['duration']);
+                                @endphp
+
+                                @if ($unpaidCount > 0)
+                                    {{ $unpaidCount }} Unpaid break{{ $unpaidCount > 1 ? 's' : '' }}
+                                    ({{ number_format($unpaidDuration, 2) }}h)
+                                @endif
+
+                                @if ($paidCount > 0)
+                                    @if ($unpaidCount > 0)
+                                        •
+                                    @endif
+                                    {{ $paidCount }} Paid break{{ $paidCount > 1 ? 's' : '' }}
+                                    ({{ number_format($paidDuration, 2) }}h)
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
+
 
                 {{-- ADD ROW --}}
                 <div class="text-center mt-3">
@@ -134,4 +264,6 @@
 
         </div>
     </div>
+
+
 </div>

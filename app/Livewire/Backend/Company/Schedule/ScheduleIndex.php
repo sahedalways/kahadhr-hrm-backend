@@ -29,7 +29,9 @@ class ScheduleIndex extends BaseComponent
 
     public $hoveredCell;
     public $totalBreakMinutes = 0;
+    public $totalMultiBreakMinutes = [];
     public $originalShiftTotalTime = 0;
+    public $originalMultiShiftTotalTime = [];
 
     public $employeeSearch = '';
     public $shiftEmployeeSearch = '';
@@ -63,6 +65,13 @@ class ScheduleIndex extends BaseComponent
     public $multipleShifts = [];
 
     public $showMultipleShiftAddUserPanel = [];
+
+    public $showBreaks = [];
+    public $multipleShiftNewBreaks = [];
+    public $multipleShiftBreaks = [];
+    public $showMultipleShiftAddBreakForm = [];
+    public $isShowMultiBreak = [];
+
 
 
     public $newShift = [
@@ -113,6 +122,16 @@ class ScheduleIndex extends BaseComponent
 
         $this->showMultipleShiftAddUserPanel[$index] = false;
         $this->multipleShiftEmployeeSearch[$index] = '';
+
+        $this->multipleShiftNewBreaks[$index] = [
+            [
+                'name' => '',
+                'type' => 'Paid',
+                'duration' => '0.10',
+            ]
+        ];
+
+        $this->originalMultiShiftTotalTime[$index] = '08:00';
     }
 
 
@@ -836,6 +855,64 @@ class ScheduleIndex extends BaseComponent
 
 
 
+    public function toggleMultiAllDayForShift($shiftIndex, $value)
+    {
+        // Update the all_day flag
+        $this->multipleShifts[$shiftIndex]['all_day'] = $value;
+
+        if ($value) {
+            // Set default times for All Day
+            $this->multipleShifts[$shiftIndex]['start_time'] = '09:00';
+            $this->multipleShifts[$shiftIndex]['end_time'] = '17:00';
+            $this->multipleShifts[$shiftIndex]['total_hours'] = '08:00';
+
+            // Store original total hours for this shift
+            $this->originalMultiShiftTotalTime[$shiftIndex] = $this->multipleShifts[$shiftIndex]['total_hours'];
+
+            // Convert total_hours to minutes
+            [$hours, $minutes] = explode(':', $this->multipleShifts[$shiftIndex]['total_hours']);
+            $totalMinutes = ($hours * 60) + $minutes;
+
+            // Subtract valid paid breaks only
+            $totalBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
+
+            if ($totalBreakMinutes > 0) {
+                $totalMinutes -= $totalBreakMinutes;
+                $totalMinutes = max(0, $totalMinutes);
+            }
+
+            // Convert back to HH:MM format
+            $newHours = floor($totalMinutes / 60);
+            $newMinutes = $totalMinutes % 60;
+
+            $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $newHours, $newMinutes);
+        }
+    }
+
+
+
+    private function calculateTotalBreakMinutes($shiftIndex): int
+    {
+        $totalMinutes = 0;
+
+        foreach ($this->multipleShiftNewBreaks[$shiftIndex] ?? [] as $break) {
+            if (
+                !empty($break['name']) && !empty($break['type']) && !empty($break['duration'])
+                && strtolower($break['type']) === 'paid'
+            ) {
+
+                $duration = (float) $break['duration'];
+                $hours = floor($duration);
+                $minutes = ($duration - $hours) * 100;
+                $totalMinutes += ($hours * 60 + $minutes);
+            }
+        }
+
+        return $totalMinutes;
+    }
+
+
+
     public function calculateTotalHours()
     {
         if ($this->newShift['start_time'] && $this->newShift['end_time']) {
@@ -860,6 +937,37 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+    public function calculateMultiTotalHours($shiftIndex)
+    {
+        $shift = $this->multipleShifts[$shiftIndex] ?? null;
+        if (!$shift) return;
+
+        if (!empty($shift['start_time']) && !empty($shift['end_time'])) {
+            $start = \Carbon\Carbon::createFromFormat('H:i', $shift['start_time']);
+            $end = \Carbon\Carbon::createFromFormat('H:i', $shift['end_time']);
+
+
+            if ($end->lt($start)) {
+                $end->addDay();
+            }
+
+            $diff = $end->diffInMinutes($start, false);
+            $diff = abs($diff);
+
+            $hours = floor($diff / 60);
+            $minutes = $diff % 60;
+
+            $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $hours, $minutes);
+
+
+            $this->originalMultiShiftTotalTime[$shiftIndex] = $this->multipleShifts[$shiftIndex]['total_hours'];
+        }
+    }
+
+
+
+
     public function getFilteredEmployeesProperty()
     {
         return $this->employees->filter(function ($employee) {
@@ -869,7 +977,116 @@ class ScheduleIndex extends BaseComponent
         });
     }
 
+    public function showBreaksSection($shiftIndex)
+    {
 
+        $this->isShowMultiBreak[$shiftIndex] = true;
+    }
+
+
+
+    public function addMultipleBreakRow($shiftIndex)
+    {
+        $this->multipleShiftNewBreaks[$shiftIndex][] = [
+            'name' => '',
+            'type' => 'Paid',
+            'duration' => '0.10',
+        ];
+
+        $this->showBreaks[$shiftIndex] = true;
+    }
+
+    public function removeMultipleBreakRow($shiftIndex, $breakIndex)
+    {
+        unset($this->multipleShiftNewBreaks[$shiftIndex][$breakIndex]);
+        $this->multipleShiftNewBreaks[$shiftIndex] = array_values($this->multipleShiftNewBreaks[$shiftIndex]);
+    }
+
+    public function confirmMultipleBreaksAndSave($shiftIndex)
+    {
+        $breaks = $this->multipleShiftNewBreaks[$shiftIndex] ?? [];
+
+        // Validate each break
+        foreach ($breaks as $key => $break) {
+            if (empty($break['name'])) {
+                $this->addError("multipleShiftNewBreaks.$shiftIndex.$key.name", "Break name is required.");
+            }
+            if (empty($break['type'])) {
+                $this->addError("multipleShiftNewBreaks.$shiftIndex.$key.type", "Break type is required.");
+            }
+            if (empty($break['duration'])) {
+                $this->addError("multipleShiftNewBreaks.$shiftIndex.$key.duration", "Break duration is required.");
+            }
+        }
+
+        // Stop if there are errors
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
+
+
+        $totalBreakMinutes = 0;
+        $paidMinutes = 0;
+        $unpaidMinutes = 0;
+
+        foreach ($this->multipleShiftNewBreaks[$shiftIndex] ?? [] as $break) {
+            if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+
+                $duration = (float) $break['duration'];
+                $hours = floor($duration);
+                $minutes = ($duration - $hours) * 100;
+                $breakMinutes = $hours * 60 + $minutes;
+
+                if (strtolower($break['type']) === 'paid') {
+                    $totalBreakMinutes += $breakMinutes;
+                    $paidMinutes += $breakMinutes;
+                } else {
+                    $unpaidMinutes += $breakMinutes;
+                }
+
+
+                $exists = ShiftBreak::where('company_id', $this->company_id)
+                    ->where('title', $break['name'])
+                    ->exists();
+
+                if (!$exists) {
+                    ShiftBreak::create([
+                        'company_id' => $this->company_id,
+                        'title' => $break['name'],
+                        'type' => ucfirst($break['type']),
+                        'duration' => $break['duration'],
+                    ]);
+                }
+            }
+        }
+
+        $this->multipleShifts[$shiftIndex]['breaks'] = $this->multipleShiftNewBreaks[$shiftIndex] ?? [];
+
+
+        $this->showBreaks[$shiftIndex] = false;
+
+        $this->multipleShifts[$shiftIndex]['breaks'] = $this->multipleShiftNewBreaks[$shiftIndex] ?? [];
+        $this->showBreaks[$shiftIndex] = false;
+
+
+        $originalHours = $this->originalMultiShiftTotalTime[$shiftIndex] ?? $this->multipleShifts[$shiftIndex]['total_hours'];
+
+        [$hours, $minutes] = explode(':', $originalHours);
+        $totalMinutes = ($hours * 60) + $minutes;
+
+
+        $totalBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
+
+        if ($totalBreakMinutes > 0) {
+            $totalMinutes -= $totalBreakMinutes;
+            $totalMinutes = max(0, $totalMinutes);
+        }
+
+        $newHours = floor($totalMinutes / 60);
+        $newMinutes = $totalMinutes % 60;
+
+        $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $newHours, $newMinutes);
+    }
 
 
 
@@ -1062,6 +1279,13 @@ class ScheduleIndex extends BaseComponent
 
             $this->toast('Template not found..', 'success');
         }
+    }
+
+
+
+    public function hideBreaksSection($index)
+    {
+        $this->isShowMultiBreak[$index] = false;
     }
 
 

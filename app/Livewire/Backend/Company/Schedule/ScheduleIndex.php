@@ -170,6 +170,12 @@ class ScheduleIndex extends BaseComponent
     public function clickMultipleShiftModal()
     {
         $this->isClickMultipleShift =  true;
+        $this->multipleShifts = [];
+        $this->multipleShiftNewBreaks = [];
+        $this->isShowMultiBreak = [];
+        $this->originalMultiShiftTotalTime = [];
+
+        $this->addShiftRow();
     }
 
     public function clickTempTab()
@@ -632,16 +638,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-        $shift = Shift::create([
-            'company_id' => $this->company_id,
-            'title' => $this->newShift['title'],
-            'job' => $this->newShift['job'],
-            'color' => $this->newShift['color'],
-            'address' => $this->newShift['address'],
-            'note' => $this->newShift['note'],
-        ]);
-
-
 
 
         $dates = [];
@@ -665,9 +661,53 @@ class ScheduleIndex extends BaseComponent
         }
 
 
-        foreach ($dates as $date) {
+        if (!$this->isSavedRepeatShift) {
+            $employeeIds = $this->newShift['employees'];
+
+            $conflictingShifts = Shift::whereHas('dates', function ($q) use ($currentDate) {
+                $q->where('date', $currentDate);
+            })
+                ->whereHas('dates.employees', function ($q) use ($employeeIds) {
+                    $q->whereIn('employees.id', $employeeIds);
+                })
+                ->with('dates.employees')
+                ->get();
+
+            $conflictingNames = [];
+
+            foreach ($conflictingShifts as $shift) {
+                foreach ($shift->dates as $shiftDate) {
+                    foreach ($shiftDate->employees as $employee) {
+                        $conflictingNames[$employee->id] = $employee->full_name;
+                    }
+                }
+            }
+
+            if (!empty($conflictingNames)) {
+                $displayNames = count($conflictingNames) > 3
+                    ? implode(', ', array_slice($conflictingNames, 0, 3)) . ' ...'
+                    : implode(', ', $conflictingNames);
+
+                $this->toast("Conflict: $displayNames on $currentDate", 'info');
+
+                return;
+            }
+
+
+
+            $shift = Shift::create([
+                'company_id' => $this->company_id,
+                'title' => $this->newShift['title'],
+                'job' => $this->newShift['job'],
+                'color' => $this->newShift['color'],
+                'address' => $this->newShift['address'],
+                'note' => $this->newShift['note'],
+            ]);
+
+
+
             $shiftDate = $shift->dates()->create([
-                'date' => $date,
+                'date' => $currentDate,
                 'start_time' => $this->newShift['start_time'],
                 'end_time' => $this->newShift['end_time'],
                 'total_hours' => $this->newShift['total_hours'],
@@ -686,6 +726,72 @@ class ScheduleIndex extends BaseComponent
                     }
                 }
             }
+        } else {
+
+            foreach ($dates as $date) {
+
+                $employeeIds = $this->newShift['employees'];
+
+
+                $conflictingShifts = \App\Models\Shift::whereHas('dates', function ($q) use ($date) {
+                    $q->where('date', $date);
+                })
+                    ->whereHas('dates.employees', function ($q) use ($employeeIds) {
+                        $q->whereIn('employee_id', $employeeIds);
+                    })
+                    ->with(['dates.employees'])
+                    ->get();
+
+                if ($conflictingShifts->isNotEmpty()) {
+
+                    $conflictingNames = $conflictingShifts->pluck('dates.*.employees.*.full_name')
+                        ->flatten()
+                        ->unique()
+                        ->toArray();
+
+                    $displayNames = count($conflictingNames) > 3
+                        ? implode(', ', array_slice($conflictingNames, 0, 3)) . ' ...'
+                        : implode(', ', $conflictingNames);
+
+                    $this->toast("Conflict: $displayNames on $date", 'info');
+
+                    return;
+                }
+            }
+
+            $shift = Shift::create([
+                'company_id' => $this->company_id,
+                'title' => $this->newShift['title'],
+                'job' => $this->newShift['job'],
+                'color' => $this->newShift['color'],
+                'address' => $this->newShift['address'],
+                'note' => $this->newShift['note'],
+            ]);
+
+
+
+            foreach ($dates as $date) {
+                $shiftDate = $shift->dates()->create([
+                    'date' => $date,
+                    'start_time' => $this->newShift['start_time'],
+                    'end_time' => $this->newShift['end_time'],
+                    'total_hours' => $this->newShift['total_hours'],
+                ]);
+
+                $shiftDate->employees()->attach($this->newShift['employees']);
+
+                if (!empty($this->newBreaks)) {
+                    foreach ($this->newBreaks as $break) {
+                        if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                            $shiftDate->breaks()->create([
+                                'title' => $break['name'],
+                                'type' => $break['type'],
+                                'duration' => $break['duration'],
+                            ]);
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -695,6 +801,129 @@ class ScheduleIndex extends BaseComponent
         $this->dispatch('refreshSchedule');
         $this->toast('Shift has been published successfully!', 'success');
     }
+
+
+
+
+
+
+    public function publishMultipleShifts()
+    {
+
+        $rules = [];
+        $messages = [];
+
+        foreach ($this->multipleShifts as $index => $shift) {
+            $rules["multipleShifts.$index.date"] = 'required|date';
+            $rules["multipleShifts.$index.title"] = 'required|string';
+            $rules["multipleShifts.$index.job"] = 'required|string|max:100';
+            $rules["multipleShifts.$index.start_time"] = 'required|date_format:H:i';
+            $rules["multipleShifts.$index.end_time"] = 'required|date_format:H:i';
+            $rules["multipleShifts.$index.total_hours"] = 'required';
+            $rules["multipleShifts.$index.employees"] = 'required|array|min:1';
+
+            $rules["multipleShifts.$index.address"] = 'nullable|string|max:255';
+            $rules["multipleShifts.$index.note"] = 'nullable|string|max:500';
+
+            $messages["multipleShifts.$index.date.required"] = 'Shift date is required.';
+            $messages["multipleShifts.$index.title.required"] = 'Shift title is required.';
+            $messages["multipleShifts.$index.job.required"] = 'Job is required.';
+            $messages["multipleShifts.$index.start_time.required"] = 'Start time is required.';
+            $messages["multipleShifts.$index.end_time.required"] = 'End time is required.';
+            $messages["multipleShifts.$index.employees.required"] = 'Select at least one employee.';
+        }
+
+
+
+
+
+        $dateEmployeeMap = [];
+
+        foreach ($this->multipleShifts as $shift) {
+            $date = $shift['date'];
+            foreach ($shift['employees'] as $employee) {
+                $employeeId = is_array($employee) ? $employee['id'] : $employee;
+
+                if (isset($dateEmployeeMap[$date][$employeeId])) {
+
+                    $this->toast("Employee '{$employee['full_name']}' is assigned multiple times on $date", 'info');
+                    return;
+                }
+                $dateEmployeeMap[$date][$employeeId] = true;
+            }
+        }
+
+
+
+        $this->validate($rules, $messages);
+
+
+        foreach ($this->multipleShifts as $index => $shift) {
+            $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
+
+
+            $conflictingEmployees = Shift::whereHas('dates', function ($query) use ($shift) {
+                $query->where('date', $shift['date']);
+            })->whereHas('dates.employees', function ($query) use ($employeeIds) {
+                $query->whereIn('employee_id', $employeeIds);
+            })->with(['dates.employees'])->get()
+                ->pluck('dates.*.employees.*.full_name')
+                ->flatten()
+                ->unique()
+                ->toArray();
+
+            if (!empty($conflictingEmployees)) {
+                $names = implode(', ', $conflictingEmployees);
+                $this->toast("Conflict: $names on {$shift['date']}", 'info');
+                return;
+            }
+
+
+
+
+            $shiftModel = Shift::create([
+                'company_id' => $this->company_id,
+                'title' => $shift['title'],
+                'job' => $shift['job'],
+                'color' => $shift['color'],
+                'address' => $shift['address'],
+                'note' => $shift['note'],
+            ]);
+
+            // create date row
+            $shiftDate = $shiftModel->dates()->create([
+                'date' => $shift['date'],
+                'start_time' => $shift['start_time'],
+                'end_time' => $shift['end_time'],
+                'total_hours' => $shift['total_hours'],
+            ]);
+
+            $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
+            $shiftDate->employees()->attach($employeeIds);
+
+
+            foreach ($this->multipleShiftNewBreaks[$index] ?? [] as $break) {
+                if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                    $shiftDate->breaks()->create([
+                        'title' => $break['name'],
+                        'type' => $break['type'],
+                        'duration' => $break['duration'],
+                    ]);
+                }
+            }
+        }
+
+
+
+        $this->multipleShifts = [];
+        $this->multipleShiftNewBreaks = [];
+        $this->originalMultiShiftTotalTime = [];
+
+        $this->dispatch('closemodal');
+        $this->toast('Multiple shifts published successfully!', 'success');
+    }
+
+
 
 
     public $shifts = [
@@ -1004,6 +1233,8 @@ class ScheduleIndex extends BaseComponent
 
     public function confirmMultipleBreaksAndSave($shiftIndex)
     {
+        $this->resetErrorBag();
+        $this->resetValidation();
         $breaks = $this->multipleShiftNewBreaks[$shiftIndex] ?? [];
 
         // Validate each break
@@ -1042,20 +1273,6 @@ class ScheduleIndex extends BaseComponent
                     $paidMinutes += $breakMinutes;
                 } else {
                     $unpaidMinutes += $breakMinutes;
-                }
-
-
-                $exists = ShiftBreak::where('company_id', $this->company_id)
-                    ->where('title', $break['name'])
-                    ->exists();
-
-                if (!$exists) {
-                    ShiftBreak::create([
-                        'company_id' => $this->company_id,
-                        'title' => $break['name'],
-                        'type' => ucfirst($break['type']),
-                        'duration' => $break['duration'],
-                    ]);
                 }
             }
         }
@@ -1159,19 +1376,6 @@ class ScheduleIndex extends BaseComponent
                 } elseif (strtolower($break['type']) == 'unpaid') {
                     $unpaidCount++;
                     $unpaidMinutes += $breakMinutes;
-                }
-
-                $exists = ShiftBreak::where('company_id', $this->company_id)
-                    ->where('title', $break['name'])
-                    ->exists();
-
-                if (!$exists) {
-                    ShiftBreak::create([
-                        'company_id' => $this->company_id,
-                        'title' => $break['name'],
-                        'type' => ucfirst($break['type']),
-                        'duration' => $break['duration'],
-                    ]);
                 }
             }
         }

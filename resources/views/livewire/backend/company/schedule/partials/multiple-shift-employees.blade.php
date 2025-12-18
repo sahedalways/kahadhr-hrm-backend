@@ -41,7 +41,7 @@
 
                 @forelse ($this->availableMultipleShiftEmployees[$index] ?? [] as $employee)
                     <a href="#"
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                        class="list-group-item gap-2 list-group-item-action d-flex justify-content-between align-items-center"
                         wire:click.prevent="addEmployeeToMultipleShift({{ $index }}, {{ $employee['id'] }})">
                         <div>
                             <img src="{{ $employee['avatar_url'] ?? '/assets/img/default-avatar.png' }}"

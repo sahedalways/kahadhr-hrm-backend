@@ -4,213 +4,269 @@
     <div class="modal-dialog modal-fullscreen modal-dialog-centered">
         <div class="modal-content">
 
-            {{-- HEADER --}}
-            <div class="modal-header border-bottom justify-content-center">
-                <h5 class="modal-title fw-semibold">Add Multiple Shifts</h5>
-            </div>
 
             {{-- BODY --}}
-            <div class="modal-body pt-3">
-
-                {{-- TABLE HEADER --}}
-                <div class="row fw-semibold small text-muted border-bottom pb-2 mb-2 align-items-center">
-                    <div class="col-1">Date</div>
-                    <div class="col-2">Title</div>
-                    <div class="col-2">Time</div>
-                    <div class="col-1 text-center">All</div>
-                    <div class="col-1">Hours</div>
-                    <div class="col-2">Job</div>
-                    <div class="col-1 text-center">Color</div>
-                    <div class="col-1 text-center">Emp</div>
-                    <div class="col-1 text-center">Break</div>
-                    <div class="col-1 text-center">✕</div>
+            <div class="modal-body p-4 bg-light position-relative">
+                <div class="d-flex justify-content-end">
+                    <button type="button"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                        data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
+                        <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
+                    </button>
                 </div>
 
-                {{-- TABLE ROWS --}}
+                {{-- PAGE HEADER --}}
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h4 class="h5 mb-1 fw-bold text-dark">Multiple Shift Entry</h4>
+                        <p class="text-muted small mb-0">Define and schedule multiple shift blocks for your team.</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-white text-primary border border-primary px-3 py-2 rounded-pill">
+                            {{ count($multipleShifts) }} Active Shift(s)
+                        </span>
+                    </div>
+                </div>
+
                 @foreach ($multipleShifts as $index => $shift)
-                    <div class="row align-items-center g-2 mb-2 pb-2 border-bottom">
-
-                        {{-- DATE --}}
-                        <div class="col-1">
-                            <input type="date" class="form-control form-control-sm"
-                                wire:model="multipleShifts.{{ $index }}.date">
-                        </div>
-
-                        {{-- TITLE --}}
-                        <div class="col-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Shift title"
-                                wire:model.defer="multipleShifts.{{ $index }}.title">
-                        </div>
-
-                        {{-- TIME --}}
-                        <div class="col-2 d-flex gap-1">
-                            <input type="time" class="form-control form-control-sm"
-                                wire:model="multipleShifts.{{ $index }}.start_time"
-                                @if ($shift['all_day']) disabled @endif
-                                wire:change="calculateMultiTotalHours({{ $index }})">
-
-                            <input type="time" class="form-control form-control-sm"
-                                wire:model="multipleShifts.{{ $index }}.end_time"
-                                @if ($shift['all_day']) disabled @endif
-                                wire:change="calculateMultiTotalHours({{ $index }})">
-                        </div>
-
-                        {{-- ALL DAY --}}
-                        <div class="col-1 text-center">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="allDaySwitch{{ $index }}"
-                                    wire:model="multipleShifts.{{ $index }}.all_day"
-                                    wire:change="toggleMultiAllDayForShift({{ $index }}, $event.target.checked)">
+                    <div class="card border-0 shadow-sm mb-4 rounded-4">
+                        {{-- CARD HEADER --}}
+                        <div
+                            class="card-header bg-white border-bottom-0 pt-3 px-4 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 32px; height: 32px; font-size: 14px; font-weight: 600;">
+                                    {{ $index + 1 }}
+                                </div>
+                                <h6 class="mb-0 fw-bold text-secondary text-uppercase tracking-wider"
+                                    style="font-size: 0.85rem;">Shift Configuration</h6>
                             </div>
-                        </div>
 
-                        {{-- TOTAL HOURS --}}
-                        <div class="col-1">
-                            <input type="text" readonly class="form-control form-control-sm bg-light"
-                                wire:model="multipleShifts.{{ $index }}.total_hours">
-                        </div>
-
-                        {{-- JOB --}}
-                        <div class="col-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Job"
-                                wire:model.defer="multipleShifts.{{ $index }}.job">
-                        </div>
-
-                        {{-- COLOR --}}
-                        <div class="col-1 d-flex justify-content-center">
-                            <input type="color" wire:model="multipleShifts.{{ $index }}.color"
-                                class="form-control form-control-color border-0 p-0">
-                        </div>
-
-                        {{-- EMPLOYEES --}}
-                        @include('livewire.backend.company.schedule.partials.multiple-shift-employees')
-
-
-                        {{-- BREAKS --}}
-                        <div class="col-1 text-center">
-                            @if ($isShowMultiBreak[$index] ?? false)
-                                <button type="button" class="btn btn-link p-0 small text-primary"
-                                    wire:click.prevent="hideBreaksSection({{ $index }})">
-                                    Hide Breaks
-                                </button>
-                            @else
-                                <button type="button" class="btn btn-link p-0 small text-primary"
-                                    wire:click.prevent="showBreaksSection({{ $index }})">
-                                    Add Breaks
-                                </button>
-                            @endif
-                        </div>
-
-                        {{-- Breaks section --}}
-                        @if ($isShowMultiBreak[$index] ?? false)
-                            <div class="row mb-2 ps-4 pe-4 bg-light rounded">
-                                @foreach ($multipleShiftNewBreaks[$index] ?? [] as $breakIndex => $break)
-                                    <div class="col-12 d-flex gap-2 align-items-center mb-1">
-
-
-                                        <div class="col-4">
-                                            <input type="text" class="form-control form-control-sm text-center"
-                                                wire:model.live="multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.name"
-                                                placeholder="Break name">
-                                            @error("multipleShiftNewBreaks.$index.$breakIndex.name")
-                                                <span class="text-danger small">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-
-                                        <div class="col-3">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
-                                                    type="button" data-bs-toggle="dropdown">
-                                                    {{ $multipleShiftNewBreaks[$index][$breakIndex]['type'] ?? 'Select type' }}
-                                                </button>
-
-                                                <div class="dropdown-menu p-2 text-center">
-                                                    @foreach (['Paid', 'Unpaid'] as $type)
-                                                        <button type="button" class="dropdown-item text-center"
-                                                            wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.type', '{{ $type }}')">
-                                                            {{ $type }}
-                                                        </button>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            @error("multipleShiftNewBreaks.$index.$breakIndex.type")
-                                                <span class="text-danger small">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        <div class="col-3">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
-                                                    type="button" data-bs-toggle="dropdown">
-                                                    {{ $multipleShiftNewBreaks[$index][$breakIndex]['duration'] ?? 'Select duration' }}
-                                                </button>
-
-                                                <div class="dropdown-menu p-2"
-                                                    style="max-height: 200px; overflow-y:auto;">
-                                                    @for ($i = 0; $i <= 23; $i += 0.05)
-                                                        <button type="button" class="dropdown-item text-center"
-                                                            wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.duration', '{{ number_format($i, 2) }}')">
-                                                            {{ number_format($i, 2) }}
-                                                        </button>
-                                                    @endfor
-                                                </div>
-                                            </div>
-
-                                            @error("multipleShiftNewBreaks.$index.$breakIndex.duration")
-                                                <span class="text-danger small">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        <button type="button" class="btn btn-light btn-sm"
-                                            wire:click="removeMultipleBreakRow({{ $index }}, {{ $breakIndex }})">
-                                            ✕
-                                        </button>
-                                    </div>
-                                @endforeach
-
-                                <button type="button" class="btn btn-primary btn-sm"
-                                    wire:click="addMultipleBreakRow({{ $index }})">
-                                    + Add Break
-                                </button>
-
-
-                                <button type="button" class="btn btn-success btn-sm"
-                                    wire:click="confirmMultipleBreaksAndSave({{ $index }})">
-                                    Confirm Breaks
-                                </button>
-                            </div>
-                        @endif
-
-
-
-
-                        {{-- REMOVE --}}
-                        <div class="col-1 d-flex justify-content-center">
                             @if (count($multipleShifts) > 1)
                                 <button type="button" wire:click="removeShiftRow({{ $index }})"
-                                    class="btn btn-outline-danger p-0" style="width:20px;height:20px;font-size:12px;">
-                                    ✕
+                                    class="btn btn-sm btn-light text-danger rounded-circle shadow-none circle-sm tooltip-btn"
+                                    data-tooltip="Remove Shift">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             @endif
                         </div>
 
-                        {{-- ADDRESS (FULL WIDTH BELOW ROW) --}}
-                        <div class="col-12 ps-2 pe-2 mt-1">
-                            <input type="text" class="form-control form-control-sm"
-                                placeholder="Address (optional)"
-                                wire:model.defer="multipleShifts.{{ $index }}.address">
-                        </div>
+                        <div class="card-body px-4 pb-4">
+                            {{-- SECTION 1: IDENTITY --}}
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Shift Date <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light border-end-0"><i
+                                                class="far fa-calendar-alt text-muted"></i></span>
+                                        <input type="date"
+                                            class="form-control form-control-sm border-start-0 ps-2 @error("multipleShifts.$index.date") is-invalid @enderror"
+                                            wire:model="multipleShifts.{{ $index }}.date">
+                                    </div>
 
-                        {{-- NOTE --}}
-                        <div class="col-12 ps-2 pe-2 mt-1">
-                            <input type="text" class="form-control form-control-sm" placeholder="Note"
-                                wire:model.defer="multipleShifts.{{ $index }}.note">
-                        </div>
+                                    @error("multipleShifts.$index.date")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Internal
+                                        Title <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                        class="form-control form-control-sm @error("multipleShifts.$index.title") is-invalid @enderror"
+                                        placeholder="e.g., Inventory Audit"
+                                        wire:model.defer="multipleShifts.{{ $index }}.title">
+                                    @error("multipleShifts.$index.title")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label text-muted fw-bold small text-uppercase d-block">Color
+                                        Label</label>
+                                    <input type="color" wire:model="multipleShifts.{{ $index }}.color"
+                                        class="form-control form-control-color w-100 border-0 p-0"
+                                        style="height: 31px; border-radius: 6px;">
+                                </div>
 
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Working
+                                        Hours <span class="text-danger">*</span></label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="time" class="form-control"
+                                            wire:model="multipleShifts.{{ $index }}.start_time"
+                                            @if ($shift['all_day']) disabled @endif
+                                            wire:change="calculateMultiTotalHours({{ $index }})">
+                                        <span class="input-group-text bg-white text-muted">to</span>
+                                        <input type="time" class="form-control"
+                                            wire:model="multipleShifts.{{ $index }}.end_time"
+                                            @if ($shift['all_day']) disabled @endif
+                                            wire:change="calculateMultiTotalHours({{ $index }})">
+                                    </div>
+
+                                    @error("multipleShifts.$index.start_time")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+
+
+
+
+                                    @error("multipleShifts.$index.end_time")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+
+                                </div>
+
+                                <div class="col-1 text-center border-start border-end">
+                                    <label class="form-label text-muted fw-bold small text-uppercase d-block">All
+                                        Day</label>
+                                    <div class="form-check form-switch d-inline-block p-0 m-0">
+                                        <input class="form-check-input ms-0" type="checkbox" role="switch"
+                                            wire:model="multipleShifts.{{ $index }}.all_day"
+                                            wire:change="toggleMultiAllDayForShift({{ $index }}, $event.target.checked)">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Net Hours</label>
+                                    <input type="text" readonly
+                                        class="form-control form-control-sm bg-light text-center fw-bold text-dark"
+                                        wire:model="multipleShifts.{{ $index }}.total_hours">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Job Role <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text"
+                                        class="form-control form-control-sm @error("multipleShifts.$index.job") is-invalid @enderror"
+                                        placeholder="Specify Role"
+                                        wire:model.defer="multipleShifts.{{ $index }}.job">
+
+                                    @error("multipleShifts.$index.job")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+
+
+                            {{-- SECTION 3: PERSONNEL & BREAKS --}}
+                            <div class="row g-3 mt-4 align-items-center bg-light mx-0 py-3 rounded-3 border">
+                                <div class="col-md-4 mx-auto">
+                                    <div class="row align-items-center shift-header py-3 px-2 rounded-3 mb-3">
+                                        <div class="col-md-6 d-flex align-items-center">
+                                            <div class="me-3">
+                                                <label class="text-muted fw-bold small text-uppercase d-block mb-1">
+                                                    Assign Employees <span class="text-danger">*</span>
+                                                </label>
+
+                                                @include('livewire.backend.company.schedule.partials.multiple-shift-employees')
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 text-end">
+                                            <button type="button"
+                                                class="btn btn-sm break-btn px-3 rounded-pill fw-bold
+            {{ $isShowMultiBreak[$index] ?? false ? 'btn-dark active' : 'btn-outline-dark' }}"
+                                                wire:click.prevent="{{ $isShowMultiBreak[$index] ?? false ? 'hideBreaksSection' : 'showBreaksSection' }}({{ $index }})">
+
+                                                <i class="fas fa-coffee me-2"></i>
+                                                {{ $isShowMultiBreak[$index] ?? false ? 'Close Break Manager' : 'Manage Breaks' }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+
+                                @if ($isShowMultiBreak[$index] ?? false)
+                                    <div class="col-12 mt-3 pt-3 border-top">
+                                        @foreach ($multipleShiftNewBreaks[$index] ?? [] as $breakIndex => $break)
+                                            <div
+                                                class="row g-2 align-items-center mb-2 bg-white p-2 rounded border shadow-xs mx-0">
+                                                <div class="col-4">
+                                                    <label class="form-label form-label-sm">Break Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control form-control-sm border"
+                                                        placeholder="Break Description"
+                                                        wire:model.live="multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.name">
+                                                </div>
+                                                <div class="col-3">
+                                                    <label class="form-label form-label-sm">Type <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select form-select-sm border"
+                                                        wire:model="multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.type">
+                                                        <option value="">Select Type</option>
+                                                        <option value="Paid">Paid</option>
+                                                        <option value="Unpaid">Unpaid</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-3">
+                                                    <label class="form-label form-label-sm">Duration <span
+                                                            class="text-danger">*</span></label>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm dropdown-toggle w-100 border"
+                                                            type="button" data-bs-toggle="dropdown">
+                                                            {{ $break['duration'] ?? 'Duration' }}
+                                                        </button>
+                                                        <div class="dropdown-menu text-center"
+                                                            style="max-height:200px;overflow-y:auto;">
+                                                            @for ($i = 0; $i <= 23; $i += 0.05)
+                                                                <button type="button" class="dropdown-item"
+                                                                    wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.duration','{{ number_format($i, 2) }}')">
+                                                                    {{ number_format($i, 2) }}
+                                                                </button>
+                                                            @endfor
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 text-start mt-2">
+
+                                                    <button type="button"
+                                                        class="btn btn-sm text-danger border-0 circle-sm"
+                                                        wire:click="removeMultipleBreakRow({{ $index }}, {{ $breakIndex }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                        <div class="mt-3 d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-primary px-3 shadow-none"
+                                                wire:click="addMultipleBreakRow({{ $index }})">+ Add Break
+                                                Row</button>
+                                            <button type="button" class="btn btn-sm btn-success px-3 shadow-none"
+                                                wire:click="confirmMultipleBreaksAndSave({{ $index }})">Save &
+                                                Apply Breaks</button>
+                                        </div>
+                                    </div>
+                                @endif
+
+
+                                @error("multipleShifts.$index.employees")
+                                    <div class="text-danger small mt-1 text-center">{{ $message }}</div>
+                                @enderror
+
+                            </div>
+
+                            {{-- SECTION 4: METADATA --}}
+                            <div class="row g-3 mt-2 pt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Deployment
+                                        Address</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Search location or enter manually"
+                                        wire:model.defer="multipleShifts.{{ $index }}.address">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">Manager's
+                                        Notes</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="Additional instructions..."
+                                        wire:model.defer="multipleShifts.{{ $index }}.note">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
 
                     @if (!empty($multipleShifts[$index]['breaks']))
                         <div class="row mb-2 ps-4 pe-4 bg-light rounded">
@@ -243,23 +299,39 @@
                     @endif
                 @endforeach
 
-
-                {{-- ADD ROW --}}
-                <div class="text-center mt-3">
-                    <button type="button" wire:click="addShiftRow" class="btn btn-outline-primary px-3 py-1"
-                        style="font-size:13px;">
-                        + Add another shift
+                {{-- ADD ROW BUTTON --}}
+                <div
+                    class="text-center py-4 border-2 border-dashed border-secondary-subtle rounded-4 bg-white shadow-xs">
+                    <button type="button" wire:click="addShiftRow"
+                        class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow">
+                        <i class="fas fa-layer-group me-2"></i> Add Another Shift Block
                     </button>
+                    <p class="text-muted small mt-2 mb-0">You can add multiple shifts and assign different teams to
+                        each.</p>
                 </div>
-
             </div>
+
+
+
 
             {{-- FOOTER --}}
             <div class="modal-footer">
                 <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button wire:click="saveMultipleShifts" class="btn btn-primary">
-                    Save Shifts
+                <button class="btn btn-primary" wire:click="publishMultipleShifts" wire:loading.attr="disabled"
+                    wire:target="publishMultipleShifts">
+
+                    <!-- Normal content -->
+                    <span wire:loading.remove wire:target="publishMultipleShifts">
+                        <i class="fas fa-upload me-2"></i> Publish Shifts
+                    </span>
+
+                    <!-- Loading content -->
+                    <span wire:loading wire:target="publishMultipleShifts">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Publishing...
+                    </span>
                 </button>
+
             </div>
 
         </div>

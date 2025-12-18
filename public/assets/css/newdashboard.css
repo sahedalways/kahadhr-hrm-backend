@@ -235,6 +235,60 @@ body {
     font-size: 14px;
 }
 
+.circle-sm {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 !important;
+}
+.tooltip-btn {
+    position: relative;
+}
+
+/* Tooltip bubble */
+.tooltip-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+/* Tooltip arrow */
+.tooltip-btn::before {
+    content: "";
+    position: absolute;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Show on hover */
+.tooltip-btn:hover::after,
+.tooltip-btn:hover::before {
+    opacity: 1;
+}
+.tooltip-btn::after {
+    transform: translate(-50%, 5px);
+}
+
+.tooltip-btn:hover::after {
+    transform: translate(-50%, 0);
+}
+
 @media (max-width: 991px) {
     body {
         zoom: 0.8;

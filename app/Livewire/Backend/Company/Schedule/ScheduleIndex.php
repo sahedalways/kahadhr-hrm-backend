@@ -809,6 +809,7 @@ class ScheduleIndex extends BaseComponent
         $this->isEditableShift =  false;
         $this->closeAddShiftPanel();
         $this->cancelRepeatShift();
+        $this->loadShifts();
         $this->dispatch('refreshSchedule');
         $this->toast('Shift has been published successfully!', 'success');
     }
@@ -986,6 +987,8 @@ class ScheduleIndex extends BaseComponent
         $this->multipleShifts = [];
         $this->multipleShiftNewBreaks = [];
         $this->originalMultiShiftTotalTime = [];
+
+        $this->loadShifts();
 
         $this->dispatch('closemodal');
         $this->toast('Multiple shifts published successfully!', 'success');

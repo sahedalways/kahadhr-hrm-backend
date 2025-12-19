@@ -30,8 +30,6 @@
         </div>
     </div>
 
-    @include('livewire.backend.company.schedule.partials.multiple-shift-modal')
-    @include('livewire.backend.company.schedule.partials.repeat-shift-modal')
-    @include('livewire.backend.company.schedule.partials.break-modal')
-    @include('livewire.backend.company.schedule.partials._conflict-shift-modal')
+
+
 </div>

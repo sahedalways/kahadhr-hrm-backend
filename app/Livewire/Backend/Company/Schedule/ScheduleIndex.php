@@ -686,16 +686,16 @@ class ScheduleIndex extends BaseComponent
 
         if (!$this->isSavedRepeatShift) {
 
-            if (! $this->skipConflictCheck) {
+            if (!$this->skipConflictCheck) {
                 $conflicts = $this->getConflicts(
                     $this->selectedDate,
                     $this->newShift['employees']
                 );
 
+
+
                 if ($conflicts->isNotEmpty()) {
                     $this->conflictData = $conflicts;
-
-
 
                     $this->dispatch('show-conflict-modal');
                     return;
@@ -1557,6 +1557,8 @@ class ScheduleIndex extends BaseComponent
         $this->isClickMultipleShift =  false;
         $this->isEditableShift =  true;
         $this->resetFields();
+
+
 
         $shiftDate = ShiftDate::findOrFail($dateId);
 

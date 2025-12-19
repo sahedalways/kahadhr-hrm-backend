@@ -117,11 +117,15 @@
                                                                     <ul
                                                                         class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
                                                                         <li>
-                                                                            <button class="dropdown-item" type="button"
-                                                                                wire:click="editShift({{ $shift['id'] }})">
-                                                                                <i class="fas fa-edit fa-fw me-1"></i>
-                                                                                Edit
-                                                                            </button>
+                                                                            @foreach ($shift['employees'] as $emp)
+                                                                                <button class="dropdown-item"
+                                                                                    type="button"
+                                                                                    wire:click="editOneEmpShift({{ $shift['id'] }}, {{ $emp['id'] }})">
+                                                                                    <i
+                                                                                        class="fas fa-edit fa-fw me-1"></i>
+                                                                                    Edit {{ $emp['name'] }}
+                                                                                </button>
+                                                                            @endforeach
                                                                         </li>
                                                                         <li>
                                                                             <button class="dropdown-item" type="button"
@@ -887,8 +891,10 @@
     @endif
 
 
-
-
+    @include('livewire.backend.company.schedule.partials.multiple-shift-modal')
+    @include('livewire.backend.company.schedule.partials.repeat-shift-modal')
+    @include('livewire.backend.company.schedule.partials.break-modal')
+    @include('livewire.backend.company.schedule.partials._conflict-shift-modal')
 
 </div>
 

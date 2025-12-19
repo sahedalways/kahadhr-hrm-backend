@@ -1010,6 +1010,7 @@ class ScheduleIndex extends BaseComponent
         $this->endDate = Carbon::today()->copy()->addDays(6);
         $this->currentDate = Carbon::today();
         $this->loadShifts();
+        $this->calcCalendarSummary();
     }
 
 
@@ -1722,6 +1723,7 @@ class ScheduleIndex extends BaseComponent
                     'date' => $shiftDate->date,
                     'start_time' => $shiftDate->start_time,
                     'end_time' => $shiftDate->end_time,
+                    'total_hours'  => $shiftDate->total_hours,
                     'shift' => [
                         'title' => $shiftDate->shift->title ?? null,
                         'color' => $shiftDate->shift->color ?? '#6c757d',
@@ -1808,6 +1810,45 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+    private function calcCalendarSummary(): array
+    {
+        $totalMinutes = 0;
+        $shiftCount   = 0;
+        $userIds      = [];
+
+        $period = Carbon::parse($this->startDate)->daysUntil($this->endDate);
+
+        foreach ($period as $day) {
+            $dateKey = $day->format('Y-m-d');
+            if (empty($this->calendarShifts[$dateKey])) {
+                continue;
+            }
+
+            foreach ($this->calendarShifts[$dateKey] as $row) {
+                $shiftCount++;
+
+
+                [$h, $m] = explode(':', $row['total_hours'] ?? '00:00');
+                $totalMinutes += ((int)$h * 60) + (int)$m;
+
+
+                foreach ($row['employees'] ?? [] as $emp) {
+                    $userIds[$emp['id'] ?? $emp] = true;
+                }
+            }
+        }
+
+        $hours = sprintf('%02d:%02d', intdiv($totalMinutes, 60), $totalMinutes % 60);
+
+        return [
+            'shifts' => $shiftCount,
+            'hours'  => $hours,
+            'users'  => count($userIds),
+        ];
+    }
+
+
     public function render()
     {
         $this->loadShifts();
@@ -1819,6 +1860,7 @@ class ScheduleIndex extends BaseComponent
             'employees' => $this->employees,
             'displayDateRange' => $this->displayDateRange,
             'availableMultipleShiftEmployees' => $this->availableMultipleShiftEmployees,
+
             'conflictData' => $this->conflictData ?? collect(),
         ]);
     }

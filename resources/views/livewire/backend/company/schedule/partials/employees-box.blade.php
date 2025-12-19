@@ -28,6 +28,8 @@
 
 
             {{-- Add button --}}
+
+
             <button type="button" class="btn btn-outline-primary btn-xs px-2 py-1" style="font-size: 0.75rem;"
                 data-bs-toggle="collapse" data-bs-target="#addUserPanel" aria-expanded="false"
                 aria-controls="addUserPanel" wire:click="toggleAddUserPanel">

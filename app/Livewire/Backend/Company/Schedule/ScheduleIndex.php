@@ -62,6 +62,7 @@ class ScheduleIndex extends BaseComponent
 
     public $showAddUserPanel = false;
     public $isClickMultipleShift = false;
+    public $isEditableShift = false;
 
 
     public $multipleShifts = [];
@@ -439,6 +440,7 @@ class ScheduleIndex extends BaseComponent
 
     public function openAddShiftPanelForMonth($date)
     {
+        $this->isEditableShift = false;
         $this->selectedDate = $date;
         $this->resetFields();
 
@@ -453,6 +455,7 @@ class ScheduleIndex extends BaseComponent
 
     public function openAddShiftPanel($date, $employeeId)
     {
+        $this->isEditableShift = false;
         $this->selectedDate = $date;
         $this->newShift['employees'][] = (int) $employeeId;
         $this->selectedEmployees[] = $employeeId;
@@ -643,7 +646,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
         $dates = [];
         $currentDate = $this->selectedDate;
         $count = 0;
@@ -656,7 +658,7 @@ class ScheduleIndex extends BaseComponent
                 if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
                     break;
                 }
-                if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
+                if ($this->endRepeat === 'On' && Carbon::parse($currentDate) >= Carbon::parse($this->endRepeatDate)) {
                     break;
                 }
 
@@ -667,6 +669,7 @@ class ScheduleIndex extends BaseComponent
 
         if (!$this->isSavedRepeatShift) {
             $employeeIds = $this->newShift['employees'];
+
 
             $conflictingShifts = Shift::whereHas('dates', function ($q) use ($currentDate) {
                 $q->where('date', $currentDate);
@@ -737,7 +740,7 @@ class ScheduleIndex extends BaseComponent
                 $employeeIds = $this->newShift['employees'];
 
 
-                $conflictingShifts = \App\Models\Shift::whereHas('dates', function ($q) use ($date) {
+                $conflictingShifts = Shift::whereHas('dates', function ($q) use ($date) {
                     $q->where('date', $date);
                 })
                     ->whereHas('dates.employees', function ($q) use ($employeeIds) {
@@ -762,6 +765,7 @@ class ScheduleIndex extends BaseComponent
                     return;
                 }
             }
+
 
             $shift = Shift::create([
                 'company_id' => $this->company_id,
@@ -799,7 +803,7 @@ class ScheduleIndex extends BaseComponent
         }
 
 
-
+        $this->isEditableShift =  false;
         $this->closeAddShiftPanel();
         $this->cancelRepeatShift();
         $this->dispatch('refreshSchedule');
@@ -1538,6 +1542,80 @@ class ScheduleIndex extends BaseComponent
         $this->loadShifts();
         $this->toast('Shift deleted successfully!', 'success');
     }
+
+
+
+
+
+    public function editOneEmpShift($dateId, $empId)
+    {
+        $this->isClickMultipleShift =  false;
+        $this->isEditableShift =  true;
+        $this->resetFields();
+
+        $shiftDate = ShiftDate::findOrFail($dateId);
+
+        $this->selectedDate = Carbon::parse($shiftDate->date)->format('Y-m-d');
+
+
+        $this->newShift = [
+            'title'       => $shiftDate->shift->title       ?? '',
+            'job'         => $shiftDate->shift->job         ?? '',
+            'start_time' => Carbon::parse($shiftDate->start_time)->format('H:i'),
+            'end_time'   => Carbon::parse($shiftDate->end_time)->format('H:i'),
+            'total_hours' => $shiftDate->total_hours,
+            'color'       => $shiftDate->shift->color       ?? '#000000',
+            'address'     => $shiftDate->shift->address     ?? '',
+            'note'        => $shiftDate->shift->note        ?? '',
+            'all_day'     => $shiftDate->shift->all_day     ?? false,
+            'employees'   => [(int) $empId],
+        ];
+
+
+        if ($shiftDate->breaks->isNotEmpty()) {
+            $this->newBreaks = $shiftDate->breaks
+                ->map(fn($b) => [
+                    'name'     => $b->title,
+                    'type'     => $b->type,
+                    'duration' => (float) $b->duration,
+                ])
+                ->toArray();
+
+            $this->recalculateBreakSummary();
+        } else {
+            $this->newBreaks = [];
+            $this->paidBreaksCount = 0;
+            $this->unpaidBreaksCount = 0;
+            $this->paidBreaksDuration = '00:00';
+            $this->unpaidBreaksDuration = '00:00';
+        }
+
+
+
+        $this->dispatch('shift-panel-opened');
+    }
+
+
+
+    private function recalculateBreakSummary()
+    {
+        $paid = collect($this->newBreaks)->where('type', 'Paid');
+        $unpaid = collect($this->newBreaks)->where('type', 'Unpaid');
+
+        $this->paidBreaksCount   = $paid->count();
+        $this->unpaidBreaksCount = $unpaid->count();
+
+        $this->paidBreaksDuration   = $this->hoursToTime($paid->sum('duration'));
+        $this->unpaidBreaksDuration = $this->hoursToTime($unpaid->sum('duration'));
+    }
+
+    private function hoursToTime($hours)
+    {
+        $h = floor($hours);
+        $m = round(($hours - $h) * 60);
+        return sprintf('%02d:%02d', $h, $m);
+    }
+
 
 
 

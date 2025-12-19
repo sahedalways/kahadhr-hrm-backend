@@ -326,22 +326,21 @@
 
 
                                             {{-- Single trigger + menu --}}
-                                            <div class="dropdown shift-dropdown position-absolute"
+                                            <div class="shift-dropdown position-absolute"
                                                 style="bottom: 4px; right: 6px;">
-                                                <button class="btn btn-xs btn-link text-white p-0"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button type="button"
+                                                    class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
 
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell"
-                                                    aria-labelledby="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                                <ul class="dropdown-schedule-cell d-none">
                                                     <li>
                                                         <button class="dropdown-item" type="button"
-                                                            data-bs-display="static"
                                                             wire:click="editShift({{ $content['id'] }})">
                                                             <i class="fas fa-edit fa-fw me-1"></i> Edit
                                                         </button>
                                                     </li>
+
                                                     <li>
                                                         <button class="dropdown-item" type="button"
                                                             data-bs-toggle="modal"
@@ -349,9 +348,11 @@
                                                             <i class="fas fa-eye fa-fw me-1"></i> View details
                                                         </button>
                                                     </li>
-                                                    <li>
+
+                                                    {{--<li>
                                                         <hr class="dropdown-divider">
-                                                    </li>
+                                                    </li>--}}
+
                                                     <li>
                                                         <button class="dropdown-item text-danger" type="button"
                                                             wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
@@ -361,6 +362,8 @@
                                                     </li>
                                                 </ul>
                                             </div>
+
+
                                         </div>
 
 
@@ -909,5 +912,27 @@
                 titleInput.focus();
             }
         }, 50);
+    });
+</script>
+<script>
+    document.addEventListener('click', function(e) {
+        // Toggle menu
+        if (e.target.closest('.shift-menu-btn')) {
+            const dropdown = e.target
+                .closest('.shift-dropdown')
+                .querySelector('.dropdown-schedule-cell');
+
+            // Close others
+            document.querySelectorAll('.dropdown-schedule-cell')
+                .forEach(el => el !== dropdown && el.classList.add('d-none'));
+
+            dropdown.classList.toggle('d-none');
+            e.stopPropagation();
+            return;
+        }
+
+        // Close when clicking outside
+        document.querySelectorAll('.dropdown-schedule-cell')
+            .forEach(el => el.classList.add('d-none'));
     });
 </script>

@@ -531,3 +531,14 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
 .table-responsive {
     overflow: visible !important;
 }
+.dropdown-schedule-cell {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    min-width: 160px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+    z-index: 9999;
+    padding-left: 0;
+}

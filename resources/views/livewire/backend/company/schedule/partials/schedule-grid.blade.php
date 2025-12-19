@@ -336,7 +336,7 @@
                                                 <ul class="dropdown-schedule-celll d-none">
                                                     <li>
                                                         <button class="dropdown-item" type="button"
-                                                            wire:click="editShift({{ $content['id'] }})">
+                                                            wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
                                                             <i class="fas fa-edit fa-fw me-1"></i> Edit
                                                         </button>
                                                     </li>
@@ -349,9 +349,9 @@
                                                         </button>
                                                     </li>
 
-                                                    {{--<li>
+                                                    {{-- <li>
                                                         <hr class="dropdown-divider">
-                                                    </li>--}}
+                                                    </li> --}}
 
                                                     <li>
                                                         <button class="dropdown-item text-danger" type="button"

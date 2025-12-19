@@ -1,5 +1,5 @@
 <div class="flex-grow-1 schedule-grid-container">
-    <div class="card-header bg-white d-flex justify-content-center align-items-center py-2">
+    <div class="bg-white d-flex justify-content-center align-items-center py-2">
         @include('livewire.backend.company.schedule.partials.header_nav', [
             'startDate' => $startDate ?? 'Oct 27',
             'endDate' => $endDate ?? 'Nov 2',
@@ -313,13 +313,13 @@
                                             </div>
                                             <div class="smaller opacity-75">{{ $content['time'] }}</div>
 
-                                            <a href="#"
+                                            {{--<a href="#"
                                                 id="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                                class="text-white position-absolute"
+                                                class="text-warning position-absolute"
                                                 style="bottom:4px; right:6px; font-size:12px;" data-bs-toggle="dropdown"
                                                 aria-expanded="false">
                                                 <i class="fas fa-ellipsis-v"></i>
-                                            </a>
+                                            </a>--}}
 
 
 
@@ -915,24 +915,37 @@
     });
 </script>
 <script>
-    document.addEventListener('click', function(e) {
-        // Toggle menu
-        if (e.target.closest('.shift-menu-btn')) {
-            const dropdown = e.target
-                .closest('.shift-dropdown')
-                .querySelector('.dropdown-schedule-celll');
+document.addEventListener('click', function (e) {
 
-            // Close others
-            document.querySelectorAll('.dropdown-schedule-celll')
-                .forEach(el => el !== dropdown && el.classList.add('d-none'));
+    const btn = e.target.closest('.shift-menu-btn');
 
-            dropdown.classList.toggle('d-none');
-            e.stopPropagation();
-            return;
-        }
+    if (btn) {
+        const shiftBlock = btn.closest('.shift-block');
+        const dropdown = btn
+            .closest('.shift-dropdown')
+            .querySelector('.dropdown-schedule-celll');
 
-        // Close when clicking outside
+        // reset all
+        document.querySelectorAll('.shift-block')
+            .forEach(el => el.classList.remove('active-z'));
+
         document.querySelectorAll('.dropdown-schedule-celll')
-            .forEach(el => el.classList.add('d-none'));
-    });
+            .forEach(el => el !== dropdown && el.classList.add('d-none'));
+
+        // activate current
+        shiftBlock.classList.add('active-z');
+        dropdown.classList.toggle('d-none');
+
+        e.stopPropagation();
+        return;
+    }
+
+    // click outside → reset everything
+    document.querySelectorAll('.dropdown-schedule-celll')
+        .forEach(el => el.classList.add('d-none'));
+
+    document.querySelectorAll('.shift-block')
+        .forEach(el => el.classList.remove('active-z'));
+});
 </script>
+

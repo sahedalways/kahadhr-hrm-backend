@@ -3,14 +3,14 @@
 @endpush
 
 
-<div class="container-fluid my-3 schedule-app">
+<div class="schedule-app">
     <div class="ms-3 mt-2">
-        <h5 class="mb-0 fw-bold">Schedule</h5>
+        <h5 class=" fw-bold">Schedule</h5>
     </div>
 
-    <div class="card shadow-sm">
+    <div class=" shadow-sm">
 
-        <div class="card-body p-0 position-relative">
+        <div class=" p-0 position-relative">
 
 
 
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="card-footer bg-white py-2">
+        <div class=" bg-white py-2">
             @include('livewire.backend.company.schedule.partials.footer_summary')
         </div>
     </div>

@@ -945,6 +945,20 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+
+    private function generateWeekDays(Carbon $start)
+    {
+        $days = [];
+        for ($i = 0; $i < 7; $i++) {
+            $days[] = [
+                'full_date' => $start->copy()->addDays($i)->format('Y-m-d'),
+                'highlight' => $start->copy()->addDays($i)->isToday(),
+            ];
+        }
+        return $days;
+    }
+
+
     public function updatedSearch()
     {
         $this->employees = Employee::where('company_id', $this->company_id)
@@ -1001,13 +1015,18 @@ class ScheduleIndex extends BaseComponent
         $this->viewMode = $mode;
 
         if ($mode === 'weekly') {
-            $this->endDate = $this->startDate->copy()->addDays(6);
+
+            $this->startDate = now()->startOfDay();
+            $this->endDate = now()->addDays(6)->endOfDay();
         } elseif ($mode === 'monthly') {
-            $this->startDate = $this->startDate->copy()->startOfMonth();
-            $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->startDate = now()->startOfMonth();
+            $this->endDate = now()->endOfMonth();
         }
+
+
         $this->loadShifts();
     }
+
 
     public function goToPrevious()
     {
@@ -1569,6 +1588,8 @@ class ScheduleIndex extends BaseComponent
 
     public function render()
     {
+        $this->loadShifts();
+
 
         return view('livewire.backend.company.schedule.schedule-index', [
             'weekDays' => $this->weekDays,

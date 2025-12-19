@@ -12,20 +12,14 @@
 
         <div class="card-body p-0 position-relative">
 
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2 position-absolute"
-                style="left: 50%">
-                @include('livewire.backend.company.schedule.partials.header_nav', [
-                    'startDate' => $startDate ?? 'Oct 27',
-                    'endDate' => $endDate ?? 'Nov 2',
-                ])
-            </div>
+           
 
             <div class="d-flex">
                 @if ($viewMode === 'weekly')
                     @include('livewire.backend.company.schedule.partials.sidebar')
                 @endif
 
-                <div class="flex-grow-1 schedule-grid-container" style="overflow-x: auto; margin-top: 5rem !important;">
+                <div>
                     @include('livewire.backend.company.schedule.partials.schedule-grid')
                 </div>
             </div>

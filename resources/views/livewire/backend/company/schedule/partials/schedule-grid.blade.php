@@ -345,7 +345,7 @@
                                                         <button class="dropdown-item" type="button"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
-                                                            <i class="fas fa-eye fa-fw me-1"></i> View details
+                                                            <i class="fas fa-eye fa-fw me-1"></i> View
                                                         </button>
                                                     </li>
 

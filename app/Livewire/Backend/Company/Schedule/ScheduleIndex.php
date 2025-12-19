@@ -77,6 +77,9 @@ class ScheduleIndex extends BaseComponent
 
     public $calendarShifts = [];
 
+    public $skipConflictCheck = false;
+    public $conflictData      = [];
+
 
 
     public $newShift = [
@@ -179,6 +182,7 @@ class ScheduleIndex extends BaseComponent
         $this->multipleShiftNewBreaks = [];
         $this->isShowMultiBreak = [];
         $this->originalMultiShiftTotalTime = [];
+        $this->skipConflictCheck = false;
 
         $this->addShiftRow();
     }
@@ -440,7 +444,6 @@ class ScheduleIndex extends BaseComponent
 
     public function openAddShiftPanelForMonth($date)
     {
-        $this->isEditableShift = false;
         $this->selectedDate = $date;
         $this->resetFields();
 
@@ -461,6 +464,7 @@ class ScheduleIndex extends BaseComponent
         $this->selectedEmployees[] = $employeeId;
 
         $this->isClickMultipleShift =  false;
+        $this->skipConflictCheck = false;
 
         $this->resetFields();
 
@@ -599,6 +603,18 @@ class ScheduleIndex extends BaseComponent
         return $grouped;
     }
 
+
+
+    public function getConflicts($date, array $empIds)
+    {
+        return Shift::whereHas('dates', fn($q) => $q->where('date', $date))
+            ->whereHas('dates.employees', fn($q) => $q->whereIn('employees.id', $empIds))
+            ->with('dates.employees')
+            ->get();
+    }
+
+
+
     public function publishShift()
     {
 
@@ -646,6 +662,7 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
         $dates = [];
         $currentDate = $this->selectedDate;
         $count = 0;
@@ -658,7 +675,7 @@ class ScheduleIndex extends BaseComponent
                 if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
                     break;
                 }
-                if ($this->endRepeat === 'On' && Carbon::parse($currentDate) >= Carbon::parse($this->endRepeatDate)) {
+                if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
                     break;
                 }
 
@@ -668,38 +685,22 @@ class ScheduleIndex extends BaseComponent
 
 
         if (!$this->isSavedRepeatShift) {
-            $employeeIds = $this->newShift['employees'];
+
+            if (! $this->skipConflictCheck) {
+                $conflicts = $this->getConflicts(
+                    $this->selectedDate,
+                    $this->newShift['employees']
+                );
+
+                if ($conflicts->isNotEmpty()) {
+                    $this->conflictData = $conflicts;
 
 
-            $conflictingShifts = Shift::whereHas('dates', function ($q) use ($currentDate) {
-                $q->where('date', $currentDate);
-            })
-                ->whereHas('dates.employees', function ($q) use ($employeeIds) {
-                    $q->whereIn('employees.id', $employeeIds);
-                })
-                ->with('dates.employees')
-                ->get();
 
-            $conflictingNames = [];
-
-            foreach ($conflictingShifts as $shift) {
-                foreach ($shift->dates as $shiftDate) {
-                    foreach ($shiftDate->employees as $employee) {
-                        $conflictingNames[$employee->id] = $employee->full_name;
-                    }
+                    $this->dispatch('show-conflict-modal');
+                    return;
                 }
             }
-
-            if (!empty($conflictingNames)) {
-                $displayNames = count($conflictingNames) > 3
-                    ? implode(', ', array_slice($conflictingNames, 0, 3)) . ' ...'
-                    : implode(', ', $conflictingNames);
-
-                $this->toast("Conflict: $displayNames on $currentDate", 'info');
-
-                return;
-            }
-
 
 
             $shift = Shift::create([
@@ -734,74 +735,56 @@ class ScheduleIndex extends BaseComponent
                 }
             }
         } else {
-
             foreach ($dates as $date) {
 
-                $employeeIds = $this->newShift['employees'];
+                if (! $this->skipConflictCheck) {
+                    $conflicts = $this->getConflicts(
+                        $date,
+                        $this->newShift['employees']
+                    );
 
-
-                $conflictingShifts = Shift::whereHas('dates', function ($q) use ($date) {
-                    $q->where('date', $date);
-                })
-                    ->whereHas('dates.employees', function ($q) use ($employeeIds) {
-                        $q->whereIn('employee_id', $employeeIds);
-                    })
-                    ->with(['dates.employees'])
-                    ->get();
-
-                if ($conflictingShifts->isNotEmpty()) {
-
-                    $conflictingNames = $conflictingShifts->pluck('dates.*.employees.*.full_name')
-                        ->flatten()
-                        ->unique()
-                        ->toArray();
-
-                    $displayNames = count($conflictingNames) > 3
-                        ? implode(', ', array_slice($conflictingNames, 0, 3)) . ' ...'
-                        : implode(', ', $conflictingNames);
-
-                    $this->toast("Conflict: $displayNames on $date", 'info');
-
-                    return;
+                    if ($conflicts->isNotEmpty()) {
+                        $this->conflictData = $conflicts;
+                        $this->dispatch('show-conflict-modal');
+                        return;
+                    }
                 }
-            }
 
-
-            $shift = Shift::create([
-                'company_id' => $this->company_id,
-                'title' => $this->newShift['title'],
-                'job' => $this->newShift['job'],
-                'color' => $this->newShift['color'],
-                'address' => $this->newShift['address'],
-                'note' => $this->newShift['note'],
-            ]);
-
-
-
-            foreach ($dates as $date) {
-                $shiftDate = $shift->dates()->create([
-                    'date' => $date,
-                    'start_time' => $this->newShift['start_time'],
-                    'end_time' => $this->newShift['end_time'],
-                    'total_hours' => $this->newShift['total_hours'],
+                $shift = Shift::create([
+                    'company_id' => $this->company_id,
+                    'title' => $this->newShift['title'],
+                    'job' => $this->newShift['job'],
+                    'color' => $this->newShift['color'],
+                    'address' => $this->newShift['address'],
+                    'note' => $this->newShift['note'],
                 ]);
 
-                $shiftDate->employees()->attach($this->newShift['employees']);
 
-                if (!empty($this->newBreaks)) {
-                    foreach ($this->newBreaks as $break) {
-                        if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-                            $shiftDate->breaks()->create([
-                                'title' => $break['name'],
-                                'type' => $break['type'],
-                                'duration' => $break['duration'],
-                            ]);
+
+                foreach ($dates as $date) {
+                    $shiftDate = $shift->dates()->create([
+                        'date' => $date,
+                        'start_time' => $this->newShift['start_time'],
+                        'end_time' => $this->newShift['end_time'],
+                        'total_hours' => $this->newShift['total_hours'],
+                    ]);
+
+                    $shiftDate->employees()->attach($this->newShift['employees']);
+
+                    if (!empty($this->newBreaks)) {
+                        foreach ($this->newBreaks as $break) {
+                            if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                                $shiftDate->breaks()->create([
+                                    'title' => $break['name'],
+                                    'type' => $break['type'],
+                                    'duration' => $break['duration'],
+                                ]);
+                            }
                         }
                     }
                 }
             }
         }
-
 
         $this->isEditableShift =  false;
         $this->closeAddShiftPanel();
@@ -811,6 +794,44 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+
+
+
+    public function confirmOverwrite()
+    {
+        $empIdsToReplace = $this->isClickMultipleShift
+            ? collect($this->multipleShifts)->pluck('employees')->flatten(1)->pluck('id')->unique()->toArray()
+            : $this->newShift['employees'];
+
+        foreach ($this->conflictData as $shift) {
+            foreach ($shift->dates as $date) {
+                if (Carbon::parse($date->date)->format('Y-m-d') !== $this->selectedDate) {
+                    continue;
+                }
+
+
+                $date->employees()->detach($empIdsToReplace);
+
+
+                if ($date->employees()->doesntExist()) {
+                    $date->breaks()->delete();
+                    $date->delete();
+                }
+            }
+        }
+
+        $this->skipConflictCheck = true;
+
+        if ($this->isClickMultipleShift) {
+            $this->publishMultipleShifts();
+        } else {
+            $this->publishShift();
+        }
+
+        /* 3. Clean-up */
+        $this->skipConflictCheck = false;
+        $this->dispatch('hide-conflict-modal');
+    }
 
 
 
@@ -870,22 +891,18 @@ class ScheduleIndex extends BaseComponent
             $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
 
 
-            $conflictingEmployees = Shift::whereHas('dates', function ($query) use ($shift) {
-                $query->where('date', $shift['date']);
-            })->whereHas('dates.employees', function ($query) use ($employeeIds) {
-                $query->whereIn('employee_id', $employeeIds);
-            })->with(['dates.employees'])->get()
-                ->pluck('dates.*.employees.*.full_name')
-                ->flatten()
-                ->unique()
-                ->toArray();
+            if (! $this->skipConflictCheck) {
+                $conflicts = $this->getConflicts(
+                    $shift['date'],
+                    $employeeIds
+                );
 
-            if (!empty($conflictingEmployees)) {
-                $names = implode(', ', $conflictingEmployees);
-                $this->toast("Conflict: $names on {$shift['date']}", 'info');
-                return;
+                if ($conflicts->isNotEmpty()) {
+                    $this->conflictData = $conflicts;
+                    $this->dispatch('show-conflict-modal');
+                    return;
+                }
             }
-
 
 
 
@@ -950,18 +967,6 @@ class ScheduleIndex extends BaseComponent
     }
 
 
-
-    private function generateWeekDays(Carbon $start)
-    {
-        $days = [];
-        for ($i = 0; $i < 7; $i++) {
-            $days[] = [
-                'full_date' => $start->copy()->addDays($i)->format('Y-m-d'),
-                'highlight' => $start->copy()->addDays($i)->isToday(),
-            ];
-        }
-        return $days;
-    }
 
 
     public function updatedSearch()
@@ -1745,6 +1750,7 @@ class ScheduleIndex extends BaseComponent
             'employees' => $this->employees,
             'displayDateRange' => $this->displayDateRange,
             'availableMultipleShiftEmployees' => $this->availableMultipleShiftEmployees,
+            'conflictData' => $this->conflictData ?? collect(),
         ]);
     }
 }

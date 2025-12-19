@@ -8,8 +8,8 @@ class BreakofShift extends Model
 {
     protected $fillable = ['title', 'type', 'duration', 'shift_date_id'];
 
-    public function dates()
+    public function shiftDate()
     {
-        return $this->hasMany(ShiftDate::class);
+        return $this->belongsTo(ShiftDate::class, 'shift_date_id');
     }
 }

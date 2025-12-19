@@ -63,23 +63,153 @@
                                         @endphp
 
                                         <td class="schedule-cell month-cell {{ $day->equalTo(\Carbon\Carbon::today()) ? 'bg-primary-light-cell' : '' }}"
-                                            style="position: relative; height: 80px; width: 14.285%;">
+                                            style="position: relative; height: 80px; width: 14.285%;"
+                                            x-data="{ hover: false }" @mouseenter="hover = true"
+                                            @mouseleave="hover = false">
 
                                             @if ($isInCurrentMonth)
+                                                {{-- Date Number --}}
                                                 <div class="small text-end p-1 text-dark {{ $day->equalTo(\Carbon\Carbon::today()) ? 'fw-bold' : '' }}"
                                                     style="font-size: 0.85rem;">
                                                     {{ $day->day }}
                                                 </div>
 
-                                                <button
-                                                    wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
-                                                    class="btn btn-sm btn-primary add-shift-month-btn position-absolute d-flex justify-content-center align-items-center"
-                                                    style="width: 28px; height: 28px; top: 50%; left: 50%;
-                   transform: translate(-50%, -50%);
-                   z-index: 10; padding: 0; border-radius: 50%;"
-                                                    title="Add Shift">
-                                                    +
-                                                </button>
+                                                @php
+                                                    $dateKey = $day->format('Y-m-d');
+                                                    $hasShift = !empty($this->calendarShifts[$dateKey]);
+                                                @endphp
+
+                                                {{-- Show Shifts --}}
+                                                @if ($hasShift)
+                                                    @foreach ($this->calendarShifts[$dateKey] as $shift)
+                                                        @foreach ($this->calendarShifts[$dateKey] as $shift)
+                                                            @php
+                                                                $modalId = 'shiftDetailsModal-' . $shift['id'];
+                                                            @endphp
+
+                                                            <div class="shift-block text-white rounded px-1 py-0 mb-1"
+                                                                style="background-color: {{ $shift['shift']['color'] }}; font-size: 11px; cursor:pointer;"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#{{ $modalId }}">
+                                                                <div class="fw-semibold">{{ $shift['shift']['title'] }}
+                                                                </div>
+                                                                <div>
+                                                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('H:i') }}
+                                                                    -
+                                                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('H:i') }}
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="modal fade" id="{{ $modalId }}"
+                                                                tabindex="-1" aria-hidden="true" wire:ignore.self
+                                                                data-bs-backdrop="static" data-bs-keyboard="false">
+                                                                <div
+                                                                    class="modal-dialog modal-dialog-centered modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header bg-primary text-white">
+                                                                            <h5 class="modal-title text-white">
+                                                                                {{ $shift['shift']['title'] ?? '-' }}
+                                                                            </h5>
+                                                                            <button type="button"
+                                                                                class="btn-close btn-close-white"
+                                                                                data-bs-dismiss="modal"
+                                                                                aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="row mb-2">
+                                                                                <div class="col-sm-6">
+                                                                                    <strong>Time:</strong>
+                                                                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('H:i') }}
+                                                                                    -
+                                                                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('H:i') }}
+                                                                                </div>
+                                                                                <div class="col-sm-6">
+                                                                                    <strong>Address:</strong>
+                                                                                    {{ $shift['shift']['address'] ?? '-' }}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            @if (!empty($shift['employees']))
+                                                                                @php
+                                                                                    $employees = collect(
+                                                                                        $shift['employees'],
+                                                                                    )
+                                                                                        ->pluck('name')
+                                                                                        ->toArray();
+                                                                                    $showLimit = 5;
+                                                                                    $moreCount =
+                                                                                        count($employees) - $showLimit;
+                                                                                @endphp
+                                                                                <div class="mb-2 mt-2">
+                                                                                    <strong>Employees:</strong>
+                                                                                    {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
+                                                                                    @if ($moreCount > 0)
+                                                                                        <span
+                                                                                            class="text-muted">+{{ $moreCount }}
+                                                                                            more</span>
+                                                                                    @endif
+                                                                                </div>
+                                                                            @endif
+
+                                                                            @if (!empty($shift['shift']['note']))
+                                                                                <div class="mb-2">
+                                                                                    <strong>Note:</strong>
+                                                                                    {{ $shift['shift']['note'] ?? '-' }}
+                                                                                </div>
+                                                                            @endif
+
+                                                                            @if (!empty($shift['breaks']))
+                                                                                <div class="mb-2">
+                                                                                    <strong>Breaks:</strong>
+                                                                                    <table
+                                                                                        class="table table-sm table-bordered mt-1">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th>Title</th>
+                                                                                                <th>Type</th>
+                                                                                                <th>Duration (hr)</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            @foreach ($shift['breaks'] as $break)
+                                                                                                <tr>
+                                                                                                    <td>{{ $break['title'] }}
+                                                                                                    </td>
+                                                                                                    <td>{{ $break['type'] }}
+                                                                                                    </td>
+                                                                                                    <td>{{ $break['duration'] }}
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            @endforeach
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                class="btn btn-secondary"
+                                                                                data-bs-dismiss="modal">Close</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endif
+
+
+                                                @if (!$hasShift)
+                                                    <button
+                                                        wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
+                                                        class="btn btn-sm btn-primary position-absolute"
+                                                        style="width: 28px; height: 28px; top: 50%; left: 50%;
+                           transform: translate(-50%, -50%);
+                           padding: 0; border-radius: 50%; z-index: 10;"
+                                                        x-show="hover">
+                                                        +
+                                                    </button>
+                                                @endif
                                             @endif
                                         </td>
                                     @endforeach
@@ -91,58 +221,130 @@
             @else
                 @foreach ($employees as $employee)
                     <tr>
+
                         @foreach ($weekDays as $day)
                             @php
                                 $content = $this->getCellContent($employee['id'], $day['full_date']);
                                 $hoverKey = $employee['id'] . '_' . $day['full_date'];
                             @endphp
                             <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
-                                style="position: relative;" wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
+                                style="position: relative;"
+                                wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
                                 wire:mouseleave="$set('hoveredCell', null)">
 
                                 @if ($content && $content['type'] === 'Leave')
                                     <div
                                         class="unpaid-leave text-center p-1 rounded {{ $day['highlight'] ? 'unpaid-leave-highlight' : '' }}">
                                         <div class="small fw-bold">
-                                            {{ $viewMode === 'weekly' ? $content['label'] : 'Leave' }}</div>
+                                            {{ $viewMode === 'weekly' ? $content['label'] : 'Leave' }}
+                                        </div>
                                     </div>
                                 @elseif ($content && $content['type'] === 'Shift')
-                                    <div class="shift-block {{ $content['color'] }} text-white p-1 rounded">
-                                        <div class="small fw-bold">Shift</div>
-                                        @if ($viewMode === 'weekly')
-                                            <div class="smaller">{{ $content['time'] }}</div>
-                                        @endif
+                                    <div class="shift-block text-white p-1 rounded"
+                                        style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer;"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+
+                                        <div class="small fw-bold">{{ $content['title'] }}</div>
+                                        <div class="smaller">{{ $content['time'] }}</div>
                                     </div>
-                                @endif
 
 
-                                {{-- @if ($hoveredCell === $hoverKey)
+
+                                    <div class="modal fade"
+                                        id="shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                        aria-hidden="true" tabindex="-1" wire:ignore.self data-bs-backdrop="static"
+                                        data-bs-keyboard="false">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white">{{ $content['title'] ?? '-' }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <div class="row mb-2">
+                                                        <div class="col-sm-6">
+                                                            <strong>Time:</strong> {{ $content['time'] ?? '-' }}
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <strong>Address:</strong>
+                                                            {{ $content['shift']['address'] ?? '-' }}
+                                                        </div>
+                                                    </div>
+
+                                                    @if (!empty($content['employees']))
+                                                        @php
+                                                            $employees = collect($content['employees'])
+                                                                ->pluck('name')
+                                                                ->toArray();
+                                                            $showLimit = 5;
+                                                            $moreCount = count($employees) - $showLimit;
+                                                        @endphp
+
+                                                        <div class="mb-2">
+                                                            <strong>Employees:</strong>
+                                                            {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
+                                                            @if ($moreCount > 0)
+                                                                <span class="text-muted">+{{ $moreCount }}
+                                                                    more</span>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+
+
+                                                    @if (!empty($content['shift']['note']))
+                                                        <div class="mb-2">
+                                                            <strong>Note:</strong>
+                                                            {{ $content['shift']['note'] ?? '-' }}
+                                                        </div>
+                                                    @endif
+
+                                                    @if (!empty($content['breaks']))
+                                                        <div class="mb-2">
+                                                            <strong>Breaks:</strong>
+                                                            <table class="table table-sm table-bordered mt-1">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Title</th>
+                                                                        <th>Type</th>
+                                                                        <th>Duration (hr)</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($content['breaks'] as $break)
+                                                                        <tr>
+                                                                            <td>{{ $break['title'] }}</td>
+                                                                            <td>{{ $break['type'] }}</td>
+                                                                            <td>{{ $break['duration'] }}</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Close</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
                                     <button
                                         wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                        class="btn btn-sm btn-primary position-absolute d-flex justify-content-center align-items-center"
-                                        style="width: 24px; height: 24px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; padding: 0;"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">+</button>
-                                @endif --}}
-
-                                <button
-                                    wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                    class="btn btn-sm btn-primary add-shift-btn position-absolute"
-                                    style="
-            width: 28px;
-            height: 28px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 0;
-            z-index: 20;
-            border-radius: 50%;
-        "
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">
-                                    +
-                                </button>
-
-
-
+                                        class="btn btn-sm btn-primary add-shift-btn position-absolute"
+                                        style="width: 28px; height: 28px; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">
+                                        +
+                                    </button>
+                                @endif
                             </td>
                         @endforeach
                     </tr>
@@ -576,6 +778,9 @@
     @endif
 
 
+
+
+
 </div>
 
 
@@ -587,31 +792,5 @@
                 titleInput.focus();
             }
         }, 50);
-    });
-</script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });
-</script>
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl, {
-                trigger: 'hover',
-                delay: {
-                    "show": 200,
-                    "hide": 100
-                }
-            })
-        })
     });
 </script>

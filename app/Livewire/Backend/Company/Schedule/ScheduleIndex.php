@@ -6,6 +6,7 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\Shift;
 use App\Models\ShiftBreak;
+use App\Models\ShiftDate;
 use App\Models\ShiftTemplates;
 use Carbon\Carbon;
 
@@ -71,6 +72,8 @@ class ScheduleIndex extends BaseComponent
     public $multipleShiftBreaks = [];
     public $showMultipleShiftAddBreakForm = [];
     public $isShowMultiBreak = [];
+
+    public $calendarShifts = [];
 
 
 
@@ -240,7 +243,7 @@ class ScheduleIndex extends BaseComponent
         if ($this->frequency === 'Daily') {
             $this->everyOptions = range(1, 30);
         } elseif ($this->frequency === 'Weekly') {
-            $this->everyOptions = range(1, 2);
+            $this->everyOptions = range(1, 20);
         } else {
             $this->everyOptions = range(1, 12);
         }
@@ -926,22 +929,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-    public $shifts = [
-
-        1 => [
-            '2025-10-27' => ['type' => 'Shift', 'time' => '9:00 AM - 5:00 PM', 'color' => 'bg-success'],
-        ],
-
-        2 => [
-            '2025-10-27' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-10-28' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-10-29' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-10-30' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-10-31' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-11-01' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-            '2025-11-02' => ['type' => 'Leave', 'label' => 'Unpaid Leave', 'all_day' => true],
-        ],
-    ];
     public function mount()
     {
         $this->company_id = auth()->user()->company->id;
@@ -949,10 +936,12 @@ class ScheduleIndex extends BaseComponent
         $this->shiftEmployees = $this->employees;
         $this->addShiftRow();
 
+
         $this->setEveryOptions();
         $this->startDate = Carbon::today();
         $this->endDate = Carbon::today()->copy()->addDays(6);
         $this->currentDate = Carbon::today();
+        $this->loadShifts();
     }
 
 
@@ -998,9 +987,11 @@ class ScheduleIndex extends BaseComponent
         return $days;
     }
 
-    public function getCellContent($employeeId, $date)
+
+
+    public function updatedViewMode($value)
     {
-        return $this->shifts[$employeeId][$date] ?? null;
+        $this->loadShifts();
     }
 
 
@@ -1015,6 +1006,7 @@ class ScheduleIndex extends BaseComponent
             $this->startDate = $this->startDate->copy()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
         }
+        $this->loadShifts();
     }
 
     public function goToPrevious()
@@ -1494,8 +1486,90 @@ class ScheduleIndex extends BaseComponent
 
 
 
+    public function loadShifts()
+    {
+        $this->calendarShifts = ShiftDate::whereHas('shift', function ($q) {
+            $q->where('company_id', $this->company_id);
+        })
+            ->with([
+                'shift:id,title,color,address,note',
+                'employees:id,f_name,l_name',
+                'breaks:id,shift_date_id,title,type,duration'
+            ])
+            ->get()
+            ->map(function ($shiftDate) {
+                return [
+                    'id' => $shiftDate->id,
+                    'date' => $shiftDate->date,
+                    'start_time' => $shiftDate->start_time,
+                    'end_time' => $shiftDate->end_time,
+                    'shift' => [
+                        'title' => $shiftDate->shift->title ?? null,
+                        'color' => $shiftDate->shift->color ?? '#6c757d',
+                        'address' => $shiftDate->shift->address ?? null,
+                        'note' => $shiftDate->shift->note ?? null,
+                    ],
+                    'employees' => $shiftDate->employees->map(function ($emp) {
+                        return [
+                            'id' => $emp->id,
+                            'name' => $emp->f_name . ' ' . $emp->l_name,
+                        ];
+                    })->toArray(),
+                    'breaks' => $shiftDate->breaks->map(function ($b) {
+                        return [
+                            'title' => $b->title,
+                            'type' => $b->type,
+                            'duration' => $b->duration,
+                        ];
+                    })->toArray(),
+                ];
+            })
+            ->groupBy('date')
+            ->toArray();
+    }
+
+
+
+
+    public function getCellContent($employeeId, $date)
+    {
+
+        if (empty($this->calendarShifts[$date])) {
+            return null;
+        }
+
+        foreach ($this->calendarShifts[$date] as $shiftDate) {
+            foreach ($shiftDate['employees'] as $employee) {
+                if ($employee['id'] == $employeeId) {
+                    return [
+                        'type'  => 'Shift',
+                        'title' => $shiftDate['shift']['title'],
+                        'color' => $shiftDate['shift']['color'],
+                        'time'  =>
+                        Carbon::parse($shiftDate['start_time'])->format('H:i')
+                            . ' - ' .
+                            Carbon::parse($shiftDate['end_time'])->format('H:i'),
+
+                        'employees' => $shiftDate['employees'] ?? [],
+                        'shift' => [
+                            'address' => $shiftDate['shift']['address'] ?? '-',
+                            'note'    => $shiftDate['shift']['note'] ?? '-',
+                        ],
+                        'breaks'    => $shiftDate['breaks'] ?? [],
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+
+
     public function render()
     {
+
         return view('livewire.backend.company.schedule.schedule-index', [
             'weekDays' => $this->weekDays,
             'viewMode' => $this->viewMode,

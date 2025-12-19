@@ -15,7 +15,7 @@ class ShiftDate extends Model
 
     public function breaks()
     {
-        return $this->hasMany(BreakofShift::class);
+        return $this->hasMany(BreakofShift::class, 'shift_date_id');
     }
 
     public function employees()

@@ -83,7 +83,7 @@
                 @if ($frequency !== 'Daily')
                     <div class="mb-3 mt-4">
                         <div class="d-flex align-items-center gap-3">
-                            <span class="text-muted me-2">Repeats on</span>
+                            <span class="text-muted me-2">Repeats on <span class="text-danger">*</span></span>
 
                             <div class="dropdown flex-grow-1" style="min-width: 200px;">
                                 <button class="btn btn-sm dropdown-toggle text-center w-100" type="button"

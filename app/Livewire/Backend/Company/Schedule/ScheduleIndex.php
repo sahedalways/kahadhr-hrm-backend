@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Company\Schedule;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\BreakofShift;
 use App\Models\Employee;
 use App\Models\Shift;
 use App\Models\ShiftBreak;
@@ -83,7 +84,7 @@ class ScheduleIndex extends BaseComponent
         'start_time' => '09:00',
         'end_time' => '17:00',
         'total_hours' => '08:00',
-        'color' => '#0000',
+        'color' => '#000000',
         'address' => '',
         'note' => '',
         'all_day' => false,
@@ -216,7 +217,7 @@ class ScheduleIndex extends BaseComponent
                 'end_time'    => \Carbon\Carbon::parse($template->end_time)->format('H:i'),
 
                 'total_hours' => $this->calculateTotalHours(),
-                'color'       => $template->color ?? '#0000',
+                'color'       => $template->color ?? '#000000',
                 'address'     => $template->address ?? '',
                 'note'        => $template->note ?? '',
                 'all_day'     => $template->all_day ?? false,
@@ -1502,6 +1503,74 @@ class ScheduleIndex extends BaseComponent
     {
         $this->isShowMultiBreak[$index] = false;
     }
+
+
+
+    public function deleteShiftForAllEmp($dateId)
+    {
+
+        $shiftDate = ShiftDate::findOrFail($dateId);
+        $shiftId   = $shiftDate->shift_id;
+
+
+        $shiftDate->employees()->detach();
+
+
+        $stillHasEmployees = $shiftDate->employees()->exists();
+
+
+        if (! $stillHasEmployees) {
+            $shiftDate->breaks()->delete();
+            $shiftDate->delete();
+        }
+
+
+
+        $remaining = ShiftDate::where('shift_id', $shiftId)->exists();
+
+
+        if (! $remaining) {
+            Shift::where('id', $shiftId)->delete();
+            BreakofShift::where('shift_date_id', $dateId)->delete();
+        }
+
+
+        $this->loadShifts();
+        $this->toast('Shift deleted successfully!', 'success');
+    }
+
+
+
+
+    public function deleteShiftOneEmp($dateId, $empId)
+    {
+        $shiftDate = ShiftDate::findOrFail($dateId);
+        $shiftId   = $shiftDate->shift_id;
+
+        $shiftDate->employees()->detach($empId);
+
+
+        $stillHasEmployees = $shiftDate->employees()->exists();
+
+
+        if (! $stillHasEmployees) {
+            $shiftDate->breaks()->delete();
+            $shiftDate->delete();
+        }
+
+
+
+        $remaining = ShiftDate::where('shift_id', $shiftId)->exists();
+
+        if (! $remaining) {
+            Shift::where('id', $shiftId)->delete();
+        }
+
+
+        $this->loadShifts();
+        $this->toast('Shift deleted successfully!', 'success');
+    }
+
 
 
 

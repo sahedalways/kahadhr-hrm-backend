@@ -131,7 +131,7 @@
                                                                         <li>
                                                                             <button class="dropdown-item text-danger"
                                                                                 type="button"
-                                                                                wire:click="deleteShift({{ $shift['id'] }})"
+                                                                                wire:click="deleteShiftForAllEmp({{ $shift['id'] }})"
                                                                                 onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
                                                                                 <i
                                                                                     class="fas fa-trash-alt fa-fw me-1"></i>
@@ -337,7 +337,7 @@
                                                 </li>
                                                 <li>
                                                     <button class="dropdown-item text-danger" type="button"
-                                                        wire:click="deleteShift({{ $content['id'] }})"
+                                                        wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
                                                         onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
                                                         <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
                                                     </button>

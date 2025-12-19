@@ -22,7 +22,7 @@
         </button>
     </div>
 
-    {{-- Employee selection panel (Livewire controlled) --}}
+
     @if ($showMultipleShiftAddUserPanel[$index] ?? false)
         <div class="card card-body p-0 shadow-sm mt-2">
             {{-- Search --}}

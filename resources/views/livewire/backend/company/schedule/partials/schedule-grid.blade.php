@@ -87,18 +87,65 @@
                                                                 $modalId = 'shiftDetailsModal-' . $shift['id'];
                                                             @endphp
 
-                                                            <div class="shift-block text-white rounded px-1 py-0 mb-1"
-                                                                style="background-color: {{ $shift['shift']['color'] }}; font-size: 11px; cursor:pointer;"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#{{ $modalId }}">
-                                                                <div class="fw-semibold">{{ $shift['shift']['title'] }}
+
+                                                            <div class="position-relative">
+
+                                                                <div class="shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
+                                                                    style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;">
+                                                                    <div class="fw-semibold text-truncate"
+                                                                        style="max-width: 100%;">
+                                                                        {{ $shift['shift']['title'] }}</div>
+                                                                    <div>
+                                                                        {{ \Carbon\Carbon::parse($shift['start_time'])->format('g:i A') }}
+                                                                        -
+                                                                        {{ \Carbon\Carbon::parse($shift['end_time'])->format('g:i A') }}
+                                                                    </div>
                                                                 </div>
-                                                                <div>
-                                                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('H:i') }}
-                                                                    -
-                                                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('H:i') }}
+
+
+                                                                <div class="dropdown shift-dropdown">
+                                                                    <button class="btn btn-xs btn-link text-white p-0"
+                                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <i class="fas fa-ellipsis-v"></i>
+                                                                    </button>
+                                                                    <ul
+                                                                        class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                                        <li>
+                                                                            <button class="dropdown-item" type="button"
+                                                                                wire:click="editShift({{ $shift['id'] }})">
+                                                                                <i class="fas fa-edit fa-fw me-1"></i>
+                                                                                Edit
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <button class="dropdown-item" type="button"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#{{ $modalId }}">
+                                                                                <i class="fas fa-eye fa-fw me-1"></i>
+                                                                                View
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <hr class="dropdown-divider">
+                                                                        </li>
+                                                                        <li>
+                                                                            <button class="dropdown-item text-danger"
+                                                                                type="button"
+                                                                                wire:click="deleteShift({{ $shift['id'] }})"
+                                                                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+                                                                                <i
+                                                                                    class="fas fa-trash-alt fa-fw me-1"></i>
+                                                                                Delete
+                                                                            </button>
+                                                                        </li>
+                                                                    </ul>
                                                                 </div>
                                                             </div>
+
+
+
+
+
 
                                                             <div class="modal fade" id="{{ $modalId }}"
                                                                 tabindex="-1" aria-hidden="true" wire:ignore.self
@@ -119,9 +166,9 @@
                                                                             <div class="row mb-2">
                                                                                 <div class="col-sm-6">
                                                                                     <strong>Time:</strong>
-                                                                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('H:i') }}
+                                                                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('g:i A') }}
                                                                                     -
-                                                                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('H:i') }}
+                                                                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('g:i A') }}
                                                                                 </div>
                                                                                 <div class="col-sm-6">
                                                                                     <strong>Address:</strong>
@@ -240,14 +287,52 @@
                                         </div>
                                     </div>
                                 @elseif ($content && $content['type'] === 'Shift')
-                                    <div class="shift-block text-white p-1 rounded"
-                                        style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer;"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                    <div class="shift-block text-white rounded position-relative shadow-sm p-3"
+                                        style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all .25s ease-in-out;">
 
-                                        <div class="small fw-bold">{{ $content['title'] }}</div>
-                                        <div class="smaller">{{ $content['time'] }}</div>
+
+                                        <div class="small fw-bold text-truncate" style="max-width: 100%;">
+                                            {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
+                                        </div>
+                                        <div class="smaller opacity-75">{{ $content['time'] }}</div>
+
+                                        <a href="#"
+                                            id="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                            class="text-white position-absolute"
+                                            style="bottom:4px; right:6px; font-size:12px;" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </a>
+
+                                        {{-- Dropdown menu --}}
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                                            aria-labelledby="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                            wire:ignore.self>
+                                            <li>
+                                                <button class="dropdown-item" type="button"
+                                                    wire:click="editShift({{ $content['id'] }})">
+                                                    <i class="fas fa-edit fa-fw me-1"></i> Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item" type="button"
+                                                    wire:click="viewShift({{ $content['id'] }})">
+                                                    <i class="fas fa-eye fa-fw me-1"></i> View details
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" type="button"
+                                                    wire:click="deleteShift({{ $content['id'] }})"
+                                                    onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+                                                    <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
+                                                </button>
+                                            </li>
+                                        </ul>
                                     </div>
+
 
 
 
@@ -339,9 +424,9 @@
                                 @else
                                     <button
                                         wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                        class="btn btn-sm btn-primary add-shift-btn position-absolute"
+                                        class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
                                         style="width: 28px; height: 28px; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Add Shift">
+                                        data-tooltip="Add Shift">
                                         +
                                     </button>
                                 @endif

@@ -1562,12 +1562,13 @@ class ScheduleIndex extends BaseComponent
                 if ($employee['id'] == $employeeId) {
                     return [
                         'type'  => 'Shift',
+                        'id'    => $shiftDate['id'],
                         'title' => $shiftDate['shift']['title'],
                         'color' => $shiftDate['shift']['color'],
                         'time'  =>
-                        Carbon::parse($shiftDate['start_time'])->format('H:i')
+                        Carbon::parse($shiftDate['start_time'])->format('g:i A')
                             . ' - ' .
-                            Carbon::parse($shiftDate['end_time'])->format('H:i'),
+                            Carbon::parse($shiftDate['end_time'])->format('g:i A'),
 
                         'employees' => $shiftDate['employees'] ?? [],
                         'shift' => [

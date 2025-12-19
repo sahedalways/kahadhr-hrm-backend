@@ -84,7 +84,7 @@
 
 .schedule-cell .shift-block,
 .schedule-cell .unpaid-leave {
-    padding: 2px !important;
+    padding: 5px 28px !important;
 }
 
 .employee-row:hover {
@@ -500,4 +500,11 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
 .month-cell:hover .add-shift-month-btn {
     opacity: 1;
     pointer-events: auto;
+}
+
+.shift-dropdown {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    z-index: 1055;
 }

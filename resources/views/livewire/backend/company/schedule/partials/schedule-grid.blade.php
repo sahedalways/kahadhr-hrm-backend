@@ -109,7 +109,7 @@
                                                                         <i class="fas fa-ellipsis-v"></i>
                                                                     </button>
                                                                     <ul
-                                                                        class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                                        class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
                                                                         <li>
                                                                             <button class="dropdown-item" type="button"
                                                                                 wire:click="editShift({{ $shift['id'] }})">
@@ -304,33 +304,46 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </a>
 
-                                        {{-- Dropdown menu --}}
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                                            aria-labelledby="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                            wire:ignore.self>
-                                            <li>
-                                                <button class="dropdown-item" type="button"
-                                                    wire:click="editShift({{ $content['id'] }})">
-                                                    <i class="fas fa-edit fa-fw me-1"></i> Edit
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item" type="button"
-                                                    wire:click="viewShift({{ $content['id'] }})">
-                                                    <i class="fas fa-eye fa-fw me-1"></i> View details
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item text-danger" type="button"
-                                                    wire:click="deleteShift({{ $content['id'] }})"
-                                                    onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
-                                                    <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
-                                                </button>
-                                            </li>
-                                        </ul>
+
+
+
+
+                                        {{-- Single trigger + menu --}}
+                                        <div class="dropdown shift-dropdown position-absolute"
+                                            style="bottom: 4px; right: 6px;">
+                                            <button class="btn btn-xs btn-link text-white p-0" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell"
+                                                aria-labelledby="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                                <li>
+                                                    <button class="dropdown-item" type="button"
+                                                        data-bs-display="static"
+                                                        wire:click="editShift({{ $content['id'] }})">
+                                                        <i class="fas fa-edit fa-fw me-1"></i> Edit
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item" type="button"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                                        <i class="fas fa-eye fa-fw me-1"></i> View details
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item text-danger" type="button"
+                                                        wire:click="deleteShift({{ $content['id'] }})"
+                                                        onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+                                                        <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
 
 

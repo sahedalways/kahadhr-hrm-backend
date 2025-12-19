@@ -508,3 +508,26 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     right: 4px;
     z-index: 1055;
 }
+
+/* .schedule-cell {
+    overflow: visible !important;
+    position: relative;
+} */
+
+/* .dropdown-schedule-cell {
+    z-index: 1060 !important;
+    position: absolute;
+    inset: auto 0 auto auto !important;
+    transform: translate(-100%, -100%) !important;
+}
+.shift-dropdown .dropdown-menu {
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 4px;
+} */
+.shift-block,
+.schedule-cell,
+.card,
+.table-responsive {
+    overflow: visible !important;
+}

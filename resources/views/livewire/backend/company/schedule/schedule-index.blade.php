@@ -19,7 +19,7 @@
                     @include('livewire.backend.company.schedule.partials.sidebar')
                 @endif
 
-                <div>
+                <div class="w-100">
                     @include('livewire.backend.company.schedule.partials.schedule-grid')
                 </div>
             </div>

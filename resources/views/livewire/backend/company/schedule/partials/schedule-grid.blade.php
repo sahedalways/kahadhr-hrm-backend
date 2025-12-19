@@ -333,7 +333,7 @@
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
 
-                                                <ul class="dropdown-schedule-cell d-none">
+                                                <ul class="dropdown-schedule-celll d-none">
                                                     <li>
                                                         <button class="dropdown-item" type="button"
                                                             wire:click="editShift({{ $content['id'] }})">
@@ -920,10 +920,10 @@
         if (e.target.closest('.shift-menu-btn')) {
             const dropdown = e.target
                 .closest('.shift-dropdown')
-                .querySelector('.dropdown-schedule-cell');
+                .querySelector('.dropdown-schedule-celll');
 
             // Close others
-            document.querySelectorAll('.dropdown-schedule-cell')
+            document.querySelectorAll('.dropdown-schedule-celll')
                 .forEach(el => el !== dropdown && el.classList.add('d-none'));
 
             dropdown.classList.toggle('d-none');
@@ -932,7 +932,7 @@
         }
 
         // Close when clicking outside
-        document.querySelectorAll('.dropdown-schedule-cell')
+        document.querySelectorAll('.dropdown-schedule-celll')
             .forEach(el => el.classList.add('d-none'));
     });
 </script>

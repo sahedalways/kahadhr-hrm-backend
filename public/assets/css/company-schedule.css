@@ -531,7 +531,7 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
 .table-responsive {
     overflow: visible !important;
 }
-.dropdown-schedule-cell {
+.dropdown-schedule-celll {
     position: absolute;
     bottom: 100%;
     right: 0;

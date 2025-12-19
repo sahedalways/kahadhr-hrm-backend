@@ -62,7 +62,7 @@
                                                 class="far fa-calendar-alt text-muted"></i></span>
                                         <input type="date"
                                             class="form-control form-control-sm border-start-0 ps-2 @error("multipleShifts.$index.date") is-invalid @enderror"
-                                            wire:model="multipleShifts.{{ $index }}.date">
+                                            wire:model.live="multipleShifts.{{ $index }}.date">
                                     </div>
 
                                     @error("multipleShifts.$index.date")

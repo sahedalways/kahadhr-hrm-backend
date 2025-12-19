@@ -13,21 +13,35 @@
         <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2"
             style="min-height: 50px; background-color: #f9f9f9;">
             @foreach ($this->selectedShiftEmployees as $employee)
-                <div class="d-flex align-items-center bg-primary text-white rounded-pill px-2 py-1"
-                    style="font-size: 0.75rem;">
+                @php
+
+                    $isOnLeave = $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                @endphp
+
+                <div class="d-flex align-items-center {{ $isOnLeave ? 'bg-secondary' : 'bg-primary' }} text-white rounded-pill px-2 py-1"
+                    style="font-size: 0.75rem; {{ $isOnLeave ? 'opacity: .5; cursor: not-allowed;' : '' }}"
+                    @if ($isOnLeave) onclick="event.preventDefault()" @endif>
+
                     <img src="{{ $employee->avatar_url ?? '/assets/img/default-avatar.png' }}"
                         alt="{{ $employee->full_name }}" class="rounded-circle me-2" width="28" height="28">
-                    <span class="me-2">{{ $employee->full_name }}</span>
-                    <button type="button" class="btn btn-sm btn-transparent p-0 text-white ms-auto"
-                        wire:click="removeEmployeeFromShift({{ $employee->id }})" aria-label="Remove">
-                        <i class="fas fa-times"></i>
-                    </button>
+
+                    <span class="me-2">
+                        {{ $isOnLeave ? 'Unavailable' : $employee->full_name }}
+                    </span>
+
+
+                    @unless ($isOnLeave)
+                        <button type="button" class="btn btn-sm btn-transparent p-0 text-white ms-auto"
+                            wire:click="removeEmployeeFromShift({{ $employee->id }})" aria-label="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    @endunless
                 </div>
             @endforeach
 
 
 
-            {{-- Add button --}}
+
 
 
             <button type="button" class="btn btn-outline-primary btn-xs px-2 py-1" style="font-size: 0.75rem;"
@@ -60,15 +74,23 @@
                     </div>
 
                     @forelse ($this->availableShiftEmployees as $employee)
+                        @php
+                            $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                        @endphp
                         <a href="#"
                             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                            wire:click.prevent="addEmployeeToShift({{ $employee->id }})">
+                            wire:click.prevent="{{ $isOnLeave ? '' : 'addEmployeeToShift(' . $employee->id . ')' }}"
+                            style="{{ $isOnLeave ? 'cursor:not-allowed; opacity:.65;' : '' }}">
+
                             <div>
                                 <img src="{{ $employee->avatar_url ?? '/assets/img/default-avatar.png' }}"
                                     class="rounded-circle me-2" width="32" height="32">
                                 {{ $employee->full_name }}
                             </div>
-                            <small class="text-success">Available</small>
+
+                            <small class="{{ $isOnLeave ? 'text-danger' : 'text-success' }} fw-semibold">
+                                {{ $isOnLeave ? 'Unavailable' : 'Available' }}
+                            </small>
                         </a>
                     @empty
                         <div class="list-group-item text-center text-muted">

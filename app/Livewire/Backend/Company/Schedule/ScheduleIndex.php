@@ -661,6 +661,26 @@ class ScheduleIndex extends BaseComponent
 
 
 
+        $employeesOnLeave = [];
+        foreach ($this->newShift['employees'] as $emp) {
+            $empId   = is_array($emp) ? $emp['id'] : $emp;
+            $empName = is_array($emp) ? $emp['full_name'] : optional(Employee::find($empId))->full_name;
+
+            if (hasLeave($empId, $this->selectedDate)) {
+                $employeesOnLeave[] = $empName;
+            }
+        }
+
+        if ($employeesOnLeave) {
+            $display = implode(', ', array_slice($employeesOnLeave, 0, 3));
+            if (count($employeesOnLeave) > 3) $display .= ' ...';
+
+
+            $this->toast("Employees on leave: $display", 'error');
+            return;
+        }
+
+
 
 
         $dates = [];
@@ -862,6 +882,29 @@ class ScheduleIndex extends BaseComponent
             $messages["multipleShifts.$index.employees.required"] = 'Select at least one employee.';
         }
 
+
+        foreach ($this->multipleShifts as $idx => $row) {
+            if (empty($row['date'])) continue;          // skip empty rows
+
+            $onLeaveNames = [];
+            foreach ($row['employees'] as $emp) {
+                $empId = is_array($emp) ? $emp['id'] : $emp;
+                if (hasLeave($empId, $row['date'])) {
+                    $onLeaveNames[] = is_array($emp) ? $emp['full_name'] : optional(Employee::find($empId))->full_name;
+                }
+            }
+
+            if ($onLeaveNames) {
+                $display = implode(', ', array_slice($onLeaveNames, 0, 3));
+                if (count($onLeaveNames) > 3) $display .= ' ...';
+
+
+
+                $this->toast("Row " . ($idx + 1) . ": employees on leave – $display", 'error');
+
+                return;
+            }
+        }
 
 
 
@@ -1738,6 +1781,27 @@ class ScheduleIndex extends BaseComponent
         return null;
     }
 
+
+
+    public function dateChanged()
+    {
+        $this->shiftEmployees = $this->shiftEmployees;
+    }
+
+
+    public function updatedMultipleShifts($value, $nested)
+    {
+
+        if (str($nested)->afterLast('.')->value() === 'date') {
+            $index = (int) str($nested)->before('.')->value();
+
+
+            $this->multipleShifts[$index] = $this->multipleShifts[$index];
+
+
+            $this->reset("multipleShiftEmployeeSearch.$index");
+        }
+    }
 
 
 

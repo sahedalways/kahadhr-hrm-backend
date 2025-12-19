@@ -259,11 +259,11 @@
                                                     @if (!$hasShift)
                                                         <button
                                                             wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
-                                                            class="btn btn-sm btn-primary position-absolute"
+                                                            class="btn btn-sm btn-primary position-absolute tooltip-btn"
                                                             style="width: 28px; height: 28px; top: 50%; left: 50%;
                            transform: translate(-50%, -50%);
                            padding: 0; border-radius: 50%; z-index: 10;"
-                                                            x-show="hover">
+                                                            x-show="hover" data-tooltip="Add Shift">
                                                             +
                                                         </button>
                                                     @endif
@@ -289,12 +289,16 @@
                                     wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
                                     wire:mouseleave="$set('hoveredCell', null)">
 
-                                    @if ($content && $content['type'] === 'Leave')
-                                        <div
-                                            class="unpaid-leave text-center p-1 rounded {{ $day['highlight'] ? 'unpaid-leave-highlight' : '' }}">
-                                            <div class="small fw-bold">
-                                                {{ $viewMode === 'weekly' ? $content['label'] : 'Leave' }}
-                                            </div>
+
+                                    @php
+                                        $onLeave = hasLeave($employee['id'], $day['full_date']);
+                                    @endphp
+
+                                    @if ($onLeave)
+                                        {{-- Leave cell --}}
+                                        <div class="d-flex align-items-center justify-content-center h-100"
+                                            style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px;">
+                                            <span class="text-danger small fw-bold">Unavailable</span>
                                         </div>
                                     @elseif ($content && $content['type'] === 'Shift')
                                         <div class="shift-block text-white rounded position-relative shadow-sm p-3"
@@ -305,15 +309,6 @@
                                                 {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
                                             </div>
                                             <div class="smaller opacity-75">{{ $content['time'] }}</div>
-
-                                            {{-- <a href="#"
-                                                id="shiftMenu-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                                class="text-warning position-absolute"
-                                                style="bottom:4px; right:6px; font-size:12px;" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </a> --}}
-
 
 
 
@@ -342,9 +337,7 @@
                                                         </button>
                                                     </li>
 
-                                                    {{-- <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li> --}}
+
 
                                                     <li>
                                                         <button class="dropdown-item text-danger" type="button"
@@ -452,11 +445,13 @@
                                         <button
                                             wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
                                             class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
-                                            style="width: 28px; height: 28px; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
+                                            style="width: 28px; height: 28px; top: 50%; left: 50%;
+                   transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
                                             data-tooltip="Add Shift">
                                             +
                                         </button>
                                     @endif
+
                                 </td>
                             @endforeach
                         </tr>
@@ -519,7 +514,7 @@
                                 <div class="col-8 d-flex align-items-center">
                                     <div class="input-group input-group-sm me-3" style="max-width: 160px;">
                                         <input type="date" class="form-control no-calendar-icon"
-                                            wire:model="selectedDate" id="shiftDate">
+                                            wire:model.live="selectedDate" id="shiftDate" wire:change="dateChanged">
                                         <span class="input-group-text bg-white" style="cursor: pointer;"
                                             onclick="document.getElementById('shiftDate').showPicker()">
                                             <i class="far fa-calendar-alt text-muted"></i>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Employee;
+use App\Models\LeaveRequest;
 use App\Models\SiteSetting;
 
 if (!function_exists('siteSetting')) {
@@ -107,4 +109,35 @@ class EnvUpdater
 
     return true;
   }
+}
+
+
+
+/**
+ * Check if an employee has any APPROVED leave on a given date
+ *
+ * @param int $empId
+ * @param string $date  Y-m-d
+ * @param int|null $companyId  optional, auto-fetch from emp if null
+ * @return bool
+ */
+function hasLeave(int $empId, string $date, ?int $companyId = null): bool
+{
+  $emp = Employee::find($empId);
+
+  if (!$emp) {
+    return false;
+  }
+
+  return LeaveRequest::query()
+    ->when(
+      $companyId,
+      fn($q) => $q->where('company_id', $companyId),
+      fn($q) => $q->where('company_id', $emp->company_id)
+    )
+    ->where('user_id', $emp->user_id)
+    ->where('status', 'approved')
+    ->whereDate('start_date', '<=', $date)
+    ->whereDate('end_date', '>=', $date)
+    ->exists();
 }

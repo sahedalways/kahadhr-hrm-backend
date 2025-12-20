@@ -757,11 +757,12 @@ class ScheduleIndex extends BaseComponent
         } else {
             foreach ($dates as $date) {
 
-                if (! $this->skipConflictCheck) {
+                if (!$this->skipConflictCheck) {
                     $conflicts = $this->getConflicts(
                         $date,
                         $this->newShift['employees']
                     );
+
 
                     if ($conflicts->isNotEmpty()) {
                         $this->conflictData = $conflicts;
@@ -769,6 +770,12 @@ class ScheduleIndex extends BaseComponent
                         return;
                     }
                 }
+            }
+
+
+            foreach ($dates as $date) {
+
+
 
                 $shift = Shift::create([
                     'company_id' => $this->company_id,
@@ -935,7 +942,7 @@ class ScheduleIndex extends BaseComponent
             $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
 
 
-            if (! $this->skipConflictCheck) {
+            if (!$this->skipConflictCheck) {
                 $conflicts = $this->getConflicts(
                     $shift['date'],
                     $employeeIds

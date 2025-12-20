@@ -30,11 +30,6 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
 
-            <button class="btn btn-sm btn-link text-primary p-0 ms-3">
-                <i class="fas fa-calendar-alt"></i>
-            </button>
-
-
 
 
         </div>

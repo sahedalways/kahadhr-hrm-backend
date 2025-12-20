@@ -232,6 +232,33 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+    public function goToPrevious()
+    {
+        if ($this->viewMode === 'weekly') {
+            $this->startDate->subWeek();
+            $this->endDate->subWeek();
+            $this->currentDate->subWeek();
+        } elseif ($this->viewMode === 'monthly') {
+            $this->startDate->subMonth()->startOfMonth();
+            $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->currentDate->subMonth();
+        }
+    }
+
+    public function goToNext()
+    {
+        if ($this->viewMode === 'weekly') {
+            $this->startDate->addWeek();
+            $this->endDate->addWeek();
+            $this->currentDate->addWeek();
+        } elseif ($this->viewMode === 'monthly') {
+            $this->startDate->addMonth()->startOfMonth();
+            $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->currentDate->addMonth();
+        }
+    }
+
+
 
 
     public function render()

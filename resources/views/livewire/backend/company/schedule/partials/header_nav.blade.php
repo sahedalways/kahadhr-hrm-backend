@@ -30,9 +30,6 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
 
-            <button class="btn btn-sm btn-link text-primary p-0 ms-3">
-                <i class="fas fa-calendar-alt"></i>
-            </button>
 
 
             <button class="btn btn-sm btn-outline-primary ms-3" title="Add multiple shift" data-bs-toggle="modal"

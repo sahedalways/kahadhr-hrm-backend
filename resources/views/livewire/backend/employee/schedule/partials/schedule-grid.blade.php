@@ -1,6 +1,6 @@
 <div class="flex-grow-1 schedule-grid-container">
     <div class="bg-white d-flex justify-content-center align-items-center py-2">
-        @include('livewire.backend.company.schedule.partials.header_nav', [
+        @include('livewire.backend.employee.schedule.partials.header_nav', [
             'startDate' => $startDate ?? 'Oct 27',
             'endDate' => $endDate ?? 'Nov 2',
         ])
@@ -258,9 +258,7 @@
                                     @elseif ($content && $content['type'] === 'Shift')
                                         @php $modalId = 'shiftDetailsModal-'.$employee['id'].'-'.\Str::slug($content['title']); @endphp
                                         <div class="shift-block text-white rounded position-relative shadow-sm p-3"
-                                            style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s ease-in-out;"
-                                            draggable="true"
-                                            x-on:dragstart="$wire.handleDrag('{{ $day['full_date'] }}', {{ $employee['id'] }}, {{ $content['id'] }})">
+                                            style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s ease-in-out;">
                                             <div class="small fw-bold text-truncate">
                                                 {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
                                             </div>

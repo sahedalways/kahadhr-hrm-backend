@@ -26,12 +26,36 @@
 
 
                 @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
-                    <div class="timer-box">
-                        <span class="timer-time">{{ $headerTimer }}</span>
+                    <div x-data
+                        x-on:header-timer-update.window="$wire.updateTimer($event.detail.time, $event.detail.running)"
+                        class="d-flex align-items-center gap-2">
 
-                        @if ($isRunning)
-                            <div class="timer-running-dot"></div>
-                        @endif
+                        <div class="
+            d-inline-flex align-items-center gap-2
+            px-3 py-2
+            rounded-3
+            text-white
+            fw-500
+            shadow-sm
+            border border-1 border-white-10
+            bg-gradient-to-r from-primary to-info
+        "
+                            style="--bs-bg-opacity:.15;
+               background: linear-gradient(135deg, rgba(var(--bs-primary-rgb),.85) 0%, rgba(var(--bs-info-rgb),.75) 100%);
+               backdrop-filter: blur(4px);
+               -webkit-backdrop-filter: blur(4px);">
+
+                            <i class="bi bi-stopwatch fs-5"></i>
+
+
+                            <span class="timer-time font-monospace fs-5 lh-1 text-white">{{ $headerTimer }}</span>
+
+
+                            @if ($isRunning)
+                                <div class="timer-running-dot rounded-circle bg-white"
+                                    style="width:8px;height:8px;animation:pulse 1.2s infinite"></div>
+                            @endif
+                        </div>
                     </div>
                 @endif
 
@@ -181,7 +205,8 @@
                                         <i class="fas fa-columns me-2"></i> Dashboard
                                     </a>
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>
+                                <li><a class="dropdown-item" href="#"><i
+                                            class="fas fa-question-circle me-2"></i>
                                         Help
                                         Center</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-headset me-2"></i>

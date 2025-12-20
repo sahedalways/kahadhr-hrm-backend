@@ -39,13 +39,13 @@
 <body class="g-sidenav-show">
 
 
-    <div id="preloader" class="preloader">
+    {{-- <div id="preloader" class="preloader">
         <div class="hr-line-loader">
             <div class="line"></div>
             <div class="line"></div>
             <div class="line"></div>
         </div>
-    </div>
+    </div> --}}
 
 
     <div class=" bg-white position-absolute w-100">

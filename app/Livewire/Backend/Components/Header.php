@@ -19,13 +19,6 @@ class Header extends Component
         'tick' => 'increaseOneSecond',
     ];
 
-    protected function getListeners(): array
-    {
-
-        return [
-            'allNotifications' => 'newNotification',
-        ];
-    }
 
 
     public $headerTimer = '00:00:00';
@@ -33,8 +26,21 @@ class Header extends Component
 
     public function updateTimer($time, $running)
     {
+
         $this->headerTimer = $time;
         $this->isRunning = $running;
+    }
+
+    protected function getListeners()
+    {
+        return array_merge($this->listeners, [
+            "echo:header-timer-update,header-timer-update" => 'handleBrowserTimerUpdate',
+        ]);
+    }
+
+    public function handleBrowserTimerUpdate($payload)
+    {
+        $this->updateTimer($payload['time'], $payload['running']);
     }
 
 
@@ -85,6 +91,8 @@ class Header extends Component
 
     public function render()
     {
+
+
         return view('livewire.backend.components.header');
     }
 

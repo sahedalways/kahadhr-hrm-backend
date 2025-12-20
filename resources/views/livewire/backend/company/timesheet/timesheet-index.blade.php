@@ -1,6 +1,11 @@
 @push('styles')
     <link href="{{ asset('assets/css/timesheet.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/company-schedule.css') }}" rel="stylesheet" />
 @endpush
+@php
+    use Carbon\Carbon;
+@endphp
+
 
 <div class="container-fluid dashboard-container">
     <div class="row h-100">
@@ -23,7 +28,7 @@
             </div>
 
             <div class="action-card">
-                <a href="#" class="action-link">
+                <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#timeSheetModal">
                     <i class="fas fa-list-alt"></i>
                     <span>View Time Records</span>
                 </a>
@@ -154,91 +159,201 @@
 
     </div>
 
-    <div wire:ignore.self class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog"
-        aria-labelledby="manualEntryModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-md" role="document">
+    <div wire:ignore.self class="modal fade" id="timeSheetModal" tabindex="-1" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+
+        <div class="modal-dialog modal-md">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h6 class="modal-title fw-600">Submit Manual Attendance</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <h6 class="modal-title fw-600">Time Sheet</h6>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-                <form wire:submit.prevent="submitManualEntry">
-                    <div class="modal-body">
-                        <div class="row g-2">
+                {{-- date navigator --}}
+                <div class="bg-white d-flex justify-content-center align-items-center py-2 ">
+                    @include('livewire.backend.company.timesheet.partials.header_nav', [
+                        'startDate' => $displayDateRange,
+                        'endDate' => '',
+                    ])
+                </div>
 
-                            {{-- Employee Dropdown --}}
-                            <div class="col-md-12 mb-2">
-                                <label class="form-label">Employee <span class="text-danger">*</span></label>
-                                <select class="form-select shadow-sm" wire:model="employeeId" required>
-                                    <option value="" selected>Select Employee</option>
+                {{-- ================= MONTHLY VIEW ================= --}}
+                @if ($viewMode === 'monthly')
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table m-0">
+                            <thead>
+                                <tr>
+                                    <th>Mon</th>
+                                    <th>Tue</th>
+                                    <th>Wed</th>
+                                    <th>Thu</th>
+                                    <th>Fri</th>
+                                    <th>Sat</th>
+                                    <th>Sun</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($weeks as $week)
+                                    <tr>
+                                        @foreach ($week as $day)
+                                            @php
+                                                $isCurrent = $day->month == $this->startDate->month;
+                                                $dateKey = $day->format('Y-m-d');
+                                                $hasAtt = !empty($this->attendanceCalendar[$dateKey]);
+                                                $employees = $this->shiftMap[$dateKey] ?? [];
+                                            @endphp
+
+                                            <td class="schedule-cell month-cell {{ $day->equalTo(today()) ? 'bg-primary-light-cell' : '' }}"
+                                                style="height:80px;width:14.28%;position:relative;">
+
+
+                                                @if ($day->month == $this->startDate->month)
+                                                    <span class="date-number">{{ $day->day }}</span>
+                                                @endif
+
+
+                                                @if ($isCurrent && $hasAtt)
+                                                    @foreach ($this->attendanceCalendar[$dateKey] as $att)
+                                                        @include(
+                                                            'livewire.backend.company.timesheet.partials._attendance-block',
+                                                            ['att' => $att]
+                                                        )
+                                                    @endforeach
+                                                @endif
+
+                                                @php
+                                                    $isPastOrToday = $day->lessThanOrEqualTo(today());
+                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
+
+                                                @endphp
+
+
+
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- ================= WEEKLY VIEW ================= --}}
+                @else
+                    <div class="d-flex">
+
+                        {{-- sidebar --}}
+                        <div class="mt-n3">
+                            <div class="schedule-sidebar p-2 border-end" style="width:280px;flex-shrink:0;">
+                                <input type="text" class="form-control form-control-sm mb-3"
+                                    placeholder="Search employees..." wire:model.live="employeeSearch">
+
+                                <h6 class="fw-bold text-muted text-uppercase mb-2">Employees</h6>
+
+                                <div class="employee-list ">
+                                    @if ($employees->isEmpty())
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                            <div>No employees found.</div>
+                                        </div>
+                                    @else
+                                        @foreach ($employees as $emp)
+                                            {{-- single loop --}}
+                                            <div class="d-flex align-items-center py-2 px-2 employee-row shadow-sm rounded mb-2"
+                                                title="{{ $emp->full_name }}">
+
+                                                {{-- avatar (optional) --}}
+                                                <div class="position-relative me-3">
+                                                    <img src="{{ $emp->avatar_url ?? asset('assets/img/default-avatar.png') }}"
+                                                        alt="{{ $emp->full_name }}"
+                                                        class="rounded-circle employee-avatar">
+                                                </div>
+
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-semibold">{{ $emp->full_name }}</span>
+                                                    <small
+                                                        class="text-muted">{{ ucfirst($emp->role ?? 'Employee') }}</small>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- grid --}}
+                        <div class="flex-grow-1 mt-4">
+                            <table class="table table-bordered schedule-table m-0">
+                                <thead>
+                                    <tr class="text-center">
+                                        @foreach ($weekDays as $day)
+                                            <th
+                                                class="{{ $day['highlight'] ? 'bg-primary-light text-primary' : 'bg-light' }}">
+                                                <div class="fw-bold">{{ $day['day'] }}</div>
+                                                <small>{{ $day['date'] }}</small>
+                                            </th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+
+                                <tbody>
                                     @foreach ($employees as $emp)
-                                        <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
+                                        <tr>
+                                            @foreach ($weekDays as $day)
+                                                @php
+                                                    $dateKey = $day['full_date'];
+                                                    $onLeave = hasLeave($emp['id'], $dateKey);
+                                                    $empAtt = collect($this->attendanceCalendar[$dateKey] ?? [])->where(
+                                                        'user_id',
+                                                        $emp->user_id,
+                                                    );
+
+                                                    $hasShift = in_array($emp['id'], $this->shiftMap[$dateKey] ?? []);
+                                                    $isPastOrToday = Carbon::parse($dateKey)->lessThanOrEqualTo(
+                                                        today(),
+                                                    );
+                                                @endphp
+
+                                                <td
+                                                    class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}">
+                                                    @if ($onLeave)
+                                                        <div class="unavailable-box">Unavailable</div>
+                                                    @elseif ($empAtt->isNotEmpty())
+                                                        @foreach ($empAtt as $att)
+                                                            @include(
+                                                                'livewire.backend.company.timesheet.partials._attendance-block',
+                                                                ['att' => $att]
+                                                            )
+                                                        @endforeach
+                                                    @elseif ($hasShift && $isPastOrToday)
+                                                        <div class="absent-badge w-100 text-center">
+                                                            <span class="badge bg-danger small">Absent -
+                                                                {{ $emp->full_name }}</span>
+                                                        </div>
+                                                    @endif
+
+
+                                                </td>
+                                            @endforeach
+                                        </tr>
                                     @endforeach
-                                </select>
-                                @error('employeeId')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            {{-- Date --}}
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control shadow-sm" wire:model="manualDate"
-                                    required>
-                                @error('manualDate')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            {{-- Clock In --}}
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Clock In <span class="text-danger">*</span></label>
-                                <input type="time" class="form-control shadow-sm" wire:model="clockInTime"
-                                    required>
-                                @error('clockInTime')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            {{-- Clock Out --}}
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Clock Out</label>
-                                <input type="time" class="form-control shadow-sm" wire:model="clockOutTime">
-                                @error('clockOutTime')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            {{-- Reason --}}
-                            <div class="col-md-12 mb-2">
-                                <label class="form-label">Reason</label>
-                                <textarea class="form-control shadow-sm" wire:model="reason" placeholder="Optional reason"></textarea>
-                                @error('reason')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                @endif
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="submitManualEntry">
-                            <span wire:loading wire:target="submitManualEntry">
-                                <i class="fas fa-spinner fa-spin me-2"></i> Submitting...
-                            </span>
-                            <span wire:loading.remove wire:target="submitManualEntry">Submit</span>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
+
+
+
+
+
 </div>
 
 

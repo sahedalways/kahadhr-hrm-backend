@@ -8,6 +8,8 @@ use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use App\Models\Employee;
 use App\Models\Notification;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 
 class TimesheetIndex extends BaseComponent
@@ -33,20 +35,233 @@ class TimesheetIndex extends BaseComponent
     public $clockInTime;
     public $clockOutTime;
     public $reason;
+    public $viewMode = 'weekly';
+    public $weeks = [];
+
+    public $startDate;
+    public $endDate;
+    public $currentDate;
+    public $employees;
+    public $company_id;
+
+    public $employeeSearch;
+
+    public $currentAttendance = [];
+    public $attendanceCalendar = [];
+
+    public $shiftMap = [];
+
+
+
+
+
+
+    public function updatedEmployeeSearch()
+    {
+        $this->employees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->when($this->employeeSearch, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('f_name', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhere('l_name', 'like', '%' . $this->employeeSearch . '%')
+                        ->orWhereRaw("CONCAT(f_name, ' ', l_name) LIKE ?", ['%' . $this->employeeSearch . '%']);
+                });
+            })
+            ->orderBy('f_name')
+            ->get();
+    }
+
+
+
+
+    public function setViewMode($mode)
+    {
+        $this->viewMode = $mode;
+
+        if ($mode === 'weekly') {
+
+            $this->startDate = now()->startOfDay();
+            $this->endDate = now()->addDays(6)->endOfDay();
+        } elseif ($mode === 'monthly') {
+            $this->startDate = now()->startOfMonth();
+            $this->endDate = now()->endOfMonth();
+        }
+        $this->buildAttendanceCalendar();
+    }
+
+
+    public function goToPrevious()
+    {
+        if ($this->viewMode === 'weekly') {
+            $this->startDate->subWeek();
+            $this->endDate->subWeek();
+            $this->currentDate->subWeek();
+        } elseif ($this->viewMode === 'monthly') {
+            $this->startDate->subMonth()->startOfMonth();
+            $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->currentDate->subMonth();
+        }
+        $this->buildAttendanceCalendar();
+    }
+
+    public function goToNext()
+    {
+        if ($this->viewMode === 'weekly') {
+            $this->startDate->addWeek();
+            $this->endDate->addWeek();
+            $this->currentDate->addWeek();
+        } elseif ($this->viewMode === 'monthly') {
+            $this->startDate->addMonth()->startOfMonth();
+            $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->currentDate->addMonth();
+        }
+        $this->buildAttendanceCalendar();
+    }
+
+    public function getDisplayDateRangeProperty()
+    {
+        if ($this->viewMode === 'weekly') {
+            return $this->startDate->format('M d') . ' - ' . $this->endDate->format('M d');
+        } elseif ($this->viewMode === 'monthly') {
+            return $this->startDate->format('F Y');
+        }
+    }
+
+
+    public function getFilteredEmployeesProperty()
+    {
+        return $this->employees->filter(function ($employee) {
+            if (!$this->search) return true;
+            $name = strtolower($employee->f_name . ' ' . $employee->l_name);
+            return str_contains($name, strtolower($this->search));
+        });
+    }
+
+
+
+    protected function loadEmployees()
+    {
+        $query = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id');
+
+        if (!empty($this->employeeSearch)) {
+            $query->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->employeeSearch . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->employeeSearch . '%');
+            });
+        }
+
+        $this->employees = $query->orderBy('f_name')->get();
+    }
+
+
+
+
+    public function buildAttendanceCalendar()
+    {
+        $start = $this->viewMode === 'weekly'
+            ? $this->startDate->copy()->startOfWeek()
+            : $this->startDate->copy()->startOfMonth()->startOfWeek();
+
+        $end = $this->viewMode === 'weekly'
+            ? $this->endDate->copy()->endOfWeek()
+            : $this->endDate->copy()->endOfMonth()->endOfWeek();
+
+        $rows = Attendance::with('user:id,f_name,l_name')
+            ->where('company_id', $this->company_id)
+            ->whereBetween('clock_in', [$start, $end])
+            ->get()
+            ->groupBy(fn($r) => Carbon::parse($r->clock_in)->format('Y-m-d'));
+
+
+        $this->attendanceCalendar = $rows->map(fn($day) => $day->map(fn($att) => [
+
+
+            'id'        => $att->id,
+            'user_id'   => $att->user_id,
+            'type'      => 'Attendance',
+            'color'     => match ($att->status) {
+                'approved' => '#28a745',
+                'pending'  => '#ffc107',
+                default    => '#dc3545'
+            },
+            'title'     => $att->user->full_name,
+            'start_time' => Carbon::parse($att->clock_in)->format('g:i A'),
+            'end_time'  => $att->clock_out ? Carbon::parse($att->clock_out)->format('g:i A') : '---',
+            'status'    => $att->status,
+            'is_manual' => $att->is_manual,
+            'location'  => $att->clock_in_location,
+            'note'      => $att->clock_out_location,
+        ]));
+
+
+        $this->shiftMap = DB::table('shift_dates as sd')
+            ->join('shift_employees as se', 'sd.id', '=', 'se.shift_date_id')
+            ->selectRaw('sd.date, se.employee_id')
+            ->whereBetween('sd.date', [$start, $end])
+            ->whereIn('se.employee_id', $this->employees->pluck('id'))
+            ->get()
+            ->groupBy(fn($row) => $row->date)               // Y-m-d
+            ->map(fn($g) => $g->pluck('employee_id')->toArray());
+    }
+
+
+    public function getWeekDaysProperty()
+    {
+        $days = [];
+        $current = $this->startDate->copy();
+        $end = $this->endDate->copy();
+
+        $maxIterations = $this->viewMode === 'monthly' ? $this->startDate->daysInMonth : 7;
+        $count = 0;
+
+        while ($current->lte($end) && $count < $maxIterations) {
+            $days[] = [
+                'full_date' => $current->format('Y-m-d'),
+
+                'day' => $this->viewMode === 'weekly' ? $current->format('D') : $current->format('j'),
+                'date' => $current->format('m/d'),
+                'highlight' => $current->equalTo($this->currentDate->copy()->startOfDay()),
+            ];
+            $current->addDay();
+            $count++;
+        }
+
+        return $days;
+    }
+
+
+
 
     public function mount()
     {
+        $this->company_id = app('authUser')->company->id;
         $this->loaded = collect();
         $this->loadMore();
+        $this->startDate = Carbon::today();
+        $this->endDate = Carbon::today()->copy()->addDays(6);
+        $this->currentDate = Carbon::today();
+
+        $start = $this->startDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY);
+        $end   = $this->startDate->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
+        $days  = collect(Carbon::parse($start)->daysUntil($end)->toArray());
+
+        $this->weeks = $days->chunk(7);
+        $this->loadEmployees();
+        $this->buildAttendanceCalendar();
     }
 
     public function render()
     {
+
+
         return view('livewire.backend.company.timesheet.timesheet-index', [
             'records' => $this->loaded,
-            'employees' => Employee::where('company_id', auth()->user()->company->id)
-                ->whereNotNull('user_id')
-                ->get(),
+            'weekDays' => $this->weekDays,
+            'viewMode' => $this->viewMode,
+
+            'displayDateRange' => $this->displayDateRange,
+            'employees' =>  $this->employees,
 
         ]);
     }

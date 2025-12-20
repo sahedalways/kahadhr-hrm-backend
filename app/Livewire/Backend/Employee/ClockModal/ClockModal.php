@@ -331,6 +331,7 @@ class ClockModal extends BaseComponent
             ->latest()
             ->first();
 
+
         if (!$this->attendance) {
             $this->elapsedTime = '00:00:00';
             return;
@@ -345,6 +346,7 @@ class ClockModal extends BaseComponent
 
             if ($this->attendance->clock_out) {
                 $clockOutTime = Carbon::parse($this->attendance->clock_out, $userTimeZone);
+
                 $elapsedSeconds = $clockOutTime->diffInSeconds($clockInTime);
             } else {
                 $elapsedSeconds = $currentTime->diffInSeconds($clockInTime);
@@ -362,7 +364,13 @@ class ClockModal extends BaseComponent
             $this->elapsedTime = '00:00:00';
         }
 
-        $this->dispatch('update-header-timer', $this->elapsedTime, !$this->attendance->clock_out);
+
+
+        $this->dispatch(
+            'update-header-timer',
+            time: $this->elapsedTime,
+            running: !$this->attendance->clock_out
+        )->to('backend.components.header');
     }
 
 
@@ -375,7 +383,7 @@ class ClockModal extends BaseComponent
         $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
 
         $shiftStart = $this->shiftStartTime;
-        $shiftEnd = $this->shiftStartTime;
+        $shiftEnd = $this->shiftEndTime;
 
         $shiftStartMinusGrace = $shiftStart->copy()->subMinutes(config('attendance.grace_minutes'));
 

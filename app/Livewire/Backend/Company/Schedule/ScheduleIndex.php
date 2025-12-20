@@ -755,6 +755,7 @@ class ScheduleIndex extends BaseComponent
                 }
             }
         } else {
+
             foreach ($dates as $date) {
 
                 if (!$this->skipConflictCheck) {
@@ -773,45 +774,42 @@ class ScheduleIndex extends BaseComponent
             }
 
 
+
+            $shift = Shift::create([
+                'company_id' => $this->company_id,
+                'title' => $this->newShift['title'],
+                'job' => $this->newShift['job'],
+                'color' => $this->newShift['color'],
+                'address' => $this->newShift['address'],
+                'note' => $this->newShift['note'],
+            ]);
+
+
+
             foreach ($dates as $date) {
-
-
-
-                $shift = Shift::create([
-                    'company_id' => $this->company_id,
-                    'title' => $this->newShift['title'],
-                    'job' => $this->newShift['job'],
-                    'color' => $this->newShift['color'],
-                    'address' => $this->newShift['address'],
-                    'note' => $this->newShift['note'],
+                $shiftDate = $shift->dates()->create([
+                    'date' => $date,
+                    'start_time' => $this->newShift['start_time'],
+                    'end_time' => $this->newShift['end_time'],
+                    'total_hours' => $this->newShift['total_hours'],
                 ]);
 
+                $shiftDate->employees()->attach($this->newShift['employees']);
 
-
-                foreach ($dates as $date) {
-                    $shiftDate = $shift->dates()->create([
-                        'date' => $date,
-                        'start_time' => $this->newShift['start_time'],
-                        'end_time' => $this->newShift['end_time'],
-                        'total_hours' => $this->newShift['total_hours'],
-                    ]);
-
-                    $shiftDate->employees()->attach($this->newShift['employees']);
-
-                    if (!empty($this->newBreaks)) {
-                        foreach ($this->newBreaks as $break) {
-                            if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-                                $shiftDate->breaks()->create([
-                                    'title' => $break['name'],
-                                    'type' => $break['type'],
-                                    'duration' => $break['duration'],
-                                ]);
-                            }
+                if (!empty($this->newBreaks)) {
+                    foreach ($this->newBreaks as $break) {
+                        if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                            $shiftDate->breaks()->create([
+                                'title' => $break['name'],
+                                'type' => $break['type'],
+                                'duration' => $break['duration'],
+                            ]);
                         }
                     }
                 }
             }
         }
+
 
         $this->isEditableShift =  false;
         $this->closeAddShiftPanel();

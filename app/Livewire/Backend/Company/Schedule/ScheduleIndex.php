@@ -79,7 +79,7 @@ class ScheduleIndex extends BaseComponent
 
     public $skipConflictCheck = false;
     public $conflictData      = [];
-
+    public $dragSource = [];
 
 
     public $newShift = [
@@ -1846,6 +1846,74 @@ class ScheduleIndex extends BaseComponent
             'hours'  => $hours,
             'users'  => count($userIds),
         ];
+    }
+
+
+
+
+    public function handleDrag(string $fromDate, int $fromEmpId, int $shiftDateId)
+    {
+        $this->dragSource = [
+            'date' => $fromDate,
+            'empId' => $fromEmpId,
+            'shiftDateId' => $shiftDateId,
+        ];
+    }
+
+    public function handleDrop(string $toDate, int $toEmpId)
+    {
+        if (empty($this->dragSource)) return;
+
+
+
+        [$fromDate, $fromEmpId, $shiftDateId] = [
+            $this->dragSource['date'],
+            $this->dragSource['empId'],
+            $this->dragSource['shiftDateId'],
+        ];
+
+        // same cell – do nothing
+        if ($fromDate === $toDate && $fromEmpId === $toEmpId) {
+            $this->dragSource = [];
+            return;
+        }
+
+        $srcDate = ShiftDate::with('breaks')->find($shiftDateId);
+        if (!$srcDate) return;
+
+
+        $srcDate->employees()->detach($fromEmpId);
+
+
+        if ($srcDate->employees()->doesntExist()) {
+            $srcDate->breaks()->delete();
+            $srcDate->delete();
+        }
+
+
+        $tgtDate = ShiftDate::firstOrCreate([
+            'date'        => $toDate,
+            'shift_id'    => $srcDate->shift_id,
+            'start_time'  => $srcDate->start_time,
+            'end_time'    => $srcDate->end_time,
+            'total_hours' => $srcDate->total_hours,
+        ]);
+
+
+        foreach ($srcDate->breaks as $break) {
+            $tgtDate->breaks()->create([
+                'title'    => $break->title,
+                'type'     => $break->type,
+                'duration' => $break->duration,
+            ]);
+        }
+
+
+        $tgtDate->employees()->attach($toEmpId);
+
+        $this->loadShifts();
+        $this->dragSource = [];
+        $this->toast('Shift moved successfully!', 'success');
     }
 
 

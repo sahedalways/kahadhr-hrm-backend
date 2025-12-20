@@ -156,25 +156,24 @@
 
                                                                                 @if (!empty($shift['employees']))
                                                                                     @php
+
                                                                                         $employees = collect(
                                                                                             $shift['employees'],
                                                                                         )
+                                                                                            ->where(
+                                                                                                'id',
+                                                                                                $employee['id'],
+                                                                                            )
                                                                                             ->pluck('name')
                                                                                             ->toArray();
-                                                                                        $showLimit = 5;
-                                                                                        $moreCount =
-                                                                                            count($employees) -
-                                                                                            $showLimit;
                                                                                     @endphp
-                                                                                    <div class="mb-2 mt-2">
-                                                                                        <strong>Employees:</strong>
-                                                                                        {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
-                                                                                        @if ($moreCount > 0)
-                                                                                            <span
-                                                                                                class="text-muted">+{{ $moreCount }}
-                                                                                                more</span>
-                                                                                        @endif
-                                                                                    </div>
+
+                                                                                    @if ($employees)
+                                                                                        <div class="mb-2 mt-2">
+                                                                                            <strong>Employee:</strong>
+                                                                                            {{ $employees[0] }}
+                                                                                        </div>
+                                                                                    @endif
                                                                                 @endif
 
                                                                                 @if (!empty($shift['shift']['note']))
@@ -318,23 +317,20 @@
 
                                                         @if (!empty($content['employees']))
                                                             @php
+                                                                // keep only the row owner
                                                                 $employees = collect($content['employees'])
+                                                                    ->where('id', $employee['id'])
                                                                     ->pluck('name')
                                                                     ->toArray();
-                                                                $showLimit = 5;
-                                                                $moreCount = count($employees) - $showLimit;
                                                             @endphp
-                                                            <div class="d-flex align-items-center mb-3">
-                                                                <i class="fas fa-users text-success me-2"></i>
-                                                                <strong>Employees:</strong>
-                                                                <span class="ms-1">
-                                                                    {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
-                                                                    @if ($moreCount > 0)
-                                                                        <span class="text-muted">+{{ $moreCount }}
-                                                                            more</span>
-                                                                    @endif
-                                                                </span>
-                                                            </div>
+
+                                                            @if ($employees)
+                                                                <div class="d-flex align-items-center mb-3">
+                                                                    <i class="fas fa-users text-success me-2"></i>
+                                                                    <strong>Employee:</strong>
+                                                                    <span class="ms-1">{{ $employees[0] }}</span>
+                                                                </div>
+                                                            @endif
                                                         @endif
 
                                                         @if (!empty($content['shift']['note']))

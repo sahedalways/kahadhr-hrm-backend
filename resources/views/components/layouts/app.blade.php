@@ -125,9 +125,6 @@
 
 
 
-
-
-
     <script>
         document.addEventListener("livewire:init", () => {
             Livewire.on("toast", (event) => {
@@ -143,7 +140,7 @@
                 closeButton: true,
                 progressBar: true,
                 timeOut: 5000,
-                positionClass: "toast-top-right",
+                positionClass: "toast-top-center",
             };
         });
     </script>
@@ -204,8 +201,13 @@
 
 
 
+    @php
+        $todaysShift = todaysShiftForUser();
+    @endphp
 
-    <livewire:backend.employee.clock-modal.clock-modal />
+    @if (auth()->check() && auth()->user()->user_type === 'employee' && $todaysShift)
+        <livewire:backend.employee.clock-modal.clock-modal />
+    @endif
 
 
     @stack('js')

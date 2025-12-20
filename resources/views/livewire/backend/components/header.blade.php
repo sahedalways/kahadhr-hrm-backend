@@ -202,12 +202,14 @@
                         </div>
                     @endif
 
+                    @php
+                        $todaysShift = todaysShiftForUser();
+                    @endphp
+
 
                     <!-- CLOCK ICON -->
-
-                    @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
-                        <span class="d-flex cursor-pointer text-white" data-bs-toggle="modal"
-                            data-bs-target="#AppClockModal">
+                    @if (auth()->user()->user_type == 'employee')
+                        <span class="d-flex cursor-pointer text-white" onclick="checkTodaysShift()">
                             <i class="fa-regular fa-clock fs-4"></i>
                         </span>
                     @endif
@@ -328,5 +330,31 @@
         setInterval(() => {
             Livewire.dispatch('tick');
         }, 1000);
+    });
+</script>
+
+
+<script>
+    function checkTodaysShift() {
+        const hasShift = @json((bool) $todaysShift);
+
+        if (!hasShift) {
+            toastr.error("You don't have any shift scheduled for today.");
+            return;
+        }
+
+        const modal = new bootstrap.Modal(
+            document.getElementById('AppClockModal')
+        );
+        modal.show();
+    }
+
+    document.addEventListener("livewire:init", () => {
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            positionClass: "toast-center",
+        };
     });
 </script>

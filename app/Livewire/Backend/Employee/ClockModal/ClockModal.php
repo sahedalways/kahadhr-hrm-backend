@@ -376,6 +376,7 @@ class ClockModal extends BaseComponent
 
         $shiftStart = $this->shiftStartTime;
         $shiftEnd = $this->shiftStartTime;
+
         $shiftStartMinusGrace = $shiftStart->copy()->subMinutes(config('attendance.grace_minutes'));
 
 

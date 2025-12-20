@@ -51,7 +51,18 @@ class TimesheetIndex extends BaseComponent
 
     public $shiftMap = [];
 
+    public $selectedAttendance = null;
 
+
+
+    public function openAttendanceModal($attendanceId)
+    {
+        $this->selectedAttendance = Attendance::with(['user', 'requests'])
+            ->where('company_id', $this->company_id)
+            ->find($attendanceId);
+
+        $this->dispatch('open-attendance-modal');
+    }
 
 
 
@@ -167,7 +178,7 @@ class TimesheetIndex extends BaseComponent
             ? $this->endDate->copy()->endOfWeek()
             : $this->endDate->copy()->endOfMonth()->endOfWeek();
 
-        $rows = Attendance::with('user:id,f_name,l_name')
+        $rows = Attendance::with('user:id,f_name,l_name', 'requests')
             ->where('company_id', $this->company_id)
             ->whereBetween('clock_in', [$start, $end])
             ->get()
@@ -183,7 +194,8 @@ class TimesheetIndex extends BaseComponent
             'color'     => match ($att->status) {
                 'approved' => '#28a745',
                 'pending'  => '#ffc107',
-                default    => '#dc3545'
+                'rejected'    => '#dc3545',
+                default   => '#000000ff'
             },
             'title'     => $att->user->full_name,
             'start_time' => Carbon::parse($att->clock_in)->format('g:i A'),
@@ -368,19 +380,14 @@ class TimesheetIndex extends BaseComponent
         }
 
         $request->status = 'approved';
-
         $request->save();
 
 
-        $attendance = $request->attendance;
-        if ($attendance) {
-            $attendance->status = 'approved';
-            $attendance->save();
-        }
-
+        $this->syncAttendanceStatus($request->attendance_id);
 
 
         $message = "Your attendance request has been approved.";
+
 
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
@@ -414,11 +421,7 @@ class TimesheetIndex extends BaseComponent
 
         $request->save();
 
-        $attendance = $request->attendance;
-        if ($attendance) {
-            $attendance->status = 'rejected';
-            $attendance->save();
-        }
+        $this->syncAttendanceStatus($request->attendance_id);
 
 
         $message = "Your attendance request has been rejected.";
@@ -438,6 +441,54 @@ class TimesheetIndex extends BaseComponent
         $this->toast('Request rejected successfully!', 'error');
         $this->resetLoaded();
     }
+
+
+
+
+
+
+
+    public function approveAttendance($attendanceId)
+    {
+        $attendance = Attendance::with('requests')->find($attendanceId);
+        if (!$attendance) return;
+
+        // approve all pending requests
+        foreach ($attendance->requests as $req) {
+            if ($req->status === 'pending') {
+                $req->update(['status' => 'approved']);
+            }
+        }
+
+        $attendance->update(['status' => 'approved']);
+
+        $this->toast('Attendance approved successfully', 'success');
+
+        // refresh modal data
+        $this->selectedAttendance = $attendance->fresh(['user', 'requests']);
+        $this->buildAttendanceCalendar();
+    }
+
+    public function rejectAttendance($attendanceId)
+    {
+        $attendance = Attendance::with('requests')->find($attendanceId);
+        if (!$attendance) return;
+
+        foreach ($attendance->requests as $req) {
+            if ($req->status === 'pending') {
+                $req->update(['status' => 'rejected']);
+            }
+        }
+
+        $attendance->update(['status' => 'rejected']);
+
+        $this->toast('Attendance rejected', 'error');
+
+        $this->selectedAttendance = $attendance->fresh(['user', 'requests']);
+        $this->buildAttendanceCalendar();
+    }
+
+
 
 
     public function toggleReason($requestId)
@@ -498,6 +549,27 @@ class TimesheetIndex extends BaseComponent
         $this->reset(['employeeId', 'manualDate', 'clockInTime', 'clockOutTime', 'reason']);
 
         $this->dispatch('closemodal');
+    }
+
+
+
+    private function syncAttendanceStatus(int $attendanceId): void
+    {
+        $attendance = Attendance::find($attendanceId);
+        if (!$attendance) return;
+
+        $all = AttendanceRequest::where('attendance_id', $attendanceId)->get();
+
+        // সব approved ?
+        if ($all->every(fn($r) => $r->status === 'approved')) {
+            $attendance->update(['status' => 'approved']);
+            return;
+        }
+
+        if ($all->contains(fn($r) => $r->status === 'rejected')) {
+            $attendance->update(['status' => 'rejected']);
+            return;
+        }
     }
 
 

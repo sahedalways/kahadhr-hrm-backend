@@ -10,7 +10,7 @@ use App\Models\ShiftBreak;
 use App\Models\ShiftDate;
 use App\Models\ShiftTemplates;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
 
 class ScheduleIndex extends BaseComponent
 {
@@ -723,6 +723,25 @@ class ScheduleIndex extends BaseComponent
             }
 
 
+            $employeesAlreadyAssigned = DB::table('shift_employees')
+                ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                ->where('shift_dates.date', $this->selectedDate)
+                ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
+                ->pluck('shift_employees.employee_id')
+                ->toArray();
+
+            if ($employeesAlreadyAssigned) {
+                $names = Employee::whereIn('id', $employeesAlreadyAssigned)
+                    ->pluck('f_name')
+                    ->implode(', ');
+                $this->toast("Employees already assigned on {$this->selectedDate}: {$names}", 'error');
+                return;
+            }
+
+
+
+
+
             $shift = Shift::create([
                 'company_id' => $this->company_id,
                 'title' => $this->newShift['title'],
@@ -772,6 +791,24 @@ class ScheduleIndex extends BaseComponent
                     }
                 }
             }
+
+            foreach ($dates as $date) {
+                $already = DB::table('shift_employees')
+                    ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                    ->where('shift_dates.date', $date)
+                    ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
+                    ->pluck('shift_employees.employee_id')
+                    ->toArray();
+
+                if ($already) {
+                    $names = Employee::whereIn('id', $already)->pluck('f_name')->implode(', ');
+                    $this->toast("Employees already assigned on {$date}: {$names}", 'error');
+                    return;
+                }
+            }
+
+
+
 
 
 
@@ -952,6 +989,23 @@ class ScheduleIndex extends BaseComponent
                     return;
                 }
             }
+
+
+            $alreadyAssigned = DB::table('shift_employees')
+                ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                ->where('shift_dates.date', $shift['date'])
+                ->whereIn('shift_employees.employee_id', $employeeIds)
+                ->pluck('shift_employees.employee_id')
+                ->toArray();
+
+            if ($alreadyAssigned) {
+                $names = Employee::whereIn('id', $alreadyAssigned)
+                    ->pluck('f_name')
+                    ->implode(', ');
+                $this->toast("Employees already assigned on {$shift['date']}: {$names}", 'error');
+                return;
+            }
+
 
 
 

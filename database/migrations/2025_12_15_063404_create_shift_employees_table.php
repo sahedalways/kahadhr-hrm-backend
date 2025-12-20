@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shift_date_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('employee_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unique(['shift_date_id', 'employee_id'], 'unique_shift_date_employee');
             $table->timestamps();
         });
     }

@@ -396,15 +396,8 @@ class ClockModal extends BaseComponent
 
             if ($this->currentAttendance->clock_in && !$this->currentAttendance->clock_out) {
 
-                if ($now->lessThanOrEqualTo($shiftEnd)) {
-                    $showClockOutButton = true;
-                    $statusLabel = 'Working Time';
-                } else {
-
-                    $showClockInButton = false;
-                    $showClockOutButton = false;
-                    $statusLabel = 'Todays Worked';
-                }
+                $showClockOutButton = true;
+                $statusLabel = 'Working Time';
             } elseif ($this->currentAttendance->clock_in && $this->currentAttendance->clock_out) {
 
                 $showClockInButton = false;

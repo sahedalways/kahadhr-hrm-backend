@@ -205,15 +205,17 @@
                                                 $dateKey = $day->format('Y-m-d');
                                                 $hasAtt = !empty($this->attendanceCalendar[$dateKey]);
                                                 $employees = $this->shiftMap[$dateKey] ?? [];
+
                                             @endphp
 
                                             <td class="schedule-cell month-cell {{ $day->equalTo(today()) ? 'bg-primary-light-cell' : '' }}"
                                                 style="height:80px;width:14.28%;position:relative;">
 
 
-                                                @if ($day->month == $this->startDate->month)
-                                                    <span class="date-number">{{ $day->day }}</span>
-                                                @endif
+
+                                                <span class="date-number">{{ $day->day }}</span>
+
+
 
 
                                                 @if ($isCurrent && $hasAtt)
@@ -353,8 +355,241 @@
 
 
 
+    <div wire:ignore.self class="modal fade" id="attendanceDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+
+                {{-- Header --}}
+                <div class="modal-header bg-light rounded-top-4">
+                    <div>
+                        <h6 class="modal-title fw-bold mb-0">
+                            <i class="fas fa-clock me-2 text-primary"></i>
+                            Attendance Details
+                        </h6>
+                        @if ($selectedAttendance)
+                            <small class="text-muted">
+                                {{ \Carbon\Carbon::parse($selectedAttendance->clock_in)->format('l, d M Y') }}
+                            </small>
+                        @endif
+                    </div>
+
+                    <button class="btn btn-sm btn-outline-secondary rounded-circle" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="modal-body px-4 py-3">
+                    @if ($selectedAttendance)
+
+                        {{-- Employee Info --}}
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ $selectedAttendance->user->employee->avatar_url ?? asset('assets/img/default-avatar.png') }}"
+                                class="rounded-circle me-3" style="width:45px;height:45px;object-fit:cover;">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $selectedAttendance->user->full_name }}
+                                </div>
+                                <small class="text-muted">Employee</small>
+                            </div>
+
+                            <div class="ms-auto">
+                                <div class="ms-auto d-flex align-items-center gap-2">
+
+                                    @php
+                                        $statusColor = match ($selectedAttendance->status) {
+                                            'approved' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected' => 'danger',
+                                            default => 'secondary',
+                                        };
+                                    @endphp
+
+                                    {{-- Status Badge --}}
+                                    <span class="badge bg-{{ $statusColor }} px-3 py-2">
+                                        {{ ucfirst($selectedAttendance->status) }}
+                                    </span>
+
+                                    {{-- Action Dropdown (Only Pending) --}}
+                                    @if ($selectedAttendance->status === 'pending')
+                                        <div class="dropdown">
+
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                data-bs-toggle="dropdown" wire:loading.attr="disabled"
+                                                wire:target="approveAttendance,rejectAttendance">
+                                                Actions
+                                            </button>
+
+                                            <div class="dropdown-menu dropdown-menu-end shadow-sm p-2"
+                                                style="min-width: 220px;">
+
+                                                {{-- Approve --}}
+                                                <button type="button"
+                                                    class="dropdown-item d-flex align-items-center gap-2 text-success rounded"
+                                                    wire:click="approveAttendance({{ $selectedAttendance->id }})"
+                                                    wire:loading.attr="disabled" wire:target="approveAttendance">
+
+                                                    <span wire:loading.remove wire:target="approveAttendance">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </span>
+
+                                                    <span wire:loading wire:target="approveAttendance">
+                                                        <i class="fas fa-spinner fa-spin"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        Approve Attendance
+                                                        <small class="d-block text-muted">
+                                                            Confirm this attendance
+                                                        </small>
+                                                    </span>
+                                                </button>
+
+                                                <div class="dropdown-divider"></div>
+
+                                                {{-- Reject --}}
+                                                <button type="button"
+                                                    class="dropdown-item d-flex align-items-center gap-2 text-danger rounded"
+                                                    wire:click="rejectAttendance({{ $selectedAttendance->id }})"
+                                                    wire:loading.attr="disabled" wire:target="rejectAttendance">
+
+                                                    <span wire:loading.remove wire:target="rejectAttendance">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </span>
+
+                                                    <span wire:loading wire:target="rejectAttendance">
+                                                        <i class="fas fa-spinner fa-spin"></i>
+                                                    </span>
+
+                                                    <span>
+                                                        Reject Attendance
+                                                        <small class="d-block text-muted">
+                                                            Mark as rejected
+                                                        </small>
+                                                    </span>
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {{-- Time Info --}}
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="border rounded-3 p-2">
+                                    <small class="text-muted d-block">Clock In</small>
+                                    <span class="fw-bold">
+                                        {{ \Carbon\Carbon::parse($selectedAttendance->clock_in)->format('h:i A') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded-3 p-2">
+                                    <small class="text-muted d-block">Clock Out</small>
+                                    <span class="fw-bold">
+                                        {{ $selectedAttendance->clock_out
+                                            ? \Carbon\Carbon::parse($selectedAttendance->clock_out)->format('h:i A')
+                                            : '---' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Location --}}
+                        @if ($selectedAttendance->clock_in_location || $selectedAttendance->clock_out_location)
+                            <div class="border rounded-3 p-3 mb-3 bg-light">
+
+                                {{-- Clock In Location --}}
+                                @if ($selectedAttendance->clock_in_location)
+                                    <div class="d-flex align-items-start mb-2">
+                                        <i class="fas fa-sign-in-alt text-success me-2 mt-1"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Clock In Location</small>
+                                            <span class="fw-semibold">
+                                                {{ $selectedAttendance->clock_in_location }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- Clock Out Location --}}
+                                @if ($selectedAttendance->clock_out_location)
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-sign-out-alt text-danger me-2 mt-1"></i>
+                                        <div>
+                                            <small class="text-muted d-block">Clock Out Location</small>
+                                            <span class="fw-semibold">
+                                                {{ $selectedAttendance->clock_out_location }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
+
+                            </div>
+                        @endif
+
+
+                        {{-- Requests --}}
+                        <h6 class="fw-bold mt-4 mb-3">
+                            <i class="fas fa-file-alt me-2 text-primary"></i>
+                            Attendance Requests
+                        </h6>
+
+                        @forelse($selectedAttendance->requests as $req)
+                            @php
+                                $reqColor = match ($req->status) {
+                                    'approved' => 'success',
+                                    'pending' => 'warning',
+                                    'rejected' => 'danger',
+                                    default => 'secondary',
+                                };
+                            @endphp
+
+                            <div class="border rounded-3 p-3 mb-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="fw-semibold">
+                                        {{ ucfirst(str_replace('_', ' ', $req->type)) }}
+                                    </span>
+                                    <span class="badge bg-{{ $reqColor }}">
+                                        {{ ucfirst($req->status) }}
+                                    </span>
+                                </div>
+
+                                <small class="text-muted">
+                                    {{ $req->reason }}
+                                </small>
+                            </div>
+                        @empty
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle me-1"></i>
+                                No requests found
+                            </div>
+                        @endforelse
+
+                    @endif
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 </div>
+
+
+<script>
+    window.addEventListener('open-attendance-modal', () => {
+        const modal = new bootstrap.Modal(
+            document.getElementById('attendanceDetailModal')
+        );
+        modal.show();
+    });
+</script>
 
 
 

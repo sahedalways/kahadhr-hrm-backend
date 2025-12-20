@@ -23,16 +23,7 @@
             <!-- RIGHT SIDE ICON + PROFILE -->
             <div class="d-flex align-items-center gap-3 position-relative w-100">
 
-                <!-- LEFT SECTION (Mobile menu icon) -->
-                {{--<div class="d-flex align-items-center">
-                    <a href="javascript:;" class="nav-link text-dark p-0 d-xl-none" id="iconNavbarSidenav">
-                        <div class="sidenav-toggler-inner">
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                            <i class="sidenav-toggler-line bg-dark"></i>
-                        </div>
-                    </a>
-                </div>--}}
+
 
                 @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
                     <div class="timer-box">
@@ -72,9 +63,7 @@
                     @if ($userType !== 'superAdmin')
                         <div class="dropdown">
 
-                            <img src="{{ $userType === 'company'
-                                ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png'
-                                : $user->avatar_url ?? '/assets/img/default-avatar.png' }}"
+                            <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
                                 alt="Avatar" class="rounded-circle cursor-pointer dropdown-toggle" width="40"
                                 height="40" id="profileDropdownToggle" data-bs-toggle="dropdown"
                                 aria-expanded="false">
@@ -192,8 +181,7 @@
                                         <i class="fas fa-columns me-2"></i> Dashboard
                                     </a>
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i
-                                            class="fas fa-question-circle me-2"></i>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>
                                         Help
                                         Center</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-headset me-2"></i>
@@ -218,7 +206,8 @@
                     <!-- CLOCK ICON -->
 
                     @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
-                        <span class="d-flex cursor-pointer" data-bs-toggle="modal" data-bs-target="#AppClockModal">
+                        <span class="d-flex cursor-pointer text-white" data-bs-toggle="modal"
+                            data-bs-target="#AppClockModal">
                             <i class="fa-regular fa-clock fs-4"></i>
                         </span>
                     @endif

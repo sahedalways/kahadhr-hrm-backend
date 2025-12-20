@@ -126,16 +126,34 @@
                                 </td>
 
                                 <!-- Late Clock In -->
-                                <td>{{ $clockInRequest->type ?? 'N/A' }}</td>
-                                <td>{{ $clockInRequest->reason ?? 'N/A' }}</td>
+                                <td>
+                                    @if (optional($clockInRequest)->type)
+                                        <span class="badge bg-success">Yes</span>
+                                    @else
+                                        <span class="badge bg-secondary">N/A</span>
+                                    @endif
+                                </td>
+                                <td>{{ optional($clockInRequest)->reason ?? 'N/A' }}</td>
 
                                 <!-- Early Clock Out -->
-                                <td>{{ $earlyClockOutRequest->type ?? 'N/A' }}</td>
-                                <td>{{ $earlyClockOutRequest->reason ?? 'N/A' }}</td>
+                                <td>
+                                    @if (optional($earlyClockOutRequest)->type)
+                                        <span class="badge bg-warning text-dark">Yes</span>
+                                    @else
+                                        <span class="badge bg-secondary">N/A</span>
+                                    @endif
+                                </td>
+                                <td>{{ optional($earlyClockOutRequest)->reason ?? 'N/A' }}</td>
 
                                 <!-- Late Clock Out -->
-                                <td>{{ $lateClockOutRequest->type ?? 'N/A' }}</td>
-                                <td>{{ $lateClockOutRequest->reason ?? 'N/A' }}</td>
+                                <td>
+                                    @if (optional($lateClockOutRequest)->type)
+                                        <span class="badge bg-danger">Yes</span>
+                                    @else
+                                        <span class="badge bg-secondary">N/A</span>
+                                    @endif
+                                </td>
+                                <td>{{ optional($lateClockOutRequest)->reason ?? 'N/A' }}</td>
                             </tr>
 
                         @empty

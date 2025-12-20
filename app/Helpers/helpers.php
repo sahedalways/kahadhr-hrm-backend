@@ -2,7 +2,10 @@
 
 use App\Models\Employee;
 use App\Models\LeaveRequest;
+use App\Models\ShiftDate;
 use App\Models\SiteSetting;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('siteSetting')) {
   function siteSetting()
@@ -140,4 +143,23 @@ function hasLeave(int $empId, string $date, ?int $companyId = null): bool
     ->whereDate('start_date', '<=', $date)
     ->whereDate('end_date', '>=', $date)
     ->exists();
+}
+
+
+
+if (!function_exists('todaysShiftForUser')) {
+  /**
+   * Return today's ShiftDate (with relations) for the authenticated user
+   * null if no shift assigned today
+   */
+  function todaysShiftForUser(?int $userId = null): ?ShiftDate
+  {
+    $userId = $userId ?: Auth::id();
+    if (!$userId) return null;
+
+    return ShiftDate::whereDate('date', Carbon::today())
+      ->whereHas('employees', fn($q) => $q->where('user_id', $userId))
+      ->with(['shift', 'breaks']) // eager load anything you need
+      ->first();
+  }
 }

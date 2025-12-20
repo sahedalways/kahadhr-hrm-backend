@@ -505,24 +505,6 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     right: 4px;
 }
 
-/* .schedule-cell {
-    overflow: visible !important;
-    position: relative;
-} */
-
-/* .dropdown-schedule-cell {
-    z-index: 1060 !important;
-    position: absolute;
-    inset: auto 0 auto auto !important;
-    transform: translate(-100%, -100%) !important;
-}
-.shift-dropdown .dropdown-menu {
-    top: 100% !important;
-    bottom: auto !important;
-    margin-top: 4px;
-} */
-
-
 .dropdown-schedule-celll {
     position: absolute;
     list-style: none;
@@ -531,15 +513,15 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     min-width: 150px;
     background: #fff;
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     padding-left: 0;
     z-index: 99999;
 }
 .shift-block {
-    position: relative; 
+    position: relative;
     z-index: 1;
 }
 
 .shift-block.active-z {
-    z-index: 10; 
+    z-index: 10;
 }

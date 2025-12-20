@@ -23,6 +23,7 @@ class ClockModal extends BaseComponent
 
     public $shiftStartTime;
     public $shiftEndTime;
+    public $shiftTotalHours;
     public $graceMinutes;
     public $currentTime;
     public $currentAttendance;
@@ -48,7 +49,7 @@ class ClockModal extends BaseComponent
 
     public function clockIn()
     {
-        $shiftStart = Carbon::parse(config('attendance.scheduled_shift.start'), 'Asia/Dhaka');
+        $shiftStart = $this->shiftStartTime;
         $grace = config('attendance.grace_minutes');
 
 
@@ -143,7 +144,7 @@ class ClockModal extends BaseComponent
             return;
         }
 
-        $shiftEnd = Carbon::parse(config('attendance.scheduled_shift.end'), 'Asia/Dhaka');
+        $shiftEnd = $this->shiftEndTime;
         $grace = config('attendance.grace_minutes');
         $bdTime = now()->setTimezone('Asia/Dhaka');
 
@@ -244,13 +245,20 @@ class ClockModal extends BaseComponent
 
     public function mount()
     {
-
+        $todaysShift = todaysShiftForUser();
         $this->updateWorkingHoursCount();
         $this->fetchPreviousAttendances();
 
-        // Shift info from config
-        $this->shiftStartTime = config('attendance.scheduled_shift.start');
-        $this->shiftEndTime = config('attendance.scheduled_shift.end');
+
+        if ($todaysShift) {
+            $this->shiftStartTime = Carbon::parse($todaysShift->start_time, auth()->user()->timezone);
+            $this->shiftEndTime   = Carbon::parse($todaysShift->end_time, auth()->user()->timezone);
+            $this->shiftTotalHours = $todaysShift->total_hours;
+        } else {
+            $this->shiftStartTime = null;
+            $this->shiftEndTime   = null;
+            $this->shiftTotalHours = null;
+        }
         $this->graceMinutes = config('attendance.grace_minutes');
     }
 
@@ -366,8 +374,8 @@ class ClockModal extends BaseComponent
 
         $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
 
-        $shiftStart = Carbon::parse(config('attendance.scheduled_shift.start'), $userTimeZone);
-        $shiftEnd = Carbon::parse(config('attendance.scheduled_shift.end'), $userTimeZone);
+        $shiftStart = $this->shiftStartTime;
+        $shiftEnd = $this->shiftStartTime;
         $shiftStartMinusGrace = $shiftStart->copy()->subMinutes(config('attendance.grace_minutes'));
 
 
@@ -376,20 +384,20 @@ class ClockModal extends BaseComponent
 
         if ($this->currentAttendance) {
 
-            // Clocked in but not clocked out
+
             if ($this->currentAttendance->clock_in && !$this->currentAttendance->clock_out) {
-                // Only show Clock Out if current time <= shift end
+
                 if ($now->lessThanOrEqualTo($shiftEnd)) {
                     $showClockOutButton = true;
                     $statusLabel = 'Working Time';
                 } else {
-                    // Shift end passed → hide buttons
+
                     $showClockInButton = false;
                     $showClockOutButton = false;
                     $statusLabel = 'Todays Worked';
                 }
             } elseif ($this->currentAttendance->clock_in && $this->currentAttendance->clock_out) {
-                // Already clocked out
+
                 $showClockInButton = false;
                 $showClockOutButton = false;
                 $statusLabel = 'Todays Worked';

@@ -8,6 +8,8 @@ use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use App\Models\Employee;
 use App\Models\Notification;
+use App\Models\ShiftDate;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
@@ -52,6 +54,17 @@ class TimesheetIndex extends BaseComponent
     public $shiftMap = [];
 
     public $selectedAttendance = null;
+
+    public $absentDetails = [];
+
+
+    public $totalLeaves = 0;
+    public $totalPending = 0;
+    public $totalApproved = 0;
+    public $totalRejected = 0;
+    public $totalHours = '0h 0m';
+    public $absentDate;
+    public $totalAbsents;
 
 
 
@@ -98,6 +111,7 @@ class TimesheetIndex extends BaseComponent
             $this->endDate = now()->endOfMonth();
         }
         $this->buildAttendanceCalendar();
+        $this->loadEmployees();
     }
 
 
@@ -147,6 +161,54 @@ class TimesheetIndex extends BaseComponent
             return str_contains($name, strtolower($this->search));
         });
     }
+
+
+    public function getShiftHours($attendance)
+    {
+
+        $date = Carbon::parse($attendance->clock_in)->format('Y-m-d');
+        $employeeId = $attendance->user->employee->id;
+
+
+        $shiftDate = ShiftDate::where('date', $date)
+            ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+            ->with('breaks')
+            ->first();
+
+
+
+        if (!$shiftDate) {
+            return [
+                'shift_hours' => '---',
+                'worked_hours' => '---'
+            ];
+        }
+
+
+        $shiftStart = Carbon::createFromFormat('H:i:s', $shiftDate->start_time);
+        $shiftEnd = Carbon::createFromFormat('H:i:s', $shiftDate->end_time);
+        $totalShiftMinutes = $shiftEnd->diffInMinutes($shiftStart);
+
+
+
+
+        $breakMinutes = $shiftDate->breaks->sum(fn($b) => $b->duration);
+
+
+        if ($attendance->clock_in && $attendance->clock_out) {
+            $clockIn = Carbon::parse($attendance->clock_in);
+            $clockOut = Carbon::parse($attendance->clock_out);
+            $workedMinutes = $clockOut->diffInMinutes($clockIn) - $breakMinutes;
+        } else {
+            $workedMinutes = 0;
+        }
+
+        return [
+            'shift_hours' => sprintf('%dh %dm', intdiv(abs($totalShiftMinutes), 60), abs($totalShiftMinutes) % 60),
+            'worked_hours' => sprintf('%dh %dm', intdiv(abs($workedMinutes), 60), abs($workedMinutes) % 60),
+        ];
+    }
+
 
 
 
@@ -245,6 +307,116 @@ class TimesheetIndex extends BaseComponent
 
 
 
+    public function showAbsentDetails($date)
+    {
+        $this->absentDate = $date;
+
+        // Get absent users for that date
+        $shiftEmployees = $this->shiftMap[$date] ?? [];
+        $attendanceUsers = collect($this->attendanceCalendar[$date] ?? [])
+            ->pluck('user_id')
+            ->unique();
+
+        $this->absentDetails = collect($shiftEmployees)
+            ->diff($attendanceUsers)
+            ->map(fn($id) => $this->employees->firstWhere('id', $id)?->full_name ?? 'Unknown')
+            ->toArray();
+
+        $this->dispatch('showAbsentModal');
+    }
+
+
+    public function getRecordsProperty()
+    {
+        return $this->loaded;
+    }
+
+
+    public function calculateTotalAbsents()
+    {
+        $total = 0;
+
+        foreach ($this->shiftMap as $date => $shiftEmployeeIds) {
+
+
+            if (Carbon::parse($date)->isFuture()) {
+                continue;
+            }
+
+            $attendanceUserIds = collect($this->attendanceCalendar[$date] ?? [])
+                ->pluck('user_id')
+                ->unique();
+
+            $absentCount = collect($shiftEmployeeIds)
+                ->diff($attendanceUserIds)
+                ->count();
+
+            $total += $absentCount;
+        }
+
+        return $total;
+    }
+
+
+
+
+    public function calculateTotalLeaves()
+    {
+        $totalLeaves = 0;
+        foreach ($this->employees as $emp) {
+            foreach ($this->weekDays as $day) {
+                if (hasLeave($emp->id, $day['full_date'])) {
+                    $totalLeaves++;
+                }
+            }
+        }
+        return $totalLeaves;
+    }
+
+
+
+
+    public function calculateTotalHours()
+    {
+        $totalMinutes = 0;
+
+        $this->flatAttendances()->each(function ($att) use (&$totalMinutes) {
+
+            if (
+                empty($att['start_time']) ||
+                empty($att['end_time']) ||
+                $att['start_time'] === '---' ||
+                $att['end_time'] === '---'
+            ) {
+                return;
+            }
+
+            $start = Carbon::createFromFormat('g:i A', $att['start_time']);
+            $end   = Carbon::createFromFormat('g:i A', $att['end_time']);
+
+
+            if ($end->lessThanOrEqualTo($start)) {
+                $end->addDay();
+            }
+
+            $totalMinutes += $start->diffInMinutes($end);
+        });
+
+        $hours = intdiv($totalMinutes, 60);
+        $minutes = $totalMinutes % 60;
+
+        return "{$hours}h {$minutes}m";
+    }
+
+
+
+
+    private function flatAttendances()
+    {
+        return collect($this->attendanceCalendar)->flatten(1);
+    }
+
+
     public function mount()
     {
         $this->company_id = app('authUser')->company->id;
@@ -261,6 +433,18 @@ class TimesheetIndex extends BaseComponent
         $this->weeks = $days->chunk(7);
         $this->loadEmployees();
         $this->buildAttendanceCalendar();
+
+
+        $flat = $this->flatAttendances();
+
+        $this->totalAbsents  = $this->calculateTotalAbsents();
+        $this->totalLeaves   = $this->calculateTotalLeaves();
+
+        $this->totalPending  = $flat->where('status', 'pending')->count();
+        $this->totalApproved = $flat->where('status', 'approved')->count();
+        $this->totalRejected = $flat->where('status', 'rejected')->count();
+
+        $this->totalHours    = $this->calculateTotalHours();
     }
 
     public function render()

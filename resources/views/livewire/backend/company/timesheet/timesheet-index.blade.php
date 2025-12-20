@@ -209,16 +209,33 @@
                                             @endphp
 
                                             <td class="schedule-cell month-cell {{ $day->equalTo(today()) ? 'bg-primary-light-cell' : '' }}"
-                                                style="height:80px;width:14.28%;position:relative;">
+                                                style="height:120px; width:14.28%; position:relative; vertical-align:top; padding:4px;">
 
+                                                {{-- Date number --}}
+                                                <span class="date-number fw-bold">{{ $day->day }}</span>
 
+                                                @php
+                                                    $isCurrentMonth = $day->month === $this->startDate->month;
+                                                    $isPastOrToday = $day->lessThanOrEqualTo(today());
 
-                                                <span class="date-number">{{ $day->day }}</span>
+                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
+                                                    $attendanceUsers = collect(
+                                                        $this->attendanceCalendar[$dateKey] ?? [],
+                                                    )
+                                                        ->pluck('user_id')
+                                                        ->unique();
 
+                                                    // Employees who had shift but no attendance
+                                                    $absentUsers = collect($shiftEmployees)
+                                                        ->diff($attendanceUsers)
+                                                        ->map(
+                                                            fn($id) => optional($this->employees->firstWhere('id', $id))
+                                                                ->full_name ?? 'Unknown',
+                                                        );
+                                                @endphp
 
-
-
-                                                @if ($isCurrent && $hasAtt)
+                                                {{-- Attendance blocks --}}
+                                                @if ($isCurrentMonth && !empty($this->attendanceCalendar[$dateKey]))
                                                     @foreach ($this->attendanceCalendar[$dateKey] as $att)
                                                         @include(
                                                             'livewire.backend.company.timesheet.partials._attendance-block',
@@ -227,12 +244,23 @@
                                                     @endforeach
                                                 @endif
 
-                                                @php
-                                                    $isPastOrToday = $day->lessThanOrEqualTo(today());
-                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
+                                                {{-- Absent indicator --}}
+                                                @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
+                                                    @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
+                                                        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-1"
+                                                            style="width:80%; cursor:pointer;"
+                                                            wire:click="showAbsentDetails('{{ $dateKey }}')">
 
-                                                @endphp
+                                                            {{-- Absent count badge --}}
+                                                            <span
+                                                                class="badge bg-danger d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill small shadow-sm w-100 text-center">
+                                                                <i class="fas fa-user-times"></i>
+                                                                {{ $absentUsers->count() }} Absent
+                                                            </span>
 
+                                                        </div>
+                                                    @endif
+                                                @endif
 
 
                                             </td>
@@ -307,36 +335,49 @@
                                             @foreach ($weekDays as $day)
                                                 @php
                                                     $dateKey = $day['full_date'];
-                                                    $onLeave = hasLeave($emp['id'], $dateKey);
-                                                    $empAtt = collect($this->attendanceCalendar[$dateKey] ?? [])->where(
-                                                        'user_id',
-                                                        $emp->user_id,
-                                                    );
 
-                                                    $hasShift = in_array($emp['id'], $this->shiftMap[$dateKey] ?? []);
-                                                    $isPastOrToday = Carbon::parse($dateKey)->lessThanOrEqualTo(
-                                                        today(),
-                                                    );
+                                                    // Conditions
+                                                    $onLeave = hasLeave($emp->id, $dateKey);
+
+                                                    $empAttendance = collect(
+                                                        $this->attendanceCalendar[$dateKey] ?? [],
+                                                    )->where('user_id', $emp->user_id);
+
+                                                    $hasShift = in_array($emp->id, $this->shiftMap[$dateKey] ?? []);
+
+                                                    $isPastDate = Carbon::parse($dateKey)->lt(today()); // strictly past
+                                                    $isToday = Carbon::parse($dateKey)->isToday();
                                                 @endphp
 
                                                 <td
                                                     class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}">
+
+                                                    {{-- Leave --}}
                                                     @if ($onLeave)
-                                                        <div class="unavailable-box">Unavailable</div>
-                                                    @elseif ($empAtt->isNotEmpty())
-                                                        @foreach ($empAtt as $att)
+                                                        <div class="unavailable-box">
+                                                            Unavailable
+                                                        </div>
+
+                                                        {{-- Attendance exists --}}
+                                                    @elseif ($empAttendance->isNotEmpty())
+                                                        @foreach ($empAttendance as $att)
                                                             @include(
                                                                 'livewire.backend.company.timesheet.partials._attendance-block',
                                                                 ['att' => $att]
                                                             )
                                                         @endforeach
-                                                    @elseif ($hasShift && $isPastOrToday)
-                                                        <div class="absent-badge w-100 text-center">
-                                                            <span class="badge bg-danger small">Absent -
-                                                                {{ $emp->full_name }}</span>
+
+                                                        {{-- Absent: Shift exists + past date + no attendance --}}
+                                                    @elseif ($hasShift && ($isPastDate || $isToday))
+                                                        <div
+                                                            class="absent-badge d-flex justify-content-center align-items-center py-1">
+                                                            <span
+                                                                class="badge bg-danger d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill shadow-sm">
+                                                                <i class="fas fa-user-times"></i>
+                                                                Absent
+                                                            </span>
                                                         </div>
                                                     @endif
-
 
                                                 </td>
                                             @endforeach
@@ -347,9 +388,11 @@
                         </div>
                     </div>
                 @endif
-
+                @include('livewire.backend.company.timesheet.partials.footer_summary')
             </div>
         </div>
+
+
     </div>
 
 
@@ -381,6 +424,9 @@
                 {{-- Body --}}
                 <div class="modal-body px-4 py-3">
                     @if ($selectedAttendance)
+                        @php
+                            $hours = $this->getShiftHours($selectedAttendance);
+                        @endphp
 
                         {{-- Employee Info --}}
                         <div class="d-flex align-items-center mb-4">
@@ -500,6 +546,24 @@
                             </div>
                         </div>
 
+
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="border rounded-3 p-2">
+                                    <small class="text-muted d-block">Shift Hours</small>
+                                    <span class="fw-bold">{{ $hours['shift_hours'] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded-3 p-2">
+                                    <small class="text-muted d-block">Worked Hours</small>
+                                    <span class="fw-bold">{{ $hours['worked_hours'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                         {{-- Location --}}
                         @if ($selectedAttendance->clock_in_location || $selectedAttendance->clock_out_location)
                             <div class="border rounded-3 p-3 mb-3 bg-light">
@@ -579,6 +643,42 @@
     </div>
 
 
+
+
+    <div wire:ignore.self class="modal fade" id="absentModal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Absent Details - {{ $absentDate }}</h6>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @forelse($absentDetails as $name)
+                        <div class="p-2 mb-2 border rounded d-flex align-items-center gap-2">
+                            <i class="fas fa-user-times text-danger"></i>
+                            <span>{{ $name }}</span>
+                        </div>
+                    @empty
+                        <p class="text-muted">No absent users.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        window.addEventListener('showAbsentModal', () => {
+            const modal = new bootstrap.Modal(document.getElementById('absentModal'));
+            modal.show();
+        });
+    </script>
+
+
+
 </div>
 
 
@@ -613,4 +713,12 @@
     }
     setInterval(updateTime, 1000);
     updateTime();
+</script>
+
+
+<script>
+    window.addEventListener('showAbsentModal', () => {
+        const modal = new bootstrap.Modal(document.getElementById('absentModal'));
+        modal.show();
+    });
 </script>

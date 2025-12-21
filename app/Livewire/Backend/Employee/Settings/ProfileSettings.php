@@ -134,9 +134,13 @@ class ProfileSettings extends BaseComponent
 
         $this->filteredCountries = $this->countries;
 
-        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+        $this->customFields = CustomEmployeeProfileField::where('company_id', $this->employee->company_id)
             ->orderBy('id')
             ->get();
+
+        $this->customValues = $this->employee->customFieldValues
+            ->pluck('value', 'field_id')
+            ->toArray();
     }
 
     public function updatedState($value)
@@ -231,7 +235,7 @@ class ProfileSettings extends BaseComponent
 
                 CustomEmployeeProfileFieldValue::updateOrCreate(
                     [
-                        'employee_id' => auth()->user()->id,
+                        'employee_id' => auth()->user()->employee->id,
                         'field_id' => $fieldId,
                     ],
                     [

@@ -343,7 +343,7 @@ class UsersIndex extends BaseComponent
         $this->resetInputFields();
         $this->editMode = true;
 
-        $this->employee = Employee::with('user', 'profile')->find($id);
+        $this->employee = Employee::with('user', 'profile', 'customFieldValues')->find($id);
 
         if (!$this->employee) {
             $this->toast('Employee not found!', 'error');
@@ -392,6 +392,15 @@ class UsersIndex extends BaseComponent
             $this->passport_number = $profile->passport_number;
             $this->passport_expiry_date = $profile->passport_expiry_date;
         }
+
+        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->orderBy('id')
+            ->get();
+
+
+        $this->customValues = $this->employee->customFieldValues
+            ->pluck('value', 'field_id')
+            ->toArray();
     }
 
     public function sendVerificationLink($employeeId)

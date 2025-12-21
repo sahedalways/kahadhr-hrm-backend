@@ -21,7 +21,10 @@ class TimesheetIndex extends BaseComponent
     public $perPage = 10;
 
     public $search = '';
-    public $employeeId = '';
+    public $showEmployeeFilter = false;
+
+    public $employeeId;
+    public $filterUsers = [];
     public $dateFrom = '';
     public $dateTo = '';
     public $statusFilter = '';
@@ -466,10 +469,13 @@ class TimesheetIndex extends BaseComponent
     {
         $this->resetLoaded();
     }
-    public function updatedEmployeeId()
+
+    public function updatedFilterUsers()
     {
         $this->resetLoaded();
     }
+
+
     public function updatedDateFrom()
     {
         $this->resetLoaded();
@@ -508,10 +514,11 @@ class TimesheetIndex extends BaseComponent
             });
         }
 
-        // EMPLOYEE FILTER
-        if ($this->employeeId) {
-            $query->where('user_id', $this->employeeId);
+
+        if (!empty($this->filterUsers)) {
+            $query->whereIn('user_id', $this->filterUsers);
         }
+
 
         // DATE RANGE
         if ($this->dateFrom) {

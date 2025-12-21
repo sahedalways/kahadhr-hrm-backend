@@ -17,8 +17,10 @@ class CompanyPayslip extends BaseComponent
 
     public $company_id;
 
+    public $showEmployeeFilter = false;
+
     // Filters
-    public $filterUser = '';
+    public $filterUsers = [];
 
     public $sortOrder = 'desc';
     public $perPage = 20;
@@ -86,8 +88,8 @@ class CompanyPayslip extends BaseComponent
 
         $query = PaySlip::where('company_id', $this->company_id);
 
-        if ($this->filterUser) {
-            $query->where('user_id', $this->filterUser);
+        if (!empty($this->filterUsers)) {
+            $query->whereIn('user_id', $this->filterUsers);
         }
 
 
@@ -133,12 +135,10 @@ class CompanyPayslip extends BaseComponent
         $this->loadMore();
     }
 
-    public function handleUserFilter($id)
+    public function updatedFilterUsers()
     {
-        $this->filterUser = $id;
         $this->resetLoaded();
     }
-
 
     public function handleSort($value)
     {

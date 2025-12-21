@@ -44,15 +44,41 @@
 
                             {{-- Employee Filter (Admin Only) --}}
                             <div class="col-md-3">
-                                <select class="form-select form-select-lg"
-                                    wire:change="handleEmployeeFilter($event.target.value)">
-                                    <option value="">All Employees</option>
+                                <button type="button" class="btn d-flex align-items-center justify-content-between"
+                                    wire:click="$toggle('showEmployeeFilter')"
+                                    style="
+        font-weight: 500;
+        background: linear-gradient(145deg, #4678a3, #495057);
+        border: 1px solid #3d4348;
+        color: #fff;
+        box-shadow: inset 0 1px rgba(32, 31, 31, 0.3), 0 2px 4px rgba(0,0,0,0.4);
+        border-radius: 6px;
+        padding: 6px 12px;  
+        width: auto;         
+        min-width: 380px;    
+    ">
+                                    Filter by Employees
+                                    <!-- Arrow icon -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                        fill="currentColor" class="bi bi-chevron-down transition-arrow"
+                                        style="transition: transform 0.3s;" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                    </svg>
+                                </button>
 
-                                    @foreach ($employees as $emp)
-                                        <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
-                                    @endforeach
-                                </select>
+                                <!-- Employee multi-select dropdown -->
+                                @if ($showEmployeeFilter)
+                                    <select class="form-select form-select-lg" multiple wire:model.live="filterUsers">
+                                        @foreach ($employees as $emp)
+                                            <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
                             </div>
+
+
+
 
                             {{-- Sort --}}
                             <div class="col-md-3">
@@ -133,7 +159,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                                {{-- TABLE --}}
+                {{-- TABLE --}}
                 <div class="card-body">
                     <div class="table-responsive">
 
@@ -572,6 +598,8 @@
     </div>
 
 </div>
+
+
 
 
 <script>

@@ -592,7 +592,7 @@
                 <span id="typingUser"></span> is typing...
             </div> --}}
 
-            <div class="text-center my-2 d-flex align-items-center px-4" wire:loading.flex
+            <div class="text-center my-2 d-none align-items-center px-4" wire:loading.flex
                 wire:target="sendMessage, loadMore">
                 <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading...
             </div>
@@ -1044,28 +1044,39 @@
                                 }
                             }
 
-                            // Avatar logic
                             if ($user->user_type === 'employee') {
-                                $avatar =
-                                    $user->employee && $user->employee->avatar_url
-                                        ? asset($user->employee->avatar_url)
-                                        : asset('/assets/img/default-avatar.png');
+                                $avatar = null;
+                                $showInitials = true;
+                                $initials = strtoupper(
+                                    substr($user->employee->f_name ?? '', 0, 1) .
+                                        substr($user->employee->l_name ?? '', 0, 1),
+                                );
                             } elseif ($user->user_type === 'company') {
                                 $avatar =
                                     $user->company && $user->company->company_logo_url
                                         ? asset($user->company->company_logo_url)
                                         : asset('/assets/img/default-image.jpg');
+                                $showInitials = false;
                             } else {
                                 $avatar = asset('/assets/img/default-image.jpg');
+                                $showInitials = false;
                             }
+
                         @endphp
 
 
                         <div class="d-flex align-items-center p-2 hover-bg-light rounded mb-2" style="cursor:pointer;"
                             wire:click="startNewChat({{ $user->id }})" data-bs-dismiss="modal">
 
-                            <img src="{{ $avatar }}" class="rounded-circle me-3"
-                                style="width:45px;height:45px;object-fit:cover;">
+                            @if ($showInitials)
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width:45px; height:45px; background-color:#6c757d; color:#fff; font-weight:bold;">
+                                    {{ $initials }}
+                                </div>
+                            @else
+                                <img src="{{ $avatar }}" class="rounded-circle me-3"
+                                    style="width:45px;height:45px;object-fit:cover;">
+                            @endif
 
                             <div>
                                 <div class="fw-bold">{{ $displayName }}</div>

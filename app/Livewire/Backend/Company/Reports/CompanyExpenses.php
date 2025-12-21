@@ -17,9 +17,10 @@ class CompanyExpenses extends BaseComponent
 
     public $company_id;
     public $search;
+    public $showEmployeeFilter = false;
 
     // Filters
-    public $filterUser = '';
+    public $filterUsers = [];
     public $filterCategory = '';
     public $filterDate = '';
     public $date_from;
@@ -84,8 +85,8 @@ class CompanyExpenses extends BaseComponent
         $query = Expenses::where('company_id', $this->company_id);
 
         // Filter: User
-        if ($this->filterUser) {
-            $query->where('user_id', $this->filterUser);
+        if (!empty($this->filterUsers)) {
+            $query->whereIn('user_id', $this->filterUsers);
         }
 
         // Filter: Category
@@ -160,9 +161,8 @@ class CompanyExpenses extends BaseComponent
         $this->loadMore();
     }
 
-    public function handleEmployeeFilter($id)
+    public function updatedFilterUsers()
     {
-        $this->filterUser = $id;
         $this->resetLoaded();
     }
 
@@ -412,8 +412,9 @@ class CompanyExpenses extends BaseComponent
     {
         $query = Expenses::where('company_id', $this->company_id);
 
-        if ($this->filterUser) {
-            $query->where('user_id', $this->filterUser);
+        if (!empty($this->filterUsers)) {
+
+            $query->whereIn('user_id', $this->filterUsers);
         }
 
         if ($this->filterCategory) {

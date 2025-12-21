@@ -859,7 +859,7 @@
                                 </div>
                             @empty
                                 <div class="col-12 py-5 text-center">
-                                    <p class="text-white-50">No templates saved yet.</p>
+                                    <p class="text-dark-50">No templates saved yet.</p>
                                 </div>
                             @endforelse
                         </div>

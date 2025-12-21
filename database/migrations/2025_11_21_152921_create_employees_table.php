@@ -37,6 +37,8 @@ return new class extends Migration
             $table->string('invite_token')->nullable()->unique();
             $table->timestamp('invite_token_expires_at')->nullable();
             $table->boolean('verified')->default(false);
+            $table->date('billable_from')->nullable();
+
 
 
             $table->timestamps();

@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\PaymentStatusEmailJob;
 use Illuminate\Console\Command;
 use App\Models\Company;
 use App\Models\CompanyChargeRate;
+use App\Models\Employee;
 use App\Models\Invoice;
 use App\Services\PaymentGateway;
 use Carbon\Carbon;
@@ -23,13 +25,15 @@ class ChargeCompanies extends Command
             ->get();
 
         foreach ($companies as $company) {
-            $employeeCount = $company->activeEmployees()->count();
-
+            $employeeCount = Employee::where('company_id', $company->id)
+                ->whereDate('billable_from', '<=', now()->endOfMonth())
+                ->count();
 
             // Skip if no employees
             if ($employeeCount == 0) continue;
 
-            $amount = $company->monthlyAmount();
+            $rate = CompanyChargeRate::first()->rate;
+            $amount = $employeeCount * $rate;
 
             $card = $company->defaultCard();
 
@@ -80,9 +84,25 @@ class ChargeCompanies extends Command
                 $company->payment_failed_count += 1;
                 $company->save();
 
+                $company->notify('payment_failed', [
+                    'message' => 'Payment attempt failed. Please update your card.',
+                    'failed_attempts' => $company->payment_failed_count,
+                ]);
+
+                PaymentStatusEmailJob::dispatch($company->id, 'payment_failed');
+
+
+
+
                 if ($company->payment_failed_count >= 3) {
                     $company->subscription_status = 'suspended';
                     $company->save();
+
+                    $company->notify('subscription_suspended', [
+                        'message' => 'Your subscription has been suspended due to multiple failed payments.',
+                    ]);
+
+                    PaymentStatusEmailJob::dispatch($company->id, 'subscription_suspended');
                 }
             }
 

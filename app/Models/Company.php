@@ -26,6 +26,7 @@ class Company extends Model
         'subscription_start',
         'subscription_end',
         'payment_failed_count',
+        'trial_ends_at',
         'payment_status',
         'status',
 
@@ -51,7 +52,7 @@ class Company extends Model
     // One Company → Many Bank Infos
     public function bankInfos()
     {
-        return $this->hasMany(CompanyBankInfo::class);
+        return $this->hasOne(CompanyBankInfo::class);
     }
 
 
@@ -288,5 +289,23 @@ class Company extends Model
     public function defaultCard()
     {
         return $this->bankInfos()->latest()->first();
+    }
+
+
+    public function hasValidCard()
+    {
+        return $this->bankInfos()
+            && !empty($this->bankInfos->stripe_payment_method_id);
+    }
+
+
+    public function notify($type, array $data)
+    {
+        return Notification::create([
+            'company_id' => $this->id,
+            'user_id' => null,
+            'type' => $type,
+            'data' => json_encode($data),
+        ]);
     }
 }

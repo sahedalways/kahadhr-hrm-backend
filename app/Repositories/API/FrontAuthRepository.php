@@ -35,6 +35,7 @@ class FrontAuthRepository
         'company_email'        => $data['company_email'],
         'subscription_start'   => now(),
         'subscription_end'     => now()->addDays(14),
+        'trial_ends_at' => now()->addDays(14),
         'subscription_status'  => 'trial',
       ]);
 

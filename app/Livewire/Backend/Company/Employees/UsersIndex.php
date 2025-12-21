@@ -182,6 +182,7 @@ class UsersIndex extends BaseComponent
             'contract_hours' => $this->salary_type === 'hourly' ? $this->contract_hours : null,
             'invite_token' => Str::random(64),
             'invite_token_expires_at' => Carbon::now()->addHours(48),
+            'billable_from' => now()->addDays(3),
 
         ]);
 
@@ -859,6 +860,7 @@ class UsersIndex extends BaseComponent
                     'f_name' => $rowAssoc['f_name'] ?? null,
                     'l_name' => $rowAssoc['l_name'] ?? null,
                     'department_id' => $department?->id,
+                    'billable_from' => now()->addDays(3),
                     'role' => in_array($rowAssoc['role'] ?? '', config('roles')) ? $rowAssoc['role'] : 'employee',
                 ]);
             } catch (\Exception $e) {

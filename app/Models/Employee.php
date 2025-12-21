@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'company_id',
@@ -29,7 +31,8 @@ class Employee extends Model
         'avatar',
         'verified',
         'leave_in_liew',
-        'annual_leave_hours'
+        'annual_leave_hours',
+        'billable_from',
     ];
 
     protected $casts = [

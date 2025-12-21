@@ -49,7 +49,7 @@ Route::domain('{company}.' . config('app.base_domain'))
 */
 Route::domain('{company}.' . config('app.base_domain'))
   ->prefix('dashboard')
-  ->middleware(['auth', 'companyAdmin'])
+  ->middleware(['auth', 'companyAdmin', 'checkSuspended'])
   ->name('company.dashboard.')
   ->group(function () {
     // Dashboard home

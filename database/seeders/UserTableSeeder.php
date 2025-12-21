@@ -51,6 +51,7 @@ class UserTableSeeder extends Seeder
       'company_mobile' => '016165238944',
       'company_email' => 'company@company.com',
       'subscription_status' => 'trial',
+      'trial_ends_at' => now()->addDays(14),
       'subscription_start' => now(),
       'subscription_end' => now()->addDays(14),
     ]);
@@ -64,6 +65,9 @@ class UserTableSeeder extends Seeder
       'phone_no' => '01712345678',
       'password' => Hash::make('12345678'),
       'user_type' => 'company',
+      'trial_ends_at' => now()->addDays(14),
+      'subscription_start' => now(),
+      'subscription_end' => now()->addDays(14),
       'email_verified_at' => now(),
       'phone_verified_at' => now(),
     ]);
@@ -103,6 +107,7 @@ class UserTableSeeder extends Seeder
         'phone_no' => $emp['phone_no'],
         'password' => Hash::make('12345678'),
         'user_type' => 'employee',
+        'billable_from' => now()->addDays(3),
         'email_verified_at' => now(),
         'phone_verified_at' => now(),
       ]);
@@ -116,6 +121,7 @@ class UserTableSeeder extends Seeder
         'l_name' => $emp['l_name'],   // Added
         'contract_hours' => 0,
         'salary_type' => 'monthly',
+        'billable_from' => now()->addDays(3),
         'start_date' => now(),
       ]);
     }
@@ -142,6 +148,7 @@ class UserTableSeeder extends Seeder
         'l_name' => $emp['l_name'],   // Added
         'contract_hours' => 50,
         'salary_type' => 'hourly',
+        'billable_from' => now()->addDays(3),
         'start_date' => now(),
       ]);
     }

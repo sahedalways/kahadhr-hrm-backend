@@ -33,6 +33,7 @@ return new class extends Migration
             $table->enum('payment_status', ['paid', 'unpaid', 'pending'])->default('pending');
             $table->date('subscription_start')->nullable();
             $table->date('subscription_end')->nullable();
+            $table->date('trial_ends_at')->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });

@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Company\Employees;
 use App\Jobs\SendEmployeeInvitation;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Company;
+use App\Models\CustomEmployeeProfileField;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Team;
@@ -62,10 +63,19 @@ class UsersIndex extends BaseComponent
     public $departments, $teams;
     public $csv_file;
 
+    public $customFields = [];
+    public $customValues = [];
+
     public $addMethod = 'manual';
 
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
 
+    public $customField = [
+        'label' => '',
+        'type' => 'text',
+        'options' => '',
+        'required' => false,
+    ];
 
 
     public $genderOptions = ['male', 'female', 'other'];
@@ -209,6 +219,44 @@ class UsersIndex extends BaseComponent
         // Finally
         $this->resetErrorBag();
     }
+
+
+
+
+
+
+    public function saveCustomField()
+    {
+        $rules = [
+            'customField.label' => 'required|string|max:255',
+            'customField.type' => 'required|in:text,number,date,textarea,select',
+            'customField.options' => 'nullable|required_if:customField.type,select',
+            'customField.required' => 'boolean',
+        ];
+
+        $this->validate($rules);
+
+
+
+        CustomEmployeeProfileField::create([
+            'company_id' => auth()->user()->company->id,
+            'name'       => $this->customField['label'],
+            'key'        => Str::slug($this->customField['label'], '_'),
+            'type'       => $this->customField['type'],
+            'options'    => $this->customField['type'] === 'select'
+                ? array_map('trim', explode(',', $this->customField['options']))
+                : null,
+            'required'   => $this->customField['required'],
+        ]);
+
+        $this->reset('customField');
+
+        $this->dispatch('closemodal');
+        $this->resetInputFields();
+        $this->resetLoaded();
+        $this->toast('Custom field added successfully', 'success');
+    }
+
 
 
 

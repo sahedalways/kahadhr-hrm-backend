@@ -26,6 +26,13 @@
             </a>
         </div>
 
+        <div class="col-auto">
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#customFieldModal">
+                <i class="fa fa-sliders-h me-1"></i> Custom Fields
+            </button>
+        </div>
+
+
     </div>
 
     <div class="card mb-4">
@@ -877,7 +884,38 @@
 
 
 
+                    @if (!empty($customFields) && $customFields->count())
+                        <hr>
+                        @foreach ($customFields as $field)
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">
+                                    {{ $field->label }}
+                                    @if ($field->is_required)
+                                        <span class="text-danger">*</span>
+                                    @endif
+                                </label>
 
+                                @if ($field->type === 'text')
+                                    <input type="text" class="form-control"
+                                        wire:model.defer="customValues.{{ $field->id }}">
+                                @elseif($field->type === 'date')
+                                    <input type="date" class="form-control"
+                                        wire:model.defer="customValues.{{ $field->id }}">
+                                @elseif($field->type === 'textarea')
+                                    <textarea class="form-control" wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                @elseif($field->type === 'select')
+                                    <select class="form-select" wire:model.defer="customValues.{{ $field->id }}">
+                                        <option value="">Select</option>
+                                        @foreach (explode(',', $field->options) as $opt)
+                                            <option value="{{ trim($opt) }}">
+                                                {{ trim($opt) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </div>
+                        @endforeach
+                    @endif
 
 
 
@@ -895,6 +933,67 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
+
+    <div wire:ignore.self class="modal fade" id="customFieldModal" tabindex="-1">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Add Custom Employee Field</h6>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Field Label</label>
+                        <input type="text" class="form-control" wire:model="customField.label"
+                            placeholder="e.g. Emergency Contact Name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Field Type</label>
+                        <select class="form-select" wire:model="customField.type">
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="textarea">Textarea</option>
+                            <option value="select">Dropdown</option>
+                        </select>
+                    </div>
+
+                    @if ($customField['type'] === 'select')
+                        <div class="mb-3">
+                            <label class="form-label">Options (comma separated)</label>
+                            <input type="text" class="form-control" wire:model="customField.options"
+                                placeholder="A+, B+, O+">
+                        </div>
+                    @endif
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" wire:model="customField.required">
+                        <label class="form-check-label">
+                            Required Field
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" wire:click="saveCustomField">
+                        Save Field
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
     <div wire:ignore.self class="modal fade" id="verifyModal" tabindex="-1" role="dialog"

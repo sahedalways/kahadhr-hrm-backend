@@ -173,4 +173,24 @@ class Employee extends Model
     {
         return $this->hasOne(EmployeeProfile::class, 'emp_id');
     }
+
+
+    public function customFieldValues()
+    {
+        return $this->hasMany(CustomEmployeeProfileFieldValue::class);
+    }
+
+    /**
+     * Handy accessor:
+     * $employee->customFields
+     */
+    public function customFields()
+    {
+        return $this->belongsToMany(
+            CustomEmployeeProfileField::class,
+            'custom_employee_profile_field_values',
+            'employee_id',
+            'field_id'
+        )->withPivot('value');
+    }
 }

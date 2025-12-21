@@ -33,6 +33,7 @@ class Employee extends Model
         'leave_in_liew',
         'annual_leave_hours',
         'billable_from',
+        'deleted_at',
     ];
 
     protected $casts = [

@@ -39,7 +39,7 @@ return new class extends Migration
             $table->boolean('verified')->default(false);
             $table->date('billable_from')->nullable();
 
-
+            $table->softDeletes();
 
             $table->timestamps();
         });

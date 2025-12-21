@@ -65,9 +65,6 @@ class UserTableSeeder extends Seeder
       'phone_no' => '01712345678',
       'password' => Hash::make('12345678'),
       'user_type' => 'company',
-      'trial_ends_at' => now()->addDays(14),
-      'subscription_start' => now(),
-      'subscription_end' => now()->addDays(14),
       'email_verified_at' => now(),
       'phone_verified_at' => now(),
     ]);
@@ -81,6 +78,7 @@ class UserTableSeeder extends Seeder
       'subscription_status' => 'trial',
       'subscription_start' => now(),
       'subscription_end' => now()->addDays(14),
+      'trial_ends_at' => now()->addDays(14),
     ]);
 
 
@@ -107,7 +105,6 @@ class UserTableSeeder extends Seeder
         'phone_no' => $emp['phone_no'],
         'password' => Hash::make('12345678'),
         'user_type' => 'employee',
-        'billable_from' => now()->addDays(3),
         'email_verified_at' => now(),
         'phone_verified_at' => now(),
       ]);

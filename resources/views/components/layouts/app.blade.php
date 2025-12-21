@@ -54,7 +54,31 @@
     <div class="fixed-sidebar">
         @livewire('backend.components.side-bar')
     </div>
-    <main class="main-content position-relative border-radius-lg content-wrapper">
+
+    @php
+        $company = auth()->check() ? auth()->user()->company : null;
+        $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
+        $bannerText =
+            $company && $company->subscription_status === 'trial'
+                ? 'You are currently on a trial plan.'
+                : ($company && $company->subscription_status === 'suspended'
+                    ? 'Your account is suspended. Contact to support'
+                    : '');
+    @endphp
+
+    @if ($showBanner)
+        <div class="status-banner text-center text-white py-1 mx-auto"
+            style="max-width: 600px; background-color: rgba(243, 156, 18, 0.15); 
+                position: fixed; top: 10px; left: 0; right: 0; z-index:1050; 
+                font-weight:500; font-size:0.85rem; border-radius:5px;">
+            {{ $bannerText }}
+        </div>
+    @endif
+
+
+
+    <main class="main-content position-relative border-radius-lg content-wrapper"
+        @if ($showBanner) style="padding-top: 50px;" @else style="padding-top: 25px;" @endif>
         <div class="fixed-header border-bottom">
             @livewire('backend.components.header')
         </div>

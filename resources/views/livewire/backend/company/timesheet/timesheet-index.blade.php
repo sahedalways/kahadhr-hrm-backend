@@ -670,6 +670,95 @@
 
 
 
+    <div wire:ignore.self class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog"
+        aria-labelledby="manualEntryModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">Submit Manual Attendance</h6>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="submitManualEntry">
+                    <div class="modal-body">
+                        <div class="row g-2">
+
+                            {{-- Employee Dropdown --}}
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label">Employee <span class="text-danger">*</span></label>
+                                <select class="form-select shadow-sm" wire:model="employeeId" required>
+                                    <option value="" selected>Select Employee</option>
+                                    @foreach ($employees as $emp)
+                                        <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('employeeId')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Date --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control shadow-sm" wire:model="manualDate"
+                                    required>
+                                @error('manualDate')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Clock In --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Clock In <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control shadow-sm" wire:model="clockInTime"
+                                    required>
+                                @error('clockInTime')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Clock Out --}}
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Clock Out</label>
+                                <input type="time" class="form-control shadow-sm" wire:model="clockOutTime">
+                                @error('clockOutTime')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Reason --}}
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label">Reason</label>
+                                <textarea class="form-control shadow-sm" wire:model="reason" placeholder="Optional reason"></textarea>
+                                @error('reason')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                            wire:target="submitManualEntry">
+                            <span wire:loading wire:target="submitManualEntry">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Submitting...
+                            </span>
+                            <span wire:loading.remove wire:target="submitManualEntry">Submit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <div wire:ignore.self class="modal fade" id="absentModal" tabindex="-1">
         <div class="modal-dialog modal-md">

@@ -144,3 +144,24 @@ Route::domain('{company}.' . config('app.base_domain'))
     Route::get('/onboarding/view/{id}', [OnboardingController::class, 'view'])
       ->name('onboarding.view');
   });
+
+
+Route::get('/employees/csv-template', function () {
+  $headers = [
+    'Content-Type' => 'text/csv',
+    'Content-Disposition' => 'attachment; filename="employee_import_template.csv"',
+  ];
+
+  $callback = function () {
+    $file = fopen('php://output', 'w');
+
+    fputcsv($file, ['f_name', 'l_name', 'email', 'department', 'role']);
+
+
+    fputcsv($file, ['John', 'Doe', 'john@example.com', 'HR', 'Employee']);
+
+    fclose($file);
+  };
+
+  return response()->stream($callback, 200, $headers);
+})->name('employees.csv.template');

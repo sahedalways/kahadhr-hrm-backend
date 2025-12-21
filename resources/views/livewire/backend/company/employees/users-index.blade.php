@@ -225,7 +225,15 @@
                             @enderror
                             <small class="text-muted">CSV must include headers: f_name, l_name, email,
                                 department, role</small>
+
+
+                            <a href="{{ route('employees.csv.template') }}"
+                                class="btn btn-sm btn-outline-secondary mt-2 ms-5">
+                                <i class="fas fa-download me-1"></i> Download CSV Template
+                            </a>
                         </div>
+
+
                         <button class="btn btn-primary" wire:click="importCsv" wire:loading.attr="disabled">
                             <span wire:loading wire:target="importCsv"><i
                                     class="fas fa-spinner fa-spin me-2"></i>Importing...</span>

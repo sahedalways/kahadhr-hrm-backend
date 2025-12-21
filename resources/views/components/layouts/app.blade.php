@@ -77,8 +77,7 @@
 
 
 
-    <main class="main-content position-relative border-radius-lg content-wrapper"
-        @if ($showBanner) style="padding-top: 50px;" @else style="padding-top: 25px;" @endif>
+    <main class="main-content position-relative border-radius-lg content-wrapper">
         <div class="fixed-header border-bottom">
             @livewire('backend.components.header')
         </div>

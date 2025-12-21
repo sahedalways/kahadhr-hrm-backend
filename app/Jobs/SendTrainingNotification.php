@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EmailSetting;
 use App\Models\User;
 use App\Models\Training;
 use Illuminate\Bus\Queueable;
@@ -27,6 +28,10 @@ class SendTrainingNotification implements ShouldQueue
     public function handle()
     {
         try {
+            $gateway = EmailSetting::where('company_id ', $this->user->company_id)->first(); // example
+            configureSmtp($gateway);
+
+
             Mail::send('mail.training_notification', [
                 'training' => $this->training,
                 'user' => $this->user,

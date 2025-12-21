@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EmailSetting;
 use App\Models\PaySlipRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,6 +29,9 @@ class PayslipRequestNotificationJob implements ShouldQueue
         if (!$req || !$req->company) return;
 
         try {
+            $gateway = EmailSetting::where('company_id ', $req->company->id)->first();
+            configureSmtp($gateway);
+
             Mail::send('mail.payslip_request', [
                 'request' => $req,
                 'company' => $req->company,

@@ -40,7 +40,8 @@
         },
         "files": [
             "app/Helpers/helpers.php",
-            "app/Helpers/FileHelper.php"
+            "app/Helpers/FileHelper.php",
+            "app/Helpers/MailHelper.php"
         ]
     },
     "autoload-dev": {

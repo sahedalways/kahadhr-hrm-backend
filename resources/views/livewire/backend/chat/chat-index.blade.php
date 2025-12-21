@@ -422,19 +422,23 @@
                 <div class="d-flex align-items-center">
 
 
-                    <div class="rounded-circle p-2 me-2"
-                        style="width: 45px; height: 45px; background-color: #d1e7dd; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                    <div class="rounded-circle me-2"
+                        style="width:45px; height:45px; background-color:#2299dd; display:flex; justify-content:center; align-items:center; overflow:hidden; font-weight:bold; color:#fff;">
 
-                        @if ($receiverInfo && $receiverInfo['type'] === 'group')
+                        @if ($receiverInfo && ($receiverInfo['type'] === 'group' || $receiverInfo['type'] === 'teamGroup'))
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
-                                style="min-width: 40px; min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
-                        @elseif($receiverInfo && $receiverInfo['type'] === 'teamGroup')
-                            <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
-                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                                style="width:100%; height:100%; object-fit:cover;">
                         @else
-                            <img src="{{ $receiverInfo['photo'] }}" alt="User Icon"
-                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                            @php
+                                $nameParts = explode(' ', $receiverInfo['name'] ?? '');
+                                $fInitial = strtoupper(substr($nameParts[0] ?? '', 0, 1));
+                                $lInitial = strtoupper(substr(end($nameParts) ?? '', 0, 1));
+                                $initials = $fInitial . $lInitial;
+                            @endphp
+
+                            <span>{{ $initials }}</span>
                         @endif
+
                     </div>
 
 

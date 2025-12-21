@@ -6,6 +6,7 @@ use App\Events\NotificationEvent;
 use App\Jobs\SendTrainingNotification;
 use App\Jobs\SendTrainingReminder;
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\EmailSetting;
 use App\Models\Employee;
 use App\Models\Notification;
 use App\Models\Training;
@@ -194,6 +195,18 @@ class TrainingIndex extends BaseComponent
             'require_proof' => 'boolean',
             'send_email' => 'boolean',
         ]);
+
+
+        if ($this->send_email) {
+            $gateway = EmailSetting::where('company_id', $this->company_id)->first();
+
+            if (! $gateway) {
+                $this->toast('SMTP gateway not found for this company!', 'error');
+
+                return;
+            }
+        }
+
 
 
         if ($this->instruction_file) {
@@ -415,6 +428,15 @@ class TrainingIndex extends BaseComponent
 
     public function sendReminder($id)
     {
+
+        $gateway = EmailSetting::where('company_id', $this->company_id)->first();
+
+        if (! $gateway) {
+            $this->toast('SMTP gateway not found for this company!', 'error');
+
+            return;
+        }
+
         SendTrainingReminder::dispatch($id)->onConnection('sync')->onQueue('urgent');
 
         $this->toast('Reminder sent successfully!', 'success');

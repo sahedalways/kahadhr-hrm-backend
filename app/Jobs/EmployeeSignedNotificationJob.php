@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 
 use App\Models\CompanyDocument;
+use App\Models\EmailSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -44,6 +45,10 @@ class EmployeeSignedNotificationJob implements ShouldQueue
 
 
     try {
+      $gateway = EmailSetting::where('company_id ', $company->id)->first();
+      configureSmtp($gateway);
+
+
       Mail::send('mail.employee_signed', [
         'document' => $document,
         'employee' => $document->employee,

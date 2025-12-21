@@ -246,6 +246,14 @@
                                 @enderror
                             </div>
 
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" wire:model="send_email"
+                                    id="emailCheck">
+                                <label class="form-check-label fw-bold" for="emailCheck">
+                                    Send employee an email notification
+                                </label>
+                            </div>
+
 
                         </div>
                     </div>

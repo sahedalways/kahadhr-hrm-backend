@@ -6,6 +6,7 @@ use App\Events\NotificationEvent;
 use App\Jobs\EmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
+use App\Models\EmailSetting;
 use App\Models\Employee;
 use App\Models\Notification;
 use App\Traits\Exportable;
@@ -25,6 +26,7 @@ class DocumentManageIndex extends BaseComponent
     public $loaded, $lastId = null, $hasMore = true;
     public $employees;
     public $statusFilter = null;
+    public $send_email = false;
     protected $listeners = [
         'deleteDocument' => 'deleteDocument',
         'sortUpdated' => 'handleSort'
@@ -70,7 +72,18 @@ class DocumentManageIndex extends BaseComponent
             'expires_at' => 'nullable|date',
             'emp_id' => 'nullable|integer|exists:employees,id',
             'file_path' => 'required|file|mimes:pdf|max:20240',
+            'send_email' => 'boolean',
         ]);
+
+        if ($this->send_email) {
+            $gateway = EmailSetting::where('company_id', $this->company_id)->first();
+
+            if (! $gateway) {
+                $this->toast('SMTP gateway not found for this company!', 'error');
+
+                return;
+            }
+        }
 
 
         $filePath = $this->file_path->store('pdf/company/documents', 'public');

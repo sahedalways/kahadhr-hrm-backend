@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EmailSetting;
 use App\Models\TrainingAssignment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,6 +38,10 @@ class SendTrainingReminder implements ShouldQueue
         }
 
         try {
+            $gateway = EmailSetting::where('company_id ', $assignment->user->company_id)->first();
+            configureSmtp($gateway);
+
+
             Mail::send('mail.training_notification', [
                 'training' => $assignment->training,
                 'user' => $assignment->user,

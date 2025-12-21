@@ -3,6 +3,8 @@
 namespace App\Livewire\Backend\Employee\Settings;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\CustomEmployeeProfileField;
+use App\Models\CustomEmployeeProfileFieldValue;
 use Livewire\WithFileUploads;
 use Illuminate\Http\UploadedFile;
 use App\Models\Department;
@@ -17,7 +19,8 @@ class ProfileSettings extends BaseComponent
 
     public $filteredCountries = [];
 
-
+    public $customFields = [];
+    public $customValues = [];
     public $countrySearch = '';
 
     public $f_name, $l_name, $avatar, $old_avatar;
@@ -130,6 +133,10 @@ class ProfileSettings extends BaseComponent
         }
 
         $this->filteredCountries = $this->countries;
+
+        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->orderBy('id')
+            ->get();
     }
 
     public function updatedState($value)
@@ -214,6 +221,26 @@ class ProfileSettings extends BaseComponent
                 'passport_expiry_date' => $validatedData['passport_expiry_date'] ?: null,
             ]
         );
+
+
+        if (!empty($this->customValues)) {
+            foreach ($this->customValues as $fieldId => $value) {
+                $field = CustomEmployeeProfileField::find($fieldId);
+                if (!$field) continue;
+
+
+                CustomEmployeeProfileFieldValue::updateOrCreate(
+                    [
+                        'employee_id' => auth()->user()->id,
+                        'field_id' => $fieldId,
+                    ],
+                    [
+                        'value' => $value,
+                    ]
+                );
+            }
+        }
+
 
 
         $this->toast('Employee Profile Updated Successfully!', 'success');

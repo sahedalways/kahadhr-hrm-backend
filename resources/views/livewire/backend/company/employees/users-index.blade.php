@@ -19,12 +19,7 @@
             </button>
         </div>
 
-        <div class="col-auto">
-            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
-                class="btn btn-icon btn-3 btn-white text-primary mb-0">
-                <i class="fa fa-plus me-2"></i> Add New Employee
-            </a>
-        </div>
+
 
         <div class="col-auto">
             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#customFieldModal">
@@ -32,6 +27,12 @@
             </button>
         </div>
 
+        <div class="col-auto">
+            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
+                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+                <i class="fa fa-plus me-2"></i> Add New Employee
+            </a>
+        </div>
 
     </div>
 
@@ -534,26 +535,7 @@
                             @enderror
                         </div>
 
-                        {{-- 
-                        <div class="col-md-12 mb-2">
-                            <label class="form-label">Profile Image</label>
-                            <input type="file" class="form-control" wire:model="avatar" accept="image/*">
 
-
-                            @if ($avatar)
-                                <img src="{{ $avatar->temporaryUrl() }}" class="img-thumbnail mt-2" width="80">
-
-                                <div wire:loading wire:target="avatar">
-                                    <span class="text-muted">Uploading...</span>
-                                </div>
-                            @elseif ($avatar_preview)
-                                <img src="{{ $avatar_preview }}" class="img-thumbnail mt-2" width="80">
-                            @endif
-
-                            @error('avatar')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div> --}}
 
                         <!-- PROFILE INFORMATION -->
                         <hr class="my-3">
@@ -879,43 +861,48 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+
+
+                        @if (!empty($customFields) && $customFields->count())
+                            <hr>
+                            @foreach ($customFields as $field)
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">
+                                        {{ $field->name }}
+                                        @if ($field->required)
+                                            <span class="text-danger">*</span>
+                                        @endif
+                                    </label>
+
+                                    @if ($field->type === 'text')
+                                        <input type="text" class="form-control"
+                                            placeholder="Enter {{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'date')
+                                        <input type="date" class="form-control" placeholder="{{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'textarea')
+                                        <textarea class="form-control" placeholder="Enter {{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                    @elseif($field->type === 'select')
+                                        <select class="form-select"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                            <option value="">{{ $field->name }}</option>
+                                            @foreach ($field->options ?? [] as $opt)
+                                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+
                     </div>
 
 
 
 
-                    @if (!empty($customFields) && $customFields->count())
-                        <hr>
-                        @foreach ($customFields as $field)
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">
-                                    {{ $field->label }}
-                                    @if ($field->is_required)
-                                        <span class="text-danger">*</span>
-                                    @endif
-                                </label>
 
-                                @if ($field->type === 'text')
-                                    <input type="text" class="form-control"
-                                        wire:model.defer="customValues.{{ $field->id }}">
-                                @elseif($field->type === 'date')
-                                    <input type="date" class="form-control"
-                                        wire:model.defer="customValues.{{ $field->id }}">
-                                @elseif($field->type === 'textarea')
-                                    <textarea class="form-control" wire:model.defer="customValues.{{ $field->id }}"></textarea>
-                                @elseif($field->type === 'select')
-                                    <select class="form-select" wire:model.defer="customValues.{{ $field->id }}">
-                                        <option value="">Select</option>
-                                        @foreach (explode(',', $field->options) as $opt)
-                                            <option value="{{ trim($opt) }}">
-                                                {{ trim($opt) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                @endif
-                            </div>
-                        @endforeach
-                    @endif
 
 
 
@@ -984,9 +971,24 @@
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary" wire:click="saveCustomField">
-                        Save Field
-                    </button>
+                    <div class="modal-footer">
+
+
+                        <button class="btn btn-primary" wire:click="saveCustomField" wire:loading.attr="disabled"
+                            wire:target="saveCustomField">
+
+
+                            <span wire:loading wire:target="saveCustomField">
+                                <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                            </span>
+
+
+                            <span wire:loading.remove wire:target="saveCustomField">
+                                Save Field
+                            </span>
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </div>

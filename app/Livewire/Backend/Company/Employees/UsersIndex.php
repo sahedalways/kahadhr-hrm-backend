@@ -6,6 +6,7 @@ use App\Jobs\SendEmployeeInvitation;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Company;
 use App\Models\CustomEmployeeProfileField;
+use App\Models\CustomEmployeeProfileFieldValue;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Team;
@@ -153,6 +154,10 @@ class UsersIndex extends BaseComponent
         }
 
         $this->filteredCountries = $this->countries;
+
+        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->orderBy('id')
+            ->get();
     }
 
 
@@ -547,6 +552,24 @@ class UsersIndex extends BaseComponent
             ]
         );
 
+
+        if (!empty($this->customValues)) {
+            foreach ($this->customValues as $fieldId => $value) {
+                $field = CustomEmployeeProfileField::find($fieldId);
+                if (!$field) continue;
+
+
+                CustomEmployeeProfileFieldValue::updateOrCreate(
+                    [
+                        'employee_id' => $this->employee->id,
+                        'field_id' => $fieldId,
+                    ],
+                    [
+                        'value' => $value,
+                    ]
+                );
+            }
+        }
 
 
 

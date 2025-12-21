@@ -414,6 +414,46 @@
                             @enderror
                         </div>
 
+
+
+
+
+                        @if (!empty($customFields) && $customFields->count())
+                            <hr>
+                            @foreach ($customFields as $field)
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">
+                                        {{ $field->name }}
+                                        @if ($field->required)
+                                            <span class="text-danger">*</span>
+                                        @endif
+                                    </label>
+
+                                    @if ($field->type === 'text')
+                                        <input type="text" class="form-control"
+                                            placeholder="Enter {{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'date')
+                                        <input type="date" class="form-control" placeholder="{{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'textarea')
+                                        <textarea class="form-control" placeholder="Enter {{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                    @elseif($field->type === 'select')
+                                        <select class="form-select"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                            <option value="">{{ $field->name }}</option>
+                                            @foreach ($field->options ?? [] as $opt)
+                                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+
+
+
                         <!-- SUBMIT -->
                         <hr class="mt-4">
                         <div class="d-flex justify-content-end">

@@ -11,6 +11,14 @@ use App\Models\Team;
 class ProfileSettings extends BaseComponent
 {
     use WithFileUploads;
+    public $countries = [];
+    public $cities = [];
+    public $locations = [];
+
+    public $filteredCountries = [];
+
+
+    public $countrySearch = '';
 
     public $f_name, $l_name, $avatar, $old_avatar;
     public $job_title, $department_id, $team_id;
@@ -25,6 +33,43 @@ class ProfileSettings extends BaseComponent
     public $employee;
     public $departments = [];
     public $teams = [];
+
+    public $genderOptions = ['male', 'female', 'other'];
+
+    public $maritalOptions = ['single', 'married'];
+    public $immigrationOptions = [
+        "British Citizen",
+        "Indefinite Leave to Remain (ILR)",
+        "Pre-Settled Status",
+        "Settled Status",
+        "Skilled Worker Visa",
+        "Student Visa (Tier 4)",
+        "Graduate Visa",
+        "Health and Care Worker Visa",
+        "Family Visa",
+        "Spouse Visa",
+        "Start-up Visa",
+        "Innovator Visa",
+        "Temporary Work Visa",
+        "Youth Mobility Scheme Visa",
+        "Asylum Seeker",
+        "Refugee Status",
+        "Other",
+    ];
+
+
+
+    public function updatedCountrySearch($value)
+    {
+        $this->filteredCountries = collect($this->countries)
+            ->filter(function ($c) use ($value) {
+                return str_contains(strtolower($c['name']), strtolower($value));
+            })
+            ->values()
+            ->toArray();
+    }
+
+
 
     /* Load employee info */
     public function mount()
@@ -70,7 +115,31 @@ class ProfileSettings extends BaseComponent
 
         $this->departments = Department::where('company_id', $this->employee->company_id)->pluck('name', 'id');
         $this->teams       = Team::where('company_id', $this->employee->company_id)->pluck('name', 'id');
+
+        $this->country = 'United Kingdom';
+
+
+        $jsonPath = resource_path('data/countries.json');
+        if (file_exists($jsonPath)) {
+            $this->countries = json_decode(file_get_contents($jsonPath), true);
+        }
+
+        $json = resource_path('data/uk_locations.json');
+        if (file_exists($json)) {
+            $this->locations = json_decode(file_get_contents($json), true);
+        }
+
+        $this->filteredCountries = $this->countries;
     }
+
+    public function updatedState($value)
+    {
+        $this->cities = collect($this->locations)
+            ->firstWhere('state', $value)['cities'] ?? [];
+        $this->city = null;
+    }
+
+
 
     /* Save employee profile */
     public function save()

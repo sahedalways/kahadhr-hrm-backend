@@ -22,6 +22,15 @@ class UsersIndex extends BaseComponent
     use WithFileUploads;
     use Exportable;
 
+    public $countries = [];
+    public $cities = [];
+    public $locations = [];
+
+    public $filteredCountries = [];
+
+
+    public $countrySearch = '';
+
     public $employees, $employee, $employee_id, $title;
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
@@ -58,10 +67,46 @@ class UsersIndex extends BaseComponent
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
 
 
+
+    public $genderOptions = ['male', 'female', 'other'];
+
+    public $maritalOptions = ['single', 'married'];
+    public $immigrationOptions = [
+        "British Citizen",
+        "Indefinite Leave to Remain (ILR)",
+        "Pre-Settled Status",
+        "Settled Status",
+        "Skilled Worker Visa",
+        "Student Visa (Tier 4)",
+        "Graduate Visa",
+        "Health and Care Worker Visa",
+        "Family Visa",
+        "Spouse Visa",
+        "Start-up Visa",
+        "Innovator Visa",
+        "Temporary Work Visa",
+        "Youth Mobility Scheme Visa",
+        "Asylum Seeker",
+        "Refugee Status",
+        "Other",
+    ];
+
+
+
     protected $rulesCsv = [
         'csv_file' => 'required|file|mimes:csv,txt|max:2048',
     ];
 
+
+    public function updatedCountrySearch($value)
+    {
+        $this->filteredCountries = collect($this->countries)
+            ->filter(function ($c) use ($value) {
+                return str_contains(strtolower($c['name']), strtolower($value));
+            })
+            ->values()
+            ->toArray();
+    }
 
     public function openModal($field)
     {
@@ -75,8 +120,39 @@ class UsersIndex extends BaseComponent
         $this->loaded = collect();
         $this->departments = Department::all();
         $this->teams = Team::all();
+
+        $jsonPath = resource_path('data/countries.json');
+        if (file_exists($jsonPath)) {
+            $this->countries = json_decode(file_get_contents($jsonPath), true);
+        }
+
+
         $this->loadMore();
+
+        $this->country = 'United Kingdom';
+
+
+        $jsonPath = resource_path('data/countries.json');
+        if (file_exists($jsonPath)) {
+            $this->countries = json_decode(file_get_contents($jsonPath), true);
+        }
+
+        $json = resource_path('data/uk_locations.json');
+        if (file_exists($json)) {
+            $this->locations = json_decode(file_get_contents($json), true);
+        }
+
+        $this->filteredCountries = $this->countries;
     }
+
+
+    public function updatedState($value)
+    {
+        $this->cities = collect($this->locations)
+            ->firstWhere('state', $value)['cities'] ?? [];
+        $this->city = null;
+    }
+
 
     public function render()
     {
@@ -211,6 +287,7 @@ class UsersIndex extends BaseComponent
 
     public function editProfile($id)
     {
+        $this->resetInputFields();
         $this->editMode = true;
 
         $this->employee = Employee::with('user', 'profile')->find($id);
@@ -244,10 +321,10 @@ class UsersIndex extends BaseComponent
             $this->date_of_birth = $profile->date_of_birth;
             $this->street_1 = $profile->street_1;
             $this->street_2 = $profile->street_2;
-            $this->city = $profile->city;
-            $this->state = $profile->state;
+            $this->city = $profile->city ?: null;
+            $this->state = $profile->state ?: null;
             $this->postcode = $profile->postcode;
-            $this->country = $profile->country;
+            $this->country = $profile->country ?: 'United Kingdom';
             $this->nationality = $profile->nationality;
             $this->home_phone = $profile->home_phone;
             $this->mobile_phone = $profile->mobile_phone;
@@ -255,7 +332,7 @@ class UsersIndex extends BaseComponent
             $this->gender = $profile->gender;
             $this->marital_status = $profile->marital_status;
             $this->tax_reference_number = $profile->tax_reference_number;
-            $this->immigration_status = $profile->immigration_status;
+            $this->immigration_status = $profile->immigration_status ?: null;
             $this->brp_number = $profile->brp_number;
             $this->brp_expiry_date = $profile->brp_expiry_date;
             $this->right_to_work_expiry_date = $profile->right_to_work_expiry_date;

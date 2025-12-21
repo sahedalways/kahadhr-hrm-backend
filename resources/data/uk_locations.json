@@ -1,0 +1,67 @@
+[
+    {
+        "state": "England",
+        "cities": [
+            "London",
+            "Birmingham",
+            "Manchester",
+            "Liverpool",
+            "Leeds",
+            "Bristol",
+            "Sheffield",
+            "Leicester",
+            "Coventry",
+            "Nottingham",
+            "Southampton",
+            "Newcastle upon Tyne",
+            "Brighton and Hove",
+            "Plymouth",
+            "Reading",
+            "Norwich",
+            "Oxford",
+            "Cambridge",
+            "Derby",
+            "Wolverhampton",
+            "Preston",
+            "Salisbury",
+            "Carlisle",
+            "Chelmsford",
+            "Chester",
+            "Chichester",
+            "Wakefield",
+            "Worcester",
+            "Lincoln",
+            "Durham",
+            "Bradford"
+        ]
+    },
+    {
+        "state": "Scotland",
+        "cities": [
+            "Edinburgh",
+            "Glasgow",
+            "Aberdeen",
+            "Dundee",
+            "Inverness",
+            "Perth",
+            "Stirling",
+            "Dunfermline"
+        ]
+    },
+    {
+        "state": "Wales",
+        "cities": [
+            "Cardiff",
+            "Swansea",
+            "Newport",
+            "Bangor",
+            "St Asaph",
+            "St Davids",
+            "Wrexham"
+        ]
+    },
+    {
+        "state": "Northern Ireland",
+        "cities": ["Belfast", "Derry", "Lisburn", "Newry", "Armagh"]
+    }
+]

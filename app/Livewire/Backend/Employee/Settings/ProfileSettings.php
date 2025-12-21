@@ -98,10 +98,10 @@ class ProfileSettings extends BaseComponent
         $this->date_of_birth             = optional($this->employee->profile?->date_of_birth)->format('Y-m-d');
         $this->street_1                  = $this->employee->profile?->street_1;
         $this->street_2                  = $this->employee->profile?->street_2;
-        $this->city                       = $this->employee->profile?->city;
-        $this->state                      = $this->employee->profile?->state;
+        $this->city                       = $this->employee->profile?->city ?: null;
+        $this->state                      = $this->employee->profile?->state ?: null;
         $this->postcode                   = $this->employee->profile?->postcode;
-        $this->country                    = $this->employee->profile?->country;
+        $this->country                    = $this->employee->profile?->country ?: null;
         $this->nationality                = $this->employee->profile?->nationality;
         $this->home_phone                 = $this->employee->profile?->home_phone;
         $this->mobile_phone               = $this->employee->profile?->mobile_phone;
@@ -109,7 +109,7 @@ class ProfileSettings extends BaseComponent
         $this->gender                     = $this->employee->profile?->gender;
         $this->marital_status             = $this->employee->profile?->marital_status;
         $this->tax_reference_number       = $this->employee->profile?->tax_reference_number;
-        $this->immigration_status         = $this->employee->profile?->immigration_status;
+        $this->immigration_status         = $this->employee->profile?->immigration_status ?: null;
         $this->brp_number                 = $this->employee->profile?->brp_number;
         $this->brp_expiry_date            = optional($this->employee->profile?->brp_expiry_date)->format('Y-m-d');
         $this->right_to_work_expiry_date  = optional($this->employee->profile?->right_to_work_expiry_date)->format('Y-m-d');

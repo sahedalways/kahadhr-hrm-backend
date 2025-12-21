@@ -862,9 +862,9 @@
                             @enderror
                         </div>
 
-
+                        <hr>
                         @if (!empty($customFields) && $customFields->count())
-                            <hr>
+
                             @foreach ($customFields as $field)
                                 <div class="col-md-6 mb-2">
                                     <label class="form-label">

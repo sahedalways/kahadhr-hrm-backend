@@ -20690,7 +20690,7 @@ fieldset:disabled .btn {
     }
 
     .dropdown:not(.dropdown-hover) .dropdown-menu {
-        margin-top: 55px !important
+        margin-top: 45px !important
     }
 
     .dropdown .dropdown-menu.show {

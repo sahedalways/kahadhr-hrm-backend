@@ -1,5 +1,5 @@
 <div class="col-12">
-    <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2 mb-2" style="min-height:50px; ">
+    <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2 mb-2 bg-white" style="min-height:50px; ">
 
         {{-- Selected employees --}}
         @foreach ($multipleShifts[$index]['employees'] ?? [] as $employee)
@@ -58,7 +58,7 @@
                         wire:click.prevent="{{ $onLeave ? '' : 'addEmployeeToMultipleShift(' . $index . ',' . $employee['id'] . ')' }}"
                         style="{{ $onLeave ? 'cursor:not-allowed; opacity:.65;' : '' }}">
 
-                        <div>
+                        <div class="d-flex align-items-center text-sm">
                             <img src="{{ $employee['avatar_url'] ?? '/assets/img/default-avatar.png' }}"
                                 class="rounded-circle me-2" width="32" height="32">
                             {{ $employee['full_name'] }}

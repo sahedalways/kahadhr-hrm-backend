@@ -5,20 +5,20 @@
 
 
             @if (!$showAddBreakForm)
-                <div class="modal-header border-0 pb-2 pe-4 position-relative">
+                <div class="modal-header border-0 pe-4 position-relative justify-content-end">
                     <h5 class="modal-title fs-6 text-secondary mx-auto" id="customAddBreakModalLabel">
                         Add breaks to shift details
                     </h5>
                     <button type="button"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-3 top-50 translate-middle-y"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center "
                         data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
                         <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>
                 </div>
             @else
-                <div class="modal-header border-0 pb-2 pe-4 position-relative">
+                <div class="modal-header border-0 pe-4 position-relative justify-content-end">
                     <button type="button"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-3 top-50 translate-middle-y"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center "
                         data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
                         <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>
@@ -54,7 +54,7 @@
                         <h6 class="text-secondary mb-3 text-center">Add break types</h6>
 
                         @foreach ($newBreaks as $index => $break)
-                            <div class="row g-2 align-items-end mb-3 text-center">
+                            <div class="row g-2 align-items-end mb-3 text-center add-break">
 
                                 <div class="col-4">
                                     <label class="form-label small text-secondary mb-1">
@@ -68,12 +68,34 @@
                                     <label class="form-label small text-secondary mb-1">
                                         Type
                                     </label>
-                                    <select class="form-select form-select-sm text-center"
-                                        wire:model.live="newBreaks.{{ $index }}.type">
-                                        <option value="">Select</option>
-                                        <option value="Paid">Paid</option>
-                                        <option value="Unpaid">Unpaid</option>
-                                    </select>
+
+                                    <label class="form-label small text-secondary mb-1">
+                                        Type
+                                    </label>
+
+                                    <div class="dropdown">
+                                        <button
+                                            class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-center"
+                                            data-bs-toggle="dropdown" type="button">
+                                            {{ !empty($newBreaks[$index]['type']) ? $newBreaks[$index]['type'] : 'Select' }}
+                                        </button>
+
+                                        <div class="dropdown-menu w-100 text-center">
+                                            <button type="button" class="dropdown-item"
+                                                wire:click="$set('newBreaks.{{ $index }}.type', 'Paid')">
+                                                Paid
+                                            </button>
+
+                                            <button type="button" class="dropdown-item"
+                                                wire:click="$set('newBreaks.{{ $index }}.type', 'Unpaid')">
+                                                Unpaid
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+
+
                                 </div>
                                 <div class="col-3">
                                     {{-- <label class="form-label small text-secondary mb-1 text-center">

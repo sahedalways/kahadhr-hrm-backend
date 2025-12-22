@@ -1,4 +1,4 @@
-      <div class="mt-4">
+      <div class="pt-4 bg-white">
           <div class="schedule-sidebar p-2 border-end" style="width: 280px; flex-shrink: 0;">
 
               <div class="input-group mb-3">

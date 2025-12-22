@@ -162,7 +162,7 @@
                     <i class="bi bi-question-circle"></i>
                 </a>
 
-                <button type="button" class="btn btn-link text-decoration-none me-2" data-bs-dismiss="modal"
+                <button type="button" class="btn text-decoration-none me-2" data-bs-dismiss="modal"
                     wire:click="cancelRepeatShift">
                     Cancel repeat
                 </button>

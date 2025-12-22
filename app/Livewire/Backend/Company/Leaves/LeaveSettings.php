@@ -7,6 +7,7 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\Notification;
+use App\Models\User;
 
 class LeaveSettings extends BaseComponent
 {
@@ -14,6 +15,7 @@ class LeaveSettings extends BaseComponent
     public $leaveSetting;
     public $company;
     public $selectedEmployee;
+    public $selectedEmployeeName;
     public $employees;
     public $total_annual_hours;
 
@@ -41,6 +43,11 @@ class LeaveSettings extends BaseComponent
     public function selectEmployee($userId)
     {
         $this->selectedEmployee = $userId;
+        $selectedUser = User::select('f_name', 'l_name')
+            ->where('id', $userId)
+            ->first();
+
+        $this->selectedEmployeeName = $selectedUser->f_name . ' ' . $selectedUser->l_name;
 
         $leaveBalance = LeaveBalance::where('user_id', $userId)
             ->where('company_id', $this->company->id)

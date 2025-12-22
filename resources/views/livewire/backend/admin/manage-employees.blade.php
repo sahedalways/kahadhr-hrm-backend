@@ -1,5 +1,5 @@
 <div>
-    <div class="row align-items-center justify-content-between mb-4">
+    <div class="row g-3 align-items-center justify-content-between mb-4">
 
         <!-- LEFT: Title -->
         <div class="col-auto">
@@ -28,7 +28,7 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <div class="row">
+            <div class="row g-3">
                 <div class="col-md-8">
                     <input type="text" class="form-control shadow-sm" placeholder="Search by name, email, job title"
                         wire:model="search" wire:keyup="set('search', $event.target.value)">

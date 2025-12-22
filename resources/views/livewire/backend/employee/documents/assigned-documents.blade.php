@@ -1,6 +1,6 @@
 <div>
     <!-- Search + Sort -->
-    <div class="row align-items-center justify-content-between mb-4">
+    <div class="row g-3 align-items-center justify-content-between mb-4">
         <div class="col-md-6 mb-2">
             <input type="text" class="form-control shadow-sm" placeholder="Search by document name" wire:model="search"
                 wire:keyup="set('search', $event.target.value)" />

@@ -1,5 +1,5 @@
 <div>
-    <div class="row align-items-center justify-content-between mb-4">
+    <div class="row g-3 align-items-center justify-content-between mb-4">
 
         {{-- LEFT: Title --}}
         <div class="col-auto">

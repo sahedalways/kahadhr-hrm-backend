@@ -79,7 +79,7 @@
             @livewire('backend.components.header')
         </div>
 
-        <div class="container-fluid pb-3 h-100">
+        <div style="min-width: 400px" class="container-fluid pb-3 h-100">
             {{ $slot }}
         </div>
     </main>

@@ -94,7 +94,7 @@ tr {
 
 .schedule-cell .shift-block,
 .schedule-cell .unpaid-leave {
-    padding: 5px 28px !important;
+    padding: 15px 28px !important;
 }
 
 .employee-row:hover {
@@ -502,7 +502,7 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     position: absolute;
     top: 0;
     right: 4px;
-    color: red;
+    z-index: 1;
 }
 
 .dropdown-schedule-celll {

@@ -94,9 +94,9 @@
                                                             @endphp
 
 
-                                                            <div  class="position-relative bg-dark">
+                                                            <div  class="position-relative">
 
-                                                                <div class="shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
+                                                                <div class="shift-block text-white rounded px-1 py-0 mb-3 mx-auto"
                                                                     style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;">
                                                                     <div class="fw-semibold text-truncate"
                                                                         style="max-width: 100%;">

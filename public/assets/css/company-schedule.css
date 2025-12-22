@@ -1,12 +1,15 @@
 .bg-primary-light {
     background-color: #e9f0ff !important;
 }
+
 .text-primary {
     color: #007bff !important;
 }
+
 .bg-primary-light-cell {
     background-color: #f7f9ff;
 }
+
 .bg-purple {
     background-color: #9c27b0;
 }
@@ -16,11 +19,12 @@
     border-radius: 0.5rem;
 }
 
-.schedule-table.table-bordered > :not(caption) > * > * {
+.schedule-table.table-bordered> :not(caption)>*>* {
     border-width: 0 1px 1px 0;
     border-color: #eee;
 }
-.schedule-table.table-bordered > :not(caption) > * > *:first-child {
+
+.schedule-table.table-bordered> :not(caption)>*>*:first-child {
     border-left-width: 1px;
 }
 
@@ -41,11 +45,13 @@
 .schedule-sidebar {
     background-color: #fff;
 }
+
 .schedule-sidebar .employee-row {
     cursor: pointer;
     border-radius: 4px;
     padding: 0.5rem;
 }
+
 .schedule-sidebar .employee-row:hover {
     background-color: #f8f9fa;
 }
@@ -55,11 +61,12 @@
     color: #dc3545;
     border: 1px solid #dc3545;
 }
+
 .unpaid-leave-highlight {
     background-color: #ffcccc;
 }
 
-.schedule-table tbody tr:nth-child(4) ~ tr td {
+.schedule-table tbody tr:nth-child(4)~tr td {
     border-top: none;
     border-bottom: 1px solid #eee;
 }
@@ -90,14 +97,17 @@
     background-color: #f8f9fa;
     transform: translateX(3px);
 }
+
 .employee-row {
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
+
 .employee-row:hover {
     background-color: #f8f9fa;
     transform: translateX(3px);
 }
+
 .employee-avatar {
     width: 40px;
     height: 40px;
@@ -105,31 +115,19 @@
     border: 2px solid #fff;
 }
 
-.shift-panel-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    opacity: 0;
-    animation: overlayFadeIn 0.4s ease-out forwards;
-}
 
 .shift-panel {
     position: fixed;
     top: 0;
     right: 0;
-
     width: 500px !important;
     max-width: 100%;
-
     height: 100%;
     background: #fff;
-
     display: flex;
     flex-direction: column;
-
     border-radius: 12px 0 0 12px;
     box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
-
     animation: slideIn 0.35s ease forwards;
 }
 
@@ -137,6 +135,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -147,6 +146,7 @@
     from {
         transform: translateX(100%);
     }
+
     to {
         transform: translateX(0);
     }
@@ -156,27 +156,18 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    animation: overlayFadeIn 0.4s ease-out forwards;
     backdrop-filter: blur(2px);
+    z-index: 1050;
 }
 
-.shift-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 380px;
-    height: 100%;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    border-radius: 12px 0 0 12px;
-    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.35s ease forwards;
-}
 
 @keyframes slideIn {
     from {
         transform: translateX(100%);
     }
+
     to {
         transform: translateX(0);
     }
@@ -186,6 +177,7 @@
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(100%);
     }
@@ -203,6 +195,7 @@
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
@@ -266,6 +259,7 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     opacity: 1;
     pointer-events: auto;
 }
+
 .custom-break-modal-icon-circle {
     background-color: #e6f7ef;
     color: #5cb85c;
@@ -473,9 +467,11 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
     transition: all 0.2s ease-in-out;
 }
+
 .bg-soft-primary {
     background-color: #e7f1ff;
 }
+
 .transition-all {
     transition: all 0.2s ease-in-out;
 }
@@ -516,6 +512,7 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
     padding-left: 0;
     z-index: 99999;
 }
+
 .shift-block {
     position: relative;
     z-index: 1;
@@ -524,3 +521,10 @@ input[type="date"].no-calendar-icon::-moz-calendar-picker-indicator {
 .shift-block.active-z {
     z-index: 10;
 }
+
+/*@media (max-width: 767px) {
+    .shift-panel {
+        top: 89px;
+
+    }
+}*/

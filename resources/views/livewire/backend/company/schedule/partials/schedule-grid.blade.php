@@ -539,62 +539,93 @@
                         <form wire:submit.prevent="saveShift" class="d-flex flex-column gap-3">
 
                             {{-- DATE --}}
-                            <div class="row align-items-center g-2 mb-3 shift-form-row">
-                                <div class="col-3">
-                                    <label class="fw-semibold">Date <span class="text-danger">*</span></label>
+                            <div class="row align-items-md-center g-2 mb-3 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label class="fw-semibold mb-1 mb-md-0">
+                                        Date <span class="text-danger">*</span>
+                                    </label>
                                 </div>
-                                <div class="col-8 d-flex align-items-center">
-                                    <div class="input-group input-group-sm me-3" style="max-width: 160px;">
-                                        <input type="date" class="form-control no-calendar-icon"
-                                            wire:model.live="selectedDate" id="shiftDate" wire:change="dateChanged">
-                                        <span class="input-group-text bg-white" style="cursor: pointer;"
-                                            onclick="document.getElementById('shiftDate').showPicker()">
-                                            <i class="far fa-calendar-alt text-muted"></i>
-                                        </span>
 
+                                <!-- Input + Switch -->
+                                <div class="col-12 col-md-8">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+
+                                        <!-- Date input -->
+                                        <div class="input-group input-group-sm w-100 w-md-auto"
+                                            style="max-width: 160px;">
+                                            <input type="date" class="form-control no-calendar-icon"
+                                                wire:model.live="selectedDate" id="shiftDate"
+                                                wire:change="dateChanged">
+
+                                            <span class="input-group-text bg-white" style="cursor: pointer;"
+                                                onclick="document.getElementById('shiftDate').showPicker()">
+                                                <i class="far fa-calendar-alt text-muted"></i>
+                                            </span>
+                                        </div>
+
+                                        <!-- Error -->
                                         @error('selectedDate')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            <div class="text-danger small">{{ $message }}</div>
                                         @enderror
+
+                                        <!-- All day switch -->
+                                        <div class="form-check form-switch ms-md-auto">
+                                            <input class="form-check-input" type="checkbox"
+                                                wire:model="newShift.all_day"
+                                                wire:change="toggleOnAllDay($event.target.checked)">
+                                            <label class="form-check-label small text-muted ms-1">
+                                                All day
+                                            </label>
+                                        </div>
+
                                     </div>
-
-
-
-                                    <div class="form-check form-switch ms-auto">
-                                        <input class="form-check-input" type="checkbox" wire:model="newShift.all_day"
-                                            wire:change="toggleOnAllDay($event.target.checked)">
-                                        <label class="form-check-label small text-muted ms-1">All day</label>
-                                    </div>
-
                                 </div>
                             </div>
+
 
                             {{-- TIME --}}
-                            <div class="row align-items-center g-2 mb-1 shift-form-row">
-                                <div class="col-3">
-                                    <label class="fw-semibold">Time <span class="text-danger">*</span></label>
-                                </div>
-                                <div class="col-9 d-flex align-items-center gap-2">
-                                    <input type="time" class="form-control form-control-sm"
-                                        wire:model.live="newShift.start_time" style="max-width: 110px;"
-                                        wire:change="calculateTotalHours()"
-                                        @if ($newShift['all_day']) readonly @endif>
-                                    <span class="text-muted">→</span>
-                                    <input type="time" class="form-control form-control-sm"
-                                        wire:model.live="newShift.end_time" style="max-width: 110px;"
-                                        wire:change="calculateTotalHours()"
-                                        @if ($newShift['all_day']) readonly @endif>
-                                    <span class="ms-auto small fw-semibold " style="color: #000000;">
-                                        {{ $newShift['total_hours'] ?? '08:00' }} hrs
-                                    </span>
+                            <div class="row align-items-md-center g-2 mb-1 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label class="fw-semibold mb-1 mb-md-0">
+                                        Time <span class="text-danger">*</span>
+                                    </label>
                                 </div>
 
-                                @error('newShift.start_time')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                                @error('newShift.end_time')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
+                                <!-- Time inputs -->
+                                <div class="col-12 col-md-9">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+
+                                        <!-- Start time -->
+                                        <input type="time" class="form-control form-control-sm"
+                                            wire:model.live="newShift.start_time" wire:change="calculateTotalHours()"
+                                            @if ($newShift['all_day']) readonly @endif>
+
+                                        <span class="text-muted d-none d-md-inline">→</span>
+
+                                        <!-- End time -->
+                                        <input type="time" class="form-control form-control-sm"
+                                            wire:model.live="newShift.end_time" wire:change="calculateTotalHours()"
+                                            @if ($newShift['all_day']) readonly @endif>
+
+                                        <!-- Total hours -->
+                                        <span class="small fw-semibold ms-md-auto" style="color:#000;">
+                                            {{ $newShift['total_hours'] ?? '08:00' }} hrs
+                                        </span>
+
+                                    </div>
+
+                                    <!-- Errors -->
+                                    @error('newShift.start_time')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                    @error('newShift.end_time')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
+
 
 
 
@@ -658,13 +689,13 @@
                                     @endif
                                 </div>
                             @else
-                                <div class="d-flex align-items-center mb-3 text-primary" style="font-size: 0.875rem;">
+                                <div class="gap-2 d-flex align-items-center flex-wrap mb-3 text-primary" style="font-size: 0.875rem;">
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
-                                        wire:click="getDefaultBreaks()" class="text-primary small me-3">
+                                        wire:click="getDefaultBreaks()" class="text-primary small">
                                         <i class="fas fa-coffee me-2"></i> Add break
                                     </a>
 
-                                    <a href="#" class="me-3 text-primary small" data-bs-toggle="modal"
+                                    <a href="#" class="text-primary small" data-bs-toggle="modal"
                                         data-bs-target="#customRepeatShiftModal">
                                         <i class="fas fa-redo me-2"></i>
                                         @if ($isSavedRepeatShift)
@@ -703,14 +734,20 @@
 
 
                             {{-- TITLE --}}
-                            <div class="row align-items-center g-2 mb-3 shift-form-row">
-                                <div class="col-3">
-                                    <label class="fw-semibold">Shift Title <span class="text-danger">*</span></label>
+                            <div class="row align-items-md-center g-2 mb-3 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label for="shiftTitleInput" class="fw-semibold mb-1 mb-md-0">
+                                        Shift Title <span class="text-danger">*</span>
+                                    </label>
                                 </div>
-                                <div class="col-9">
+
+                                <!-- Input -->
+                                <div class="col-12 col-md-9">
                                     <input type="text" id="shiftTitleInput" wire:model.defer="newShift.title"
                                         class="form-control form-control-sm" placeholder="Enter shift title…"
                                         required>
+
                                     @error('newShift.title')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
@@ -718,44 +755,62 @@
                             </div>
 
 
+
                             {{-- JOB + COLOR --}}
-                            <div class="row align-items-center g-2 mb-3 shift-form-row">
-                                <div class="col-3">
-                                    <label class="fw-semibold">Job <span class="text-danger">*</span></label>
-                                </div>
-                                <div class="col-9 d-flex align-items-center gap-2">
-                                    <input type="text" class="form-control form-control-sm"
-                                        wire:model.defer="newShift.job" placeholder="Enter job…">
-
-                                    <input type="color" wire:model="newShift.color"
-                                        class="form-control form-control-color border-0"
-                                        style="width: 38px; height: 31px;">
+                            <div class="row align-items-md-center g-2 mb-3 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label class="fw-semibold mb-1 mb-md-0">
+                                        Job <span class="text-danger">*</span>
+                                    </label>
                                 </div>
 
-                                <div class="col-12" style="margin-left: 7.3rem;">
+                                <!-- Input + Color -->
+                                <div class="col-12 col-md-9">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+
+                                        <!-- Job input -->
+                                        <input type="text" class="form-control form-control-sm"
+                                            wire:model.defer="newShift.job" placeholder="Enter job…">
+
+                                        <!-- Color picker -->
+                                        <input type="color" wire:model="newShift.color"
+                                            class="form-control form-control-color border-0 p-0"
+                                            style="width: 38px; height: 31px;">
+
+                                    </div>
+
+                                    <!-- Error -->
                                     @error('newShift.job')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
-
                             </div>
+
 
                             {{-- EMPLOYEES --}}
                             @include('livewire.backend.company.schedule.partials.employees-box')
 
                             {{-- ADDRESS --}}
-                            <div class="row align-items-center g-2 mb-3 shift-form-row">
-                                <div class="col-3">
-                                    <label class="fw-semibold">Address</label>
+                            <div class="row align-items-md-center g-2 mb-3 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label class="fw-semibold mb-1 mb-md-0">
+                                        Address
+                                    </label>
                                 </div>
-                                <div class="col-9">
+
+                                <!-- Input -->
+                                <div class="col-12 col-md-9">
                                     <input type="text" wire:model.defer="newShift.address"
                                         class="form-control form-control-sm" placeholder="Enter address…">
+
                                     @error('newShift.address')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+
 
                             {{-- NOTE --}}
                             <div class="row g-2 mb-4 shift-form-row">

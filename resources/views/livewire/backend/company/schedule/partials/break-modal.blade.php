@@ -10,7 +10,7 @@
                         Add breaks to shift details
                     </h5>
                     <button type="button"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-0 top-50 translate-middle-y"
+                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-absolute end-3 top-50 translate-middle-y"
                         data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
                         <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
                     </button>

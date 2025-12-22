@@ -388,13 +388,15 @@ body {
 @media (max-width: 767px) {
     .status-banner {
         max-width: 100%;
-        position: relative;
+        position: sticky;
+        top: 0;
         background-color: rgb(80, 80, 80);
         border-radius: 0;
         -webkit-border-radius: 0;
         -moz-border-radius: 0;
         -ms-border-radius: 0;
         -o-border-radius: 0;
+        z-index: 111;
     }
 
     .fixed-header {

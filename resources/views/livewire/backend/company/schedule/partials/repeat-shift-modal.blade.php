@@ -5,7 +5,7 @@
         <div class="modal-content shift-modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header border-0 pb-2 pe-4 position-relative">
+            <div class="modal-header border-0 pe-4 position-relative">
                 <h5 class="modal-title fs-6 text-secondary mx-auto" id="customRepeatShiftModalLabel">
                     Repeating shift settings
                 </h5>

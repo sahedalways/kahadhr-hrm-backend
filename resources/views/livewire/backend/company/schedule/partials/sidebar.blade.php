@@ -19,7 +19,7 @@
                       </div>
                   @else
                       @foreach ($employees as $employee)
-                          <div class="d-flex align-items-center py-2 px-2 employee-row shadow-sm rounded mb-2"
+                          <div class="d-flex align-items-center py-2 px-2 employee-row border rounded mb-2"
                               title="{{ $employee['f_name'] }} {{ $employee['l_name'] }}">
 
                               <div class="position-relative me-3">

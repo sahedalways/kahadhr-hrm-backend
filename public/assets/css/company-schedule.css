@@ -65,7 +65,6 @@
 }
 
 .schedule-sidebar .employee-list .employee-row {
-    min-height: 90px;
     align-items: flex-start !important;
     padding-top: 1rem;
     padding-bottom: 1rem;

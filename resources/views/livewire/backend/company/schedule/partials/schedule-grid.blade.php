@@ -1,5 +1,5 @@
 <div class="flex-grow-1 schedule-grid-container">
-    <div class="bg-white d-flex justify-content-center align-items-center py-2">
+    <div class="bg-white d-flex justify-content-center align-items-center py-2 px-3">
         @include('livewire.backend.company.schedule.partials.header_nav', [
             'startDate' => $startDate ?? 'Oct 27',
             'endDate' => $endDate ?? 'Nov 2',

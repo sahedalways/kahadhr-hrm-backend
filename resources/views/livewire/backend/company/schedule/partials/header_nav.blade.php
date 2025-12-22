@@ -1,12 +1,12 @@
 <div class=" bg-white d-flex justify-content-between align-items-center py-2">
     <div class="d-flex align-items-center gap-3">
 
-        <div class="dropdown me-1">
+        <div class="dropdown me-1" >
             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
                 {{ $viewMode === 'weekly' ? 'Week' : 'Month' }}
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" >
                 <li>
                     <a class="dropdown-item @if ($viewMode === 'weekly') active @endif" href="#"
                         wire:click="setViewMode('weekly')">Week</a>

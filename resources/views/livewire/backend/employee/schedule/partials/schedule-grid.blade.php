@@ -84,9 +84,9 @@
                                                         @if ($hasShift)
                                                             @foreach ($this->calendarShifts[$dateKey] as $shift)
                                                                 @php $modalId = 'shiftDetailsModal-'.$shift['id']; @endphp
-                                                                <div class="position-relative">
-                                                                    <div class="shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
-                                                                        style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;">
+                                                                <div  style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;" class="position-relative">
+                                                                    <div class=" shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
+                                                                       >
                                                                         <div class="fw-semibold text-truncate">
                                                                             {{ $shift['shift']['title'] }}
                                                                         </div>
@@ -102,7 +102,7 @@
                                                                             class="btn btn-xs btn-link text-white p-0"
                                                                             data-bs-toggle="dropdown"
                                                                             aria-expanded="false">
-                                                                            <i class="fas fa-ellipsis-v"></i>
+                                                                            <i class="fa-solid fa-bars"></i>
                                                                         </button>
                                                                         <ul
                                                                             class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
@@ -111,8 +111,7 @@
                                                                                     type="button"
                                                                                     data-bs-toggle="modal"
                                                                                     data-bs-target="#{{ $modalId }}">
-                                                                                    <i
-                                                                                        class="fas fa-eye fa-fw me-1"></i>
+                                                                                    <i class="fa-solid fa-bars"></i>
                                                                                     View
                                                                                 </button>
                                                                             </li>
@@ -263,10 +262,10 @@
                                             </div>
                                             <div class="smaller opacity-75">{{ $content['time'] }}</div>
 
-                                            <div class="shift-dropdown position-absolute" style="bottom:4px;right:6px;">
+                                            <div class="shift-dropdown position-absolute" style="top:0; right:6px;">
                                                 <button type="button"
                                                     class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
-                                                    <i class="fas fa-ellipsis-v"></i>
+                                                    <i class="fa-solid fa-bars"></i>
                                                 </button>
                                                 <ul class="dropdown-schedule-celll d-none">
                                                     <li>

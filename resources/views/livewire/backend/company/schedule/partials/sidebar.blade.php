@@ -11,7 +11,7 @@
               <div class="py-2">
                   <h6 class="fw-bold text-muted text-uppercase mb-1">Unassigned shifts</h6>
               </div>
-              <div class="employee-list mt-1">
+              <div class="employee-list mt-2">
                   @if ($employees->isEmpty())
                       <div class="text-center text-muted py-4">
                           <i class="fas fa-user-slash fa-2x mb-2"></i>
@@ -19,7 +19,7 @@
                       </div>
                   @else
                       @foreach ($employees as $employee)
-                          <div class="d-flex align-items-center py-2 px-2 employee-row border rounded mb-2"
+                          <div class="d-flex align-items-center py-4 px-2 employee-row border rounded mb-2"
                               title="{{ $employee['f_name'] }} {{ $employee['l_name'] }}">
 
                               <div class="position-relative me-3">

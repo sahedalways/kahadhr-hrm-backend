@@ -94,10 +94,10 @@
                                                             @endphp
 
 
-                                                            <div class="position-relative">
+                                                            <div  class="position-relative bg-dark">
 
                                                                 <div class="shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
-                                                                    style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;">
+                                                                    style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;">
                                                                     <div class="fw-semibold text-truncate"
                                                                         style="max-width: 100%;">
                                                                         {{ $shift['shift']['title'] }}</div>
@@ -112,7 +112,7 @@
                                                                 <div class="dropdown shift-dropdown">
                                                                     <button class="btn btn-xs btn-link text-white p-0"
                                                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <i class="fas fa-ellipsis-v"></i>
+                                                                       <i class="fa-solid fa-bars"></i>
                                                                     </button>
                                                                     <ul
                                                                         class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
@@ -319,13 +319,13 @@
 
                                             {{-- Single trigger + menu --}}
                                             <div class="shift-dropdown position-absolute"
-                                                style="bottom: 4px; right: 6px;">
+                                                style="top: 0; right: 6px;">
                                                 <button type="button"
                                                     class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
-                                                    <i class="fas fa-ellipsis-v"></i>
+                                                   <i class="fa-solid fa-bars"></i>
                                                 </button>
 
-                                                <ul class="dropdown-schedule-celll d-none">
+                                                <ul class="dropdown-schedule-celll d-none" wire:ignore.self>
                                                     <li>
                                                         <button class="dropdown-item" type="button"
                                                             wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">

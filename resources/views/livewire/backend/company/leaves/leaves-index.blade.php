@@ -9,9 +9,9 @@
         <div class="row g-3">
 
             <!-- Left Column: Employee List + Search -->
-            <div class="col-12">
+            <div class="col-lg-6 col-md-8 col-12">
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-primary text-white p-3">
                         <h5 class="mb-0">Employees</h5>
                     </div>
                     <div class="card shadow-lg border-0 h-100">
@@ -73,24 +73,11 @@
                 </div>
             </div>
 
-            <!-- Middle Column: Calendar -->
-            <div class="col-lg-6" wire:ignore>
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">Leaves Calendar</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="calendar" style="min-height: 500px;"></div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-6">
+   <div class="col-lg-6">
                 <div class="card shadow-sm mb-4">
 
                     <div class="card shadow-sm border-0">
-                        <div class="card-header bg-primary text-white border-0 py-3">
+                        <div class="card-header bg-primary text-white border-0 p-3">
                             <h5 class="mb-0">⏳ Pending Leave Requests</h5>
                         </div>
                         <div class="card-body p-4">
@@ -287,6 +274,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Middle Column: Calendar -->
+            <div class="col-12" wire:ignore>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white p-3">
+                        <h5 class="mb-0">Leaves Calendar</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar" style="min-height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+
+
+         
 
 
         </div>

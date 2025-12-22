@@ -396,6 +396,17 @@ body {
     border-color: #d2d6da;
 }
 
+table.fc-col-header,
+.fc-daygrid-body,
+table.fc-scrollgrid-sync-table {
+    min-width: 100%;
+    width: 100% !important;
+}
+
+.fc-header-toolbar.fc-toolbar {
+    flex-wrap: wrap;
+}
+
 @media (max-width: 991px) {
     body {
         zoom: 0.8;

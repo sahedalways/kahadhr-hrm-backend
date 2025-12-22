@@ -8,7 +8,7 @@
         <h5 class=" fw-bold">Schedule</h5>
     </div>
 
-    <div style="min-width: max-content;" class="shadow-sm overflow-y-auto">
+    <div class="shadow-sm overflow-y-auto">
 
         <div class=" p-0 position-relative">
 

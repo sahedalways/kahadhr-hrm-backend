@@ -39,7 +39,7 @@
                             <div class="col-md-8">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text" class="form-control form-control-lg border-start-0"
+                                    <input type="text" class="form-control border-start-0"
                                         placeholder="Search by team name" wire:model="search"
                                         wire:keyup="set('search', $event.target.value)" />
                                 </div>

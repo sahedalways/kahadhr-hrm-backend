@@ -314,6 +314,57 @@ body {
     font-size: 0.85rem;
     border-radius: 5px;
 }
+/* Target only sidebar icons */
+#sidenav-collapse-main > ul > li:nth-child(1) i {
+    color: #17c1e8 !important; /* Dashboard */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(2) i {
+    color: #5e72e4; /* Manage Companies */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(3) i {
+    color: #33d9b2; /* Billing */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(4) i {
+    color: #f5365c; /* Reports */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(5) i {
+    color: #ff793f; /* Support */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(6) i {
+    color: #11cdef; /* Contact */
+}
+
+#sidenav-collapse-main > ul > li:nth-child(7) i {
+    color: #2dce89; /* Settings */
+}
+#sidenav-collapse-main > ul > li:nth-child(8) i {
+    color: #2d3dce; 
+}
+#sidenav-collapse-main > ul > li:nth-child(9) i {
+    color: #0fb9b1; 
+}
+#sidenav-collapse-main > ul > li:nth-child(10) i {
+    color: #a55eea; 
+}
+#sidenav-collapse-main > ul > li:nth-child(11) i {
+    color: #2c2c54; 
+}
+
+#sidenav-collapse-main > ul > li:last-child i {
+    color: #eb3b5a; /* Logout */
+}
+
+
+#sidenav-collapse-main ul ul li:nth-child(1) i { color: #5e72e4; }
+#sidenav-collapse-main ul ul li:nth-child(2) i { color: #2dce89; }
+#sidenav-collapse-main ul ul li:nth-child(3) i { color: #f5365c; }
+#sidenav-collapse-main ul ul li:nth-child(4) i { color: #fb6340; }
+
 
 @media (max-width: 991px) {
     body {

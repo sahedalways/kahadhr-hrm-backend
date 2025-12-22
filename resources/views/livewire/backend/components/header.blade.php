@@ -59,7 +59,22 @@
                     </div>
                 @endif
 
+                @php
+                    $company = auth()->check() ? auth()->user()->company : null;
+                    $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
+                    $bannerText =
+                        $company && $company->subscription_status === 'trial'
+                            ? 'You are currently on a trial plan.'
+                            : ($company && $company->subscription_status === 'suspended'
+                                ? 'Your account is suspended. Contact to support'
+                                : '');
+                @endphp
 
+                @if ($showBanner)
+                    <div class="status-banner text-center text-white py-1 mx-auto d-md-block d-none">
+                        {{ $bannerText }}
+                    </div>
+                @endif
 
                 <!-- RIGHT SECTION (Everything else) -->
                 <div class="d-flex align-items-center gap-3 ms-auto">
@@ -79,7 +94,7 @@
 
 
                     <!-- NOTIFICATION DROPDOWN -->
-                    <div class="notification-dropdown" id="notificationDropdown" wire:ignore style="width: 550px;">
+                    <div class="notification-dropdown" id="notificationDropdown" wire:ignore>
                         @livewire('backend.components.notifications')
                     </div>
 
@@ -87,11 +102,14 @@
                     @if ($userType !== 'superAdmin')
                         <div class="dropdown">
 
-                            <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
-                                alt="Avatar" class="rounded-circle cursor-pointer dropdown-toggle" width="40"
-                                height="40" id="profileDropdownToggle" data-bs-toggle="dropdown"
-                                aria-expanded="false">
 
+                            <div id="profileDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false"
+                                class="cursor-pointer d-flex flex-nowrap align-items-center gap-2">
+                                <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
+                                    alt="Avatar" class="rounded-circle cursor-pointer dropdown-toggle" width="40"
+                                    height="40">
+                                <i class="fa-solid fa-caret-down"></i>
+                            </div>
 
 
                             <ul class="dropdown-menu dropdown-menu-end profile-dropdown" id="profileDropdown"
@@ -181,9 +199,10 @@
                                 </li>
 
 
-                                <li>
+                                <li class="dropdown-divider-item">
                                     <hr class="dropdown-divider">
                                 </li>
+
 
 
                                 {{-- Main Navigation Links --}}
@@ -214,7 +233,7 @@
                                 </li>
 
                                 {{-- Logout --}}
-                                <li>
+                               <li class="dropdown-divider-item">
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>

@@ -37,7 +37,22 @@
 </head>
 
 <body class="g-sidenav-show">
+    @php
+        $company = auth()->check() ? auth()->user()->company : null;
+        $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
+        $bannerText =
+            $company && $company->subscription_status === 'trial'
+                ? 'You are currently on a trial plan.'
+                : ($company && $company->subscription_status === 'suspended'
+                    ? 'Your account is suspended. Contact to support'
+                    : '');
+    @endphp
 
+    @if ($showBanner)
+        <div class="status-banner text-center text-white py-1 mx-auto d-md-none d-block">
+            {{ $bannerText }}
+        </div>
+    @endif
 
     <div id="preloader" class="preloader">
         <div class="hr-line-loader">
@@ -55,25 +70,7 @@
         @livewire('backend.components.side-bar')
     </div>
 
-    @php
-        $company = auth()->check() ? auth()->user()->company : null;
-        $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
-        $bannerText =
-            $company && $company->subscription_status === 'trial'
-                ? 'You are currently on a trial plan.'
-                : ($company && $company->subscription_status === 'suspended'
-                    ? 'Your account is suspended. Contact to support'
-                    : '');
-    @endphp
 
-    @if ($showBanner)
-        <div class="status-banner text-center text-white py-1 mx-auto"
-            style="max-width: 600px; background-color: rgba(243, 156, 18, 0.15); 
-                position: fixed; top: 10px; left: 0; right: 0; z-index:1050; 
-                font-weight:500; font-size:0.85rem; border-radius:5px;">
-            {{ $bannerText }}
-        </div>
-    @endif
 
 
 

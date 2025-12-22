@@ -83,7 +83,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/companies/employees') ? 'active' : '' }}"
                                     href="{{ route('super-admin.employees') }}">
-                                    <i class="fas fa-user-friends sidenav-mini-icon side-bar-inner"></i>
+                                    <i class="fas fa-user-friends sidenav-mini-icon side-bar-inner text-info"></i>
                                     <span class="sidenav-normal side-bar-inner"> Employees </span>
                                 </a>
                             </li>

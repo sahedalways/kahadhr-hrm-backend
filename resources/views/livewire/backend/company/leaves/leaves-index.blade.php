@@ -9,7 +9,7 @@
         <div class="row g-3">
 
             <!-- Left Column: Employee List + Search -->
-            <div class="col-lg-3">
+            <div class="col-12">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Employees</h5>
@@ -74,7 +74,7 @@
             </div>
 
             <!-- Middle Column: Calendar -->
-            <div class="col-lg-5" wire:ignore>
+            <div class="col-lg-6" wire:ignore>
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-info text-white">
                         <h5 class="mb-0">Leaves Calendar</h5>
@@ -86,7 +86,7 @@
             </div>
 
 
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="card shadow-sm mb-4">
 
                     <div class="card shadow-sm border-0">

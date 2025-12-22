@@ -20593,7 +20593,7 @@ fieldset:disabled .btn {
     }
 
     .dropdown:not(.dropdown-hover) .dropdown-menu {
-        margin-top: 40px !important
+        margin-top: 45px !important
     }
 
     .dropdown .dropdown-menu:before {
@@ -28573,7 +28573,7 @@ Docs & License: https://fullcalendar.io/
 .fc .fc-button-primary:hover,
 .fc .fc-button-primary:not(:disabled):active,
 .fc .fc-button-primary:not(:disabled):active:focus {
-    transform: translateY(-1px);
+    /*transform: translateY(-1px);*/
     box-shadow: 0 7px 14px rgba(50, 50, 93, .1), 0 3px 6px rgba(0, 0, 0, .08);
     background-color: #8392ab;
     border-color: #8392ab

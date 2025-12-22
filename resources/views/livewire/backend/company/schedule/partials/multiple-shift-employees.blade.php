@@ -40,40 +40,50 @@
             </div>
 
             {{-- Available employees --}}
-            <div class="list-group list-group-flush" style="max-height:200px; overflow-y:auto;">
-                <div class="list-group-item list-group-item-action bg-light fw-semibold small py-1">
-                    All employees ({{ $availableMultipleShiftEmployees[$index]->count() ?? 0 }})
-                </div>
 
-                @forelse ($this->availableMultipleShiftEmployees[$index] ?? [] as $employee)
-                    @php
 
-                        $shiftDate = $multipleShifts[$index]['date'] ?? null;
-                        $onLeave = $shiftDate ? hasLeave($employee['id'], $shiftDate) : false;
-                    @endphp
 
-                    <a href="#"
-                        class="list-group-item gap-3 list-group-item-action d-flex justify-content-between align-items-center
-          {{ $onLeave ? 'disabled opacity-light' : '' }}"
-                        wire:click.prevent="{{ $onLeave ? '' : 'addEmployeeToMultipleShift(' . $index . ',' . $employee['id'] . ')' }}"
-                        style="{{ $onLeave ? 'cursor:not-allowed; opacity:.65;' : '' }}">
-
-                        <div class="d-flex align-items-center text-sm">
-                            <img src="{{ $employee['avatar_url'] ?? '/assets/img/default-avatar.png' }}"
-                                class="rounded-circle me-2" width="32" height="32">
-                            {{ $employee['full_name'] }}
-                        </div>
-
-                        <small class=" {{ $onLeave ? 'text-danger' : 'text-success' }} fw-semibold">
-                            {{ $onLeave ? 'Unavailable' : 'Available' }}
-                        </small>
-                    </a>
-                @empty
-                    <div class="list-group-item text-center text-muted">
-                        No available employees found.
+            @if ($multipleShifts[$index]['date'])
+                <div class="list-group list-group-flush" style="max-height:200px; overflow-y:auto;">
+                    <div class="list-group-item list-group-item-action bg-light fw-semibold small py-1">
+                        All employees ({{ $availableMultipleShiftEmployees[$index]->count() ?? 0 }})
                     </div>
-                @endforelse
-            </div>
+
+                    @forelse ($this->availableMultipleShiftEmployees[$index] ?? [] as $employee)
+                        @php
+
+                            $shiftDate = $multipleShifts[$index]['date'] ?? null;
+                            $onLeave = $shiftDate ? hasLeave($employee['id'], $shiftDate) : false;
+                        @endphp
+
+                        <a href="#"
+                            class="list-group-item gap-3 list-group-item-action d-flex justify-content-between align-items-center
+          {{ $onLeave ? 'disabled opacity-light' : '' }}"
+                            wire:click.prevent="{{ $onLeave ? '' : 'addEmployeeToMultipleShift(' . $index . ',' . $employee['id'] . ')' }}"
+                            style="{{ $onLeave ? 'cursor:not-allowed; opacity:.65;' : '' }}">
+
+                            <div class="d-flex align-items-center text-sm">
+                                <img src="{{ $employee['avatar_url'] ?? '/assets/img/default-avatar.png' }}"
+                                    class="rounded-circle me-2" width="32" height="32">
+                                {{ $employee['full_name'] }}
+                            </div>
+
+                            <small class=" {{ $onLeave ? 'text-danger' : 'text-success' }} fw-semibold">
+                                {{ $onLeave ? 'Unavailable' : 'Available' }}
+                            </small>
+                        </a>
+                    @empty
+                        <div class="list-group-item text-center text-muted">
+                            No available employees found.
+                        </div>
+                    @endforelse
+                </div>
+            @else
+                <div class="list-group-item text-muted text-center">
+                    You need to select date first
+                </div>
+            @endif
+
         </div>
     @endif
 </div>

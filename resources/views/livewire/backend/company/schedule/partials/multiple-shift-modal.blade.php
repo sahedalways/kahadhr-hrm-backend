@@ -238,10 +238,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-2 text-start mt-2">
+                                                <div class="col-2 text-start ">
 
                                                     <button type="button"
-                                                        class="btn btn-sm text-danger border-0 circle-sm"
+                                                        class="btn btn-sm text-danger border-0 circle-sm "
+                                                        style="margin-top: 1.7rem !important"
                                                         wire:click="removeMultipleBreakRow({{ $index }}, {{ $breakIndex }})">
                                                         <i class="fas fa-times"></i>
                                                     </button>

@@ -120,7 +120,7 @@
                                             <div class="position-relative mb-3">
                                                 <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
                                                     class="img-fluid shadow-sm clickable-image"
-                                                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
+                                                    style="min-width: 120px; width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
                                                     data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
                                                     alt="Employee Avatar">
 
@@ -146,16 +146,16 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <dl class="row mb-0 small">
-                                                    <dt class="col-sm-4 text-muted">Work Email:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2 text-truncate">
+                                                    <dt class="col-sm-5 text-muted">Work Email:</dt>
+                                                    <dd class="col-sm-7 text-dark fw-medium mb-2 text-truncate">
                                                         {{ $details->email }}</dd>
 
-                                                    <dt class="col-sm-4 text-muted">Work Phone:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2">
+                                                    <dt class="col-sm-5 text-muted">Work Phone:</dt>
+                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
                                                         {{ $details->user->phone_no ?? 'N/A' }}</dd>
 
-                                                    <dt class="col-sm-4 text-muted">Role:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2">
+                                                    <dt class="col-sm-5 text-muted">Role:</dt>
+                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
                                                         {{ ucfirst($details->role) }}</dd>
                                                 </dl>
                                             </div>

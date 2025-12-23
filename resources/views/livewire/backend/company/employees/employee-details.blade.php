@@ -116,83 +116,159 @@
                     <div class="tab-pane fade show active" id="overview" role="tabpanel"
                         aria-labelledby="overview-tab">
                         <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
-                            <div class="card-header bg-white py-4 border-bottom-0"
+                            <div class="card-header bg-white py-4 border-bottom-0 d-flex align-items-center justify-content-between"
                                 style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+
+                                <!-- Title -->
                                 <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
                                     <i class="fas fa-user-circle me-3 text-info"></i>
                                     Employee Overview
                                 </h4>
+
+                                <!-- Menu Button -->
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-envelope me-2 text-muted"></i> Send Email
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-user-lock me-2 text-muted"></i> Change Status
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#">
+                                                <i class="fas fa-trash me-2"></i> Remove Employee
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
                             </div>
 
-                            <div class="card-body p-4 pt-0">
-                                <div class="row g-4">
 
-                                    <div class="col-lg-3 col-md-4 text-center border-end">
+                            <div class="card-body p-4 pt-0">
+                                <div class="row g-4 align-items-start">
+
+                                    <!-- Profile -->
+                                    <div class="col-lg-3 col-md-4 text-center position-relative">
+
+                                        <!-- responsive border -->
+                                        <div class="d-none d-md-block position-absolute top-0 end-0 h-100 border-end">
+                                        </div>
+
                                         <div class="d-flex flex-column align-items-center p-3">
+
                                             <div class="position-relative mb-3">
                                                 <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
-                                                    class="img-fluid shadow-sm clickable-image"
-                                                    style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
-                                                    data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                                    class="shadow-sm clickable-image flex-shrink-0"
+                                                    style="width:120px;height:120px;aspect-ratio:1/1;object-fit:cover;border-radius:50%;border:4px solid var(--bs-info);"
                                                     alt="Employee Avatar">
 
                                                 <span
-                                                    class="badge rounded-pill position-absolute bottom-0 end-0 p-2 
-                                  {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
-                                                    style="transform: translate(25%, 25%);">
+                                                    class="badge rounded-pill position-absolute p-2 
+                {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
+                                                    style="transform: translate(25%, 25%); bottom: 12px;
+    right: 8px ">
                                                     <i
                                                         class="bi {{ $details->is_active ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
                                                 </span>
                                             </div>
 
-                                            <h4 class="mb-1 fw-bold">{{ $details->full_name }}</h4>
-                                            <p class="text-muted small mb-0">{{ $details->job_title ?: 'N/A' }}</p>
-
+                                            <h5 class="mb-1 fw-bold">{{ $details->full_name }}</h5>
+                                            <p class="text-muted small fw-bold mb-0">{{ $details->job_title ?: 'N/A' }}</p>
 
                                         </div>
                                     </div>
 
+
+
+                                    <!-- Details -->
                                     <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info text-center">Employment & Contact</h5>
+                                        <h5 class="fw-bold mb-3 text-info text-center text-md-start">
+                                            Employment & Contact
+                                        </h5>
 
-                                        <div class="row g-3">
+                                        <div class="row">
+
+                                            <!-- Left Info -->
                                             <div class="col-md-6">
-                                                <dl class="row mb-0 small">
-                                                    <dt class="col-sm-4 text-muted">Work Email:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2 text-truncate">
-                                                        {{ $details->email }}</dd>
+                                                <div class="p-3 pb-md-3 pb-0 rounded bg-light-subtle h-100">
 
-                                                    <dt class="col-sm-4 text-muted">Work Phone:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2">
-                                                        {{ $details->user->phone_no ?? 'N/A' }}</dd>
+                                                    <div class="mb-3">
+                                                        <div class="text-muted fw-bold small">Work Email</div>
+                                                        <div class="fw-medium text-truncate">
+                                                            {{ $details->email }}
+                                                        </div>
+                                                    </div>
 
-                                                    <dt class="col-sm-4 text-muted">Role:</dt>
-                                                    <dd class="col-sm-8 text-dark fw-medium mb-2">
-                                                        {{ ucfirst($details->role) }}</dd>
-                                                </dl>
+                                                    <div class="mb-3">
+                                                        <div class="text-muted fw-bold small">Work Phone</div>
+                                                        <div>
+                                                            {{ $details->user->phone_no ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="text-muted fw-bold small">Role</div>
+                                                        <div>
+                                                            {{ ucfirst($details->role) }}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
 
-                                            <div class="col-md-6 border-start">
-                                                <dl class="row mb-0 small">
-                                                    <dt class="col-sm-5 text-muted">Company:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->company->company_name ?? 'N/A' }}</dd>
+                                            <!-- Right Info -->
+                                            <div class="col-md-6">
+                                                <div class="p-3 rounded bg-light-subtle h-100">
 
-                                                    <dt class="col-sm-5 text-muted">Department:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->department?->name ?? 'N/A' }}</dd>
+                                                    <div class="mb-3">
+                                                        <div class="text-muted small fw-bold">Company</div>
+                                                        <div>
+                                                            {{ $details->company->company_name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
 
-                                                    <dt class="col-sm-5 text-muted">Team:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->team?->name ?? 'N/A' }}</dd>
-                                                </dl>
+                                                    <div class="mb-3">
+                                                        <div class="text-muted small fw-bold">Department</div>
+                                                        <div>
+                                                            {{ $details->department?->name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="text-muted small fw-bold">Team</div>
+                                                        <div>
+                                                            {{ $details->team?->name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
+
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 

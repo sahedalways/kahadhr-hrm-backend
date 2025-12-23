@@ -406,6 +406,15 @@ table.fc-scrollgrid-sync-table {
 .fc-header-toolbar.fc-toolbar {
     flex-wrap: wrap;
 }
+@media (max-width: 1199px) {
+    .clickable-image {
+        width:100px !important;
+        height:100px !important;
+    }
+     body {
+        zoom: 0.9;
+    }
+}
 
 @media (max-width: 991px) {
     body {

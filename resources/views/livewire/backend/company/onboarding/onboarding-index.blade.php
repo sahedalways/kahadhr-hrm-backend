@@ -73,7 +73,12 @@
                 <div class="col-md-6 col-lg-4 d-flex">
                     <div class="card onboarding-step shadow-sm w-100 position-relative">
 
-                        {{-- 🔵 Hover View Button --}}
+                      
+
+
+                        {{-- Media --}}
+                        <div class="media-container text-center p-3 position-relative">
+                              {{-- 🔵 Hover View Button --}}
                         <div class="view-overlay">
                             <a href="{{ route('company.dashboard.onboarding.view', [
                                 'id' => $item->id,
@@ -83,10 +88,6 @@
                                 View
                             </a>
                         </div>
-
-
-                        {{-- Media --}}
-                        <div class="media-container text-center p-3">
 
                             @php
                                 $media = strtolower($item->media ?? '');
@@ -121,8 +122,8 @@
                             </p>
                         </div>
 
-                        <div class="card-footer bg-light border-0 d-flex justify-content-between align-items-center">
-                            <div>
+                        <div class="card-footer gap-4 flex-wrap bg-light border-0 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <span class="badge bg-secondary">
                                     @if (isset($item->creator) && $item->creator->user_type === 'company')
                                         Company Admin

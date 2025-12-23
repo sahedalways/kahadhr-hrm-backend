@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-   <div class="col-lg-6">
+            <div class="col-lg-6">
                 <div class="card shadow-sm mb-4">
 
                     <div class="card shadow-sm border-0">
@@ -122,8 +122,10 @@
                             </ul>
 
                             <hr class="my-4">
+                            <div class="card-header bg-primary text-white border-0 p-3 mb-2">
+                                <h5 class="mb-0">✍️ Manual Leave Entry</h5>
+                            </div>
 
-                            <h5 class="fw-bold mb-3 text-primary">✍️ Manual Leave Entry</h5>
                             <form wire:submit.prevent="saveRequest">
                                 {{-- Employee Select --}}
                                 <div class="mb-3">
@@ -288,7 +290,7 @@
             </div>
 
 
-         
+
 
 
         </div>

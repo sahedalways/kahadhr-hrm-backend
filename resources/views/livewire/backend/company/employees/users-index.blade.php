@@ -69,14 +69,14 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
+                                        <th>Name</th>
+
                                         <th>Email</th>
                                         <th>Job Title</th>
-                                        <th>Department</th>
+                                        {{-- <th>Department</th>
                                         <th>Team</th>
                                         <th>Status</th>
-                                        <th>Is Verified</th>
+                                        <th>Is Verified</th> --}}
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -85,8 +85,8 @@
                                     @forelse($infos as $employee)
                                         <tr>
                                             <td>{{ $i++ }}</td>
-                                            <td>{{ $employee->f_name ?? 'N/A' }}</td>
-                                            <td>{{ $employee->l_name ?? 'N/A' }}</td>
+                                            <td>{{ $employee->full_name ?? 'N/A' }}</td>
+
                                             <td>
                                                 <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
                                                     style="cursor:pointer; padding:2px 4px; border-radius:4px;"
@@ -99,11 +99,11 @@
                                                 </span>
                                             </td>
                                             <td>{{ $employee->job_title ?? 'N/A' }}</td>
-                                            <td>{{ $employee->department->name ?? 'N/A' }}</td>
-                                            <td>{{ $employee->team->name ?? 'N/A' }}</td>
+                                            {{-- <td>{{ $employee->department->name ?? 'N/A' }}</td>
+                                            <td>{{ $employee->team->name ?? 'N/A' }}</td> --}}
 
 
-                                            <td>
+                                            {{-- <td>
                                                 <a href="#" wire:click.prevent="toggleStatus({{ $employee->id }})"
                                                     onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                     onmouseout="this.style.backgroundColor='transparent';"
@@ -112,8 +112,8 @@
                                                     title="Click to change status">
                                                     {!! statusBadgeTwo($employee->is_active) !!}
                                                 </a>
-                                            </td>
-                                            <td>
+                                            </td> --}}
+                                            {{-- <td>
                                                 @if (!$employee->verified && !$employee->invite_token)
                                                     <button class="badge badge-primary badge-xs border-0"
                                                         wire:click="sendVerificationLink({{ $employee->id }})"
@@ -133,14 +133,11 @@
                                                 @else
                                                     <span class="badge badge-success badge-xs">Verified</span>
                                                 @endif
-                                            </td>
+                                            </td> --}}
 
 
 
                                             <td>
-
-
-
 
                                                 <a href="{{ route('company.dashboard.employees.details', [
                                                     'company' => app('authUser')->company->sub_domain,
@@ -154,19 +151,19 @@
                                                 </a>
 
 
-                                                <a data-bs-toggle="modal" data-bs-target="#editProfile"
+                                                {{-- <a data-bs-toggle="modal" data-bs-target="#editProfile"
                                                     wire:click="editProfile({{ $employee->id }})"
                                                     class="badge badge-info badge-xs text-white"
                                                     style="background-color:#4ba3f7 !important; color:#ffffff !important; cursor:pointer; transition: all 0.3s ease;"
                                                     onmouseover="this.style.setProperty('background-color', '#5ca6f9', 'important'); this.style.setProperty('color', '#000000', 'important');"
                                                     onmouseout="this.style.setProperty('background-color', '#4ba3f7', 'important'); this.style.setProperty('color', '#ffffff', 'important');">
                                                     Edit Profile
-                                                </a>
+                                                </a> --}}
 
 
 
 
-                                                <a href="#" class="badge badge-warning badge-xs"
+                                                {{-- <a href="#" class="badge badge-warning badge-xs"
                                                     wire:click.prevent="assignAAdmin({{ $employee->id }})">
                                                     A-Admin
                                                 </a>
@@ -174,7 +171,7 @@
                                                 <a href="#" class="badge badge-danger badge-xs"
                                                     wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
                                                     Delete
-                                                </a>
+                                                </a> --}}
 
                                             </td>
                                         </tr>

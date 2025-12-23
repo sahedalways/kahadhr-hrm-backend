@@ -1,18 +1,17 @@
-<aside
-    class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start"
+<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start"
     id="sidenav-main" data-color="primary">
 
     <div class="sidenav-header">
-                  <div class=" sidenav-toggler-inner-wrapper w-100">
-                <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
-                    {{--<div class="sidenav-toggler-inner">
+        <div class=" sidenav-toggler-inner-wrapper w-100">
+            <a href="javascript:;" class="nav-link p-0 w-fitcontent sidenav-toggler">
+                {{-- <div class="sidenav-toggler-inner">
                         <i class="sidenav-toggler-line bg-dark"></i>
                         <i class="sidenav-toggler-line bg-dark"></i>
                         <i class="sidenav-toggler-line bg-dark"></i>
-                    </div>--}}
-                    <i class="fa-solid fa-angle-left sidebar-icon"></i>
-                </a>
-            </div>
+                    </div> --}}
+                <i class="fa-solid fa-angle-left sidebar-icon"></i>
+            </a>
+        </div>
 
         @php
             $authUser = app('authUser');
@@ -403,7 +402,7 @@
                                 <a class="nav-link {{ Request::is('dashboard/reports/pay-slips') ? 'active' : '' }}"
                                     href="{{ route('company.dashboard.reports.payslips', ['company' => app('authUser')->company->sub_domain]) }}">
                                     <i class="fas fa-file-invoice-dollar sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Pay Slips </span>
+                                    <span class="sidenav-normal"> PaySlips </span>
                                 </a>
                             </li>
 
@@ -560,7 +559,7 @@
                                 <a class="nav-link {{ Request::is('employee/dashboard/reports/pay-slips*') ? 'active' : '' }}"
                                     href="{{ route('employee.dashboard.reports.payslips', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                                     <i class="fa-solid fa-file-invoice-dollar sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Pay Slips </span>
+                                    <span class="sidenav-normal"> PaySlips </span>
                                 </a>
                             </li>
 

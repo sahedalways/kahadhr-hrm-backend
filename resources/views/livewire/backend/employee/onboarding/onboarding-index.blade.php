@@ -3,7 +3,7 @@
         placeholder="Search by title ..." class="form-control mb-2" />
 
     <div class="list-group">
-        @foreach ($announcements as $announcement)
+        @forelse ($announcements as $announcement)
             <div class="list-group-item">
                 <h5>{{ $announcement->title }}</h5>
                 <p>{!! $announcement->description !!}</p>
@@ -29,7 +29,6 @@
                     </div>
                 @endif
 
-
                 <div class="mt-2 text-muted small">
                     <span>
                         Created by:
@@ -41,9 +40,12 @@
                     </span> |
                     <span>Created at: {{ $announcement->created_at->format('d M Y') }}</span>
                 </div>
-
             </div>
-        @endforeach
+        @empty
+            <div class="list-group-item text-center text-muted">
+                No announcements found.
+            </div>
+        @endforelse
     </div>
 
     @if ($hasMore)

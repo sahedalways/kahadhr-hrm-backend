@@ -74,8 +74,9 @@
                 </div>
             </div>
         @empty
-            <div class="col-12 text-center mt-4">
-                <p class="text-white">No documents assigned.</p>
+
+            <div class="list-group-item text-center text-muted">
+                No documents assigned.
             </div>
         @endforelse
     </div>

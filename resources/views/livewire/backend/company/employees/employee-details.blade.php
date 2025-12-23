@@ -153,7 +153,7 @@
                                     </div>
 
                                     <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info">Employment & Contact</h5>
+                                        <h5 class="fw-bold mb-3 text-info text-center">Employment & Contact</h5>
 
                                         <div class="row g-3">
                                             <div class="col-md-6">

@@ -193,7 +193,7 @@
                             @endif
                         </div>
 
-           
+
 
                         @if ($hasMore)
                             <div class="text-center my-3">
@@ -986,13 +986,14 @@
                                 placeholder="A+, B+, O+">
                         </div>
                     @endif
-
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" wire:model="customField.required">
-                        <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" id="requiredField"
+                            wire:model="customField.required">
+                        <label class="form-check-label" for="requiredField">
                             Required Field
                         </label>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">

@@ -30,23 +30,26 @@
             @endphp
 
             @if ($item->media && $isImage)
-                <img src="{{ asset('storage/' . $item->media) }}" class="img-fluid rounded shadow-lg border"
-                    alt="media">
+                <img src="{{ asset('storage/' . $item->media) }}" class="rounded shadow-lg border" alt="media"
+                    style="max-width:300px; max-height:200px; object-fit:cover;">
             @elseif ($item->media && $isVideo)
-                <video class="w-100 rounded shadow-lg border" controls>
+                <video class="rounded shadow-lg border" controls
+                    style="max-width:300px; max-height:200px; width:100%; height:auto;">
                     <source src="{{ asset('storage/' . $item->media) }}" type="video/mp4">
                 </video>
             @elseif ($item->media && $isAudio)
-                <audio controls class="w-100">
+                <audio controls class="w-100" style="max-width:300px;">
                     <source src="{{ asset('storage/' . $item->media) }}">
                 </audio>
             @else
-                <div class="media-placeholder p-5 border rounded bg-dark-subtle text-center">
+                <div class="media-placeholder p-4 border rounded bg-dark-subtle text-center"
+                    style="max-width:300px; margin:auto;">
                     <i class="bi bi-file-earmark-text fs-2 text-muted"></i>
                     <p class="small text-muted mt-2">No media uploaded</p>
                 </div>
             @endif
         </div>
+
 
         {{-- Back Button --}}
         <div class="d-flex justify-content-start mt-4">

@@ -4,32 +4,37 @@
 
     <div class="list-group">
         @forelse ($announcements as $announcement)
-            <div class="list-group-item">
-                <h5>{{ $announcement->title }}</h5>
-                <p>{!! $announcement->description !!}</p>
+            <div class="list-group-item text-center">
+                <h5 class="text-center">{{ $announcement->title }}</h5>
+                <p class="text-center">{!! $announcement->description !!}</p>
 
                 @if ($announcement->media)
-                    <div class="mt-2">
+                    <div class="mt-2 text-center">
                         @php
                             $ext = pathinfo($announcement->media, PATHINFO_EXTENSION);
                         @endphp
+
                         @if (in_array($ext, ['mp4', 'mov', 'avi']))
-                            <video width="250" controls>
+                            <video controls
+                                style="max-width:300px; max-height:200px; width:100%; height:auto; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
                                 <source src="{{ asset('storage/' . $announcement->media) }}"
                                     type="video/{{ $ext }}">
                             </video>
                         @elseif (in_array($ext, ['mp3', 'wav']))
-                            <audio controls>
+                            <audio controls style="width:100%; max-width:300px;">
                                 <source src="{{ asset('storage/' . $announcement->media) }}"
                                     type="audio/{{ $ext }}">
                             </audio>
                         @else
-                            <img src="{{ asset('storage/' . $announcement->media) }}" alt="media" class="img-fluid">
+                            <img src="{{ asset('storage/' . $announcement->media) }}" alt="media"
+                                style="max-width:300px; max-height:200px; width:100%; object-fit:cover; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);"
+                                class="clickable-image cursor-pointer"
+                                data-src="{{ asset('storage/' . $announcement->media) ?? asset('assets/default-user.jpg') }}">
                         @endif
                     </div>
                 @endif
 
-                <div class="mt-2 text-muted small">
+                <div class="mt-2 text-muted small text-center mt-4">
                     <span>
                         Created by:
                         @if (isset($announcement->creator) && $announcement->creator->user_type === 'company')

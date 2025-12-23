@@ -323,10 +323,7 @@
                                         style="width: 250px; font-size: 0.85rem;">
                                         <p class="text-muted mb-2"><i class="bi bi-info-circle-fill me-1"></i>No card
                                             saved yet.</p>
-                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#editCardModal">
-                                            <i class="bi bi-plus-circle-fill me-1"></i> Add New Card
-                                        </button>
+
                                     </div>
                                 @endif
                             </div>

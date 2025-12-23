@@ -16,49 +16,85 @@
 
             <!-- Sidebar -->
             <div class="col-lg-3">
-                <div class="card border-0 shadow-lg" style="border-radius: 0.75rem; overflow: hidden;">
-                    <div class="card-body p-0">
+                <div class="card shadow-sm" style="border-radius:14px;border:none;overflow:hidden;background:#fff;">
 
-                        <div class="list-group list-group-flush" role="tablist">
+                    <!-- Header -->
+                    <div
+                        style="background:linear-gradient(135deg,#0dcaf0,#0b9ed0);
+                   color:#fff;
+                   padding:14px 20px;
+                   font-weight:600;
+                   font-size:0.85rem;
+                   text-transform:uppercase;
+                   letter-spacing:.5px;">
+                        <i class="bi bi-person-circle me-2"></i>
+                        Employee Profile
+                    </div>
 
-                            <div class="list-group-item bg-info text-white text-uppercase fw-bold small py-3 px-4"
-                                style="border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
-                                <i class="bi bi-person-circle me-2"></i> Employee Profile
-                            </div>
+                    <!-- Menu -->
+                    <div class="list-group list-group-flush" role="tablist">
 
-                            <a class="list-group-item list-group-item-action active py-3 px-4 fw-bold border-0"
-                                data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview"
-                                aria-selected="true"
-                                style="border-left: 5px solid var(--bs-info) !important; color: var(--bs-info) !important; background-color: #ebf6ff; transition: all 0.25s ease;">
-                                <i class="bi bi-person-lines-fill me-3 fs-5 align-middle"></i> Employee Overview
-                            </a>
+                        <!-- Active -->
+                        <a class="list-group-item list-group-item-action active" data-bs-toggle="tab" href="#overview"
+                            role="tab"
+                            style="border:none;
+                      padding:14px 20px;
+                      display:flex;
+                      align-items:center;
+                      gap:12px;
+                      background:#e9f7fc;
+                      color:#0dcaf0;
+                      font-weight:600;
+                      border-left:4px solid #0dcaf0;">
+                            <i class="bi bi-person-lines-fill" style="font-size:1.1rem;"></i>
+                            Employee Overview
+                        </a>
 
-                            <a class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 text-dark"
-                                data-bs-toggle="tab" href="#personalInfo" role="tab" aria-controls="personalInfo"
-                                aria-selected="false"
-                                style="transition: background-color 0.25s ease; border-left: 5px solid transparent;">
-                                <i class="bi bi-person-badge me-3 fs-5 align-middle"></i> Personal Info
-                            </a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#personalInfo"
+                            role="tab"
+                            style="border:none;
+                      padding:14px 20px;
+                      display:flex;
+                      align-items:center;
+                      gap:12px;
+                      font-weight:500;
+                      color:#444;">
+                            <i class="bi bi-person-badge" style="font-size:1.1rem;color:#6c757d;"></i>
+                            Personal Info
+                        </a>
 
-                            <a class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 text-dark"
-                                data-bs-toggle="tab" href="#employment" role="tab" aria-controls="employment"
-                                aria-selected="false"
-                                style="transition: background-color 0.25s ease; border-left: 5px solid transparent;">
-                                <i class="bi bi-briefcase me-3 fs-5 align-middle"></i> Employment Info
-                            </a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#employment"
+                            role="tab"
+                            style="border:none;
+                      padding:14px 20px;
+                      display:flex;
+                      align-items:center;
+                      gap:12px;
+                      font-weight:500;
+                      color:#444;">
+                            <i class="bi bi-briefcase" style="font-size:1.1rem;color:#6c757d;"></i>
+                            Employment Info
+                        </a>
 
-                            <a class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 text-dark"
-                                data-bs-toggle="tab" href="#documentsSection" role="tab"
-                                aria-controls="documentsSection" aria-selected="false"
-                                style="border-bottom-left-radius: 0.75rem; border-bottom-right-radius: 0.75rem; background-color: #f7f7f7; transition: background-color 0.25s ease; border-left: 5px solid transparent;">
-                                <i class="bi bi-folder me-3 fs-5 align-middle"></i> Documents
-                            </a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#documentsSection"
+                            role="tab"
+                            style="border:none;
+                      padding:14px 20px;
+                      display:flex;
+                      align-items:center;
+                      gap:12px;
+                      font-weight:500;
+                      color:#444;">
+                            <i class="bi bi-folder" style="font-size:1.1rem;color:#6c757d;"></i>
+                            Documents
+                        </a>
 
-                        </div>
+
 
                     </div>
                 </div>
             </div>
+
 
             <!-- Main Content -->
             <div class="col-lg-9">
@@ -70,9 +106,10 @@
                         <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
                             <div class="card-header bg-white py-4 border-bottom-0"
                                 style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                <h3 class="mb-0 fw-bold text-dark d-flex align-items-center">
-                                    <i class="bi bi-person-circle me-3 text-info"></i> Employee Overview
-                                </h3>
+                                <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-3 text-info"></i>
+                                    Employee Overview
+                                </h4>
                             </div>
 
                             <div class="card-body p-4 pt-0">
@@ -104,7 +141,7 @@
                                     </div>
 
                                     <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info">Employment & Contact</h5>
+                                        <h5 class="fw-bold mb-3 text-info text-center">Employment & Contact</h5>
 
                                         <div class="row g-3">
                                             <div class="col-md-6">
@@ -149,37 +186,47 @@
 
                     <!-- Employment Info -->
                     <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
-                        <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
-                            <div class="card-header bg-white py-4 border-bottom-0"
-                                style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                <h3 class="mb-0 fw-bold text-dark d-flex align-items-center">
-                                    <i class="bi bi-briefcase me-3 text-info"></i> Employment Information
-                                </h3>
+                        <div class="card border-0 shadow-lg" style="border-radius:1rem;">
+
+                            <!-- Header -->
+                            <div class="card-header bg-white py-3 border-bottom-0"
+                                style="border-top-left-radius:1rem;border-top-right-radius:1rem;">
+                                <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                                    <i class="fas fa-briefcase me-3 text-info"></i>
+
+                                    Employment Information
+                                </h4>
                             </div>
 
                             <div class="card-body p-4">
                                 <div class="row g-4">
 
+                                    <!-- Left -->
                                     <div class="col-md-6">
-                                        <h5 class="fw-bold text-secondary mb-3">Contract Structure</h5>
+                                        <h5 class="fw-bold text-secondary mb-3" style="font-size:0.95rem;">
+                                            Contract Structure
+                                        </h5>
 
                                         <div class="p-3 bg-light rounded-3 mb-3 border-start border-3 border-info">
-                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1">Salary
-                                                Type</small>
-                                            <p class="fs-5 fw-bold mb-0 text-dark">
+                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1"
+                                                style="font-size:0.7rem;">
+                                                Salary Type
+                                            </small>
+                                            <p class="fw-bold mb-0 text-dark" style="font-size:0.9rem;">
                                                 {{ ucfirst($details->salary_type ?? 'N/A') }}
                                             </p>
                                         </div>
 
                                         <div
-                                            class="p-3 bg-light rounded-3 mb-3 border-start border-3 
+                                            class="p-3 bg-light rounded-3 mb-3 border-start border-3
                         @if (($details->salary_type ?? '') === 'hourly') border-warning @else border-success @endif">
-                                            <small
-                                                class="text-muted text-uppercase fw-semibold d-block mb-1">Employment
-                                                Type</small>
-                                            <p
-                                                class="fs-5 fw-bold mb-0 
-                            @if (($details->salary_type ?? '') === 'hourly') text-warning @else text-success @endif">
+                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1"
+                                                style="font-size:0.7rem;">
+                                                Employment Type
+                                            </small>
+                                            <p class="fw-bold mb-0
+                            @if (($details->salary_type ?? '') === 'hourly') text-warning @else text-success @endif"
+                                                style="font-size:0.9rem;">
                                                 @if (($details->salary_type ?? '') === 'hourly')
                                                     Part Time
                                                 @else
@@ -190,35 +237,43 @@
 
                                         @if (($details->salary_type ?? '') === 'hourly')
                                             <div class="p-3 bg-light rounded-3">
-                                                <small
-                                                    class="text-muted text-uppercase fw-semibold d-block mb-1">Contract
-                                                    Hours</small>
-                                                <p class="fs-5 fw-bold mb-0 text-dark">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1"
+                                                    style="font-size:0.7rem;">
+                                                    Contract Hours
+                                                </small>
+                                                <p class="fw-bold mb-0 text-dark" style="font-size:0.9rem;">
                                                     {{ $details->contract_hours ?? 'N/A' }} hours/week
                                                 </p>
                                             </div>
                                         @endif
                                     </div>
 
+                                    <!-- Right -->
                                     <div class="col-md-6 border-start ps-4">
-                                        <h5 class="fw-bold text-secondary mb-3">Duration & History</h5>
+                                        <h5 class="fw-bold text-secondary mb-3" style="font-size:0.95rem;">
+                                            Duration & History
+                                        </h5>
 
                                         <div class="p-3 bg-light rounded-3 mb-3">
-                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1">Start
-                                                Date</small>
-                                            <p class="fs-4 fw-bolder mb-0 text-info">
+                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1"
+                                                style="font-size:0.7rem;">
+                                                Start Date
+                                            </small>
+                                            <p class="fw-bolder mb-0 text-info" style="font-size:1rem;">
                                                 {{ $details->start_date?->format('d M Y') ?? 'N/A' }}
                                             </p>
                                         </div>
 
                                         <div
-                                            class="p-3 rounded-3 
+                                            class="p-3 rounded-3
                         @if ($details->end_date ?? null) bg-danger-subtle border border-danger @else bg-success-subtle border border-success @endif">
-                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1">End
-                                                Date</small>
-                                            <p
-                                                class="fs-4 fw-bolder mb-0 
-                            @if ($details->end_date ?? null) text-danger @else text-success @endif">
+                                            <small class="text-muted text-uppercase fw-semibold d-block mb-1"
+                                                style="font-size:0.7rem;">
+                                                End Date
+                                            </small>
+                                            <p class="fw-bolder mb-0
+                            @if ($details->end_date ?? null) text-danger @else text-success @endif"
+                                                style="font-size:1rem;">
                                                 @if ($details->end_date ?? null)
                                                     {{ $details->end_date->format('d M Y') }}
                                                 @else
@@ -229,11 +284,10 @@
                                     </div>
 
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
+
 
                     <!-- Documents -->
                     <div class="tab-pane fade" id="documentsSection" role="tabpanel"
@@ -241,9 +295,10 @@
                         <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
                             <div class="card-header bg-white py-4 border-bottom-0"
                                 style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                <h3 class="mb-0 fw-bold text-dark d-flex align-items-center">
-                                    <i class="bi bi-folder-fill me-3 text-info"></i> Employee Documents
-                                </h3>
+                                <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                                    <i class="fas fa-folder me-3 text-info"></i>
+                                    Employee Documents
+                                </h4>
                             </div>
 
                             <div class="card-body p-4">
@@ -365,9 +420,10 @@
                     <!-- Personal Info -->
                     <div class="tab-pane fade" id="personalInfo" role="tabpanel" aria-labelledby="personalInfo-tab">
 
-                        <h3 class="mb-4 fw-bold text-dark d-flex align-items-center">
-                            <i class="bi bi-person-badge me-3 text-info"></i> Personal Information
-                        </h3>
+                        <h4 class="mb-4 fw-bold text-dark d-flex align-items-center">
+                            <i class="fas fa-id-badge me-3 text-info"></i>
+                            Personal Information
+                        </h4>
 
                         <div class="row g-4">
 

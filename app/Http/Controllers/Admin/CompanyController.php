@@ -17,12 +17,11 @@ class CompanyController extends Controller
             ->findOrFail($id);
 
         $stripeCard = null;
-        $paymentMethodId = $details->bankInfos->first()?->stripe_payment_method_id;
+        $paymentMethodId = $details->bankInfos?->first()?->stripe_payment_method_id;
 
         if ($paymentMethodId) {
             $stripeCard = $this->fetchStripeCardInfo($paymentMethodId);
         }
-
 
         $invoicesQuery = $details->invoices()->orderBy('created_at', 'desc');
 

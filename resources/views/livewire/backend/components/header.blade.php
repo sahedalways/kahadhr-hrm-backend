@@ -80,24 +80,26 @@
                 <div class="d-flex align-items-center gap-3 ms-auto">
 
                     <!-- NOTIFICATION ICON -->
-                    <span class="d-flex position-relative cursor-pointer" id="notificationBell"
-                        wire:click="markAllAsRead">
-                        <i class="fa-regular fa-bell fs-4 text-white"></i>
+                    @if ($userType !== 'superAdmin')
+                        <span class="d-flex position-relative cursor-pointer" id="notificationBell"
+                            wire:click="markAllAsRead">
+                            <i class="fa-regular fa-bell fs-4 text-white"></i>
 
-                        @if ($unreadCount > 0)
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1 fs-6">
-                                {{ $unreadCount }}
-                            </span>
-                        @endif
-                    </span>
+                            @if ($unreadCount > 0)
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1 fs-6">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </span>
 
 
-                    <!-- NOTIFICATION DROPDOWN -->
-                    <div class="notification-dropdown" id="notificationDropdown" wire:ignore>
-                        @livewire('backend.components.notifications')
-                    </div>
+                        <!-- NOTIFICATION DROPDOWN -->
 
+                        <div class="notification-dropdown" id="notificationDropdown" wire:ignore>
+                            @livewire('backend.components.notifications')
+                        </div>
+                    @endif
 
                     @if ($userType !== 'superAdmin')
                         <div class="dropdown">
@@ -233,7 +235,7 @@
                                 </li>
 
                                 {{-- Logout --}}
-                               <li class="dropdown-divider-item">
+                                <li class="dropdown-divider-item">
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li>

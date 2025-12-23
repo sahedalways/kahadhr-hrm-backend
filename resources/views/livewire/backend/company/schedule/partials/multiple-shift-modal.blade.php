@@ -53,116 +53,115 @@
 
                         <div class="card-body px-4 pb-4">
                             {{-- SECTION 1: IDENTITY --}}
-                          <div class="row g-3 align-items-md-end">
+                            <div class="row g-3 align-items-md-end">
 
-    <!-- Shift Date -->
-    <div class="col-12 col-md-2">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Shift Date <span class="text-danger">*</span>
-        </label>
-        <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light border-end-0">
-                <i class="far fa-calendar-alt text-muted"></i>
-            </span>
-            <input type="date"
-                class="form-control form-control-sm border-start-0 ps-2
+                                <!-- Shift Date -->
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Shift Date <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="far fa-calendar-alt text-muted"></i>
+                                        </span>
+                                        <input type="date"
+                                            class="form-control form-control-sm border-start-0 ps-2
                 @error("multipleShifts.$index.date") is-invalid @enderror"
-                wire:model.live="multipleShifts.{{ $index }}.date">
-        </div>
-        @error("multipleShifts.$index.date")
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
+                                            wire:model.live="multipleShifts.{{ $index }}.date">
+                                    </div>
+                                    @error("multipleShifts.$index.date")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-    <!-- Internal Title -->
-    <div class="col-12 col-md-2">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Internal Title <span class="text-danger">*</span>
-        </label>
-        <input type="text"
-            class="form-control form-control-sm
+                                <!-- Internal Title -->
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Internal Title <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                        class="form-control form-control-sm
             @error("multipleShifts.$index.title") is-invalid @enderror"
-            placeholder="e.g., Inventory Audit"
-            wire:model.defer="multipleShifts.{{ $index }}.title">
-        @error("multipleShifts.$index.title")
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
+                                        placeholder="e.g., Inventory Audit"
+                                        wire:model.defer="multipleShifts.{{ $index }}.title">
+                                    @error("multipleShifts.$index.title")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-    <!-- Color -->
-    <div class="col-lg-1 col-2">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Color
-        </label>
-        <input type="color"
-            wire:model="multipleShifts.{{ $index }}.color"
-            class="form-control form-control-color w-100 border-0 p-0"
-            style="height:31px;border-radius:6px;">
-    </div>
+                                <!-- Color -->
+                                <div class="col-lg-1 col-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Color
+                                    </label>
+                                    <input type="color" wire:model="multipleShifts.{{ $index }}.color"
+                                        class="form-control form-control-color w-100 border-0 p-0"
+                                        style="height:31px;border-radius:6px;">
+                                </div>
 
-    <!-- Working Hours -->
-    <div class="col-12 col-xl-3 col-md-4">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Working Hours <span class="text-danger">*</span>
-        </label>
-        <div class="input-group input-group-sm">
-            <input type="time" class="form-control"
-                wire:model="multipleShifts.{{ $index }}.start_time"
-                @if ($shift['all_day']) disabled @endif
-                wire:change="calculateMultiTotalHours({{ $index }})">
-            <span class="input-group-text bg-white text-muted">to</span>
-            <input type="time" class="form-control"
-                wire:model="multipleShifts.{{ $index }}.end_time"
-                @if ($shift['all_day']) disabled @endif
-                wire:change="calculateMultiTotalHours({{ $index }})">
-        </div>
+                                <!-- Working Hours -->
+                                <div class="col-12 col-xl-2 col-md-4">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Working Hours <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="time" class="form-control"
+                                            wire:model="multipleShifts.{{ $index }}.start_time"
+                                            @if ($shift['all_day']) disabled @endif
+                                            wire:change="calculateMultiTotalHours({{ $index }})">
+                                        <span class="input-group-text bg-white text-muted">to</span>
+                                        <input type="time" class="form-control"
+                                            wire:model="multipleShifts.{{ $index }}.end_time"
+                                            @if ($shift['all_day']) disabled @endif
+                                            wire:change="calculateMultiTotalHours({{ $index }})">
+                                    </div>
 
-        @error("multipleShifts.$index.start_time")
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-        @error("multipleShifts.$index.end_time")
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
+                                    @error("multipleShifts.$index.start_time")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                    @error("multipleShifts.$index.end_time")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-    <!-- All Day -->
-    <div class="col-lg-1 col-md-2 col-12 text-md-center">
-        <label class="form-label text-muted fw-bold small text-uppercase d-block">
-            All Day
-        </label>
-        <div class="form-check form-switch d-inline-block m-0">
-            <input class="form-check-input" type="checkbox"
-                wire:model="multipleShifts.{{ $index }}.all_day"
-                wire:change="toggleMultiAllDayForShift({{ $index }}, $event.target.checked)">
-        </div>
-    </div>
+                                <!-- All Day -->
+                                <div class="col-lg-1 col-md-2 col-12 text-md-center">
+                                    <label class="form-label text-muted fw-bold small text-uppercase d-block">
+                                        All Day
+                                    </label>
+                                    <div class="form-check form-switch d-inline-block m-0">
+                                        <input class="form-check-input" type="checkbox"
+                                            wire:model="multipleShifts.{{ $index }}.all_day"
+                                            wire:change="toggleMultiAllDayForShift({{ $index }}, $event.target.checked)">
+                                    </div>
+                                </div>
 
-    <!-- Net Hours -->
-    <div class="col-6 col-md-2">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Net Hours
-        </label>
-        <input type="text" readonly
-            class="form-control form-control-sm bg-light text-center fw-bold"
-            wire:model="multipleShifts.{{ $index }}.total_hours">
-    </div>
+                                <!-- Net Hours -->
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Net Hours
+                                    </label>
+                                    <input type="text" readonly
+                                        class="form-control form-control-sm bg-light text-center fw-bold"
+                                        wire:model="multipleShifts.{{ $index }}.total_hours">
+                                </div>
 
-    <!-- Job Role -->
-    <div class="col-12 col-md-2">
-        <label class="form-label text-muted fw-bold small text-uppercase">
-            Job Role <span class="text-danger">*</span>
-        </label>
-        <input type="text"
-            class="form-control form-control-sm
+                                <!-- Job Role -->
+                                <div class="col-12 col-md-2">
+                                    <label class="form-label text-muted fw-bold small text-uppercase">
+                                        Job Role <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                        class="form-control form-control-sm
             @error("multipleShifts.$index.job") is-invalid @enderror"
-            placeholder="Specify Role"
-            wire:model.defer="multipleShifts.{{ $index }}.job">
-        @error("multipleShifts.$index.job")
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
+                                        placeholder="Specify Role"
+                                        wire:model.defer="multipleShifts.{{ $index }}.job">
+                                    @error("multipleShifts.$index.job")
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-</div>
+                            </div>
 
 
 

@@ -30,10 +30,14 @@
             @endphp
 
             @if ($item->media && $isImage)
-                <img src="{{ asset('storage/' . $item->media) }}"
-                    class="rounded shadow-lg border clickable-image cursor-pointer" alt="media"
-                    style="max-width:600px; max-height:350px; object-fit:cover;"
-                    data-src="{{ asset('storage/' . $item->media) ?? asset('assets/default-user.jpg') }}">
+                <div class="d-flex justify-content-center">
+    <img src="{{ asset('storage/' . $item->media) }}"
+         class="rounded shadow-lg border cursor-pointer img-fluid"
+         alt="media"
+         style="max-width: 100%; max-height: 350px; object-fit: cover;"
+         data-src="{{ asset('storage/' . $item->media) ?? asset('assets/default-user.jpg') }}">
+</div>
+
             @elseif ($item->media && $isVideo)
                 <video class="rounded shadow-lg border" controls
                     style="max-width:300px; max-height:200px; width:100%; height:auto;">
@@ -56,7 +60,7 @@
         {{-- Back Button --}}
         <div class="d-flex justify-content-start mt-4">
             <a href="{{ route('company.dashboard.onboarding.index', ['company' => app('authUser')->company->sub_domain]) }}"
-                class="btn btn-outline-light btn-lg d-flex align-items-center gap-2">
+                class="btn btn-outline-dark btn-lg d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Back to All Onboardings
             </a>
         </div>

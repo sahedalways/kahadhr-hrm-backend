@@ -68,9 +68,19 @@ class SiteSetting extends Model
             if ($user->user_type === 'superAdmin') {
                 $builder->whereNull('company_id');
             } elseif ($user->user_type === 'company') {
-                $builder->where('company_id', $user->company->id ?? 0);
+                $companyId = $user->company->id ?? null;
+                $builder->when($companyId, function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId);
+                }, function ($q) {
+                    $q->whereNull('company_id');
+                });
             } elseif (in_array($user->user_type, ['employee', 'teamLead'])) {
-                $builder->where('company_id', $user->employee->company->id ?? 0);
+                $companyId = $user->employee->company->id ?? null;
+                $builder->when($companyId, function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId);
+                }, function ($q) {
+                    $q->whereNull('company_id');
+                });
             }
         });
 

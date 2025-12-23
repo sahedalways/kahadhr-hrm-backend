@@ -43,7 +43,7 @@
             <div class="unique-summary-card d-flex align-items-center p-3 shadow-sm border rounded">
                 <div
                     class="unique-summary-icon-box bg-success-subtle text-success me-3 rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="fas fa-users-viewfinder fa-lg"></i>
+                    <i class="fas fa-users fa-lg"></i>
                 </div>
                 <div>
                     <div class="unique-summary-value fw-bold fs-4 text-dark">{{ $summary['users'] }}</div>

@@ -7,7 +7,7 @@
     <div class="d-flex align-items-center mb-3 px-1">
         <div class="flex-grow-1 border-bottom me-3" style="opacity: 0.1;"></div>
         <h6 class="text-muted fw-bold text-uppercase mb-0 small" style="letter-spacing: 1px;">
-            {{ $viewMode == 'Monthly' ? 'Monthly Overview' : 'Weekly Overview' }}
+            {{ $viewMode == 'monthly' ? 'Monthly Overview' : 'Weekly Overview' }}
         </h6>
         <div class="flex-grow-1 border-bottom ms-3" style="opacity: 0.1;"></div>
     </div>

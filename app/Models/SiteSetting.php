@@ -68,24 +68,20 @@ class SiteSetting extends Model
             if ($user->user_type === 'superAdmin') {
                 $builder->whereNull('company_id');
             } elseif ($user->user_type === 'company') {
-                $companyId = $user->company->id ?? null;
-                $builder->when($companyId, function ($q) use ($companyId) {
-                    $q->where('company_id', $companyId);
-                }, function ($q) {
-                    $q->whereNull('company_id');
-                });
+                $builder->where('company_id', $user->company->id ?? 0);
             } elseif (in_array($user->user_type, ['employee', 'teamLead'])) {
-                $companyId = $user->employee->company->id ?? null;
-                $builder->when($companyId, function ($q) use ($companyId) {
-                    $q->where('company_id', $companyId);
-                }, function ($q) {
-                    $q->whereNull('company_id');
-                });
+                $builder->where('company_id', $user->employee->company->id ?? 0);
             }
         });
 
 
         static::updated(function ($setting) {
+            if (is_null($setting->company_id) && $setting->wasChanged('favicon')) {
+                self::whereNotNull('company_id')
+                    ->update(['favicon' => $setting->favicon]);
+            }
+
+
             if ($setting->company_id === 0 && $setting->wasChanged('copyright_text')) {
                 self::where('company_id', '>', 0)
                     ->update(['copyright_text' => $setting->copyright_text]);

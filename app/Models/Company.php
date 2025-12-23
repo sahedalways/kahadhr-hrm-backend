@@ -102,8 +102,6 @@ class Company extends Model
             SiteSetting::create([
                 'company_id'        => $company->id,
                 'site_title'        => $company->company_name,
-                'logo'              => 'png',
-                'favicon'           => 'png',
                 'site_phone_number' => $company->company_mobile ?? null,
                 'site_email'        => $company->company_email ?? null,
                 'copyright_text'    => $copyrightText,

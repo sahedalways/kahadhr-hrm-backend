@@ -427,7 +427,7 @@
 
                         @if ($receiverInfo && ($receiverInfo['type'] === 'group' || $receiverInfo['type'] === 'teamGroup'))
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"
-                                style="width:100%; height:100%; object-fit:cover;">
+                                style="width:100%; height:auto; object-fit:cover; max-height:200px; border-radius:8px;">
                         @else
                             @php
                                 $nameParts = explode(' ', $receiverInfo['name'] ?? '');

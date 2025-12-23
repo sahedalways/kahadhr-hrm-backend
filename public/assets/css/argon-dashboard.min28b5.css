@@ -22711,9 +22711,9 @@ hr.horizontal.gray-light {
     transition: all .1s ease
 }
 
-.sidenav .navbar-brand {
+/*.sidenav .navbar-brand {
     padding: 1.5rem 2rem
-}
+}*/
 
 /*.sidenav-header {
     height: 4.875rem
@@ -22845,7 +22845,7 @@ hr.horizontal.gray-light {
     background-color: transparent;
     box-shadow: none;
     color: rgba(33, 37, 41, .5);
-    margin-left: 1.35rem
+    margin-left: 1.35rem;
 }
 
 .navbar-vertical .navbar-nav .nav-item .collapse .nav .nav-item.active .nav-link,

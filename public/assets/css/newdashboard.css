@@ -154,7 +154,7 @@ body {
 
 .g-sidenav-show .navbar-vertical {
     max-width: 250px;
-    /****ADDTHISLINEFORSMOOTHNESS***Transitionsthe'max-width'propertyover0.3secondsusingan'ease-in-out'timingfunction.*/
+    width: 250px;
     transition: max-width 0.3s ease-in-out;
     -webkit-transition: max-width 0.3s ease-in-out;
     -moz-transition: max-width 0.3s ease-in-out;
@@ -182,7 +182,7 @@ body {
 }
 
 .g-sidenav-pinned .content-wrapper {
-    margin-left: 77px;
+    margin-left: 65px;
 }
 
 .nav-link .sidebar-icon {

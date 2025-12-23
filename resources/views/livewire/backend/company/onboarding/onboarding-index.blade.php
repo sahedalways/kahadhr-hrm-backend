@@ -288,7 +288,7 @@
 
 
 
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
+                        <button type="submit" class="btn btn-success btn-sm" wire:loading.attr="disabled"
                             wire:target="save">
                             <span wire:loading wire:target="save">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Saving...

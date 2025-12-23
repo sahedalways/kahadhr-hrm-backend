@@ -1,5 +1,5 @@
 <div class="col-12">
-    <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2 mb-2 bg-white" style="min-height:50px; ">
+    <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2 mb-2 " style="min-height:50px; ">
 
         {{-- Selected employees --}}
         @foreach ($multipleShifts[$index]['employees'] ?? [] as $employee)

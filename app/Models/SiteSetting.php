@@ -75,6 +75,14 @@ class SiteSetting extends Model
         });
 
 
+        static::created(function ($setting) {
+            if (is_null($setting->company_id) && $setting->favicon) {
+                self::whereNotNull('company_id')
+                    ->update(['favicon' => $setting->favicon]);
+            }
+        });
+
+
         static::updated(function ($setting) {
             if (is_null($setting->company_id) && $setting->wasChanged('favicon')) {
                 self::whereNotNull('company_id')

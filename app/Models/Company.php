@@ -98,10 +98,13 @@ class Company extends Model
 
             $copyrightText = $superAdminSettings ? $superAdminSettings->copyright_text : '';
 
+            $superAdminSetting = SiteSetting::whereNull('company_id')->first();
 
             SiteSetting::create([
                 'company_id'        => $company->id,
                 'site_title'        => $company->company_name,
+                'logo'              =>  $superAdminSetting->logo ?? null,
+                'favicon'           =>  $superAdminSetting->favicon ?? null,
                 'site_phone_number' => $company->company_mobile ?? null,
                 'site_email'        => $company->company_email ?? null,
                 'copyright_text'    => $copyrightText,

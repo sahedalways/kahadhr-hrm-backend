@@ -3,7 +3,7 @@
 
         {{-- Header Section --}}
         <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-dark">{{ $item->title }}</h1>
+            <h5 class="display-4 fw-bold text-dark">{{ $item->title }}</h5>
 
             <p class="lead text-light">
                 {!! $item->description !!}
@@ -30,8 +30,10 @@
             @endphp
 
             @if ($item->media && $isImage)
-                <img src="{{ asset('storage/' . $item->media) }}" class="rounded shadow-lg border" alt="media"
-                    style="max-width:300px; max-height:200px; object-fit:cover;">
+                <img src="{{ asset('storage/' . $item->media) }}"
+                    class="rounded shadow-lg border clickable-image cursor-pointer" alt="media"
+                    style="max-width:600px; max-height:350px; object-fit:cover;"
+                    data-src="{{ asset('storage/' . $item->media) ?? asset('assets/default-user.jpg') }}">
             @elseif ($item->media && $isVideo)
                 <video class="rounded shadow-lg border" controls
                     style="max-width:300px; max-height:200px; width:100%; height:auto;">

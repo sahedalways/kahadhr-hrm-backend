@@ -38,7 +38,7 @@
                     <span>
                         Created by:
                         @if (isset($announcement->creator) && $announcement->creator->user_type === 'company')
-                            Company Admin
+                            {{ $announcement->creator->full_name }}
                         @else
                             {{ $announcement->creator->full_name ?? 'Admin' }}
                         @endif

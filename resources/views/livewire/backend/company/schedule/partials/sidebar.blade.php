@@ -9,7 +9,7 @@
               <hr class="my-2">
 
               <div class="py-2">
-                  <h6 class="fw-bold text-muted text-uppercase mb-1">Unassigned shifts</h6>
+                  <h6 class="fw-bold text-muted text-uppercase mb-1">Employees</h6>
               </div>
               <div class="employee-list mt-2">
                   @if ($employees->isEmpty())

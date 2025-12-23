@@ -318,7 +318,7 @@
                                     @else
                                         @foreach ($employees as $emp)
                                             {{-- single loop --}}
-                                            <div class="d-flex align-items-center py-2 px-2 employee-row shadow-sm rounded mb-2"
+                                            <div class="d-flex align-items-center py-4 px-2 employee-row shadow-sm rounded mb-2"
                                                 title="{{ $emp->full_name }}">
 
                                                 {{-- avatar (optional) --}}

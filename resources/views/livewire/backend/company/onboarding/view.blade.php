@@ -3,7 +3,7 @@
 
         {{-- Header Section --}}
         <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-white">{{ $item->title }}</h1>
+            <h1 class="display-4 fw-bold text-dark">{{ $item->title }}</h1>
 
             <p class="lead text-light">
                 {!! $item->description !!}

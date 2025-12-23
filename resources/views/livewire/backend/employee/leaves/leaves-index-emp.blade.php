@@ -151,7 +151,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">No leave requests found</td>
+                                <td colspan="12" class="text-center">No leave requests found</td>
                             </tr>
                         @endforelse
                     </tbody>

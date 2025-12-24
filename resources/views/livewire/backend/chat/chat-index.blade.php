@@ -12,7 +12,7 @@
         <div class="d-flex flex-column p-0 sidebar">
 
             {{-- Add new --}}
-            <div style="min-height: 79px" class="p-3 d-flex justify-content-between align-items-center border-bottom">
+            <div style="min-height: 75px" class="p-3 d-flex justify-content-between align-items-center border-bottom">
                 <div class="dropdown">
                     <button class="mb-0 btn btn-primary gap-1 d-flex align-items-center dropdown-toggle" type="button"
                         id="addNewDropdown" data-bs-toggle="dropdown" style="border-radius: 20px; font-weight: 600;">
@@ -83,7 +83,7 @@
                                 </div>
                                 <div>
                                     <div class="fw-bold">All users' team chat</div>
-                                    <small class="text-muted">
+                                    <small class="text-muted text-break">
                                         {{ isset($lastMessages['group']) ? Str::limit($lastMessages['group'], 50) : 'Start a conversation' }}
                                     </small>
 
@@ -415,7 +415,7 @@
         </div>
 
         {{-- MAIN CHAT AREA --}}
-        <div style="min-width: 320px;" class= "d-flex flex-column p-0 flex-grow-1">
+        <div class= "d-flex flex-column p-0 flex-grow-1 chat-area">
 
             {{-- Chat Header --}}
             <div style="min-height: 75px" class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -450,10 +450,11 @@
                     </div>
                 </div>
 
-                <div>
-                    <i class="bi bi-search text-muted me-3" style="cursor: pointer;"></i>
-                    <i class="bi bi-three-dots-vertical text-muted" style="cursor: pointer;"></i>
-                </div>
+                {{--<div>
+                    <i class="fa-solid fa-magnifying-glass text-muted me-3" style="cursor: pointer;"></i>
+                    <i class="fa-solid fa-ellipsis-vertical text-muted" style="cursor: pointer;"></i>
+                </div>--}}
+
             </div>
 
 

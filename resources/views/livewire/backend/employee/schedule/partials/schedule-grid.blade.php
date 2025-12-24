@@ -251,7 +251,7 @@
                                     @if ($onLeave)
                                         <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
                                             style="background-color:#f8d7da;opacity:0.7;border-radius:4px;pointer-events:none;">
-                                            <span class="text-danger small fw-bold">Unavailable</span>
+                                            <span class="text-danger small fw-bold px-2">Unavailable</span>
                                         </div>
                                     @elseif ($content && $content['type'] === 'Shift')
                                         @php $modalId = 'shiftDetailsModal-'.$employee['id'].'-'.\Str::slug($content['title']); @endphp

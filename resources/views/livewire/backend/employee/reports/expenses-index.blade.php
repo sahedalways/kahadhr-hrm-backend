@@ -32,7 +32,7 @@
     <!-- Search + Sort + Category Filter -->
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
+            <div class="card">
                 <div class="card-body p-4">
                     <div class="row g-3 align-items-center mb-3">
 

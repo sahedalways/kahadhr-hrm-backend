@@ -57,50 +57,58 @@
                     </div>
                 </div>
 
-                {{-- TABLE --}}
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered text-center align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Period</th>
-                                    <th>File</th>
-                                    <th>Uploaded At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $i = 1; @endphp
-                                @forelse($infos as $row)
-                                    <tr>
-                                        <td>{{ $i++ }}</td>
-                                        <td>{{ $row->period }}</td>
-                                        <td>
-                                            <a href="{{ asset('storage/' . $row->file_path) }}" target="_blank"
-                                                class="btn btn-sm btn-primary">View</a>
-                                        </td>
-                                        <td>{{ date('d M, Y', strtotime($row->created_at)) }}</td>
 
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">No payslips found</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-
-                        @if ($hasMore)
-                            <div class="text-center mt-4">
-                                <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
-                                    Load More
-                                </button>
-                            </div>
-                        @endif
-                    </div>
-                </div>
 
             </div>
+        </div>
+    </div>
+    {{-- TABLE --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Period</th>
+                                <th>File</th>
+                                <th>Uploaded At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $i = 1; @endphp
+                            @forelse($infos as $row)
+                                <tr>
+                                    <td>{{ $i++ }}</td>
+                                    <td>{{ $row->period }}</td>
+                                    <td>
+                                        <a href="{{ asset('storage/' . $row->file_path) }}" target="_blank"
+                                            class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                    <td>{{ date('d M, Y', strtotime($row->created_at)) }}</td>
+
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center">No payslips found</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                    @if ($hasMore)
+                        <div class="text-center mt-4">
+                            <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                Load More
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 

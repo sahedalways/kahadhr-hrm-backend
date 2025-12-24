@@ -97,9 +97,6 @@ body {
 }*/
 
 @media (max-width: 767px) {
-    .sidebar {
-        border-right: 0 !important;
-    }
 
     input.form-control.otp-field {
         width: 30px;

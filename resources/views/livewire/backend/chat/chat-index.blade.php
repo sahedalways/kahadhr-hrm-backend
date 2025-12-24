@@ -12,7 +12,7 @@
         <div class="d-flex flex-column p-0 sidebar">
 
             {{-- Add new --}}
-            <div style="min-height: 75px" class="p-3 d-flex justify-content-between align-items-center border-bottom">
+            <div style="min-height: 77px" class="p-3 d-flex justify-content-between align-items-center border-bottom">
                 <div class="dropdown">
                     <button class="mb-0 btn btn-primary gap-1 d-flex align-items-center dropdown-toggle" type="button"
                         id="addNewDropdown" data-bs-toggle="dropdown" style="border-radius: 20px; font-weight: 600;">

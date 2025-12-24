@@ -73,60 +73,93 @@
                             <div class="card-header bg-white py-3 border-0">
                                 <h4 class="mb-0 fw-bold text-dark">Company Overview</h4>
                             </div>
-                            <div class="card-body p-4">
-                                <div class="row align-items-center g-4">
-                                    <div class="col-lg-3 col-md-4 text-center">
-                                        <div class="p-3 border rounded-4 shadow-sm" style="background-color: #f8f9fa;">
-                                            <img src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
-                                                class="img-fluid rounded-3 shadow-sm clickable-image"
-                                                style="max-height: 120px; width: 100%; object-fit: contain; cursor: pointer; border: 2px solid #ddd;"
-                                                data-src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}">
+                            <div class="card-body p-3 p-md-4">
+    <div class="row g-4 align-items-start">
 
+        <!-- Logo -->
+        <div class="col-lg-3 col-md-4 col-12 text-center">
+            <div class="border rounded-4 p-3 bg-light shadow-sm mx-auto"
+                 style="max-width:180px;">
+                <img src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                     class="img-fluid rounded-3 clickable-image"
+                     style="max-height:120px; object-fit:contain; cursor:pointer;"
+                     data-src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}">
+            </div>
+        </div>
 
-                                        </div>
-                                    </div>
+        <!-- Info + Contact -->
+        <div class="col-lg-9 col-md-8 col-12">
 
-                                    <div class="col-lg-5 col-md-8">
-                                        <h3 class="fw-bolder mb-1 text-primary d-flex align-items-center">
-                                            {{ $details->company_name }}
-                                            <span
-                                                class="badge ms-3 py-2 px-3 fw-bold 
-                      {{ $details->status == 'Active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}"
-                                                style="font-size: 0.85rem;">
-                                                {{ $details->status }}
-                                            </span>
-                                        </h3>
-                                        <p class="text-muted mb-2 fs-6">
-                                            <i class="bi bi-briefcase me-1"></i> {{ $details->business_type ?: 'N/A' }}
-                                        </p>
-                                        <hr class="my-3">
+            <!-- Company Info -->
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1 d-flex flex-wrap align-items-center gap-2">
+                    {{ $details->company_name }}
 
-                                        <dl class="row mb-0">
-                                            <dt class="col-sm-4 fw-semibold text-dark">Email:</dt>
-                                            <dd class="col-sm-8 mb-1 text-truncate">{{ $details->company_email }}</dd>
+                    <span class="badge px-3 py-2 fw-semibold
+                        {{ $details->status == 'Active'
+                            ? 'bg-success-subtle text-success'
+                            : 'bg-danger-subtle text-danger' }}">
+                        {{ $details->status }}
+                    </span>
+                </h4>
 
-                                            <dt class="col-sm-4 fw-semibold text-dark">Phone:</dt>
-                                            <dd class="col-sm-8 mb-1">{{ $details->company_mobile }}</dd>
-                                        </dl>
-                                    </div>
+                <p class="text-muted mb-3 small">
+                    <i class="fa-solid fa-briefcase me-1"></i>
+                    {{ $details->business_type ?: 'N/A' }}
+                </p>
 
-                                    <div class="col-lg-4 col-12 border-start d-none d-lg-block">
-                                        <h5 class="fw-semibold mb-3 text-secondary">Contact Location</h5>
-                                        <dl class="row mb-0 small">
-                                            <dt class="col-sm-5 text-muted">House/Suite:</dt>
-                                            <dd class="col-sm-7 mb-1 fw-medium">{{ $details->company_house_number }}
-                                            </dd>
+                <dl class="row mb-0 small">
+                    <dt class="col-4 col-sm-3 fw-semibold text-dark">
+                        <i class="fa-regular fa-envelope me-1 text-muted"></i>
+                        Email
+                    </dt>
+                    <dd class="col-8 col-sm-9 text-truncate mb-1">
+                        {{ $details->company_email ?: 'N/A' }}
+                    </dd>
 
-                                            <dt class="col-sm-5 text-muted">Full Address:</dt>
-                                            <dd class="col-sm-7 mb-1 fw-medium">
-                                                {{ $details->address_contact_info ?: 'Not Provided' }}
-                                            </dd>
-                                        </dl>
+                    <dt class="col-4 col-sm-3 fw-semibold text-dark">
+                        <i class="fa-solid fa-phone me-1 text-muted"></i>
+                        Phone
+                    </dt>
+                    <dd class="col-8 col-sm-9 mb-0">
+                        {{ $details->company_mobile ?: 'N/A' }}
+                    </dd>
+                </dl>
+            </div>
 
-                                    </div>
+            <hr class="my-3">
 
-                                </div>
-                            </div>
+            <!-- Contact / Location -->
+            <div>
+                <h6 class="fw-semibold text-secondary mb-2">
+                    <i class="fa-solid fa-location-dot me-1"></i>
+                    Contact Location
+                </h6>
+
+                <dl class="row mb-0 small">
+                    <dt class="col-5 col-sm-4 text-muted">
+                        <i class="fa-solid fa-house me-1"></i>
+                        House / Suite
+                    </dt>
+                    <dd class="col-7 col-sm-8 fw-medium mb-1">
+                        {{ $details->company_house_number ?: 'N/A' }}
+                    </dd>
+
+                    <dt class="col-5 col-sm-4 text-muted">
+                        <i class="fa-solid fa-map-location-dot me-1"></i>
+                        Address
+                    </dt>
+                    <dd class="col-7 col-sm-8 fw-medium">
+                        {{ $details->address_contact_info ?: 'Not Provided' }}
+                    </dd>
+                </dl>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
                         </div>
                     </div>
 

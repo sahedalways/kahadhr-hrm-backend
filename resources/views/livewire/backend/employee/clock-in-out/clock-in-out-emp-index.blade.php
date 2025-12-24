@@ -23,14 +23,14 @@
     <div class="row mb-3 align-items-end mt-4">
         <div class="col-md-4">
             <label for="startDate" class="form-label fw-bold">Start Date</label>
-            <input type="date" id="startDate" class="form-control form-control-lg" wire:model="startDate"
+            <input type="date" id="startDate" class="form-control" wire:model="startDate"
                 wire:change="handleStartDate($event.target.value)" />
 
         </div>
 
         <div class="col-md-4">
             <label for="endDate" class="form-label fw-bold">End Date</label>
-            <input type="date" id="endDate" class="form-control form-control-lg" wire:model="endDate"
+            <input type="date" id="endDate" class="form-control" wire:model="endDate"
                 wire:change="handleEndDate($event.target.value)" />
 
         </div>

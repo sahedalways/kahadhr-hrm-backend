@@ -43,7 +43,7 @@
 
     <div class="row g-4">
         @foreach ($this->filteredDocumentTypes as $type)
-            <div class="col-md-3">
+            <div class="col-lg-3 col-md-4">
                 <div class="card shadow-sm border-0 rounded-3 h-100">
                     <!-- Card header / type name -->
                     <div class="card-header bg-light text-primary fw-semibold d-flex align-items-center">

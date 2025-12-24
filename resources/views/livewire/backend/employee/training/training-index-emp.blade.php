@@ -38,7 +38,7 @@
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                <input type="text" class="form-control form-control-lg"
+                                <input type="text" class="form-control"
                                     placeholder="Search by course or title..." wire:model="search"
                                     wire:keyup="set('search', $event.target.value)" />
                             </div>

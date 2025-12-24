@@ -36,7 +36,12 @@
     @livewireScripts
 </head>
 
-<body class="g-sidenav-show">
+<body class="g-sidenav-show
+    @if(auth()->check() && auth()->user()->user_type === 'company')
+        is-company-mode
+    @endif
+">
+
     @php
         $company = auth()->check() ? auth()->user()->company : null;
         $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);

@@ -486,7 +486,7 @@ span.icon-position {
 }
 
 .chat-app-container {
-    height: 87vh;
+    height: 100%;
     overflow-x: auto;
     background-color: #fff;
     border: 1px solid #ddd;

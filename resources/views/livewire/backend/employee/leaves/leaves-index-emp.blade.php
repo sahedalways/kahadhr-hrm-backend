@@ -40,7 +40,7 @@
 
                 <!-- Search -->
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-lg" placeholder="Search by leave type"
+                    <input type="text" class="form-control" placeholder="Search by leave type"
                         wire:model="search" wire:keyup="set('search', $event.target.value)" />
                 </div>
 

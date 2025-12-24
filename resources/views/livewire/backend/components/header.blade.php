@@ -8,8 +8,9 @@
 
 
 <div class="position-relative">
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky" id="navbarBlur"
-        data-scroll="false">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky
+        @if (in_array($userType, ['admin', 'superAdmin'])) admin-fixed-header @endif"
+        id="navbarBlur" data-scroll="false">
         <div class="container-fluid py-1 px-3 position-relative">
 
 

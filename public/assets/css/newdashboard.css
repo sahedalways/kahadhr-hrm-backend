@@ -1,10 +1,9 @@
 body {
     background: #f6f6f6;
+    height: 100dvh;
 }
 
-.main-content {
-    height: 100% !important;
-}
+
 
 .min-height-60 {
     min-height: 60px;
@@ -406,28 +405,43 @@ table.fc-scrollgrid-sync-table {
 .fc-header-toolbar.fc-toolbar {
     flex-wrap: wrap;
 }
+
+.fixed-header {
+    top: 0;
+}
+
+.navbar-vertical.navbar-expand-xs {
+    top: 63px;
+}
+
 @media (max-width: 1199px) {
     .clickable-image {
-        width:100px !important;
-        height:100px !important;
+        width: 100px !important;
+        height: 100px !important;
     }
-     body {
+
+    body {
         zoom: 0.9;
+        height: 110dvh;
+    }
+
+    .content-wrapper {
+        height: 110dvh;
     }
 }
 
 @media (max-width: 991px) {
     body {
         zoom: 0.8;
+        height: 120dvh;
     }
 
-    .chat-app-container {
-        height: 110vh !important;
+   .content-wrapper {
+        height: 120dvh;
     }
-
     .sidebar {
         width: 300px;
-        min-width: 300px;
+        min-width: 300px !important;
     }
 
     .current-time {
@@ -449,11 +463,11 @@ table.fc-scrollgrid-sync-table {
         z-index: 111;
     }
 
-    .fixed-header {
+    .is-company-mode .fixed-header {
         top: 30px;
     }
 
-    .navbar-vertical.navbar-expand-xs {
+    .is-company-mode .navbar-vertical.navbar-expand-xs {
         top: 94px;
     }
 

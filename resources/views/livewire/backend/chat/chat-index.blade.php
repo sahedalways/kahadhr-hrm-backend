@@ -423,7 +423,7 @@
 
 
                     <div class="rounded-circle me-2"
-                        style="width:45px; height:45px; background-color:#2299dd; display:flex; justify-content:center; align-items:center; overflow:hidden; font-weight:bold; color:#fff;">
+                        style="width:45px; min-width:45px; height:45px; background-color:#2299dd; display:flex; justify-content:center; align-items:center; overflow:hidden; font-weight:bold; color:#fff;">
 
                         @if ($receiverInfo && ($receiverInfo['type'] === 'group' || $receiverInfo['type'] === 'teamGroup'))
                             <img src="{{ $receiverInfo['photo'] }}" alt="Group Icon"

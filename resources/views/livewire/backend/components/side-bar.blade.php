@@ -570,4 +570,42 @@
         </ul>
     </div>
     <hr class="horizontal dark mt-2">
+
+    <script>
+        if (document.querySelector('.navbar-vertical')) {
+            document.querySelector('.navbar-vertical').classList.remove('ps');
+        }
+    </script>
+
+    <style>
+        .navbar-vertical {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        .ps__rail-x,
+        .ps__rail-y {
+            display: none !important;
+        }
+
+        /* Normal expanded sidebar */
+        .navbar-vertical {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Collapsed sidebar */
+        .g-sidenav-show.g-sidenav-pinned .navbar-vertical {
+            max-width: 4rem !important;
+            overflow: hidden !important;
+        }
+
+        /* Prevent children from overflowing */
+        .g-sidenav-show.g-sidenav-pinned .navbar-vertical *,
+        .g-sidenav-show.g-sidenav-pinned .navbar-vertical .navbar-collapse,
+        .g-sidenav-show.g-sidenav-pinned .navbar-vertical .navbar-nav {
+            overflow: hidden !important;
+            white-space: nowrap;
+        }
+    </style>
 </aside>

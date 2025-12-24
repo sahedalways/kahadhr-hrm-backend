@@ -410,12 +410,19 @@ table.fc-scrollgrid-sync-table {
 .navbar-vertical.navbar-expand-xs {
     top: 63px;
 }
-  .chat-area {
-        width: calc(100% - 350px);
-    }
+
+.chat-area {
+    width: calc(100% - 350px);
+}
+@media (min-width: 768px) {
+  .border-md-end {
+    border-right: 1px solid #dee2e6 !important;
+  }
+}
 @media (max-width: 1199px) {
     .clickable-image {
         width: 100px !important;
+        min-width: 100px !important;
         height: 100px !important;
     }
 

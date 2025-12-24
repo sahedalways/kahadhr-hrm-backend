@@ -112,10 +112,10 @@
                                 </h4>
                             </div>
 
-                            <div class="card-body p-4 pt-0">
+                            {{--<div class="card-body p-4 pt-0">
                                 <div class="row g-4">
 
-                                    <div class="col-lg-3 col-md-4 text-center border-end">
+                                    <div class="col-lg-3 col-md-4 text-center border-md-end">
                                         <div class="d-flex flex-column align-items-center p-3">
                                             <div class="position-relative mb-3">
                                                 <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
@@ -141,43 +141,168 @@
                                     </div>
 
                                     <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info text-center">Employment & Contact</h5>
+                                        <h5 class="fw-bold mb-3 text-info text-center text-md-start">
+                                            Employment & Contact
+                                        </h5>
 
                                         <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <dl class="row mb-0 small">
-                                                    <dt class="col-sm-5 text-muted">Work Email:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2 text-truncate">
-                                                        {{ $details->email }}</dd>
 
-                                                    <dt class="col-sm-5 text-muted">Work Phone:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->user->phone_no ?? 'N/A' }}</dd>
+                                            <!-- Left -->
+                                            <div class="col-12">
+                                                <div class=" rounded bg-light-subtle h-100">
+                                                    <dl class="row mb-0 small">
 
-                                                    <dt class="col-sm-5 text-muted">Role:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ ucfirst($details->role) }}</dd>
-                                                </dl>
+                                                        <dt class="col-5 text-muted fw-semibold">Work Email</dt>
+                                                        <dd class="col-7 fw-medium text-truncate mb-2">
+                                                            {{ $details->email }}
+                                                        </dd>
+
+                                                        <dt class="col-5 text-muted fw-semibold">Work Phone</dt>
+                                                        <dd class="col-7 fw-medium mb-2">
+                                                            {{ $details->user->phone_no ?? 'N/A' }}
+                                                        </dd>
+
+                                                        <dt class="col-5 text-muted fw-semibold">Role</dt>
+                                                        <dd class="col-7 fw-medium">
+                                                            {{ ucfirst($details->role) }}
+                                                        </dd>
+
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <!-- Right -->
+                                            <div class="col-12">
+                                                <div class=" rounded bg-light-subtle h-100">
+                                                    <dl class="row mb-0 small">
+
+                                                        <dt class="col-5 text-muted fw-semibold">Company</dt>
+                                                        <dd class="col-7 fw-medium mb-2">
+                                                            {{ $details->company->company_name ?? 'N/A' }}
+                                                        </dd>
+
+                                                        <dt class="col-5 text-muted fw-semibold">Department</dt>
+                                                        <dd class="col-7 fw-medium mb-2">
+                                                            {{ $details->department?->name ?? 'N/A' }}
+                                                        </dd>
+
+                                                        <dt class="col-5 text-muted fw-semibold">Team</dt>
+                                                        <dd class="col-7 fw-medium">
+                                                            {{ $details->team?->name ?? 'N/A' }}
+                                                        </dd>
+
+                                                    </dl>
+                                                </div>
                                             </div>
 
-                                            <div class="col-md-6 border-start">
-                                                <dl class="row mb-0 small">
-                                                    <dt class="col-sm-5 text-muted">Company:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->company->company_name ?? 'N/A' }}</dd>
+                                        </div>
+                                    </div>
 
-                                                    <dt class="col-sm-5 text-muted">Department:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->department?->name ?? 'N/A' }}</dd>
+                                </div>
+                            </div>--}}
 
-                                                    <dt class="col-sm-5 text-muted">Team:</dt>
-                                                    <dd class="col-sm-7 text-dark fw-medium mb-2">
-                                                        {{ $details->team?->name ?? 'N/A' }}</dd>
-                                                </dl>
-                                            </div>
+                             <div class="card-body p-4 pt-0">
+                                <div class="row g-4 align-items-start">
+
+                                    <!-- Profile -->
+                                    <div class="col-lg-3 col-md-4 text-center position-relative">
+
+                                        <!-- responsive border -->
+                                        <div class="d-none d-md-block position-absolute top-0 end-0 h-100 border-end">
                                         </div>
 
+                                        <div class="d-flex flex-column align-items-center p-3">
 
+                                            <div class="position-relative mb-3">
+                                               <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                                    class="img-fluid shadow-sm clickable-image"
+                                                    style="min-width: 120px; width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
+                                                    data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                                    alt="Employee Avatar">
+
+                                                <span
+                                                    class="badge rounded-pill position-absolute p-2 
+                                {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
+                                                    style="transform: translate(25%, 25%); bottom: 12px;
+                                    right: 8px ">
+                                                    <i
+                                                        class="bi {{ $details->is_active ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
+                                                </span>
+                                            </div>
+
+                                            <h5 class="mb-1 fw-bold">{{ $details->full_name }}</h5>
+                                            <p class="text-muted small fw-bold mb-0">{{ $details->job_title ?: 'N/A' }}</p>
+
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- Details -->
+                                    <div class="col-lg-9 col-md-8">
+                                        <h5 class="fw-bold mb-3 text-info text-center text-md-start">
+                                            Employment & Contact
+                                        </h5>
+
+                                        <div class="row">
+
+                                            <!-- Left Info -->
+                                            <div class="col-md-6">
+                                                <div class="p-3 pb-md-3 pb-0 rounded bg-light-subtle h-100">
+
+                                                    <div class="mb-3">
+                                                        <div class="text-muted fw-bold small">Work Email</div>
+                                                        <div class="fw-medium text-truncate">
+                                                            {{ $details->email }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <div class="text-muted fw-bold small">Work Phone</div>
+                                                        <div>
+                                                            {{ $details->user->phone_no ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="text-muted fw-bold small">Role</div>
+                                                        <div>
+                                                            {{ ucfirst($details->role) }}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <!-- Right Info -->
+                                            <div class="col-md-6">
+                                                <div class="p-3 rounded bg-light-subtle h-100">
+
+                                                    <div class="mb-3">
+                                                        <div class="text-muted small fw-bold">Company</div>
+                                                        <div>
+                                                            {{ $details->company->company_name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <div class="text-muted small fw-bold">Department</div>
+                                                        <div>
+                                                            {{ $details->department?->name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="text-muted small fw-bold">Team</div>
+                                                        <div>
+                                                            {{ $details->team?->name ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>

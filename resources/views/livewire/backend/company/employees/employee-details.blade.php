@@ -178,15 +178,16 @@
 
                                             <div class="position-relative mb-3">
                                                 <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
-                                                    class="shadow-sm clickable-image flex-shrink-0"
-                                                    style="width:120px;height:120px;aspect-ratio:1/1;object-fit:cover;border-radius:50%;border:4px solid var(--bs-info);"
+                                                    class="img-fluid shadow-sm clickable-image"
+                                                    style="min-width: 120px; width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
+                                                    data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
                                                     alt="Employee Avatar">
 
                                                 <span
                                                     class="badge rounded-pill position-absolute p-2 
-                {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
+                                {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
                                                     style="transform: translate(25%, 25%); bottom: 12px;
-    right: 8px ">
+                                    right: 8px ">
                                                     <i
                                                         class="bi {{ $details->is_active ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
                                                 </span>

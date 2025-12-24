@@ -15,7 +15,7 @@
 
             {{-- CURRENT TIME --}}
             <div class="time-display text-white mb-5">
-                <div class="current-time" id="current-time" wire:ignore>10:00:00 AM</div>
+                <h1 class="current-time text-white" id="current-time" wire:ignore>10:00:00 AM</h1>
                 <div class="current-date" id="current-date" wire:ignore>Monday, Oct 26, 2024</div>
             </div>
 
@@ -43,39 +43,29 @@
             <div class="filter-section mb-5 text-white">
                 <div class="row g-2">
 
-                    <div class="col-md-3">
-                        <button type="button" class="btn d-flex align-items-center justify-content-between"
-                            wire:click="$toggle('showEmployeeFilter')"
-                            style="
-        font-weight: 500;
-        background: linear-gradient(145deg, #4678a3, #495057);
-        border: 1px solid #3d4348;
-        color: #fff;
-        box-shadow: inset 0 1px rgba(32, 31, 31, 0.3), 0 2px 4px rgba(0,0,0,0.4);
-        border-radius: 6px;
-        padding: 6px 12px;  
-        width: auto;         
-        min-width: 380px;    
-    ">
+                    <div class="col-md-4 position-relative dropdown">
+
+                        <!-- Dropdown Button -->
+                        <button
+                            class="btn btn-secondary shadow-none w-100 d-flex align-items-center justify-content-between dropdown-toggle"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Filter by Employees
-                            <!-- Arrow icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                                class="bi bi-chevron-down transition-arrow" style="transition: transform 0.3s;"
-                                viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                            </svg>
                         </button>
 
-                        <!-- Employee multi-select dropdown -->
-                        @if ($showEmployeeFilter)
-                            <select class="form-select form-select-lg" multiple wire:model.live="filterUsers">
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu w-100 p-2">
+                            <select class="form-select" multiple wire:model.live="filterUsers" size="6">
                                 @foreach ($employees as $emp)
-                                    <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
+                                    <option value="{{ $emp->user_id }}">
+                                        {{ $emp->full_name }}
+                                    </option>
                                 @endforeach
                             </select>
-                        @endif
+                        </div>
+
                     </div>
+
+
 
 
                 </div>
@@ -303,7 +293,8 @@
 
                         {{-- sidebar --}}
                         <div class="mt-n3">
-                            <div class="schedule-sidebar p-2 border-end" style="width:280px;flex-shrink:0;">
+                            <div class="schedule-sidebar p-2 border-end"
+                                style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
                                 <input type="text" class="form-control form-control-sm mb-3"
                                     placeholder="Search employees..." wire:model.live="employeeSearch">
 
@@ -341,7 +332,7 @@
                         </div>
 
                         {{-- grid --}}
-                        <div class="flex-grow-1 mt-4">
+                        <div class="flex-grow-1 mt-4 table-responsive">
                             <table class="table table-bordered schedule-table m-0">
                                 <thead>
                                     <tr class="text-center">

@@ -29,7 +29,7 @@
 
                     <div class="row g-3 align-items-center mb-3">
                         <!-- Search Input -->
-                        <div class="col-md-8">
+                        <div class="col-lg-8 col-md-6 col-12">
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i
                                         class="fa-solid fa-magnifying-glass"></i></span>
@@ -40,7 +40,7 @@
                         </div>
 
                         <!-- Sort Dropdown -->
-                        <div class="col-md-4 d-flex gap-2">
+                        <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
                             <select class="form-select" wire:change="handleSort($event.target.value)">
                                 <option value="desc">Newest First</option>
                                 <option value="asc">Oldest First</option>

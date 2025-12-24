@@ -61,7 +61,8 @@
                         aria-controls="companiesMenu" role="button"
                         aria-expanded="{{ Request::is('dashboard/companies*') ? 'true' : 'false' }}">
 
-                        <i class="fas fa-building text-sm opacity-10"></i>
+                        <i class="fa-solid fa-industry text-sm opacity-10"></i>
+                       
                         <span class="nav-link-text ms-1">Manage Companies</span>
 
                     </a>

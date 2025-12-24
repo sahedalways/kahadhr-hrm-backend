@@ -455,9 +455,7 @@ table.fc-scrollgrid-sync-table {
         width: calc(100% - 250px);
     }
 
-    .current-time {
-        font-size: 2rem !important;
-    }
+  
 }
 
 @media (max-width: 767px) {

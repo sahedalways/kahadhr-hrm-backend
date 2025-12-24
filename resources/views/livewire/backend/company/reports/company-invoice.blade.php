@@ -24,36 +24,40 @@
     </div>
 
     {{-- Filters --}}
-    <div class="row mb-3">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row mb-3 g-4">
 
-        <div class="col-md-3">
-            <select class="form-select" wire:change="handleDateFilter($event.target.value)">
-                <option value="">All Dates</option>
-                <option value="day">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-                <option value="custom">Custom</option>
-            </select>
-        </div>
+                <div class="col-md-3">
+                    <select class="form-select" wire:change="handleDateFilter($event.target.value)">
+                        <option value="">All Dates</option>
+                        <option value="day">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
 
-        @if ($filterDate === 'custom')
-            <div class="col-md-2">
-                <input type="date" class="form-control" wire:change="handleDateFrom($event.target.value)"
-                    wire:model="date_from">
-            </div>
-            <div class="col-md-2">
-                <input type="date" class="form-control" wire:change="handleDateTo($event.target.value)"
-                    wire:model="date_to">
-            </div>
-        @endif
+                @if ($filterDate === 'custom')
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" wire:change="handleDateFrom($event.target.value)"
+                            wire:model="date_from">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" wire:change="handleDateTo($event.target.value)"
+                            wire:model="date_to">
+                    </div>
+                @endif
 
-        <div class="col-md-4">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
-                <input type="text" class="form-control border-start-0"
-                    placeholder="Search by invoice number" wire:model="search"
-                    wire:keyup="set('search', $event.target.value)" />
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" class="form-control border-start-0" placeholder="Search by invoice number"
+                            wire:model="search" wire:keyup="set('search', $event.target.value)" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>

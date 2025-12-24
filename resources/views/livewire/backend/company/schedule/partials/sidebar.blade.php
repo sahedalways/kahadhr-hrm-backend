@@ -1,5 +1,5 @@
       <div class="pt-4 bg-white">
-          <div class="schedule-sidebar p-2 border-end" style="width: 280px; flex-shrink: 0;">
+          <div class="schedule-sidebar p-2 border-end"  style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
 
               <div class="input-group mb-3">
                   <input type="text" class="form-control form-control-sm" placeholder="Search employees..."

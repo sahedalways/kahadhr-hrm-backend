@@ -3,7 +3,8 @@
 @endpush
 
 
-<div class="schedule-app">
+<div class="schedule-app {{ $viewMode === 'weekly' ? 'min-width-weekly' : '' }}">
+
     <div class="ms-3 mt-2">
         <h5 class=" fw-bold">Schedule</h5>
     </div>
@@ -29,7 +30,10 @@
             @include('livewire.backend.company.schedule.partials.footer_summary')
         </div>
     </div>
-
-
-
+<style>
+    .min-width-weekly {
+        min-width: max-content;
+    }
+</style>
 </div>
+

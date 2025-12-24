@@ -33,36 +33,30 @@
                         <div class="row g-3 align-items-center mb-3">
 
 
-                            <div class="col-md-3 dropdown">
-    <button
-        class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false">
-        Filter by Employees
-    </button>
+                            <div class="col-lg-3 col-md-6 dropdown">
+                                <button
+                                    class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Filter by Employees
+                                </button>
 
-    <div class="dropdown-menu p-2 w-100" style="max-height: 250px; overflow-y: auto;">
-        @foreach ($employees as $emp)
-            <div class="form-check">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    value="{{ $emp->user_id }}"
-                    wire:model.live="filterUsers"
-                    id="emp-{{ $emp->user_id }}">
+                                <div class="dropdown-menu p-2 w-100" style="max-height: 250px; overflow-y: auto;">
+                                    @foreach ($employees as $emp)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
+                                                wire:model.live="filterUsers" id="emp-{{ $emp->user_id }}">
 
-                <label class="form-check-label" for="emp-{{ $emp->user_id }}">
-                    {{ $emp->full_name }}
-                </label>
-            </div>
-        @endforeach
-    </div>
-</div>
+                                            <label class="form-check-label" for="emp-{{ $emp->user_id }}">
+                                                {{ $emp->full_name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
 
 
 
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-6">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleMonthFilter($event.target.value)">
                                     <option value="">All Months</option>
@@ -72,7 +66,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-6">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleYearFilter($event.target.value)">
                                     <option value="">All Years</option>
@@ -83,7 +77,7 @@
                             </div>
 
                             {{-- Sort --}}
-                            <div class="col-md-3">
+                            <div class="col-lg-3 col-md-6">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
@@ -97,8 +91,17 @@
                 </div>
 
 
-                {{-- TABLE --}}
-                <div class="card-body p-0">
+
+
+            </div>
+        </div>
+    </div>
+   {{-- TABLE --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+             
+                <div class="card-body">
                     <div class="table-responsive">
 
                         <table class="table table-bordered text-center align-middle">
@@ -174,11 +177,9 @@
 
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
 
     {{-- Upload Payslip Modal --}}
     <div wire:ignore.self class="modal fade" id="uploadPayslipModal" data-bs-backdrop="static">

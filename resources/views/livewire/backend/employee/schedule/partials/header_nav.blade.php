@@ -18,7 +18,7 @@
             </ul>
         </div>
 
-        <div class="d-flex align-items-center border rounded p-2 me-4 flex-nowrap">
+        <div class="d-flex align-items-center border rounded p-2 flex-wrap justify-content-center gap-2">
 
             <button wire:click="goToPrevious" class="btn btn-sm btn-link text-dark p-0 me-2">
                 <i class="fas fa-chevron-left"></i>

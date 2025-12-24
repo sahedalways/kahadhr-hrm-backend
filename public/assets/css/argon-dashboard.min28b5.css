@@ -20518,7 +20518,17 @@ fieldset:disabled .btn {
     width: 1rem;
     height: 1rem
 }
-
+.dropdown .dropdown-toggle::after,
+.dropend .dropdown-toggle::after,
+.dropstart .dropdown-toggle::after,
+.dropup .dropdown-toggle::after {
+    content: "\f107"; 
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    border: none;
+    vertical-align: middle;
+    margin-left: 0.35rem;
+}
 @media (min-width:992px) {
 
     .dropdown .dropdown-menu,
@@ -20531,17 +20541,7 @@ fieldset:disabled .btn {
         opacity: 0
     }
 
-.dropdown .dropdown-toggle::after,
-.dropend .dropdown-toggle::after,
-.dropstart .dropdown-toggle::after,
-.dropup .dropdown-toggle::after {
-    content: "\f107"; 
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    border: none;
-    vertical-align: middle;
-    margin-left: 0.35rem;
-}
+
 
 
     .dropdown .dropdown-toggle.show:after,

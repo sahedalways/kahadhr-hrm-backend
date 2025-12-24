@@ -26,7 +26,7 @@
             <tbody>
                 @if ($viewMode === 'monthly')
                     <div class="table-responsive">
-                        <table class="table table-bordered text-center" style="table-layout: fixed; width: 100%;">
+                        <table class="table table-bordered text-center">
 
                             <thead>
                                 <tr>

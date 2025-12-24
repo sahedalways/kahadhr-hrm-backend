@@ -39,12 +39,12 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-8">
+                <div class="col-lg-8 col-md-6 col-12">
                     <input type="text" class="form-control shadow-sm" placeholder="Search by name, email, job title"
                         wire:model="search" wire:keyup="set('search', $event.target.value)">
                 </div>
 
-                <div class="col-md-4 d-flex gap-2">
+                <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
                     <select class="form-select" wire:change="handleSort($event.target.value)">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>

@@ -20,7 +20,7 @@
     </div>
 
     <!-- Search + Sort -->
-    <div class="row mb-3 align-items-end mt-4">
+    <div class="row mb-3 align-items-end mt-4 g-3">
         <div class="col-md-4">
             <label for="startDate" class="form-label fw-bold">Start Date</label>
             <input type="date" id="startDate" class="form-control" wire:model="startDate"

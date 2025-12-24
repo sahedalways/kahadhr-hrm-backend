@@ -20,12 +20,12 @@
                 onmouseover="this.style.backgroundColor='{{ $isRead ? '#f5f5ff' : '#e6d3ff' }}'"
                 onmouseout="this.style.backgroundColor='{{ $isRead ? '#ffffff' : '#f0e6ff' }}'">
 
-                <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                     <p class="mb-0 small flex-grow-1" style="line-height: 1.4;">
                         {{ \Illuminate\Support\Str::limit($notification['data']['message'] ?? '', 60) }}
                     </p>
 
-                    <small class="text-secondary ms-4 flex-shrink-0" style="font-size: 0.7rem;">
+                    <small class="text-secondary flex-shrink-0" style="font-size: 0.7rem;">
                         {{ \Carbon\Carbon::parse($notification['created_at'])->diffForHumans() }}
                     </small>
                 </div>

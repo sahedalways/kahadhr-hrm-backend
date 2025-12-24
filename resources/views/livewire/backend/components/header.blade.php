@@ -97,7 +97,7 @@
 
                         <!-- NOTIFICATION DROPDOWN -->
 
-                        <div class="notification-dropdown" id="notificationDropdown" wire:ignore>
+                        <div class="notification-dropdown px-2" id="notificationDropdown" wire:ignore>
                             @livewire('backend.components.notifications')
                         </div>
                     @endif

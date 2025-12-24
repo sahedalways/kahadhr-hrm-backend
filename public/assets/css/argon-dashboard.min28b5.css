@@ -26935,7 +26935,6 @@ pre[class*=language-] {
     background-color: #50abff;
     opacity: .5;
     width: 4px;
-     !important
 }
 
 @supports (-ms-overflow-style:none) {

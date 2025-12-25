@@ -237,27 +237,6 @@
 
 
 </body>
-<script>
-    function handleSidenavPin() {
-        const body = document.body;
-
-        if (window.innerWidth >= 769) {
-            body.classList.remove('g-sidenav-pinned');
-        } else {
-            body.classList.add('g-sidenav-pinned');
-        }
-    }
-
-    // Run on page load (after all scripts)
-    window.addEventListener('load', handleSidenavPin);
-
-    // Run on resize (debounced)
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(handleSidenavPin, 150);
-    });
-</script>
 
 
 

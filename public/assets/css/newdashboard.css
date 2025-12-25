@@ -499,3 +499,30 @@ table.fc-scrollgrid-sync-table {
         right: 0 !important;
     }
 }
+
+.mobile-chat-container {
+    position: relative;
+}
+
+/* Mobile sidebar behavior */
+@media (max-width: 767.98px) {
+    .mobile-chat-container .mobile-chat-sidebar {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100%;
+        background: #fff;
+        z-index: 1050;
+        transition: left 0.3s ease;
+    }
+
+    .mobile-chat-container.sidebar-open .mobile-chat-sidebar {
+        left: 0;
+    }
+
+    .mobile-chat-container.sidebar-open .mobile-chat-overlay {
+        display: block;
+    }
+}

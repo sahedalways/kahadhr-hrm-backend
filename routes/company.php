@@ -8,6 +8,7 @@ use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Dashboard;
 use App\Livewire\Backend\Company\DocumentManage\DocumentManageIndex;
 use App\Livewire\Backend\Company\DocumentType\DocumentTypesIndex;
+use App\Livewire\Backend\Company\Employees\EmployeeDetails;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
 use App\Livewire\Backend\Company\Leaves\LeaveSettings;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
@@ -72,12 +73,15 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::get('/', UsersIndex::class)->name('index');
 
       Route::controller(EmployeeController::class)->group(function () {
-
-        Route::get('/details/{id}', 'empDetails')->name('details');
-
         Route::post('/change-password/{id}', 'changePassword')->name('changePassword');
         Route::delete('/documents/delete/{id}', 'destroy');
       });
+
+
+      Route::get(
+        '/details/{employee}',
+        EmployeeDetails::class
+      )->name('details');
     });
 
 

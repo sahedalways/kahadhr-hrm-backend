@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use App\Models\DocumentType;
 use App\Models\EmpDocument;
 use Illuminate\Http\Request;
 use App\Models\Employee;
@@ -13,15 +12,6 @@ use App\Traits\ToastTrait;
 class EmployeeController extends Controller
 {
     use ToastTrait;
-    public function empDetails($company, $id, Request $request)
-    {
-        $details = Employee::with('documents', 'documents.documentType', 'profile')->findOrFail($id);
-
-
-        $types = DocumentType::all();
-
-        return view('livewire.backend.company.employees.employee-details', compact('details', 'types'));
-    }
 
 
 

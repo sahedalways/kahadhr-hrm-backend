@@ -457,10 +457,6 @@ table.fc-scrollgrid-sync-table {
         min-width: 250px !important;
     }
 
-    .chat-area {
-        width: calc(100% - 250px);
-    }
-
 
 }
 

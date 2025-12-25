@@ -1134,7 +1134,7 @@
 
                 {{-- Add new --}}
                 <div style="min-height: 77px"
-                    class="p-3 d-flex justify-content-between align-items-center border-bottom">
+                    class="p-3 d-flex justify-content-between align-items-center border-bottom gap-2">
                     <button class="btn btn-outline-danger d-md-none" id="sidebarClose">
                         <i class="fa-solid fa-xmark text-danger"></i>
                     </button>
@@ -1551,7 +1551,7 @@
 
                 {{-- Chat Header --}}
                 <div style="min-height: 75px"
-                    class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    class="p-3 border-bottom d-flex justify-content-between align-items-center gap-2">
                     <button class="btn btn-outline-secondary d-md-none" id="sidebarToggle" type="button">
                         <i class="fa-solid fa-bars"></i>
                     </button>

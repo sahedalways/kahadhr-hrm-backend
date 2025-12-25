@@ -43,26 +43,26 @@
             <div class="filter-section mb-5 text-white">
                 <div class="row g-2">
 
-                    <div class="col-md-4 position-relative dropdown">
-
+                    <div class="col position-relative dropdown">
                         <!-- Dropdown Button -->
                         <button
-                            class="btn btn-secondary shadow-none w-100 d-flex align-items-center justify-content-between dropdown-toggle"
+                            class="btn btn-secondary shadow-none w-100 min-width-fit d-flex align-items-center justify-content-between dropdown-toggle"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Filter by Employees
                         </button>
 
                         <!-- Dropdown Menu -->
-                        <div class="dropdown-menu w-100 p-2">
-                            <select class="form-select" multiple wire:model.live="filterUsers" size="6">
-                                @foreach ($employees as $emp)
-                                    <option value="{{ $emp->user_id }}">
+                        <div class="dropdown-menu w-100 p-2" data-bs-auto-close="outside">
+                            @foreach ($employees as $emp)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
+                                        wire:model="filterUsers" id="emp{{ $emp->user_id }}">
+                                    <label class="form-check-label" for="emp{{ $emp->user_id }}">
                                         {{ $emp->full_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
-
                     </div>
 
 
@@ -826,5 +826,16 @@
     window.addEventListener('showAbsentModal', () => {
         const modal = new bootstrap.Modal(document.getElementById('absentModal'));
         modal.show();
+    });
+</script>
+
+
+
+<script>
+    // Prevent dropdown from closing when clicking inside
+    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
+        element.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     });
 </script>

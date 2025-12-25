@@ -414,11 +414,17 @@ table.fc-scrollgrid-sync-table {
 .chat-area {
     width: calc(100% - 350px);
 }
-@media (min-width: 768px) {
-  .border-md-end {
-    border-right: 1px solid #dee2e6 !important;
-  }
+
+.min-width-fit {
+    min-width: fit-content;
 }
+
+@media (min-width: 768px) {
+    .border-md-end {
+        border-right: 1px solid #dee2e6 !important;
+    }
+}
+
 @media (max-width: 1199px) {
     .clickable-image {
         width: 100px !important;
@@ -455,7 +461,7 @@ table.fc-scrollgrid-sync-table {
         width: calc(100% - 250px);
     }
 
-  
+
 }
 
 @media (max-width: 767px) {

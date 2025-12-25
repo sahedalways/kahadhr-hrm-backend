@@ -40,12 +40,12 @@
                                     Filter by Employees
                                 </button>
 
-                                <div class="dropdown-menu p-2 w-100" style="max-height: 250px; overflow-y: auto;">
+                                <div class="dropdown-menu p-2 w-100" style="max-height: 250px; overflow-y: auto;"
+                                    data-bs-auto-close="outside">
                                     @foreach ($employees as $emp)
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
-                                                wire:model.live="filterUsers" id="emp-{{ $emp->user_id }}">
-
+                                                wire:model="filterUsers" id="emp-{{ $emp->user_id }}">
                                             <label class="form-check-label" for="emp-{{ $emp->user_id }}">
                                                 {{ $emp->full_name }}
                                             </label>
@@ -53,6 +53,8 @@
                                     @endforeach
                                 </div>
                             </div>
+
+
 
 
 
@@ -96,11 +98,11 @@
             </div>
         </div>
     </div>
-   {{-- TABLE --}}
+    {{-- TABLE --}}
     <div class="row">
         <div class="col-12">
             <div class="card">
-             
+
                 <div class="card-body">
                     <div class="table-responsive">
 
@@ -600,5 +602,16 @@
         const requestModalEl = document.getElementById('requestPayslipModal');
         const requestModal = new bootstrap.Modal(requestModalEl);
         requestModal.show();
+    });
+</script>
+
+
+
+<script>
+    // Prevent dropdown from closing when clicking inside
+    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
+        element.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     });
 </script>

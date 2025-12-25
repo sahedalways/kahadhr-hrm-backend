@@ -13,7 +13,7 @@
                 <div class="row g-3 align-items-center mb-4">
 
                     {{-- Search --}}
-                    <div class="col-xl-8 col-md-6">
+                    <div class="col-xl-8 col-md-5">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -25,7 +25,7 @@
 
                     {{-- Sort + Add --}}
                     <div
-                        class="col-xl-4 col-md-6 d-flex justify-content-end gap-3 align-items-center flex-column flex-md-row">
+                        class="col-xl-4 col-md-7 d-flex justify-content-end gap-3 align-items-center flex-column flex-md-row">
 
 
                         <select class="form-select ps-4" wire:change="handleSort($event.target.value)">

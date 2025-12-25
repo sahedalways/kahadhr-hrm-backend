@@ -43,51 +43,45 @@
                         <div class="row g-3 align-items-center mb-3">
 
                             {{-- Employee Filter (Admin Only) --}}
-                           <div class="col-md-3">
+                            <div class="col-lg-3 col-md-6 col-12">
+                                <div class="dropdown w-100">
+                                    <!-- Dropdown button -->
+                                    <button
+                                        class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Filter by Employees
+                                    </button>
 
-    <div class="dropdown w-100">
-        <!-- Dropdown button -->
-        <button class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            >
-            Filter by Employees
-        </button>
+                                    <!-- Dropdown menu -->
+                                    <div class="dropdown-menu p-3 w-100 shadow"
+                                        style="max-height: 250px; overflow-y: auto;" data-bs-auto-close="outside">
 
-        <!-- Dropdown menu -->
-        <div class="dropdown-menu p-3 w-100 shadow"
-            style="max-height: 250px; overflow-y: auto;">
+                                        <div class="fw-semibold text-muted small mb-2">
+                                            Select Employees
+                                        </div>
 
-            <div class="fw-semibold text-muted small mb-2">
-                Select Employees
-            </div>
+                                        @foreach ($employees as $emp)
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input" type="checkbox"
+                                                    value="{{ $emp->user_id }}" wire:model="filterUsers"
+                                                    id="emp-{{ $emp->user_id }}">
+                                                <label class="form-check-label" for="emp-{{ $emp->user_id }}">
+                                                    {{ $emp->full_name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
 
-            @foreach ($employees as $emp)
-                <div class="form-check mb-1">
-                    <input class="form-check-input"
-                        type="checkbox"
-                        value="{{ $emp->user_id }}"
-                        wire:model.live="filterUsers"
-                        id="emp-{{ $emp->user_id }}">
 
-                    <label class="form-check-label"
-                        for="emp-{{ $emp->user_id }}">
-                        {{ $emp->full_name }}
-                    </label>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
-</div>
 
 
 
 
 
                             {{-- Sort --}}
-                            <div class="col-md-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
@@ -96,7 +90,7 @@
                             </div>
 
                             {{-- Category Filter --}}
-                            <div class="col-md-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <select class="form-select" wire:change="handleCategoryFilter($event.target.value)">
                                     <option value="">All Categories</option>
                                     <option value="Travel">Travel</option>
@@ -114,7 +108,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <select class="form-select form-select-lg"
                                     wire:change="handleDateFilter($event.target.value)">
                                     <option value="">All Dates</option>
@@ -621,4 +615,14 @@
     function openFileInput() {
         document.getElementById('fileInput').click();
     }
+</script>
+
+
+<script>
+    // Prevent dropdown from closing when clicking inside
+    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
+        element.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
 </script>

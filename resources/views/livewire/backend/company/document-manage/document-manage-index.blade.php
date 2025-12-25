@@ -57,7 +57,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3 mb-2">
+                            <div class="col-md-3">
                                 <select class="form-select" wire:change="handleFilter($event.target.value)">
                                     <option value="">All Status</option>
                                     <option value="pending">Pending</option>

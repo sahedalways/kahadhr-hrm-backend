@@ -11,12 +11,12 @@
             <!-- Left Column: Employee List + Search -->
             <div class="col-lg-6 col-md-8 col-12">
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white p-3">
-                        <h5 class="mb-0">Employees</h5>
+                    <div class="card-header bg-primary  p-3">
+                        <h5 class="mb-0 text-white">Employees</h5>
                     </div>
                     <div class="card shadow-lg border-0 h-100">
-                        <div class="card-header bg-white border-0 pt-4 px-4">
-                            <h5 class="fw-bold text-primary mb-2">👥 Employee Directory</h5>
+                        <div class="card-header  border-0 pt-4 px-4">
+                            <h5 class="fw-bold text-primary mb-2 bg-white">👥 Employee Directory</h5>
                             <p class="text-muted small mb-3">Quickly find and view leave details.</p>
                         </div>
                         <div class="card-body p-4">
@@ -77,8 +77,8 @@
                 <div class="card shadow-sm mb-4">
 
                     <div class="card shadow-sm border-0">
-                        <div class="card-header bg-primary text-white border-0 p-3">
-                            <h5 class="mb-0">⏳ Pending Leave Requests</h5>
+                        <div class="card-header bg-primary  border-0 p-3">
+                            <h5 class="mb-0 text-white">⏳ Pending Leave Requests</h5>
                         </div>
                         <div class="card-body p-4">
 
@@ -122,8 +122,8 @@
                             </ul>
 
                             <hr class="my-4">
-                            <div class="card-header bg-primary text-white border-0 p-3 mb-2">
-                                <h5 class="mb-0">✍️ Manual Leave Entry</h5>
+                            <div class="card-header bg-primary  border-0 p-3 mb-2">
+                                <h5 class="mb-0 text-white">✍️ Manual Leave Entry</h5>
                             </div>
 
                             <form wire:submit.prevent="saveRequest">
@@ -280,8 +280,8 @@
             <!-- Middle Column: Calendar -->
             <div class="col-12" wire:ignore>
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white p-3">
-                        <h5 class="mb-0">Leaves Calendar</h5>
+                    <div class="card-header bg-info  p-3">
+                        <h5 class="mb-0 text-white">Leaves Calendar</h5>
                     </div>
                     <div class="card-body">
                         <div id="calendar" style="min-height: 500px;"></div>

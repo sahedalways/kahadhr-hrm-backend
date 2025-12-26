@@ -114,6 +114,32 @@ class LeavesIndex extends BaseComponent
             })
             ->orderBy('f_name')
             ->get();
+
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
+
+        $approvedLeaves = LeaveRequest::with('leaveType', 'user.employee')
+            ->where('company_id', $this->company->id)
+            ->where('status', 'approved')
+            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
+                        $q->where('start_date', '<', $currentMonthStart)
+                            ->where('end_date', '>', $currentMonthEnd);
+                    });
+            })
+            ->get();
+
+        $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')->where('company_id', $this->company->id)->where('status', "pending")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+
+        $this->employees->map(function ($emp) use ($approvedLeaves) {
+            $emp->leaves = $approvedLeaves->where('user_id', $emp->user_id);
+            return $emp;
+        });
     }
 
 

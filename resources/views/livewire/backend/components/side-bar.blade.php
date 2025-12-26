@@ -62,7 +62,7 @@
                         aria-expanded="{{ Request::is('dashboard/companies*') ? 'true' : 'false' }}">
 
                         <i class="fa-solid fa-industry text-sm opacity-10"></i>
-                       
+
                         <span class="nav-link-text ms-1">Manage Companies</span>
 
                     </a>
@@ -246,22 +246,16 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/departments*') ? 'active' : '' }}"
-                        href="{{ route('company.dashboard.departments.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                        <i class="fas fa-building"></i>
-                        <span class="nav-link-text ms-1">Departments</span>
-                    </a>
-                </li>
 
 
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/teams*') ? 'active' : '' }}"
-                        href="{{ route('company.dashboard.teams.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                        <i class="fas fa-users"></i>
-                        <span class="nav-link-text ms-1">Teams</span>
+                    <a class="nav-link {{ Request::is('dashboard/teams-departments*') ? 'active' : '' }}"
+                        href="{{ route('company.dashboard.teams-departments.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                        <i class="fas fa-sitemap"></i>
+                        <span class="nav-link-text ms-1">Teams & Departments</span>
                     </a>
                 </li>
+
 
 
                 <li class="nav-item">

@@ -12,8 +12,7 @@ use App\Livewire\Backend\Company\Employees\EmployeeDetails;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
 use App\Livewire\Backend\Company\Leaves\LeaveSettings;
 use App\Livewire\Backend\Company\Leaves\LeavesIndex;
-use App\Livewire\Backend\Company\ManageDepartments\ManageDepartments;
-use App\Livewire\Backend\Company\ManageTeams\ManageTeams;
+use App\Livewire\Backend\Company\ManageTeamsDepartment\ManageTeamsDepartment;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\CompanyExpenses;
 use App\Livewire\Backend\Company\Reports\CompanyInvoice;
@@ -125,13 +124,8 @@ Route::domain('{company}.' . config('app.base_domain'))
     });
 
 
-    Route::prefix('departments')->name('departments.')->group(function () {
-      Route::get('/', ManageDepartments::class)->name('index');
-    });
-
-
-    Route::prefix('teams')->name('teams.')->group(function () {
-      Route::get('/', ManageTeams::class)->name('index');
+    Route::prefix('teams-departments')->name('teams-departments.')->group(function () {
+      Route::get('/', ManageTeamsDepartment::class)->name('index');
     });
 
 

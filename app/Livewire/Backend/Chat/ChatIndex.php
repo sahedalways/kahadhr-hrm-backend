@@ -65,7 +65,7 @@ class ChatIndex extends BaseComponent
     public $teamGroups;
     public $selectedTeamId = null;
 
-    public $manualTeam = false;
+    public $manualTeam = true;
 
 
     protected $rules = [

@@ -3,7 +3,9 @@
 namespace App\Livewire\Backend\Company\ManageTeamsDepartment;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\ChatGroup;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Team;
 use App\Traits\Exportable;
 use Carbon\Carbon;
@@ -23,14 +25,47 @@ class ManageTeamsDepartment extends BaseComponent
     public $lastId = null;
     public $hasMore = true;
     public $search;
-    public $mode = 'department'; // can be 'department' or 'team'
+    public $mode = 'department';
+
+    public $employees;
+    public $filterUsers = [];
+    public $selectAllUsers = false;
+    public $teamLead = null;
 
     protected $listeners = ['deleteDepartment', 'deleteTeam', 'sortUpdated' => 'handleSort'];
+
+
+    public function updatedFilterUsers()
+    {
+        $this->selectAllUsers =
+            count($this->filterUsers) === $this->employees->count();
+    }
+
+
+    public function updatedSelectAllUsers($value)
+    {
+        if ($value) {
+            $this->filterUsers = $this->employees
+                ->pluck('user_id')
+                ->toArray();
+        } else {
+            $this->filterUsers = [];
+        }
+    }
+
+
+
+
 
     public function mount()
     {
         $this->company_id = auth()->user()->company->id;
         $this->departments = Department::where('company_id', $this->company_id)->get();
+        $this->employees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name')
+            ->get();
+
         $this->loaded = collect();
         $this->loadMore();
     }
@@ -49,6 +84,10 @@ class ManageTeamsDepartment extends BaseComponent
         $this->name = '';
         $this->team_id = null;
         $this->editMode = false;
+        $this->selectAllUsers = false;
+        $this->teamLead = null;
+        $this->filterUsers = [];
+
         $this->resetErrorBag();
     }
 
@@ -68,13 +107,28 @@ class ManageTeamsDepartment extends BaseComponent
             $this->name = $department->name;
         } else {
             $team = Team::where('company_id', $this->company_id)->find($id);
+
             if (!$team) {
                 $this->toast('Team not found!', 'error');
                 return;
             }
+
+            $this->editMode = true;
             $this->team_id = $team->id;
             $this->department_id = $team->department_id;
             $this->name = $team->name;
+
+
+            $this->filterUsers = $team->employees->pluck('id')->toArray();
+
+
+            $this->teamLead = $team->team_lead_id ? (string) $team->team_lead_id : '';
+
+            if ($this->filterUsers) {
+                $this->selectAllUsers = count($this->filterUsers) === $this->employees->count();
+            } else {
+                $this->selectAllUsers = false;
+            }
         }
     }
 
@@ -121,6 +175,8 @@ class ManageTeamsDepartment extends BaseComponent
                     ->ignore($this->team_id),
             ],
             'department_id' => 'required|exists:departments,id',
+            'filterUsers' => 'required|array|min:1',
+            'filterUsers.*' => 'exists:users,id',
         ]);
 
         $team = Team::where('company_id', $this->company_id)->find($this->team_id);
@@ -130,10 +186,34 @@ class ManageTeamsDepartment extends BaseComponent
             return;
         }
 
+        // Update team basic info
         $team->update([
             'name' => $this->name,
             'department_id' => $this->department_id,
+            'team_lead_id' => $this->teamLead ?? null,
         ]);
+
+        // Sync employees
+        $team->employees()->sync($this->filterUsers);
+
+
+        // Update or create related ChatGroup
+        $chatGroup = ChatGroup::firstOrCreate(
+            ['team_id' => $team->id],
+            [
+                'company_id' => $team->company_id,
+                'name' => $team->name,
+                'created_by' => auth()->id(),
+                'desc' => $this->teamDescription ?? null,
+                'image' => null,
+            ]
+        );
+
+
+        $chatGroup->update(['name' => $team->name]);
+
+        $groupMembers = $team->employees()->pluck('user_id')->toArray();
+        $chatGroup->members()->sync($groupMembers);
 
         $this->toast('Team updated successfully!', 'success');
         $this->dispatch('closemodal');
@@ -153,28 +233,57 @@ class ManageTeamsDepartment extends BaseComponent
                 'name' => ['required', 'string', 'max:255', Rule::unique('departments')->where('company_id', $this->company_id)->ignore($this->department_id)],
             ]);
 
-            if ($this->editMode) {
-                $dept = Department::find($this->department_id);
-                $dept->update(['name' => $this->name]);
-                $this->toast('Department updated successfully!', 'success');
-            } else {
-                Department::create(['name' => $this->name, 'company_id' => $this->company_id]);
-                $this->toast('Department created successfully!', 'success');
-            }
+
+            Department::create(['name' => $this->name, 'company_id' => $this->company_id]);
+            $this->toast('Department created successfully!', 'success');
         } else {
             $this->validate([
-                'name' => ['required', 'string', 'max:255', Rule::unique('teams')->where('company_id', $this->company_id)->ignore($this->team_id)],
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('teams')->where('company_id', $this->company_id),
+                ],
                 'department_id' => 'required|exists:departments,id',
+                'filterUsers' => 'required|array|min:1',
+                'teamLead' => 'nullable|in:' . implode(',', $this->filterUsers ?? []),
             ]);
 
-            if ($this->editMode) {
-                $team = Team::find($this->team_id);
-                $team->update(['name' => $this->name, 'department_id' => $this->department_id]);
-                $this->toast('Team updated successfully!', 'success');
-            } else {
-                Team::create(['name' => $this->name, 'department_id' => $this->department_id, 'company_id' => $this->company_id]);
-                $this->toast('Team created successfully!', 'success');
+            // Create team
+            $team = Team::create([
+                'name' => $this->name,
+                'department_id' => $this->department_id,
+                'company_id' => $this->company_id,
+                'team_lead_id' => $this->teamLead ?? null,
+            ]);
+
+
+            $syncData = [];
+            foreach ($this->filterUsers as $userId) {
+                $syncData[$userId] = [
+                    'is_team_lead' => ($this->teamLead == $userId)
+                ];
             }
+            $team->employees()->sync($syncData);
+
+
+            $imagePath = null;
+            $group = ChatGroup::create([
+                'company_id' => auth()->user()->company->id,
+                'name' => $this->name,
+                'created_by' => auth()->id(),
+                'desc' => null,
+                'image' => $imagePath,
+                'team_id' => $team->id,
+            ]);
+
+
+            $groupMembers = $team->employees()->pluck('user_id')->toArray();
+
+            $group->members()->sync($groupMembers);
+
+
+            $this->toast('Team created successfully!', 'success');
         }
 
         $this->dispatch('closemodal');

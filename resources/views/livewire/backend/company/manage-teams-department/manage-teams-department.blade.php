@@ -186,8 +186,10 @@
                     <div class="modal-body">
                         <div class="row g-2">
                             @if ($mode === 'team')
-                                <div class="col-md-12 mb-2">
-                                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                                <!-- Department Select -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Department <span
+                                            class="text-danger">*</span></label>
                                     <select class="form-select shadow-sm" wire:model="department_id" required>
                                         <option value="">Select Department</option>
                                         @foreach ($departments as $dep)
@@ -195,10 +197,64 @@
                                         @endforeach
                                     </select>
                                     @error('department_id')
-                                        <span class="text-danger">{{ $message }}</span>
+                                        <span class="text-danger small">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+                                <!-- Add Employees Dropdown -->
+                                <div class="mb-3">
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-white p-2">
+                                            <strong>Add Employees <span class="text-danger">*</span></strong>
+                                        </div>
+                                        <div class="card-body p-2" style="max-height: 250px; overflow-y: auto;">
+
+                                            @if ($employees->isEmpty())
+                                                <div class="text-center text-muted py-3">
+                                                    No employees found
+                                                </div>
+                                            @else
+                                                <div class="form-check mb-2 border-bottom pb-2">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        wire:model.live="selectAllUsers" id="emp-all">
+                                                    <label class="form-check-label fw-semibold" for="emp-all">
+                                                        Select All Employees
+                                                    </label>
+                                                </div>
+
+                                                @foreach ($employees as $emp)
+                                                    <div class="form-check mb-1">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="{{ $emp->user_id }}" wire:model.live="filterUsers"
+                                                            id="emp-{{ $emp->user_id }}">
+                                                        <label class="form-check-label"
+                                                            for="emp-{{ $emp->user_id }}">
+                                                            {{ $emp->full_name }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            @endif
+
+                                        </div>
+                                    </div>
+                                    @error('filterUsers')
+                                        <span class="text-danger small">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+
+                                <!-- Team Lead Select -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Team Lead (optional)</label>
+                                    <select class="form-select shadow-sm" wire:model="teamLead">
+                                        <option value="">Select Team Lead</option>
+                                        @foreach ($employees->whereIn('user_id', $filterUsers) as $emp)
+                                            <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endif
+
 
                             <div class="col-md-12 mb-2">
                                 <label
@@ -260,7 +316,66 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+                                <!-- Employees selection -->
+                                <div class="mb-3">
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-white p-2">
+                                            <strong>Add Employees <span class="text-danger">*</span></strong>
+                                        </div>
+                                        <div class="card-body p-2" style="max-height: 250px; overflow-y: auto;">
+
+                                            @if ($employees->isEmpty())
+                                                <div class="text-center text-muted py-3">
+                                                    No employees found
+                                                </div>
+                                            @else
+                                                <div class="form-check mb-2 border-bottom pb-2">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        wire:model.live="selectAllUsers" id="emp-all">
+                                                    <label class="form-check-label fw-semibold" for="emp-all">Select
+                                                        All Employees</label>
+                                                </div>
+
+                                                @foreach ($employees as $emp)
+                                                    <div class="form-check mb-1">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            value="{{ $emp->user_id }}" wire:model.live="filterUsers"
+                                                            id="emp-{{ $emp->user_id }}">
+                                                        <label class="form-check-label"
+                                                            for="emp-{{ $emp->user_id }}">
+                                                            {{ $emp->full_name }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            @endif
+
+                                        </div>
+                                    </div>
+                                    @error('filterUsers')
+                                        <span class="text-danger small">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+
+                                <!-- Team Lead selection -->
+                                <div class="col-md-12 mb-2">
+                                    <label class="form-label">Team Lead (optional)</label>
+                                    <select class="form-select" wire:model="teamLead">
+                                        <option value="">Select Team Lead</option>
+                                        @foreach ($employees->whereIn('user_id', array_unique(array_merge($filterUsers, [$teamLead ?? 0]))) as $emp)
+                                            <option value="{{ $emp->user_id }}"
+                                                {{ (string) $emp->user_id === (string) $teamLead ? 'selected' : '' }}>
+                                                {{ $emp->full_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+
+
+                                </div>
                             @endif
+
 
                             <div class="col-md-12 mb-2">
                                 <label

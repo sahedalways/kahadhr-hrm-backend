@@ -280,8 +280,6 @@ class UsersIndex extends BaseComponent
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
             'job_title' => ['nullable', 'string', 'max:255'],
-            'team_id' => ['required', 'exists:teams,id'],
-            'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
             'salary_type' => ['required', 'in:hourly,monthly'],
         ];
 
@@ -291,7 +289,7 @@ class UsersIndex extends BaseComponent
         }
 
         $validatedData = $this->validate($rules);
-        $team = Team::find($this->team_id);
+
 
 
         // Save employee
@@ -301,9 +299,7 @@ class UsersIndex extends BaseComponent
             'f_name' => $this->f_name,
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
-            'department_id' => $team->department_id,
-            'team_id' => $this->team_id,
-            'role' => $this->role,
+            'role' => 'employee',
             'salary_type' => $this->salary_type,
             'contract_hours' => $this->salary_type === 'hourly' ? $this->contract_hours : null,
             'invite_token' => Str::random(64),
@@ -311,6 +307,7 @@ class UsersIndex extends BaseComponent
             'billable_from' => now()->addDays(3),
 
         ]);
+
 
         $inviteUrl = route(
             'employee.auth.set-password',

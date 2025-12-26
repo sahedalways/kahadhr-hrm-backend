@@ -944,12 +944,7 @@
                         @if ($teamStep == 2)
                             <div>
                                 {{-- Toggle between Manual Team or Existing Team --}}
-                                <div class="mb-3">
-                                    <button class="btn btn-outline-primary me-2"
-                                        wire:click="$set('manualTeam', true)">Manual Team</button>
-                                    <button class="btn btn-outline-secondary"
-                                        wire:click="$set('manualTeam', false)">Select Existing Team</button>
-                                </div>
+
 
                                 {{-- Existing Team Selection --}}
                                 @if (!$manualTeam)
@@ -2071,24 +2066,9 @@
                         <!-- STEP 2 -->
                         @if ($teamStep == 2)
                             <div>
-                                {{-- Toggle between Manual Team or Existing Team --}}
-                                <div class="mb-3">
-                                    <button class="btn btn-outline-primary me-2"
-                                        wire:click="$set('manualTeam', true)">Manual Team</button>
-                                    <button class="btn btn-outline-secondary"
-                                        wire:click="$set('manualTeam', false)">Select Existing Team</button>
-                                </div>
 
-                                {{-- Existing Team Selection --}}
-                                @if (!$manualTeam)
-                                    <label class="form-label fw-bold">Select Existing Team</label>
-                                    <select class="form-select mb-3" wire:model="selectedTeamId">
-                                        <option value="">-- Select Existing Team --</option>
-                                        @foreach ($existingTeams ?? [] as $team)
-                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                @endif
+
+
 
                                 {{-- Manual Team Member Addition --}}
                                 @if ($manualTeam)
@@ -2129,9 +2109,14 @@
                                             @foreach ($selectedTeamMembersList as $member)
                                                 <div class="badge bg-secondary d-flex align-items-center">
                                                     {{ $member->f_name }} {{ $member->l_name }}
-                                                    <button type="button"
-                                                        class="btn-close btn-close-white btn-sm ms-2"
-                                                        wire:click.prevent="removeTeamMember({{ $member->id }})"></button>
+
+
+                                                    <button type="button" class="btn btn-sm btn-danger ms-2"
+                                                        wire:click.prevent="removeTeamMember({{ $member->id }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+
+
                                                 </div>
                                             @endforeach
                                         </div>

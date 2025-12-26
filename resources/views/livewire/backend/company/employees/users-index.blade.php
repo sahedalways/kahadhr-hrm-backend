@@ -19,6 +19,18 @@
             </button>
         </div>
 
+        @if (session('success'))
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    toastr.success(@json(session('success')), '', {
+                        closeButton: true,
+                        progressBar: true,
+                        timeOut: 5000,
+                        positionClass: "toast-top-right"
+                    });
+                });
+            </script>
+        @endif
 
 
         <div class="col-auto">
@@ -253,35 +265,6 @@
 
 
 
-                                <!-- Team -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Team <span class="text-danger">*</span></label>
-                                    <select class="form-select" wire:model="team_id">
-                                        <option value="">Select Team </option>
-                                        @foreach ($teams as $team)
-                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('team_id')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <!-- Role -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Role <span class="text-danger">*</span></label>
-                                    <select class="form-select" wire:model="role">
-                                        <option value="" selected>Select a role</option>
-                                        @foreach (config('roles') as $role)
-                                            <option value="{{ $role }}">
-                                                {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('role')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
 
                                 <!-- Salary Type -->
                                 <div class="col-md-6">

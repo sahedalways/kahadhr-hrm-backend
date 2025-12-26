@@ -87,6 +87,8 @@ class EmployeeDetails extends BaseComponent
     public $countrySearch = '';
 
 
+
+
     public function updatedCountrySearch($value)
     {
         $this->filteredCountries = collect($this->countries)
@@ -173,31 +175,6 @@ class EmployeeDetails extends BaseComponent
         $this->toast('Document deleted successfully', 'success');
     }
 
-
-    /* 🔹 Delete employee */  /* Delete employee */
-    public function deleteEmployee($id)
-    {
-        $employee = Employee::find($id);
-
-        if ($employee) {
-
-            if ($employee->user) {
-                $employee->user->delete();
-            }
-
-
-            $employee->delete();
-
-            $this->toast('Employee deleted successfully!', 'success');
-            $this->resetInputFields();
-
-            $this->dispatchBrowserEvent('redirect-to-employees', [
-                'url' => route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain])
-            ]);
-        } else {
-            $this->toast('Employee not found!', 'error');
-        }
-    }
 
 
 
@@ -407,8 +384,7 @@ class EmployeeDetails extends BaseComponent
             'l_name' => 'required|string|max:255',
             'title' => 'nullable|in:Mr,Mrs',
             'job_title' => 'nullable|string|max:255',
-            'team_id' => 'required|exists:teams,id',
-            'role' => ['required', 'string', 'in:' . implode(',', config('roles'))],
+            'team_id' => 'nullable|exists:teams,id',
             'salary_type' => 'required|in:hourly,monthly',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -459,7 +435,7 @@ class EmployeeDetails extends BaseComponent
             $this->employee->avatar = uploadImage($this->avatar, 'image/employee/avatar', $this->employee->avatar);
         }
 
-        $team = Team::find($this->team_id);
+
 
 
         // Update employee
@@ -468,9 +444,8 @@ class EmployeeDetails extends BaseComponent
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
             'title' => $this->title,
-            'department_id' => $team->department_id,
-            'team_id' => $this->team_id,
-            'role' => $this->role,
+
+            'role' => 'employee',
             'salary_type' => $this->salary_type,
             'contract_hours' => $this->contract_hours,
             'is_active' => $this->is_active,
@@ -494,7 +469,7 @@ class EmployeeDetails extends BaseComponent
                 'country' => $this->country,
                 'nationality' => $this->nationality,
                 'home_phone' => $this->home_phone,
-                'mobile_phone' => $this->employee->user->phone_no,
+                'mobile_phone' => $this->employee->user ? $this->employee->user->phone_no : null,
                 'personal_email' => $this->personal_email,
                 'gender' => $this->gender,
                 'marital_status' => $this->marital_status,
@@ -507,6 +482,8 @@ class EmployeeDetails extends BaseComponent
                 'passport_number' => $this->passport_number,
             ]
         );
+
+
 
 
         if (!empty($this->customValues)) {

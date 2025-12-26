@@ -84,4 +84,46 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
+
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'employee_team', 'user_id', 'team_id')
+            ->using(EmployeeTeam::class)
+            ->withPivot('is_team_lead')
+            ->withTimestamps();
+    }
+
+    protected static function booted()
+    {
+
+        static::created(function ($user) {
+            if ($user->employee) {
+                $companyId = $user->employee->company_id;
+                $employee = $user->employee;
+                $annualLeaveHours = 0;
+
+                if ($employee->salary_type === 'monthly') {
+                    $annualLeaveHours = floatval(config('leave.full_time_hours', 100)) ?? 0;
+                } elseif ($employee->salary_type === 'hourly') {
+
+                    $contractHours = $employee->contract_hours ?? 0;
+                    $partTimePercent = floatval(config('leave.part_time_percentage', 100));
+                    $totalHours = ($contractHours * 52) * ($partTimePercent / 100);
+
+                    $annualLeaveHours = ceil($totalHours);
+                }
+
+                if ($companyId) {
+                    LeaveBalance::create([
+                        'company_id'       => $companyId,
+                        'user_id'          => $employee->user_id,
+                        'total_annual_hours'      => $annualLeaveHours,
+                        'used_annual_hours'       => 0,
+                        'carry_over_hours' => $annualLeaveHours,
+                    ]);
+                }
+            }
+        });
+    }
 }

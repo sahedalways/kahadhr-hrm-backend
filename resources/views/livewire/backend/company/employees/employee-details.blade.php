@@ -177,11 +177,20 @@
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item text-danger" href="#"
-                                            wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
-                                            <i class="fas fa-trash me-2"></i> Remove Employee
-                                        </a>
+                                        <form
+                                            action="{{ route('company.dashboard.employees.empDestroy', ['company' => app('authUser')->company->sub_domain, 'id' => $employee->id]) }}"
+                                            method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger"
+                                                onclick="return confirm('Are you sure?')">
+                                                <i class="fas fa-trash me-2"></i> Remove Employee
+                                            </button>
+                                        </form>
+
+
                                     </li>
+
                                 </ul>
                             </div>
 
@@ -1003,37 +1012,8 @@
 
 
 
-                        <!-- Team -->
-                        <div class="col-md-6">
-                            <label class="form-label">Team <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="team_id">
-                                <option value="">Select Team</option>
-                                @foreach ($teams as $team)
-                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                @endforeach
-                            </select>
 
 
-                            @error('team_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Role -->
-                        <div class="col-md-6">
-                            <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="role">
-                                <option value="" selected disabled>Select a role</option>
-                                @foreach (config('roles') as $role)
-                                    <option value="{{ $role }}">
-                                        {{ ucfirst(preg_replace('/([a-z])([A-Z])/', '$1 $2', $role)) }}</option>
-                                @endforeach
-                            </select>
-
-                            @error('role')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
 
                         <!-- Salary Type -->
                         <div class="col-md-6">
@@ -1481,14 +1461,15 @@
             .catch(err => console.error(err));
     }
 
+
     Livewire.on('confirmDelete', employeeId => {
         if (confirm("Are you sure you want to delete this employee?")) {
-            Livewire.dispatch('deleteEmployee', {
-                id: employeeId
-            });
+            @this.call('deleteEmployee', employeeId);
         }
     });
 </script>
+
+
 
 <script>
     function handleOtpInput(el) {

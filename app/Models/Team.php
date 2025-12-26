@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Team extends Model
 {
     use FilterByUserType;
-    protected $fillable = ['company_id', 'department_id', 'name'];
+    protected $fillable = ['company_id', 'department_id', 'name', 'team_lead_id'];
 
     public function company()
     {
@@ -22,6 +22,9 @@ class Team extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->belongsToMany(User::class, 'employee_teams', 'team_id', 'user_id')
+            ->using(EmployeeTeam::class)
+            ->withPivot('is_team_lead')
+            ->withTimestamps();
     }
 }

@@ -933,9 +933,33 @@ class ChatIndex extends BaseComponent
             'department_id' => 'required',
             'teamDescription' => 'nullable|string|max:255',
             'teamImage' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'selectedTeamMembers' => 'required|array|min:1',
         ];
 
-        $validator = Validator::make($data, $rules);
+        $messages = [
+            'teamName.required' => 'Team name is required.',
+            'teamName.min' => 'Team name must be at least 3 characters.',
+            'teamName.max' => 'Team name cannot exceed 75 characters.',
+
+            'department_id.required' => 'Please select a department.',
+
+            'teamImage.required' => 'Please upload a team image.',
+            'teamImage.image' => 'The uploaded file must be an image.',
+            'teamImage.mimes' => 'Team image must be JPG, JPEG, PNG, or WEBP format.',
+            'teamImage.max' => 'Team image size must not exceed 2MB.',
+
+            'selectedTeamMembers.required' => 'Please select at least one team member.',
+            'selectedTeamMembers.array' => 'Invalid team members selection.',
+            'selectedTeamMembers.min' => 'At least one team member must be selected.',
+        ];
+
+
+        $validator = Validator::make($data, $rules, $messages);
+
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
 
 
         $validator->sometimes('selectedTeamMembers', 'required|array|min:1', function ($input) {

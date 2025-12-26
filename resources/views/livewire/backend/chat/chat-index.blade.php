@@ -967,7 +967,9 @@
                                     <input type="text" class="form-control mb-2"
                                         placeholder="Search members by  name, email" wire:model="teamMemberSearch"
                                         wire:keyup="set('teamMemberSearch', $event.target.value)">
-
+                                    @error('selectedTeamMembers')
+                                        <span class="text-danger small">{{ $message }}</span>
+                                    @enderror
 
                                     <div style="max-height: 300px; overflow-y: auto;">
                                         @if (!empty($teamMemberList))
@@ -989,6 +991,7 @@
                                         @else
                                             <div class="text-muted p-2">No members available.</div>
                                         @endif
+
                                     </div>
                                 @endif
 

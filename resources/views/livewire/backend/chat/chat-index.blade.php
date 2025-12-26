@@ -943,23 +943,27 @@
                         <!-- STEP 2 -->
                         @if ($teamStep == 2)
                             <div>
-                                {{-- Toggle between Manual Team or Existing Team --}}
-
-
-                                {{-- Existing Team Selection --}}
-                                @if (!$manualTeam)
-                                    <label class="form-label fw-bold">Select Existing Team</label>
-                                    <select class="form-select mb-3" wire:model="selectedTeamId">
-                                        <option value="">-- Select Existing Team --</option>
-                                        @foreach ($existingTeams ?? [] as $team)
-                                            <option value="{{ $team->id }}">{{ $team->name }}</option>
-                                        @endforeach
-                                    </select>
-                                @endif
 
                                 {{-- Manual Team Member Addition --}}
                                 @if ($manualTeam)
-                                    <label class="form-label fw-bold">Add Members</label>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Department <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select shadow-sm" wire:model="department_id" required>
+                                            <option value="">Select Department</option>
+                                            @foreach ($departments as $dep)
+                                                <option value="{{ $dep->id }}">{{ $dep->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('department_id')
+                                            <span class="text-danger small">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+
+                                    <label class="form-label fw-bold">Add Members <span
+                                            class="text-danger">*</span></label>
                                     <input type="text" class="form-control mb-2"
                                         placeholder="Search members by  name, email" wire:model="teamMemberSearch"
                                         wire:keyup="set('teamMemberSearch', $event.target.value)">
@@ -996,9 +1000,14 @@
                                             @foreach ($selectedTeamMembersList as $member)
                                                 <div class="badge bg-secondary d-flex align-items-center">
                                                     {{ $member->f_name }} {{ $member->l_name }}
-                                                    <button type="button"
-                                                        class="btn-close btn-close-white btn-sm ms-2"
-                                                        wire:click.prevent="removeTeamMember({{ $member->id }})"></button>
+
+
+                                                    <button type="button" class="btn btn-sm btn-danger ms-2"
+                                                        wire:click.prevent="removeTeamMember({{ $member->id }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+
+
                                                 </div>
                                             @endforeach
                                         </div>
@@ -1956,199 +1965,6 @@
         </div>
 
 
-        <div class="modal fade" id="newTeamModal" tabindex="-1" aria-hidden="true" wire:ignore.self
-            aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
-                <div class="modal-content" style="border-radius: 15px;">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Create New Team</h5>
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <!-- STEP NAVIGATION -->
-                        <div class="d-flex justify-content-center mb-3">
-                            <span class="badge {{ $teamStep == 1 ? 'bg-primary' : 'bg-secondary' }} me-2">1</span>
-                            <span class="badge {{ $teamStep == 2 ? 'bg-primary' : 'bg-secondary' }}">2</span>
-                        </div>
-
-                        <!-- STEP 1 -->
-                        @if ($teamStep == 1)
-                            <div>
-
-                                <label class="form-label fw-bold">Team Image <span
-                                        class="text-danger">*</span></label>
-
-                                <div onclick="document.getElementById('teamImageInput').click()"
-                                    style="
-        width:130px;
-        height:130px;
-        border-radius:50%;
-        overflow:hidden;
-        border:3px solid #ddd;
-        cursor:pointer;
-        position:relative;
-        transition:0.3s;
-        background:#f8f9fa;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    "
-                                    onmouseover="this.style.borderColor='#3b82f6'"
-                                    onmouseout="this.style.borderColor='#ddd'">
-
-
-                                    @if ($teamImage)
-                                        <img src="{{ $teamImage->temporaryUrl() }}"
-                                            style="width:100%; height:100%; object-fit:cover;">
-                                    @else
-                                        <img src="{{ asset('assets/img/default-image.jpg') }}"
-                                            style="width:100%; height:100%; object-fit:cover;">
-                                    @endif
-
-                                    <div wire:loading.flex wire:target="teamImage"
-                                        style="
-            position:absolute;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:rgba(255,255,255,0.6);
-            align-items:center;
-            justify-content:center;
-            font-size:24px;
-            display:none; /* initial hidden */
-         ">
-                                        <div class="spinner-border text-primary" role="status"
-                                            style="width:40px; height:40px;">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <input type="file" id="teamImageInput" wire:model="teamImage"
-                                    style="display:none;" accept="image/*">
-
-
-                                @error('teamImage')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-
-
-
-                                <label class="form-label fw-bold mt-3">Team Name <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="teamName" required>
-
-                                @error('teamName')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-
-                                <label class="form-label fw-bold mt-3">Description</label>
-                                <textarea class="form-control" rows="3" wire:model="teamDescription"></textarea>
-
-                                @error('teamDescription')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-
-                                <button class="btn btn-primary mt-3 w-100" wire:click="nextTeamStep">
-                                    Next →
-                                </button>
-
-                            </div>
-                        @endif
-
-                        <!-- STEP 2 -->
-                        @if ($teamStep == 2)
-                            <div>
-
-
-
-
-                                {{-- Manual Team Member Addition --}}
-                                @if ($manualTeam)
-                                    <label class="form-label fw-bold">Add Members</label>
-                                    <input type="text" class="form-control mb-2"
-                                        placeholder="Search members by  name, email" wire:model="teamMemberSearch"
-                                        wire:keyup="set('teamMemberSearch', $event.target.value)">
-
-
-                                    <div style="max-height: 300px; overflow-y: auto;">
-                                        @if (!empty($teamMemberList))
-                                            @foreach ($teamMemberList as $member)
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                                    <div>
-                                                        {{ $member->f_name }} {{ $member->l_name }}
-                                                        <br>
-                                                        <small class="text-muted">{{ $member->email }}</small>
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                        wire:click.prevent="addTeamMember({{ $member->id }})"
-                                                        @if (in_array($member->id, $selectedTeamMembers ?? [])) disabled @endif>
-                                                        Add
-                                                    </button>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="text-muted p-2">No members available.</div>
-                                        @endif
-                                    </div>
-                                @endif
-
-                                {{-- Selected Members List --}}
-                                @if (!empty($selectedTeamMembersList))
-                                    <div class="mt-3">
-                                        <label class="form-label fw-bold">Selected Members</label>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($selectedTeamMembersList as $member)
-                                                <div class="badge bg-secondary d-flex align-items-center">
-                                                    {{ $member->f_name }} {{ $member->l_name }}
-
-
-                                                    <button type="button" class="btn btn-sm btn-danger ms-2"
-                                                        wire:click.prevent="removeTeamMember({{ $member->id }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-
-
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-
-                                {{-- Navigation --}}
-                                <div class="d-flex mt-3">
-                                    <button class="btn btn-secondary w-50 me-2" wire:click="prevTeamStep">←
-                                        Back</button>
-                                    <button class="btn btn-success w-50" wire:click="createTeam"
-                                        wire:loading.attr="disabled" wire:target="createTeam">
-
-                                        <span wire:loading.remove wire:target="createTeam">Create Team</span>
-
-
-                                        <span wire:loading wire:target="createTeam">
-                                            <span class="spinner-border spinner-border-sm me-2" role="status"
-                                                aria-hidden="true"></span>
-                                            Creating...
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        @endif
-
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
 

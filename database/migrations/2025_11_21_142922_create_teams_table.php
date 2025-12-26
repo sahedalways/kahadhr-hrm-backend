@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            $table->foreignId('department_id')->nullable()->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('team_lead_id')->nullable();
             $table->foreign('team_lead_id')->references('id')->on('users')->onDelete('set null');
             $table->string('name');

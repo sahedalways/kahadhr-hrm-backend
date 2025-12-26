@@ -9,6 +9,7 @@ use App\Models\ChatGroup;
 use App\Models\ChatGroupMember;
 use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Team;
 use App\Models\User;
@@ -66,6 +67,7 @@ class ChatIndex extends BaseComponent
     public $selectedTeamId = null;
 
     public $manualTeam = true;
+    public $departments, $department_id;
 
 
     protected $rules = [
@@ -89,6 +91,8 @@ class ChatIndex extends BaseComponent
         $this->startNewChat($this->receiverId);
 
         $this->loadMessages();
+
+        $this->departments = Department::where('company_id', currentCompanyId())->get();
     }
 
     public function updatedTab()
@@ -857,6 +861,7 @@ class ChatIndex extends BaseComponent
         $this->teamName = '';
         $this->teamDescription = '';
         $this->teamImage = null;
+        $this->department_id = null;
         $this->selectedTeamMembers = [];
 
 
@@ -919,12 +924,13 @@ class ChatIndex extends BaseComponent
             'teamDescription' => $this->teamDescription,
             'teamImage' => $this->teamImage,
             'selectedTeamMembers' => $this->selectedTeamMembers,
-            'selectedTeamId' => $this->selectedTeamId,
+            'department_id' => $this->department_id,
             'manualTeam' => $this->manualTeam,
         ];
 
         $rules = [
             'teamName' => 'required|string|min:3|max:75',
+            'department_id' => 'required',
             'teamDescription' => 'nullable|string|max:255',
             'teamImage' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
@@ -951,6 +957,21 @@ class ChatIndex extends BaseComponent
         }
 
 
+
+        $team = Team::updateOrCreate(
+            ['name' => $this->teamName, 'company_id' => auth()->user()->company->id],
+            [
+                'department_id' => $this->department_id,
+                'team_lead_id' => $this->teamLead ?? null,
+            ]
+        );
+
+
+        if ($this->manualTeam) {
+            $team->employees()->sync($this->selectedTeamMembers);
+        }
+
+
         if ($this->manualTeam) {
 
             $group = ChatGroup::create([
@@ -959,22 +980,6 @@ class ChatIndex extends BaseComponent
                 'created_by' => auth()->id(),
                 'desc' => $this->teamDescription,
                 'image' => $imagePath,
-            ]);
-
-            $group->members()->sync($this->selectedTeamMembers);
-        } else {
-            $this->selectedTeamMembers = Employee::where('team_id', $this->selectedTeamId)
-                ->pluck('user_id')
-                ->toArray();
-
-
-            $group = ChatGroup::create([
-                'company_id' => auth()->user()->company->id,
-                'name' => $this->teamName,
-                'created_by' => auth()->id(),
-                'desc' => $this->teamDescription,
-                'image' => $imagePath,
-                'team_id' => $this->selectedTeamId,
             ]);
 
             $group->members()->sync($this->selectedTeamMembers);

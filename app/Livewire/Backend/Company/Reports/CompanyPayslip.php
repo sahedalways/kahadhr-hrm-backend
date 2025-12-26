@@ -49,6 +49,8 @@ class CompanyPayslip extends BaseComponent
 
     public $uploadRequestId;
 
+    public bool $selectAllUsers = false;
+
     protected $listeners = [
         'deletePayslip' => 'deletePayslip',
         'deleteRequest' => 'deleteRequest',
@@ -79,6 +81,31 @@ class CompanyPayslip extends BaseComponent
             'requests' => $this->requests,
         ]);
     }
+
+
+
+    public function updatedSelectAllUsers($value)
+    {
+        if ($value) {
+            $this->filterUsers = $this->employees
+                ->pluck('user_id')
+                ->toArray();
+        } else {
+            $this->filterUsers = [];
+        }
+
+        $this->resetLoaded();
+    }
+
+
+
+    public function updatedFilterUsers()
+    {
+        $this->selectAllUsers =
+            count($this->filterUsers) === $this->employees->count();
+        $this->resetLoaded();
+    }
+
 
     // ─── LOAD DATA ───────────────────────────────────────────────────
 
@@ -135,10 +162,7 @@ class CompanyPayslip extends BaseComponent
         $this->loadMore();
     }
 
-    public function updatedFilterUsers()
-    {
-        $this->resetLoaded();
-    }
+
 
     public function handleSort($value)
     {

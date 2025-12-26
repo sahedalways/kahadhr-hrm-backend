@@ -48,6 +48,8 @@ class CompanyExpenses extends BaseComponent
     public $expense_id;
     public $user_id;
 
+    public bool $selectAllUsers = false;
+
     protected $listeners = [
         'deleteExpense' => 'deleteExpense',
 
@@ -78,6 +80,23 @@ class CompanyExpenses extends BaseComponent
             'totalAmount' => $totalAmount,
         ]);
     }
+
+    public function updatedSelectAllUsers($value)
+    {
+        if ($value) {
+            $this->filterUsers = $this->employees
+                ->pluck('user_id')
+                ->toArray();
+        } else {
+            $this->filterUsers = [];
+        }
+
+        $this->resetLoaded();
+    }
+
+
+
+
     public function loadMore()
     {
         if (!$this->hasMore) return;
@@ -161,10 +180,16 @@ class CompanyExpenses extends BaseComponent
         $this->loadMore();
     }
 
+
+
     public function updatedFilterUsers()
     {
+        $this->selectAllUsers =
+            count($this->filterUsers) === $this->employees->count();
         $this->resetLoaded();
     }
+
+
 
     public function handleCategoryFilter($value)
     {

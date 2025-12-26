@@ -43,7 +43,8 @@
             <div class="filter-section mb-5 text-white">
                 <div class="row g-2">
 
-                    <div class="col position-relative dropdown">
+                    <div class="col position-relative dropdown" wire:ignore>
+
                         <!-- Dropdown Button -->
                         <button
                             class="btn btn-secondary shadow-none w-100 min-width-fit d-flex align-items-center justify-content-between dropdown-toggle"
@@ -53,17 +54,34 @@
 
                         <!-- Dropdown Menu -->
                         <div class="dropdown-menu w-100 p-2" data-bs-auto-close="outside">
+
+                            <!-- All Employees -->
+                            <div class="form-check mb-2 border-bottom pb-2">
+                                <input class="form-check-input" type="checkbox" wire:model.live="selectAllUsers"
+                                    id="emp-all">
+                                <label class="form-check-label fw-semibold" for="emp-all">
+                                    All Employees
+                                </label>
+                            </div>
+
+                            <div class="fw-semibold text-muted small mb-2">
+                                Select Employees
+                            </div>
+
+                            <!-- Employees List -->
                             @foreach ($employees as $emp)
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
-                                        wire:model="filterUsers" id="emp{{ $emp->user_id }}">
+                                        wire:model.live="filterUsers" id="emp{{ $emp->user_id }}">
                                     <label class="form-check-label" for="emp{{ $emp->user_id }}">
                                         {{ $emp->full_name }}
                                     </label>
                                 </div>
                             @endforeach
+
                         </div>
                     </div>
+
 
 
 

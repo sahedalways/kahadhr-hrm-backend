@@ -68,6 +68,32 @@ class TimesheetIndex extends BaseComponent
     public $totalHours = '0h 0m';
     public $absentDate;
     public $totalAbsents;
+    public bool $selectAllUsers = false;
+
+
+
+
+    public function updatedSelectAllUsers($value)
+    {
+        if ($value) {
+            $this->filterUsers = $this->employees
+                ->pluck('user_id')
+                ->toArray();
+        } else {
+            $this->filterUsers = [];
+        }
+
+        $this->resetLoaded();
+    }
+
+
+    public function updatedFilterUsers()
+    {
+        $this->selectAllUsers =
+            count($this->filterUsers) === $this->employees->count();
+        $this->resetLoaded();
+    }
+
 
 
 
@@ -470,10 +496,7 @@ class TimesheetIndex extends BaseComponent
         $this->resetLoaded();
     }
 
-    public function updatedFilterUsers()
-    {
-        $this->resetLoaded();
-    }
+
 
 
     public function updatedDateFrom()

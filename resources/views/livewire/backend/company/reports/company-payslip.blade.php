@@ -33,27 +33,49 @@
                         <div class="row g-3 align-items-center mb-3">
 
 
-                            <div class="col-lg-3 col-md-6 dropdown">
-                                <button
-                                    class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Filter by Employees
-                                </button>
+                            <div class="col-lg-3 col-md-6 col-12">
+                                <div class="dropdown w-100" wire:ignore>
+                                    <!-- Dropdown button -->
+                                    <button
+                                        class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Filter by Employees
+                                    </button>
 
-                                <div class="dropdown-menu p-2 w-100" style="max-height: 250px; overflow-y: auto;"
-                                    data-bs-auto-close="outside">
-                                    @foreach ($employees as $emp)
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
-                                                wire:model="filterUsers" id="emp-{{ $emp->user_id }}">
-                                            <label class="form-check-label" for="emp-{{ $emp->user_id }}">
-                                                {{ $emp->full_name }}
+                                    <!-- Dropdown menu -->
+                                    <div class="dropdown-menu p-3 w-100 shadow"
+                                        style="max-height: 250px; overflow-y: auto;" data-bs-auto-close="outside">
+
+
+
+
+                                        <div class="form-check mb-2 border-bottom pb-2">
+                                            <input class="form-check-input" type="checkbox"
+                                                wire:model.live="selectAllUsers" id="emp-all">
+                                            <label class="form-check-label fw-semibold" for="emp-all">
+                                                All Employees
                                             </label>
                                         </div>
-                                    @endforeach
+
+
+                                        <div class="fw-semibold text-muted small mb-2">
+                                            Select Employees
+                                        </div>
+
+
+                                        @foreach ($employees as $emp)
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input" type="checkbox"
+                                                    value="{{ $emp->user_id }}" wire:model.live="filterUsers"
+                                                    id="emp-{{ $emp->user_id }}">
+                                                <label class="form-check-label" for="emp-{{ $emp->user_id }}">
+                                                    {{ $emp->full_name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-
 
 
 

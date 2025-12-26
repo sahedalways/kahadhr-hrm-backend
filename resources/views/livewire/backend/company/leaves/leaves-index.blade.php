@@ -297,6 +297,135 @@
     </div>
 
 
+
+
+    <div wire:ignore.self class="modal fade" id="editLeaveModal" data-bs-backdrop="static" tabindex="-1"
+        aria-labelledby="editLeaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editLeaveModalLabel">Edit Leave</h5>
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body p-4">
+                    @if ($calendarLeaveInfo)
+                        <!-- 1. Employee Card -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <img src="{{ $calendarLeaveInfo->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
+                                class="rounded-circle me-3 border border-1"
+                                alt="{{ $calendarLeaveInfo->user->full_name }}"
+                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                            <div class="fw-bold text-dark flex-grow-1">{{ $calendarLeaveInfo->user->full_name }}</div>
+                        </div>
+
+                        <!-- 2. Leave Type -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <div class="me-3 fs-5" style="min-width: 25px;">
+                                {!! $calendarLeaveInfo->leaveType->emoji !!}
+                            </div>
+                            <div class="fw-medium text-dark flex-grow-1">
+                                {{ $calendarLeaveInfo->leaveType->name ?? 'N/A' }}
+                            </div>
+                        </div>
+
+                        <!-- 3. Reason/Description -->
+                        <div
+                            class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
+                            <div class="fw-normal text-dark flex-grow-1">
+                                {{ $calendarLeaveInfo->other_reason ?? '-' }}
+                            </div>
+                        </div>
+
+                        <!-- 4. Editable Date Range -->
+                        <div class="row g-2 mb-4 px-2">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Start Date <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" wire:model="editStartDate"
+                                    min="{{ date('Y-m-d') }}">
+                                @error('editStartDate')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-12 mt-3">
+                                <label class="form-label fw-bold">End Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" wire:model="editEndDate"
+                                    min="{{ date('Y-m-d') }}">
+                                @error('editEndDate')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- 5. Existing Badges / Payment info (read-only) -->
+                        @if (!in_array($calendarLeaveInfo->leave_type_id, [1, 5]))
+                            <div class="mt-4 p-3 bg-light rounded-3 border shadow-sm">
+                                <h6 class="fw-bold text-dark mb-2">
+                                    <i class="fas fa-wallet me-2 text-primary"></i> Leave Payment Details
+                                </h6>
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-medium text-muted">Type:</span>
+                                    <span class="fw-bold text-dark text-uppercase">
+                                        {{ $calendarLeaveInfo->paid_status ?? 'N/A' }}
+                                    </span>
+                                </div>
+                                @if ($calendarLeaveInfo->paid_status === 'paid')
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span class="fw-medium text-muted">Paid Hours:</span>
+                                        <span class="fw-bold text-success">
+                                            {{ number_format($calendarLeaveInfo->paid_hours, 2) }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        <!-- 6. Deduction Summary -->
+                        <div class="text-center mt-3 pt-3 border-top">
+                            <h5 class="fw-bold text-secondary">Deduction:
+                                {{ \Carbon\Carbon::parse($calendarLeaveInfo->start_date)->diffInDays(\Carbon\Carbon::parse($calendarLeaveInfo->end_date)) + 1 }}
+                                days
+                            </h5>
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-1"></i> No request selected.
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">Cancel</button>
+
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                        wire:click="updateLeave({{ $calendarLeaveInfo->id ?? 0 }})" wire:loading.attr="disabled"
+                        wire:target="updateLeave">
+                        <span wire:loading.remove wire:target="updateLeave">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </span>
+                        <span wire:loading wire:target="updateLeave">
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            Saving...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
     <div wire:ignore.self class="modal fade" id="viewRequestInfo" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="viewRequestInfoLabel" aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
@@ -411,34 +540,39 @@
 
                     <div>
                         <div>
+
                             <button type="button" class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
                                 wire:click="rejectRequest({{ $requestDetails->id ?? 0 }})"
-                                wire:loading.attr="disabled"
-                                wire:target="rejectRequest({{ $requestDetails->id ?? 0 }})">
-                                <span wire:loading.remove wire:target="rejectRequest({{ $requestDetails->id ?? 0 }})">
-                                    Reject
+                                wire:loading.attr="disabled" wire:target="rejectRequest">
+
+                                <span wire:loading.remove wire:target="rejectRequest">
+                                    <i class="fas fa-times-circle me-1"></i> Reject
                                 </span>
-                                <span wire:loading wire:target="rejectRequest({{ $requestDetails->id ?? 0 }})">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
+
+                                <span wire:loading.delay wire:target="rejectRequest">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
                                     Rejecting...
                                 </span>
                             </button>
 
-                            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm"
+
+
+
+                            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm me-2"
                                 wire:click="approveRequest({{ $requestDetails->id ?? 0 }})"
-                                wire:loading.attr="disabled"
-                                wire:target="approveRequest({{ $requestDetails->id ?? 0 }})">
-                                <span wire:loading.remove
-                                    wire:target="approveRequest({{ $requestDetails->id ?? 0 }})">
-                                    Approve
+                                wire:loading.attr="disabled" wire:target="approveRequest">
+
+                                <span wire:loading.remove wire:target="approveRequest">
+                                    <i class="fas fa-check-circle me-1"></i> Approve
                                 </span>
-                                <span wire:loading wire:target="approveRequest({{ $requestDetails->id ?? 0 }})">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
+
+                                <span wire:loading.delay wire:target="approveRequest">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
                                     Approving...
                                 </span>
                             </button>
+
+
                         </div>
 
                     </div>
@@ -563,6 +697,34 @@
                 </div>
 
 
+                @if ($calendarLeaveInfo)
+                    <div class="modal-footer d-flex justify-content-between">
+
+                        <!-- Left: Cancel Leave -->
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-4"
+                            onclick="confirmCancel({{ $calendarLeaveInfo->id }})" wire:loading.attr="disabled"
+                            wire:target="cancelLeave">
+
+                            <span wire:loading.remove wire:target="cancelLeave">
+                                <i class="fas fa-ban me-1"></i> Cancel Leave
+                            </span>
+
+                            <span wire:loading wire:target="cancelLeave">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                Cancelling...
+                            </span>
+                        </button>
+
+                        <!-- Right: Edit Leave -->
+                        <button type="button" class="btn btn-primary rounded-pill px-4"
+                            wire:click="editLeave({{ $calendarLeaveInfo->id }})" data-bs-toggle="modal"
+                            data-bs-target="#editLeaveModal">
+
+                            <i class="fas fa-edit me-1"></i> Edit Leave
+                        </button>
+
+                    </div>
+                @endif
 
             </div>
         </div>
@@ -580,4 +742,13 @@
         let modal = new bootstrap.Modal(modalEl);
         modal.show();
     });
+</script>
+
+
+<script>
+    function confirmCancel(id) {
+        if (confirm('Are you sure you want to cancel this leave?')) {
+            @this.cancelLeave(id);
+        }
+    }
 </script>

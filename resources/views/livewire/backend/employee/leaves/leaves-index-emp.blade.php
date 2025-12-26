@@ -40,8 +40,8 @@
 
                 <!-- Search -->
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Search by leave type"
-                        wire:model="search" wire:keyup="set('search', $event.target.value)" />
+                    <input type="text" class="form-control" placeholder="Search by leave type" wire:model="search"
+                        wire:keyup="set('search', $event.target.value)" />
                 </div>
 
                 <!-- Sort -->
@@ -144,10 +144,13 @@
                                         <span class="badge bg-warning">Pending</span>
                                     @elseif($leave->status == 'approved')
                                         <span class="badge bg-success">Approved</span>
+                                    @elseif($leave->status == 'cancelled')
+                                        <span class="badge bg-secondary">Cancelled</span>
                                     @else
                                         <span class="badge bg-danger">Rejected</span>
                                     @endif
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
@@ -210,7 +213,8 @@
 
                         <div class="mb-2">
                             <label>Start Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" wire:model="start_date">
+                            <input type="date" class="form-control" wire:model="start_date"
+                                min="{{ now()->toDateString() }}">>
                             @error('start_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -218,7 +222,8 @@
 
                         <div class="mb-2">
                             <label>End Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" wire:model="end_date">
+                            <input type="date" class="form-control" wire:model="end_date"
+                                min="{{ now()->toDateString() }}">>
                             @error('end_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

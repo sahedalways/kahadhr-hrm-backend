@@ -32,6 +32,10 @@ class LeavesIndex extends BaseComponent
     public $paidStatus = null;
     public $paidHours = null;
 
+    public $editStartDate;
+    public $editEndDate;
+    public $editLeaveId;
+
     protected $listeners = ['showLeaveRequestInfo'];
 
 
@@ -436,6 +440,157 @@ class LeavesIndex extends BaseComponent
             $this->paidHours = null;
         }
     }
+
+
+
+    public function cancelLeave($id)
+    {
+        $leave = LeaveRequest::with('user.employee')->findOrFail($id);
+
+
+        $userId = $leave->user_id;
+        $companyId = $leave->user->employee->company_id;
+        $hoursUsed = $leave->total_hours ?? 0;
+
+
+        if ($leave->status === 'approved') {
+            $leaveBalance = LeaveBalance::firstOrNew([
+                'user_id' => $userId,
+                'company_id' => $companyId,
+            ]);
+
+            if ($leave->leave_type_id == 1) {
+                $leaveBalance->used_annual_hours = max(0, ($leaveBalance->used_annual_hours ?? 0) - $hoursUsed);
+                $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
+            }
+
+            if ($leave->leave_type_id == 5) {
+                $leaveBalance->used_leave_in_liew = max(0, ($leaveBalance->used_leave_in_liew ?? 0) - $hoursUsed);
+            }
+
+            $leaveBalance->save();
+        }
+
+
+        $leave->update([
+            'status' => 'cancelled',
+            'paid_status' => null,
+            'paid_hours' => null,
+        ]);
+
+        $this->resetForm();
+        $this->mount();
+        if ($this->activeEmployeeId) {
+            $this->showEmployeeLeave($this->activeEmployeeId);
+        }
+
+
+        $this->toast('Leave cancelled successfully!', 'success');
+
+        $this->dispatch('closemodal');
+    }
+
+
+
+    public function editLeave($id)
+    {
+
+        $leave = LeaveRequest::findOrFail($id);
+
+        $this->editLeaveId = $id;
+
+
+        $this->editStartDate = $leave->start_date;
+        $this->editEndDate = $leave->end_date;
+
+
+        $this->dispatch('show-edit-leave-modal');
+    }
+
+
+    public function updateLeave($id)
+    {
+        $leave = LeaveRequest::findOrFail($id);
+
+        // Validate dates
+        $this->validate([
+            'editStartDate' => 'required|date|after_or_equal:today',
+            'editEndDate' => 'required|date|after_or_equal:editStartDate',
+        ]);
+
+
+        $leaveBalance = LeaveBalance::firstOrNew([
+            'user_id' => $leave->user_id,
+            'company_id' => $leave->user->employee->company_id,
+        ]);
+
+        $hoursUsed = $leave->total_hours ?? 0;
+
+        if ($leave->leave_type_id == 1) {
+            $leaveBalance->used_annual_hours = max(0, ($leaveBalance->used_annual_hours ?? 0) - $hoursUsed);
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
+        }
+
+        if ($leave->leave_type_id == 5) {
+            $leaveBalance->used_leave_in_liew = max(0, ($leaveBalance->used_leave_in_liew ?? 0) - $hoursUsed);
+        }
+
+        $leaveBalance->save();
+
+
+        $start = Carbon::parse($this->editStartDate)->startOfDay();
+        $end = Carbon::parse($this->editEndDate)->startOfDay();
+
+        $totalDays = $start->diffInDays($end, false) + 1;
+        $totalDays = abs($totalDays);
+
+        $hoursPerDay = 8;
+        $totalHours = $totalDays * $hoursPerDay;
+
+
+        if (in_array($leave->leave_type_id, [1, 5])) {
+            $this->paidHours = $totalHours;
+            $this->paidStatus = 'paid';
+
+            $availableHours = $this->getAvailableLeaveHours($leave->user_id, $leave->leave_type_id);
+            if ($totalHours > $availableHours) {
+                $this->toast('Employee does not have enough leave hours available!', 'error');
+                return;
+            }
+        }
+
+        // 4️⃣ Update leave record
+        $leave->update([
+            'start_date'  => $this->editStartDate,
+            'end_date'    => $this->editEndDate,
+            'total_hours' => $totalHours,
+            'paid_hours'  => $this->paidHours ?? 0,
+            'paid_status' => $this->paidStatus ?? null,
+        ]);
+
+
+        if ($leave->leave_type_id == 1) {
+            $leaveBalance->used_annual_hours = ($leaveBalance->used_annual_hours ?? 0) + $totalHours;
+            $leaveBalance->carry_over_hours = max(0, ($leaveBalance->total_annual_hours ?? 0) - $leaveBalance->used_annual_hours);
+        }
+
+        if ($leave->leave_type_id == 5) { // Leave in Lieu
+            $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $totalHours;
+        }
+
+        $leaveBalance->save();
+
+        $this->resetForm();
+        $this->mount();
+
+        if ($this->activeEmployeeId) {
+            $this->showEmployeeLeave($this->activeEmployeeId);
+        }
+
+        $this->toast('Leave updated successfully!', 'success');
+        $this->dispatch('closemodal');
+    }
+
 
 
 

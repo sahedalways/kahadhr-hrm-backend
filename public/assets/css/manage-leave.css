@@ -52,3 +52,77 @@
     border-left: 5px solid #0d6efd !important;
     transition: 0.2s;
 }
+
+.timeline-container {
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #dee2e6;
+}
+
+.timeline-grid {
+    display: grid;
+    /* 250px for employee name, then 31 columns of 40px each */
+    grid-template-columns: 200px repeat(31, 40px);
+    min-width: fit-content;
+}
+
+.employee-cell {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    z-index: 2;
+}
+
+.sticky-col {
+    position: sticky;
+    left: 0;
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.day-cell {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-header .day-cell {
+    height: 50px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Leave Bars */
+.leave-bar {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    z-index: 1;
+}
+
+/* Weekend Styling */
+.weekend-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.employee-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.employee-clickable:hover {
+    background-color: #c3d5e9;
+    color: #fff;
+}

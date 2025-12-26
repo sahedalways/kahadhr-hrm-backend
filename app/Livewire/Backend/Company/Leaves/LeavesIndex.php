@@ -35,6 +35,7 @@ class LeavesIndex extends BaseComponent
     public $editStartDate;
     public $editEndDate;
     public $editLeaveId;
+    public $filterEmployeeId = null;
 
     protected $listeners = ['showLeaveRequestInfo'];
 
@@ -49,19 +50,53 @@ class LeavesIndex extends BaseComponent
             abort(403, 'Company not found.');
         }
 
-
-
-        $this->employees = Employee::where('company_id', $this->company->id)
+        // Get all employees of the company
+        $this->employees = Employee::with('leaves')->where('company_id', $this->company->id)
             ->whereNotNull('user_id')
             ->orderBy('f_name')
             ->get();
 
 
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
+
+        $approvedLeaves = LeaveRequest::with('leaveType', 'user.employee')
+            ->where('company_id', $this->company->id)
+            ->where('status', 'approved')
+            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
+                        $q->where('start_date', '<', $currentMonthStart)
+                            ->where('end_date', '>', $currentMonthEnd);
+                    });
+            })
+            ->get();
+
         $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')->where('company_id', $this->company->id)->where('status', "pending")
             ->orderBy('created_at', 'desc')
             ->get();
 
+
+        $this->employees->map(function ($emp) use ($approvedLeaves) {
+            $emp->leaves = $approvedLeaves->where('user_id', $emp->user_id);
+            return $emp;
+        });
+
         $this->leaveTypes = LeaveType::all();
+    }
+
+
+    public function filterByEmployee($employeeId)
+    {
+        $this->filterEmployeeId = null;
+
+        if ($this->filterEmployeeId === $employeeId) {
+            $this->filterEmployeeId = null;
+            return;
+        }
+
+        $this->filterEmployeeId = $employeeId;
     }
 
 
@@ -183,12 +218,10 @@ class LeavesIndex extends BaseComponent
 
 
         $leaveBalance->save();
-
-        $this->resetForm();
-        $this->mount();
+        $this->dispatch('closemodal');
+        $this->dispatch('reload-page');
 
         $this->toast('Request approved successfully!', 'success');
-        $this->dispatch('closemodal');
     }
 
 
@@ -297,6 +330,9 @@ class LeavesIndex extends BaseComponent
 
         // Fire real-time event
         event(new NotificationEvent($notification));
+
+
+        $this->dispatch('reload-page');
 
 
         $this->toast('Leave has been submitted successfully.', 'success');
@@ -479,15 +515,11 @@ class LeavesIndex extends BaseComponent
         ]);
 
         $this->resetForm();
-        $this->mount();
-        if ($this->activeEmployeeId) {
-            $this->showEmployeeLeave($this->activeEmployeeId);
-        }
 
-
-        $this->toast('Leave cancelled successfully!', 'success');
 
         $this->dispatch('closemodal');
+        $this->dispatch('reload-page');
+        $this->toast('Leave cancelled successfully!', 'success');
     }
 
 
@@ -580,15 +612,13 @@ class LeavesIndex extends BaseComponent
 
         $leaveBalance->save();
 
-        $this->resetForm();
-        $this->mount();
+        $leave->refresh();
 
-        if ($this->activeEmployeeId) {
-            $this->showEmployeeLeave($this->activeEmployeeId);
-        }
+        $this->dispatch('closemodal');
+
+        $this->dispatch('reload-page');
 
         $this->toast('Leave updated successfully!', 'success');
-        $this->dispatch('closemodal');
     }
 
 

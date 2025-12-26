@@ -193,4 +193,19 @@ class Employee extends Model
             'field_id'
         )->withPivot('value');
     }
+
+
+
+    public function leaves()
+    {
+        // Assumes User has 'leaves' relation to LeaveRequest
+        return $this->hasManyThrough(
+            LeaveRequest::class,
+            User::class,
+            'id',
+            'user_id',
+            'id',
+            'id'
+        );
+    }
 }

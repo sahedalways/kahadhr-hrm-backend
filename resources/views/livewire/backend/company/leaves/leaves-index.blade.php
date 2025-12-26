@@ -1,5 +1,4 @@
 @push('styles')
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
     <link href="{{ asset('assets/css/manage-leave.css') }}" rel="stylesheet" />
 @endpush
 
@@ -8,19 +7,50 @@
     <div class="container-fluid my-4">
         <div class="row g-3">
 
-            <!-- Left Column: Employee List + Search -->
-            <div class="col-lg-6 col-md-8 col-12">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary  p-3">
-                        <h5 class="mb-0 text-white">Employees</h5>
-                    </div>
-                    <div class="card shadow-lg border-0 h-100">
-                        <div class="card-header  border-0 pt-4 px-4">
-                            <h5 class="fw-bold text-primary mb-2 bg-white">👥 Employee Directory</h5>
-                            <p class="text-muted small mb-3">Quickly find and view leave details.</p>
-                        </div>
-                        <div class="card-body p-4">
+            @php
+                use Carbon\Carbon;
 
+                $currentDate = Carbon::now();
+                $year = request('year', $currentDate->year);
+                $month = request('month', $currentDate->month);
+
+                $currentDate = Carbon::create($year, $month, 1);
+                $prevMonth = $currentDate->copy()->subMonth();
+                $nextMonth = $currentDate->copy()->addMonth();
+
+                $daysInMonth = $currentDate->daysInMonth;
+
+                $dates = [];
+                for ($d = 1; $d <= $daysInMonth; $d++) {
+                    $date = Carbon::create($year, $month, $d);
+                    $dates[] = [
+                        'day' => $d,
+                        'letter' => $date->format('D')[0],
+                        'date' => $date->format('Y-m-d'),
+                        'is_weekend' => in_array($date->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY]),
+                    ];
+                }
+            @endphp
+
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center p-3">
+                    <h5 class="mb-0">{{ $currentDate->format('F Y') }}</h5>
+                    <div class="btn-group">
+                        <a href="?year={{ $prevMonth->year }}&month={{ $prevMonth->month }}"
+                            class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <a href="?year={{ $nextMonth->year }}&month={{ $nextMonth->month }}"
+                            class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="timeline-container">
+                        <div class="timeline-grid timeline-header">
                             <div class="input-group mb-4 shadow-sm">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
                                         class="fas fa-search"></i></span>
@@ -29,49 +59,115 @@
                                     wire:keyup="set('search', $event.target.value)">
                             </div>
 
-                            <div class="list-container" style="max-height: 380px; overflow-y: auto;">
-                                <ul class="list-group list-group-flush">
-                                    @forelse ($employees as $employee)
-                                        <li class="list-group-item gap-2 list-group-item-action d-flex align-items-center p-3 border-bottom-0
-        {{ $activeEmployeeId == $employee->user_id ? 'active-employee' : '' }}"
-                                            style="cursor: pointer;"
-                                            wire:click="showEmployeeLeave({{ $employee->user_id }})">
 
-                                            <img src="{{ $employee->avatar_url }}"
-                                                class="rounded-circle border border-2 border-primary-subtle"
-                                                style="width: 50px; height: 50px; object-fit: cover;"
-                                                alt="{{ $employee->full_name }}">
-
-                                            <div class="flex-grow-1">
-                                                <h6 class="fw-bold text-dark lh-sm">{{ $employee->full_name }}</h6>
-                                                <small
-                                                    class="text-secondary d-block">{{ $employee->job_title ?? null }}</small>
-                                            </div>
-
-                                            <div class="text-end ms-auto d-flex align-items-center">
-                                                <span
-                                                    class="badge bg-light text-primary border border-primary-subtle fw-medium text-uppercase"
-                                                    style="font-size: 0.75rem;">
-                                                    <i class="fas fa-building me-1"></i>
-                                                    {{ $employee->department->name ?? 'Unknown' }}
-                                                </span>
-
-                                                <i class="fas fa-chevron-right text-muted ms-3"></i>
-                                            </div>
-                                        </li>
-                                    @empty
-                                        <li class="list-group-item text-center text-muted py-5">
-                                            <i class="fas fa-info-circle me-1"></i>No employees found.
-                                        </li>
-                                    @endforelse
-                                </ul>
-                            </div>
+                            @foreach ($dates as $d)
+                                <div
+                                    class="day-cell header-cell border-start border-bottom text-center {{ $d['is_weekend'] ? 'weekend-bg' : '' }}">
+                                    <div class="day-letter text-muted small">{{ $d['letter'] }}</div>
+                                </div>
+                            @endforeach
 
 
                         </div>
+
+                        @forelse($employees as $emp)
+                            @if ($filterEmployeeId && $filterEmployeeId !== $emp->id)
+                                @continue
+                            @endif
+
+
+
+
+                            <div class="timeline-grid timeline-row" wire:key="emp-{{ $emp->id }}" wire:ignore>
+                                <div class="employee-cell sticky-col border-bottom bg-white">
+                                    <div class="d-flex align-items-center p-2 employee-clickable
+        {{ $filterEmployeeId === $emp->id ? 'employee-active' : '' }}"
+                                        wire:click="filterByEmployee({{ $emp->id }})">
+                                        <img src="{{ $emp->avatar_url ?? 'https://ui-avatars.com/api/?name=' . $emp->full_name }}"
+                                            class="rounded-circle border border-2 border-primary-subtle me-2"
+                                            style="width: 40px; height: 40px; object-fit: cover;"
+                                            alt="{{ $emp->full_name }}">
+
+
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold text-dark lh-sm mb-0" style="font-size: 12px;">
+                                                {{ $emp->full_name }}</h6>
+                                            <small class="text-secondary d-block"
+                                                style="font-size: 10px;">{{ $emp->job_title ?? '' }}</small>
+                                        </div>
+
+
+                                        <div class="text-end ms-auto d-flex align-items-center gap-2">
+
+                                            @php
+                                                $totalLeaveDays = $emp->leaves->sum(function ($leave) {
+                                                    $start = \Carbon\Carbon::parse($leave->start_date);
+                                                    $end = \Carbon\Carbon::parse($leave->end_date);
+                                                    return $start->diffInDays($end) + 1;
+                                                });
+                                            @endphp
+
+                                            @if ($totalLeaveDays > 0)
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                    <i class="fas fa-plane-departure me-1"></i>
+                                                    {{ $totalLeaveDays }} Days
+                                                </span>
+                                            @endif
+
+                                            <span
+                                                class="badge bg-light text-primary border border-primary-subtle fw-medium text-uppercase"
+                                                style="font-size: 0.65rem;">
+                                                <i class="fas fa-building me-1"></i>
+                                                {{ $emp->department->name ?? 'Unknown' }}
+                                            </span>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+                                @foreach ($dates as $d)
+                                    @php
+                                        $leave = $emp->leaves->first(function ($l) use ($d) {
+                                            return $l->start_date <= $d['date'] && $l->end_date >= $d['date'];
+                                        });
+                                        $bgColor = $leave ? $leave->leaveType->color ?? '#fd7e14' : null;
+                                        $emoji = $leave ? $leave->leaveType->emoji ?? '🌴' : '';
+                                    @endphp
+
+                                    <div class="day-cell border-start border-bottom position-relative {{ $d['is_weekend'] ? 'weekend-bg' : '' }}"
+                                        style="cursor: pointer;"
+                                        @if ($leave) onclick="Livewire.dispatch('showLeaveRequestInfo', { id: {{ $leave->id }} })" @endif
+                                        wire:key="emp-{{ $emp->id }}-date-{{ $d['date'] }}">
+                                        @if ($leave)
+                                            <div class="leave-bar" style="background-color: {{ $bgColor }}"
+                                                title="{{ $leave->leaveType->name }}">
+                                                {{ $emoji }}
+                                            </div>
+                                        @else
+                                            <span class="cell-date-number text-muted small">{{ $d['day'] }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+
+
+                            </div>
+
+                        @empty
+                            <div class="text-center py-5 w-100">
+                                <i class="fas fa-user-slash fa-2x text-muted mb-2"></i>
+                                <div class="text-muted fw-bold">No Employees Found</div>
+                            </div>
+                        @endforelse
+
                     </div>
                 </div>
             </div>
+
+
+
 
             <div class="col-lg-6">
                 <div class="card shadow-sm mb-4">
@@ -276,21 +372,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Middle Column: Calendar -->
-            <div class="col-12" wire:ignore>
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info  p-3">
-                        <h5 class="mb-0 text-white">Leaves Calendar</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="calendar" style="min-height: 500px;"></div>
-                    </div>
-                </div>
-            </div>
-
-
-
 
 
         </div>
@@ -734,8 +815,7 @@
 </div>
 
 
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-<script src="{{ asset('js/company/manage-leave.js') }}"></script>
+
 <script>
     window.addEventListener('show-leave-modal', event => {
         let modalEl = document.getElementById('viewRequestInfoFromCalendar');
@@ -751,4 +831,12 @@
             @this.cancelLeave(id);
         }
     }
+</script>
+
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('reload-page', () => {
+            window.location.reload();
+        });
+    });
 </script>

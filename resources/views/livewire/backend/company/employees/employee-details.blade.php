@@ -177,18 +177,10 @@
                                     </li>
 
                                     <li>
-                                        <form
-                                            action="{{ route('company.dashboard.employees.empDestroy', ['company' => app('authUser')->company->sub_domain, 'id' => $employee->id]) }}"
-                                            method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger"
-                                                onclick="return confirm('Are you sure?')">
-                                                <i class="fas fa-trash me-2"></i> Remove Employee
-                                            </button>
-                                        </form>
-
-
+                                        <a class="dropdown-item text-danger" href="#"
+                                            wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
+                                            <i class="fas fa-trash me-2"></i> Remove Employee
+                                        </a>
                                     </li>
 
                                 </ul>
@@ -1464,7 +1456,7 @@
 
     Livewire.on('confirmDelete', employeeId => {
         if (confirm("Are you sure you want to delete this employee?")) {
-            @this.call('deleteEmployee', employeeId);
+            @this.call('handleDelation', employeeId);
         }
     });
 </script>

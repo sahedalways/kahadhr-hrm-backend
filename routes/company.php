@@ -74,7 +74,6 @@ Route::domain('{company}.' . config('app.base_domain'))
       Route::controller(EmployeeController::class)->group(function () {
         Route::post('/change-password/{id}', 'changePassword')->name('changePassword');
         Route::delete('/documents/delete/{id}', 'destroy');
-        Route::delete('/emp/{id}', 'destroyEmp')->name('empDestroy');
       });
 
 

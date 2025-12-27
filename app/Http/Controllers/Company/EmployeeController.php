@@ -47,23 +47,4 @@ class EmployeeController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Document deleted successfully.']);
     }
-
-
-    public function destroyEmp($company, $id)
-    {
-        $employee = Employee::findOrFail($id);
-
-        // Delete related data
-        $employee->documents()->delete();
-        $employee->customFieldValues()->delete();
-        $employee->profile()->delete();
-        if ($employee->user) {
-            $employee->user->delete();
-        }
-        $employee->delete();
-
-        return redirect()->route('company.dashboard.employees.index', [
-            'company' => $company
-        ])->with('success', 'Employee deleted successfully!');
-    }
 }

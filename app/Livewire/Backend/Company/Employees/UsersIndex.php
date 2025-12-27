@@ -413,6 +413,28 @@ class UsersIndex extends BaseComponent
     }
 
 
+    public function deleteEmployee($id)
+    {
+        $employee = Employee::find($id);
+
+        if ($employee) {
+
+            if ($employee->user) {
+                $employee->user->delete();
+            }
+
+
+            $employee->delete();
+
+            $this->toast('Employee deleted successfully!', 'success');
+            $this->resetInputFields();
+            $this->resetLoaded();
+        } else {
+            $this->toast('Employee not found!', 'error');
+        }
+    }
+
+
 
 
     public function exportEmployees($type)

@@ -25,9 +25,10 @@ class EmployeeDetails extends BaseComponent
 {
     use WithFileUploads;
     use Exportable;
-    public Employee $employee;
+
 
     public $departments, $teams;
+    public $employee;
     public $types;
 
     public $employees, $employee_id, $title;
@@ -86,6 +87,8 @@ class EmployeeDetails extends BaseComponent
     public $editMode = false;
     public $countrySearch = '';
 
+    protected $listeners = ['handleDelation'];
+
 
 
 
@@ -108,9 +111,9 @@ class EmployeeDetails extends BaseComponent
     }
 
 
-    public function mount(Employee $employee)
+    public function mount($employee)
     {
-        $this->employee = $employee->load(
+        $this->employee = Employee::with(
             'documents',
             'documents.documentType',
             'profile',
@@ -118,7 +121,15 @@ class EmployeeDetails extends BaseComponent
             'company',
             'department',
             'team'
-        );
+        )->find($employee);
+
+        if (!$this->employee) {
+            sleep(2);
+            return redirect()->route(
+                'company.dashboard.employees.index',
+                ['company' => app('authUser')->company->sub_domain]
+            );
+        }
 
 
         $this->types = DocumentType::all();
@@ -662,6 +673,42 @@ class EmployeeDetails extends BaseComponent
         $this->updating_field = null;
         $this->code_sent = false;
         $this->otpCooldown = 0;
+    }
+
+
+
+    public function handleDelation($id)
+    {
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            $this->redirect(
+                route(
+                    'company.dashboard.employees.index',
+                    ['company' => app('authUser')->company->sub_domain]
+                ),
+
+            );
+            return;
+        }
+
+        if ($employee->user) {
+            $employee->user->delete();
+        }
+
+        $employee->delete();
+
+        $this->toast('Employee deleted successfully!', 'success');
+
+
+
+        $this->redirect(
+            route(
+                'company.dashboard.employees.index',
+                ['company' => app('authUser')->company->sub_domain]
+            ),
+
+        );
     }
 
 

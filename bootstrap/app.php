@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'companyAdmin' => \App\Http\Middleware\CompanyAdmin::class,
             'checkEmployee' => \App\Http\Middleware\CheckEmployee::class,
             'checkSuspended' => \App\Http\Middleware\CheckCompanySuspended::class,
+            'check.subscription' => \App\Http\Middleware\CheckSubscriptionStatus::class,
             'cors' => \App\Http\Middleware\Cors::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'guest' => \App\Http\Middleware\RedirectIfCompanyorEmployeeAuthenticated::class,

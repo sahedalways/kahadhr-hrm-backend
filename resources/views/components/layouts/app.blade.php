@@ -45,7 +45,7 @@
         $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
         $bannerText =
             $company && $company->subscription_status === 'trial'
-                ? 'You are currently on a trial plan.'
+                ? getTrialInfo($company->subscription_status, $company->subscription_end)
                 : ($company && $company->subscription_status === 'suspended'
                     ? 'Your account is suspended. Contact to support'
                     : '');
@@ -53,7 +53,7 @@
 
     @if ($showBanner)
         <div class="status-banner text-center text-white py-1 mx-auto d-md-none d-block">
-            {{ $bannerText }}
+            {!! $bannerText !!}
         </div>
     @endif
 

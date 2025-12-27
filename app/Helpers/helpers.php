@@ -7,6 +7,8 @@ use App\Models\SiteSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+
+
 if (!function_exists('siteSetting')) {
   function siteSetting()
   {
@@ -161,5 +163,27 @@ if (!function_exists('todaysShiftForUser')) {
       ->whereHas('employees', fn($q) => $q->where('user_id', $userId))
       ->with(['shift', 'breaks']) // eager load anything you need
       ->first();
+  }
+
+
+
+  if (!function_exists('getTrialInfo')) {
+    function getTrialInfo($status, $subscription_end)
+    {
+      if ($status !== 'trial' || !$subscription_end) {
+        return null;
+      }
+
+      $endDate = Carbon::parse($subscription_end);
+      $today = Carbon::today();
+
+      if ($today->greaterThan($endDate)) {
+        return "<span class='text-danger fw-bold'>Your trial has ended.</span>";
+      }
+
+      $daysLeft = $today->diffInDays($endDate);
+
+      return "You are currently on <span class='text-danger fw-bold'>{$daysLeft}</span> days trial plan.";
+    }
   }
 }

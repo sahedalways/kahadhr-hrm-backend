@@ -15,7 +15,6 @@ use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageTeamsDepartment\ManageTeamsDepartment;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\CompanyExpenses;
-use App\Livewire\Backend\Company\Reports\CompanyInvoice;
 use App\Livewire\Backend\Company\Reports\CompanyPayslip;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
@@ -47,9 +46,24 @@ Route::domain('company.' . config('app.base_domain'))
 | Authenticated company dashboard routes
 |--------------------------------------------------------------------------
 */
+
+
 Route::domain('company.' . config('app.base_domain'))
   ->prefix('dashboard')
   ->middleware(['auth', 'companyAdmin', 'checkSuspended'])
+  ->name('company.dashboard.')
+  ->group(function () {
+
+
+    Route::prefix('settings')->name('settings.')->group(function () {
+      Route::get('bank-info', BankInfoSettings::class)->name('bank-info');
+    });
+  });
+
+
+Route::domain('company.' . config('app.base_domain'))
+  ->prefix('dashboard')
+  ->middleware(['auth', 'companyAdmin', 'check.subscription', 'checkSuspended'])
   ->name('company.dashboard.')
   ->group(function () {
     // Dashboard home
@@ -57,11 +71,8 @@ Route::domain('company.' . config('app.base_domain'))
 
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
-      // Route::get('mail', MailSettings::class)->name('mail');
-      // Route::get('sms', SmsSettings::class)->name('sms');
       Route::get('password', PasswordSettings::class)->name('password');
       Route::get('profile', ProfileSettings::class)->name('profile');
-      Route::get('bank-info', BankInfoSettings::class)->name('bank-info');
       Route::get('mail', MailSettings::class)->name('mail');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
       Route::get('calendar-year', CalendarYearSettings::class)->name('calendar-year');
@@ -120,7 +131,6 @@ Route::domain('company.' . config('app.base_domain'))
     Route::prefix('reports')->name('reports.')->group(function () {
       Route::get('/expenses', CompanyExpenses::class)->name('expenses');
       Route::get('/pay-slips', CompanyPayslip::class)->name('payslips');
-      Route::get('/invoices', CompanyInvoice::class)->name('invoices');
     });
 
 

@@ -160,7 +160,7 @@
                                                 <span class="badge bg-warning text-dark mb-2">Unverified</span>
                                             @endif
                                         @else
-                                            <span class="badge bg-secondary mb-2">No Account</span>
+                                            <span class="badge bg-secondary mb-2">Link Sent</span>
                                         @endif
 
                                         <p class="text-muted small fw-bold mb-0">{{ $employee->job_title ?: 'N/A' }}
@@ -194,8 +194,13 @@
                                                 <div class="mb-3">
                                                     <div class="text-muted fw-bold small">Work Phone</div>
                                                     <div>
-                                                        {{ $employee->user->phone_no ?? 'N/A' }}
+                                                        @if (empty($employee->user->phone_no))
+                                                            <span class="fst-italic">N/A</span>
+                                                        @else
+                                                            {{ $employee->user->phone_no }}
+                                                        @endif
                                                     </div>
+
                                                 </div>
 
                                                 <div>
@@ -554,7 +559,7 @@
                                 </div>
                                 <div style="padding:1rem;">
                                     <dl style="margin:0;">
-                                        @php $profile = $employee->profile; @endphp
+                                        @php $profile = $employee->profile ?? new \stdClass(); @endphp
 
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Date of Birth</dt>
                                         <dd style="font-weight:600; margin-bottom:0.75rem;">
@@ -655,8 +660,8 @@
                                         </dd>
 
                                         @php
-                                            $rtw = $profile->right_to_work_expiry;
-                                            $rtwExpired = $rtw && \Carbon\Carbon::parse($rtw)->isPast();
+                                            $rtw = $profile->right_to_work_expiry ?? null;
+                                            $rtwExpired = $rtw ? \Carbon\Carbon::parse($rtw)->isPast() : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">RTW Expiry</dt>
                                         <dd
@@ -672,8 +677,10 @@
                                         </dd>
 
                                         @php
-                                            $passport = $profile->passport_expiry;
-                                            $passportExpired = $passport && \Carbon\Carbon::parse($passport)->isPast();
+                                            $passport = $profile->passport_expiry ?? null;
+                                            $passportExpired = $passport
+                                                ? \Carbon\Carbon::parse($passport)->isPast()
+                                                : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport Expiry</dt>
                                         <dd
@@ -687,8 +694,8 @@
                                         </dd>
 
                                         @php
-                                            $brp = $profile->brp_expiry_date;
-                                            $brpExpired = $brp && \Carbon\Carbon::parse($brp)->isPast();
+                                            $brp = $profile->brp_expiry_date ?? null;
+                                            $brpExpired = $brp ? \Carbon\Carbon::parse($brp)->isPast() : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Expiry</dt>
                                         <dd

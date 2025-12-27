@@ -66,7 +66,7 @@
                                         <th>Job Title</th>
 
                                         <th>Status</th>
-                                        <th>Is Verified</th>
+
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -107,13 +107,6 @@
                                                     style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;">
                                                     {!! statusBadgeTwo($employee->is_active) !!}
                                                 </a>
-                                            </td>
-                                            <td>
-                                                @if ($employee->verified)
-                                                    <span class="badge badge-success badge-xs">Verified</span>
-                                                @else
-                                                    <span class="badge badge-danger badge-xs">Unverified</span>
-                                                @endif
                                             </td>
 
 

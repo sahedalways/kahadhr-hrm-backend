@@ -55,7 +55,7 @@
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
                                         class="fas fa-search"></i></span>
                                 <input type="text" class="form-control border-start-0 ps-2"
-                                    placeholder="Search by name, department, or title..." wire:model="search"
+                                    placeholder="Search by name" wire:model="search"
                                     wire:keyup="set('search', $event.target.value)">
                             </div>
 
@@ -91,38 +91,33 @@
 
                                         <div class="d-flex gap-2 flex-column">
                                             <div class="flex-grow-1">
-                                            <h6 class="fw-bold text-dark lh-sm mb-0" style="font-size: 12px;">
-                                                {{ $emp->full_name }}</h6>
-                                            <small class="text-secondary d-block"
-                                                style="font-size: 10px;">{{ $emp->job_title ?? '' }}</small>
-                                        </div>
+                                                <h6 class="fw-bold text-dark lh-sm mb-0" style="font-size: 12px;">
+                                                    {{ $emp->full_name }}</h6>
+                                                <small class="text-secondary d-block"
+                                                    style="font-size: 10px;">{{ $emp->job_title ?? '' }}</small>
+                                            </div>
 
 
-                                        <div class="text-end ms-auto d-flex align-items-center gap-2">
+                                            <div class="text-end ms-auto d-flex align-items-center gap-2">
 
-                                            @php
-                                                $totalLeaveDays = $emp->leaves->sum(function ($leave) {
-                                                    $start = \Carbon\Carbon::parse($leave->start_date);
-                                                    $end = \Carbon\Carbon::parse($leave->end_date);
-                                                    return $start->diffInDays($end) + 1;
-                                                });
-                                            @endphp
+                                                @php
+                                                    $totalLeaveDays = $emp->leaves->sum(function ($leave) {
+                                                        $start = \Carbon\Carbon::parse($leave->start_date);
+                                                        $end = \Carbon\Carbon::parse($leave->end_date);
+                                                        return $start->diffInDays($end) + 1;
+                                                    });
+                                                @endphp
 
-                                            @if ($totalLeaveDays > 0)
-                                                <span
-                                                    class="badge bg-danger-subtle text-danger border border-danger-subtle">
-                                                    <i class="fas fa-plane-departure me-1"></i>
-                                                    {{ $totalLeaveDays }} Days
-                                                </span>
-                                            @endif
+                                                @if ($totalLeaveDays > 0)
+                                                    <span
+                                                        class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                        <i class="fas fa-plane-departure me-1"></i>
+                                                        {{ $totalLeaveDays }} Days
+                                                    </span>
+                                                @endif
 
-                                            <span
-                                                class="badge bg-light text-primary border border-primary-subtle fw-medium text-uppercase"
-                                                style="font-size: 0.65rem;">
-                                                <i class="fas fa-building me-1"></i>
-                                                {{ $emp->department->name ?? 'Unknown' }}
-                                            </span>
-                                        </div>
+
+                                            </div>
                                         </div>
 
 

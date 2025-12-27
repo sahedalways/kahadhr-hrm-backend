@@ -106,11 +106,7 @@ class LeavesIndex extends BaseComponent
         $this->employees = Employee::where('company_id', $this->company->id)
             ->where(function ($q) {
                 $q->where('f_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('l_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('job_title', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('department', function ($d) {
-                        $d->where('name', 'like', '%' . $this->search . '%');
-                    });
+                    ->orWhere('l_name', 'like', '%' . $this->search . '%');
             })
             ->orderBy('f_name')
             ->get();

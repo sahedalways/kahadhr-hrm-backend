@@ -124,7 +124,7 @@
                             </h4>
 
                             <!-- Menu Button -->
-                            <div class="dropdown">
+                            <div class="dropdown" wire:ignore>
                                 <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-ellipsis-v text-muted"></i>
@@ -137,7 +137,7 @@
                                             <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
                                         </a>
                                     </li>
-                                    @if (!$employee->verified && !$employee->invite_token && !$employee->user)
+                                    @if (!$employee->verified && !$employee->user)
                                         <li>
                                             <a class="dropdown-item" href="#"
                                                 wire:click.prevent="sendVerificationLink({{ $employee->id }})"
@@ -151,26 +151,33 @@
                                                     Send Verification Link
                                                 </span>
 
+
+
                                                 <span wire:loading
                                                     wire:target="sendVerificationLink({{ $employee->id }})">
+                                                    <span class="spinner-border spinner-border-sm me-2"></span>
                                                     Sending...
                                                 </span>
                                             </a>
-                                        </li>
-                                    @elseif (!$employee->verified && $employee->invite_token)
-                                        <li>
-                                            <span class="dropdown-item text-warning disabled">
-                                                <i class="fas fa-clock me-2"></i> Link Sent
-                                            </span>
                                         </li>
                                     @endif
 
                                     <li>
                                         <a class="dropdown-item" href="#"
-                                            wire:click.prevent="toggleStatus({{ $employee->id }})">
-                                            <i class="fas fa-user-lock me-2 text-muted"></i> Change Status
+                                            wire:click.prevent="toggleStatus({{ $employee->id }})"
+                                            wire:loading.attr="disabled" wire:target="toggleStatus">
+
+                                            <span wire:loading.remove wire:target="toggleStatus">
+                                                <i class="fas fa-user-lock me-2 text-muted"></i> Change Status
+                                            </span>
+
+                                            <span wire:loading wire:target="toggleStatus">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                Changing...
+                                            </span>
                                         </a>
                                     </li>
+
 
                                     <li>
                                         <hr class="dropdown-divider">
@@ -236,7 +243,7 @@
                                                 <span class="badge bg-warning text-dark mb-2">Unverified</span>
                                             @endif
                                         @else
-                                            <span class="badge bg-secondary mb-2">No Account</span>
+                                            <span class="badge bg-secondary mb-2">Link Sent</span>
                                         @endif
 
                                         <p class="text-muted small fw-bold mb-0">{{ $employee->job_title ?: 'N/A' }}
@@ -630,7 +637,7 @@
                                 </div>
                                 <div style="padding:1rem;">
                                     <dl style="margin:0;">
-                                        @php $profile = $employee->profile; @endphp
+                                        @php $profile = $employee->profile ?? new \stdClass(); @endphp
 
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Date of Birth</dt>
                                         <dd style="font-weight:600; margin-bottom:0.75rem;">
@@ -731,8 +738,8 @@
                                         </dd>
 
                                         @php
-                                            $rtw = $profile->right_to_work_expiry;
-                                            $rtwExpired = $rtw && \Carbon\Carbon::parse($rtw)->isPast();
+                                            $rtw = $profile->right_to_work_expiry ?? null;
+                                            $rtwExpired = $rtw ? \Carbon\Carbon::parse($rtw)->isPast() : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">RTW Expiry</dt>
                                         <dd
@@ -748,8 +755,10 @@
                                         </dd>
 
                                         @php
-                                            $passport = $profile->passport_expiry;
-                                            $passportExpired = $passport && \Carbon\Carbon::parse($passport)->isPast();
+                                            $passport = $profile->passport_expiry ?? null;
+                                            $passportExpired = $passport
+                                                ? \Carbon\Carbon::parse($passport)->isPast()
+                                                : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport Expiry</dt>
                                         <dd
@@ -763,8 +772,8 @@
                                         </dd>
 
                                         @php
-                                            $brp = $profile->brp_expiry_date;
-                                            $brpExpired = $brp && \Carbon\Carbon::parse($brp)->isPast();
+                                            $brp = $profile->brp_expiry_date ?? null;
+                                            $brpExpired = $brp ? \Carbon\Carbon::parse($brp)->isPast() : false;
                                         @endphp
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Expiry</dt>
                                         <dd
@@ -783,7 +792,7 @@
                                 <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
                                     <div
                                         style="background:#198754; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
-                                        <i class="bi bi-sliders" style="margin-right:0.5rem;"></i> Custom Information
+                                        <i class="bi bi-sliders" style="margin-right:0.5rem;"></i> More Information
                                     </div>
 
                                     <div style="padding:1rem;">

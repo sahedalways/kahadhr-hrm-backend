@@ -96,6 +96,8 @@ class EmployeeDetails extends BaseComponent
     public $selectedComment;
     public $selectedDocId;
 
+
+
     public function openDocumentModal($docId)
     {
         $this->selectedFileUrl = '';
@@ -195,6 +197,16 @@ class EmployeeDetails extends BaseComponent
             ->unique('id')
             ->values()
             : collect();
+
+
+        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->orderBy('id')
+            ->get();
+
+
+        $this->customValues = $this->employee->customFieldValues
+            ->pluck('value', 'field_id')
+            ->toArray();
     }
 
 

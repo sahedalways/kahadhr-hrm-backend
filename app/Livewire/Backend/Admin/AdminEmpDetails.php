@@ -4,20 +4,10 @@ namespace App\Livewire\Backend\Admin;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CustomEmployeeProfileField;
-use App\Models\CustomEmployeeProfileFieldValue;
 use App\Models\Employee;
 use App\Models\DocumentType;
 use App\Models\EmpDocument;
-use App\Models\Team;
 use App\Traits\Exportable;
-use App\Jobs\SendEmployeeInvitation;
-use App\Models\Company;
-use App\Models\User;
-use App\Services\API\VerificationService;
-use Carbon\Carbon;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 use Livewire\WithFileUploads;
 
 class AdminEmpDetails extends BaseComponent
@@ -25,6 +15,8 @@ class AdminEmpDetails extends BaseComponent
     use WithFileUploads;
     use Exportable;
 
+    public $customFields = [];
+    public $customValues = [];
 
     public $departments;
     public $showAllTeams = false;
@@ -94,15 +86,6 @@ class AdminEmpDetails extends BaseComponent
 
 
 
-        if (!$this->employee) {
-            sleep(2);
-            return redirect()->route(
-                'company.dashboard.employees.index',
-                ['company' => app('authUser')->company->sub_domain]
-            );
-        }
-
-
         $this->types = DocumentType::all();
 
 
@@ -113,6 +96,15 @@ class AdminEmpDetails extends BaseComponent
             ->unique('id')
             ->values()
             : collect();
+
+        $this->customFields = CustomEmployeeProfileField::where('company_id', $this->employee->company_id)
+            ->orderBy('id')
+            ->get();
+
+
+        $this->customValues = $this->employee->customFieldValues
+            ->pluck('value', 'field_id')
+            ->toArray();
     }
 
 

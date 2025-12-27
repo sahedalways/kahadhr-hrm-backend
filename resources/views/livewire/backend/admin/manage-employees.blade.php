@@ -92,8 +92,8 @@
                                                     onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                     onmouseout="this.style.backgroundColor='transparent';"
                                                     style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="Click to copy">
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" class="tooltip-btn"
+                                                    data-tooltip="Click to copy" aria-label="copy email">
                                                     {{ $employee->email ?? 'N/A' }}
                                                 </span>
                                             </td>

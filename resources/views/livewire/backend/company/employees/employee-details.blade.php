@@ -777,6 +777,46 @@
                             </div>
 
                         </div>
+
+                        @if ($customFields->isNotEmpty())
+                            <div style="flex:1 1 100%; margin-top:1rem;">
+                                <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
+                                    <div
+                                        style="background:#198754; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                        <i class="bi bi-sliders" style="margin-right:0.5rem;"></i> Custom Information
+                                    </div>
+
+                                    <div style="padding:1rem;">
+                                        <div class="row">
+                                            @foreach ($customFields as $field)
+                                                @php
+                                                    $value = $customValues[$field->id] ?? null;
+                                                @endphp
+
+                                                <div class="col-md-6 mb-3">
+                                                    <dt style="color:#6c757d; margin-bottom:0.25rem;">
+                                                        {{ $field->name }}
+                                                    </dt>
+
+                                                    <dd style="font-weight:600;">
+                                                        @if ($value === null || $value === '')
+                                                            <span class="text-muted">N/A</span>
+                                                        @else
+                                                            {{-- Format by type --}}
+                                                            @if ($field->type === 'date')
+                                                                {{ \Carbon\Carbon::parse($value)->format('d F, Y') }}
+                                                            @else
+                                                                {{ $value }}
+                                                            @endif
+                                                        @endif
+                                                    </dd>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -1465,7 +1505,6 @@
 
                         <hr>
                         @if (!empty($customFields) && $customFields->count())
-
                             @foreach ($customFields as $field)
                                 <div class="col-md-6 mb-2">
                                     <label class="form-label">
@@ -1477,6 +1516,10 @@
 
                                     @if ($field->type === 'text')
                                         <input type="text" class="form-control"
+                                            placeholder="Enter {{ $field->name }}"
+                                            wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'number')
+                                        <input type="number" class="form-control"
                                             placeholder="Enter {{ $field->name }}"
                                             wire:model.defer="customValues.{{ $field->id }}">
                                     @elseif($field->type === 'date')
@@ -1498,6 +1541,7 @@
                                 </div>
                             @endforeach
                         @endif
+
 
                     </div>
 

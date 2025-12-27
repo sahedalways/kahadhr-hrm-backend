@@ -107,7 +107,8 @@
                                                 onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                 onmouseout="this.style.backgroundColor='transparent';"
                                                 style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
+                                                data-bs-toggle="tooltip" data-bs-placement="top" class="tooltip-btn"
+                                                data-tooltip="Click to copy" aria-label="copy email">
                                                 {{ $row->company_email ?? 'N/A' }}
                                             </span>
                                         </td>
@@ -116,7 +117,8 @@
                                                 onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                 onmouseout="this.style.backgroundColor='transparent';"
                                                 style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Click to copy">
+                                                data-bs-toggle="tooltip" data-bs-placement="top" class="tooltip-btn"
+                                                data-tooltip="Click to copy" aria-label="copy email">
                                                 {{ $row->company_mobile ?? 'N/A' }}
                                             </span>
                                         </td>
@@ -196,7 +198,8 @@
 
 
     <div wire:ignore.self class="modal fade" id="manageCompanyProfile" tabindex="-1" role="dialog"
-        aria-labelledby="manageCompanyProfile" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        aria-labelledby="manageCompanyProfile" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">

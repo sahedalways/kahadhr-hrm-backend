@@ -156,7 +156,7 @@
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
                                                         href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
-                                                        <i class="fas fa-university me-2"></i> Payment Settings
+                                                        <i class="fas fa-university me-2"></i> Subscriptions Settings
                                                     </a>
                                                 </li>
                                                 <li class="p-0">

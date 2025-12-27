@@ -459,15 +459,7 @@
                             </li>
 
 
-                            <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/reports/invoices*') || Request::is('dashboard/reports/invoices*') ? 'active' : '' }}"
-                                    href="{{ route('company.dashboard.reports.invoices', ['company' => app('authUser')->company->sub_domain]) }}"
-                                    data-bs-toggle="tooltip" data-bs-placement="right" title="Invoices"
-                                    data-bs-trigger="manual">
-                                    <i class="fas fa-file-invoice sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Invoices </span>
-                                </a>
-                            </li>
+
 
                         </ul>
                     </div>

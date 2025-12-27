@@ -5,7 +5,7 @@
             <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
                 style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
                 href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                <i class="bi bi-arrow-left me-2"></i>
+                <i class="fa-solid fa-arrow-left me-2"></i>
                 Back to Employees
             </a>
         </div>
@@ -215,13 +215,11 @@
             right: 8px ">
                                                 <a href="#"
                                                     wire:click.prevent="toggleStatus({{ $employee->id }})"
-                                                    onmouseover="this.style.backgroundColor='#f0f0f0';"
-                                                    onmouseout="this.style.backgroundColor='transparent';"
-                                                    style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px; tooltip-btn"
-                                                    data-tooltip="Click to change status">
+                                                    class="status-toggle tooltip-btn" data-tooltip="click to change status"
+                                                    aria-label="Toggle employee status">
 
-                                                    <i
-                                                        class="bi {{ $employee->is_active ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger' }}"></i>
+                                                    <span
+                                                        class="status-dot {{ $employee->is_active ? 'active' : 'inactive' }}"></span>
 
                                                 </a>
                                             </span>
@@ -251,7 +249,7 @@
 
                                 <!-- Details -->
                                 <div class="col-lg-9 col-md-8">
-                                    <h5 class="fw-bold mb-3 text-info text-center text-md-start">
+                                    <h5 class="fw-bold mb-3 text-info text-center">
                                         Employment & Contact
                                     </h5>
 

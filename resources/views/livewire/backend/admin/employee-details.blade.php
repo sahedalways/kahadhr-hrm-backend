@@ -6,7 +6,7 @@
                 <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
                     style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
                     href="{{ route('super-admin.companies') }}">
-                    <i class="bi bi-arrow-left me-2"></i>
+                    <i class="fa-solid fa-arrow-left me-2"></i>
                     Back to Employees
                 </a>
             </div>
@@ -154,7 +154,7 @@
 
                                     <!-- Details -->
                                     <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info text-center text-md-start">
+                                        <h5 class="fw-bold mb-3 text-info text-center">
                                             Employment & Contact
                                         </h5>
 

@@ -28,6 +28,7 @@ class EmployeeDetails extends BaseComponent
 
 
     public $departments, $teams;
+    public $showAllTeams = false;
     public $employee;
     public $types;
 
@@ -86,6 +87,7 @@ class EmployeeDetails extends BaseComponent
 
     public $editMode = false;
     public $countrySearch = '';
+    public bool $showAllDepartments = false;
 
     protected $listeners = ['handleDelation'];
 
@@ -120,8 +122,10 @@ class EmployeeDetails extends BaseComponent
             'user',
             'company',
             'department',
-            'team'
+            'user.teams'
         )->find($employee);
+
+
 
         if (!$this->employee) {
             sleep(2);
@@ -134,7 +138,6 @@ class EmployeeDetails extends BaseComponent
 
         $this->types = DocumentType::all();
 
-        $this->departments = Department::all();
         $this->teams = Team::all();
 
 
@@ -159,6 +162,14 @@ class EmployeeDetails extends BaseComponent
         }
 
         $this->filteredCountries = $this->countries;
+
+        $this->departments = $this->employee->user
+            ? $this->employee->user->teams
+            ->pluck('department')
+            ->filter()
+            ->unique('id')
+            ->values()
+            : collect();
     }
 
 
@@ -446,7 +457,9 @@ class EmployeeDetails extends BaseComponent
             $this->employee->avatar = uploadImage($this->avatar, 'image/employee/avatar', $this->employee->avatar);
         }
 
-
+        if ($this->team_id) {
+            $team = Team::find($this->team_id);
+        }
 
 
         // Update employee
@@ -712,6 +725,18 @@ class EmployeeDetails extends BaseComponent
     }
 
 
+
+
+
+    public function toggleDepartments()
+    {
+        $this->showAllDepartments = ! $this->showAllDepartments;
+    }
+
+    public function toggleTeams()
+    {
+        $this->showAllTeams = !$this->showAllTeams;
+    }
 
 
     public function render()

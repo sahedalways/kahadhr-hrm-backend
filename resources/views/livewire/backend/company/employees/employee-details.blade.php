@@ -290,25 +290,85 @@
                                             <div class="p-3 rounded bg-light-subtle h-100">
 
                                                 <div class="mb-3">
-                                                    <div class="text-muted small fw-bold">Company</div>
+                                                    <div class="text-muted fw-bold small">Company</div>
                                                     <div>
                                                         {{ $employee->company->company_name ?? 'N/A' }}
                                                     </div>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <div class="text-muted small fw-bold">Department</div>
-                                                    <div>
-                                                        {{ $employee->department?->name ?? 'N/A' }}
-                                                    </div>
+                                                    <div class="text-muted fw-bold small mb-1">Departments</div>
+
+                                                    @php
+
+                                                        $max = 5;
+                                                    @endphp
+
+                                                    @if ($departments->isEmpty())
+                                                        <span class="text-muted fst-italic">N/A</span>
+                                                    @else
+                                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                                            @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
+                                                                <span
+                                                                    class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                                                    {{ $department->name }}
+                                                                </span>
+                                                            @endforeach
+
+                                                            @if ($departments->count() > $max)
+                                                                <button wire:click="toggleDepartments"
+                                                                    class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                                    {{ $showAllDepartments ? 'See less' : 'View more' }}
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 </div>
 
                                                 <div>
-                                                    <div class="text-muted small fw-bold">Team</div>
-                                                    <div>
-                                                        {{ $employee->team?->name ?? 'N/A' }}
-                                                    </div>
+                                                    <div class="text-muted fw-bold small mb-1">Teams</div>
+
+                                                    @php
+                                                        $teams = $employee->user ? $employee->user->teams : collect();
+                                                        $max = 5;
+                                                    @endphp
+
+                                                    @if ($teams->isEmpty())
+                                                        <span class="text-muted fst-italic">N/A</span>
+                                                    @else
+                                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                                            @foreach ($teams->take($showAllTeams ? $teams->count() : $max) as $team)
+                                                                @php
+                                                                    $isLead =
+                                                                        $team->team_lead_id === $employee->user_id;
+                                                                @endphp
+
+                                                                <span
+                                                                    class="badge rounded-pill px-3 py-2
+                    {{ $isLead ? 'bg-primary text-white' : 'bg-light text-dark border' }}">
+
+                                                                    {{ $team->name }}
+
+                                                                    @if ($isLead)
+                                                                        <span class="ms-1 fw-semibold">
+                                                                            ⭐ Leader
+                                                                        </span>
+                                                                    @endif
+                                                                </span>
+                                                            @endforeach
+
+                                                            @if ($teams->count() > $max)
+                                                                <button wire:click="toggleTeams"
+                                                                    class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                                    {{ $showAllTeams ? 'See less' : 'View more' }}
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 </div>
+
+
+
 
                                             </div>
                                         </div>

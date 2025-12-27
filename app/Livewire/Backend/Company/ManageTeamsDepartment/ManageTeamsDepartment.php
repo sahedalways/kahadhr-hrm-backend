@@ -190,7 +190,7 @@ class ManageTeamsDepartment extends BaseComponent
         $team->update([
             'name' => $this->name,
             'department_id' => $this->department_id,
-            'team_lead_id' => $this->teamLead ?? null,
+            'team_lead_id' => $this->teamLead ?: null,
         ]);
 
         // Sync employees
@@ -254,7 +254,7 @@ class ManageTeamsDepartment extends BaseComponent
                 'name' => $this->name,
                 'department_id' => $this->department_id,
                 'company_id' => $this->company_id,
-                'team_lead_id' => $this->teamLead ?? null,
+                'team_lead_id' => $this->teamLead ?: null,
             ]);
 
 

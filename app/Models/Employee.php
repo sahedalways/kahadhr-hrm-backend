@@ -78,7 +78,13 @@ class Employee extends Model
 
     public function teams()
     {
-        return $this->belongsToMany(Team::class, 'employee_teams', 'user_id', 'team_id')
+        return $this->belongsToMany(
+            Team::class,
+            'employee_teams',
+            'user_id',
+            'team_id'
+        )
+            ->using(EmployeeTeam::class)
             ->withPivot('is_team_lead')
             ->withTimestamps();
     }

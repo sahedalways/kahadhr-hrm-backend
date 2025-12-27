@@ -201,23 +201,5 @@ class UserTableSeeder extends Seeder
         'name' => $dept->name . ' Team 2',
       ]);
     }
-
-
-    // --------------------------
-    // 6. Assign employees to teams and departments
-    // --------------------------
-    foreach ($employeeModels1 as $index => $emp) {
-      $team = $teams1[$index % count($teams1)];
-      $emp->team_id = $team->id;
-      $emp->department_id = $team->department_id;
-      $emp->save();
-    }
-
-    foreach ($employeeModels2 as $index => $emp) {
-      $team = $teams2[$index % count($teams2)];
-      $emp->team_id = $team->id;
-      $emp->department_id = $team->department_id;
-      $emp->save();
-    }
   }
 }

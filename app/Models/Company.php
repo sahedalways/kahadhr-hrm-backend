@@ -167,27 +167,6 @@ class Company extends Model
             }
         });
 
-
-
-        static::creating(function ($company) {
-            if (empty($company->sub_domain) && !empty($company->company_name)) {
-                $company->sub_domain = self::generateUniqueSubdomain($company->company_name);
-            }
-        });
-
-        static::updating(function ($company) {
-            if ($company->isDirty('company_name')) {
-                $company->sub_domain = self::generateUniqueSubdomain($company->company_name);
-
-                $user = $company->user;
-                if ($user) {
-                    $user->f_name = $company->company_name;
-                    $user->l_name = "company";
-                    $user->save();
-                }
-            }
-        });
-
         static::updated(function ($company) {
             $companyDirty = $company->isDirty(['company_email', 'company_mobile']);
 
@@ -215,36 +194,6 @@ class Company extends Model
                 }
             }
         });
-    }
-
-
-
-    /**
-     * Generate unique subdomain based on company name
-     */
-    protected static function generateUniqueSubdomain($companyName)
-    {
-
-        $cleanName = preg_replace('/\b(ltd|limited|pvt|private|inc|co|company)\b/i', '', $companyName);
-
-        $cleanName = preg_replace('/[^A-Za-z0-9 ]/', '', $cleanName);
-
-        $cleanName = preg_replace('/\s+/', ' ', $cleanName);
-
-
-        $cleanName = trim($cleanName);
-        $baseSlug = Str::slug($cleanName);
-
-        $slug = $baseSlug;
-        $count = 1;
-
-
-        while (self::where('sub_domain', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $count;
-            $count++;
-        }
-
-        return $slug;
     }
 
 

@@ -35,8 +35,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::domain('{company}.' . config('app.base_domain'))
-  ->middleware(['guest', 'checkCompanySubdomain'])
+Route::domain('company.' . config('app.base_domain'))
+  ->middleware(['guest'])
   ->name('company.auth.')
   ->group(function () {
     Route::get('/', CompanyLogin::class)->name('login');
@@ -47,7 +47,7 @@ Route::domain('{company}.' . config('app.base_domain'))
 | Authenticated company dashboard routes
 |--------------------------------------------------------------------------
 */
-Route::domain('{company}.' . config('app.base_domain'))
+Route::domain('company.' . config('app.base_domain'))
   ->prefix('dashboard')
   ->middleware(['auth', 'companyAdmin', 'checkSuspended'])
   ->name('company.dashboard.')

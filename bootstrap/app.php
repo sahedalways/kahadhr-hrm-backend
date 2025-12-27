@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'superAdmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'companyAdmin' => \App\Http\Middleware\CompanyAdmin::class,
-            'checkCompanySubdomain' => \App\Http\Middleware\CheckCompanySubdomain::class,
             'checkEmployee' => \App\Http\Middleware\CheckEmployee::class,
             'checkSuspended' => \App\Http\Middleware\CheckCompanySuspended::class,
             'cors' => \App\Http\Middleware\Cors::class,

@@ -71,7 +71,7 @@ class ChatIndex extends BaseComponent
 
 
     protected $rules = [
-        'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx,xls,xlsx,txt',
+        'attachment' => 'nullable|file|max:3240|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx,xls,xlsx,txt',
     ];
 
 

@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::domain('{company}.' . config('app.base_domain'))
-  ->middleware(['guest', 'checkCompanySubdomain'])
+Route::domain('company.' . config('app.base_domain'))
+  ->middleware(['guest'])
   ->name('employee.auth.')
   ->group(function () {
     Route::get('/employee-login', EmployeeLogin::class)->name('empLogin');
@@ -42,7 +42,7 @@ Route::domain('{company}.' . config('app.base_domain'))
 | Authenticated employee dashboard routes
 |--------------------------------------------------------------------------
 */
-Route::domain('{company}.' . config('app.base_domain'))
+Route::domain('company.' . config('app.base_domain'))
   ->prefix('employee/dashboard')
   ->middleware(['auth', 'checkEmployee'])
   ->name('employee.dashboard.')

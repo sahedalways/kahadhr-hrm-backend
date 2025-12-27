@@ -26,30 +26,7 @@
                             @enderror
                         </div>
 
-                        <!-- Subdomain -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Subdomain</label>
 
-                            <div class="input-group shadow-sm" style="height: 34px;">
-
-                                <input type="text" class="form-control" id="fullDomain"
-                                    style="height: 100%; padding: 2px 6px; font-size: 13px;"
-                                    value="{{ $sub_domain ? $sub_domain . '.' . config('app.base_domain') : '' }}"
-                                    readonly>
-
-                                <button class="border btn btn-outline-secondary btn-sm btn-no-hover shadow-none"
-                                    type="button" onclick="copyFullDomain()"
-                                    style="height: 100%; padding: 2px 10px; font-size: 13px;">
-                                    Copy
-                                </button>
-
-
-                            </div>
-
-                            @error('sub_domain')
-                                <span class="text-danger small">{{ $message }}</span>
-                            @enderror
-                        </div>
 
 
                         <!-- House Number -->

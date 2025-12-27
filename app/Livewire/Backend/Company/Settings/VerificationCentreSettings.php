@@ -8,11 +8,13 @@ use App\Models\Company;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\API\VerificationService;
+use App\Traits\VerifyPassword;
 use Illuminate\Validation\Rule;
 
 
 class VerificationCentreSettings extends BaseComponent
 {
+    use VerifyPassword;
 
     public $company_mobile, $company_email, $company_name;
 
@@ -31,8 +33,6 @@ class VerificationCentreSettings extends BaseComponent
 
     public $company;
 
-
-
     protected $listeners = ['openModal', 'tick'];
 
     public function openModal($field)
@@ -40,6 +40,8 @@ class VerificationCentreSettings extends BaseComponent
         $this->resetVerificationFields();
         $this->updating_field = $field;
         $this->code_sent = false;
+        $this->passwordInput = null;
+        $this->passwordVerified = false;
         $this->verification_code = null;
     }
 

@@ -907,110 +907,140 @@
                 <form wire:submit.prevent="verifyAndUpdate">
                     <div class="modal-body">
 
+                        @if (!$passwordVerified)
+                            <div class="mb-3 position-relative" wire:ignore>
+                                <label>Enter Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control extra-padding shadow-sm" id="password"
+                                    wire:model.defer="passwordInput">
+                                <span class="icon-position " style="cursor:pointer;"
+                                    onclick="togglePassword('password', this)">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+
+
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-primary" wire:click="verifyPassword"
+                                    wire:loading.attr="disabled" wire:target="verifyPassword">
+
+                                    <span wire:loading wire:target="verifyPassword">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
+                                    </span>
+
+                                    <span wire:loading.remove wire:target="verifyPassword">
+                                        Verify Password
+                                    </span>
+                                </button>
+
+                            </div>
+                        @endif
+
                         <!-- Email Input -->
-                        @if ($updating_field === 'email')
-                            <div class="mb-3">
-                                <label>New Email <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="email" class="form-control form-control-sm shadow-sm"
-                                        wire:model="new_email" placeholder="Enter new email" style="height: 38px;">
+                        @if ($passwordVerified)
+                            @if ($updating_field === 'email')
+                                <div class="mb-3">
+                                    <label>New Email <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="email" class="form-control form-control-sm shadow-sm"
+                                            wire:model="new_email" placeholder="Enter new email"
+                                            style="height: 38px;">
 
-                                    <button
-                                        class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                        type="button" style="height: 38px;"
-                                        wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
-                                        wire:loading.attr="disabled" wire:target="requestVerification"
-                                        @if ($otpCooldown > 0) disabled @endif>
-                                        <span wire:loading wire:target="requestVerification">
-                                            <i class="fas fa-spinner fa-spin me-2"></i> Sending...
-                                        </span>
-                                        <span wire:loading.remove wire:target="requestVerification">
-                                            @if ($otpCooldown > 0)
-                                                Resend In
-                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
-                                            @elseif($code_sent)
-                                                Resend OTP
-                                            @else
-                                                Send OTP
-                                            @endif
-                                        </span>
-                                    </button>
+                                        <button
+                                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                            type="button" style="height: 38px;"
+                                            wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                            wire:loading.attr="disabled" wire:target="requestVerification"
+                                            @if ($otpCooldown > 0) disabled @endif>
+                                            <span wire:loading wire:target="requestVerification">
+                                                <i class="fas fa-spinner fa-spin me-2"></i> Sending...
+                                            </span>
+                                            <span wire:loading.remove wire:target="requestVerification">
+                                                @if ($otpCooldown > 0)
+                                                    Resend In
+                                                    {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                                @elseif($code_sent)
+                                                    Resend OTP
+                                                @else
+                                                    Send OTP
+                                                @endif
+                                            </span>
+                                        </button>
 
 
 
 
 
+                                    </div>
+
+                                    <!-- Livewire polling for countdown -->
+                                    @if ($otpCooldown > 0)
+                                        <div wire:poll.1000ms="tick"></div>
+                                    @endif
+
+                                    @error('new_email')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
+                            @endif
 
-                                <!-- Livewire polling for countdown -->
-                                @if ($otpCooldown > 0)
-                                    <div wire:poll.1000ms="tick"></div>
-                                @endif
+                            <!-- Mobile Input -->
+                            @if ($updating_field === 'mobile')
+                                <div class="mb-3">
+                                    <label>New Mobile No. <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control shadow-sm form-control-sm"
+                                            wire:model="new_mobile" placeholder="Enter new mobile no."
+                                            style="height: 38px;">
+                                        <button
+                                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                            type="button" style="height: 38px;"
+                                            wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                            wire:loading.attr="disabled" wire:target="requestVerification"
+                                            @if ($otpCooldown > 0) disabled @endif>
+                                            <span wire:loading wire:target="requestVerification">
+                                                <i class="fas fa-spinner fa-spin me-2"></i> Sending...
+                                            </span>
+                                            <span wire:loading.remove wire:target="requestVerification">
+                                                @if ($otpCooldown > 0)
+                                                    Resend In
+                                                    {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                                @elseif($code_sent)
+                                                    Resend OTP
+                                                @else
+                                                    Send OTP
+                                                @endif
+                                            </span>
+                                        </button>
+                                    </div>
 
-                                @error('new_email')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        @endif
 
-                        <!-- Mobile Input -->
-                        @if ($updating_field === 'mobile')
-                            <div class="mb-3">
-                                <label>New Mobile No. <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control shadow-sm form-control-sm"
-                                        wire:model="new_mobile" placeholder="Enter new mobile no."
-                                        style="height: 38px;">
-                                    <button
-                                        class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                        type="button" style="height: 38px;"
-                                        wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
-                                        wire:loading.attr="disabled" wire:target="requestVerification"
-                                        @if ($otpCooldown > 0) disabled @endif>
-                                        <span wire:loading wire:target="requestVerification">
-                                            <i class="fas fa-spinner fa-spin me-2"></i> Sending...
-                                        </span>
-                                        <span wire:loading.remove wire:target="requestVerification">
-                                            @if ($otpCooldown > 0)
-                                                Resend In
-                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
-                                            @elseif($code_sent)
-                                                Resend OTP
-                                            @else
-                                                Send OTP
-                                            @endif
-                                        </span>
-                                    </button>
+                                    @if ($otpCooldown > 0)
+                                        <div wire:poll.1000ms="tick"></div>
+                                    @endif
+
+                                    @error('new_mobile')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
+                            @endif
 
-
-                                @if ($otpCooldown > 0)
-                                    <div wire:poll.1000ms="tick"></div>
-                                @endif
-
-                                @error('new_mobile')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        @endif
-
-                        <!-- Verification Code Input -->
-                        @if ($code_sent)
-                            <div class="mb-3">
-                                <label>Verification Code <span class="text-danger">*</span></label>
-                                <div class="d-flex gap-2">
-                                    @for ($i = 0; $i < 6; $i++)
-                                        <input type="text" wire:model="otp.{{ $i }}"
-                                            class="form-control text-center otp-field" maxlength="1" placeholder="-"
-                                            oninput="handleOtpInput(this)"
-                                            onkeydown="handleOtpBackspace(event, this)">
-                                    @endfor
+                            <!-- Verification Code Input -->
+                            @if ($code_sent)
+                                <div class="mb-3">
+                                    <label>Verification Code <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-2">
+                                        @for ($i = 0; $i < 6; $i++)
+                                            <input type="text" wire:model="otp.{{ $i }}"
+                                                class="form-control text-center otp-field" maxlength="1"
+                                                placeholder="-" oninput="handleOtpInput(this)"
+                                                onkeydown="handleOtpBackspace(event, this)">
+                                        @endfor
+                                    </div>
+                                    @error('verification_code')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                @error('verification_code')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        @endif
+                            @endif
 
 
 
@@ -1028,8 +1058,10 @@
                                 <span wire:loading.remove wire:target="verifyOtp">Verify</span>
                             </button>
                         @endif
+                        @endif
 
                     </div>
+
                 </form>
             </div>
         </div>
@@ -1648,4 +1680,18 @@
             }
         });
     });
+</script>
+
+
+<script>
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            input.type = "password";
+            icon.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    }
 </script>

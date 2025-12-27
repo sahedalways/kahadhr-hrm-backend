@@ -207,26 +207,6 @@
                                 </li>
 
 
-
-                                {{-- Main Navigation Links --}}
-                                @php
-                                    $dashboardRoute = '';
-                                    if ($userType === 'company') {
-                                        $dashboardRoute = route('company.dashboard.index', [
-                                            'company' => app('authUser')->company->sub_domain,
-                                        ]);
-                                    } elseif (in_array($userType, ['employee', 'manager'])) {
-                                        $dashboardRoute = route('employee.dashboard.index', [
-                                            'company' => app('authUser')->employee->company->sub_domain,
-                                        ]);
-                                    }
-                                @endphp
-
-                                <li>
-                                    <a class="dropdown-item" href="{{ $dashboardRoute }}">
-                                        <i class="fas fa-columns me-2"></i> Dashboard
-                                    </a>
-                                </li>
                                 <li><a class="dropdown-item" href="#"><i
                                             class="fas fa-question-circle me-2"></i>
                                         Help

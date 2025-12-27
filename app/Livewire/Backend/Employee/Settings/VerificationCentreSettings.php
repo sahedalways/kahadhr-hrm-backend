@@ -7,10 +7,12 @@ use App\Models\Company;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\API\VerificationService;
+use App\Traits\VerifyPassword;
 use Illuminate\Support\Facades\Auth;
 
 class VerificationCentreSettings extends BaseComponent
 {
+    use VerifyPassword;
     public $email, $phone_no, $full_name;
     public $new_email, $new_phone_no;
     public $code_sent = false;
@@ -27,6 +29,8 @@ class VerificationCentreSettings extends BaseComponent
         $this->updating_field = $field;
         $this->code_sent = false;
         $this->verification_code = null;
+        $this->passwordInput = null;
+        $this->passwordVerified = false;
     }
 
     public function mount()

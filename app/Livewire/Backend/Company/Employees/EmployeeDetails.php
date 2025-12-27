@@ -14,6 +14,7 @@ use App\Jobs\SendEmployeeInvitation;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\API\VerificationService;
+use App\Traits\VerifyPassword;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class EmployeeDetails extends BaseComponent
 {
     use WithFileUploads;
     use Exportable;
+    use VerifyPassword;
 
 
     public $departments, $teams;
@@ -137,6 +139,8 @@ class EmployeeDetails extends BaseComponent
         $this->updating_field = $field;
         $this->code_sent = false;
         $this->verification_code = null;
+        $this->passwordInput = null;
+        $this->passwordVerified = false;
     }
 
 

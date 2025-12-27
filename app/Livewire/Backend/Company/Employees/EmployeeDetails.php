@@ -12,7 +12,6 @@ use App\Models\Team;
 use App\Traits\Exportable;
 use App\Jobs\SendEmployeeInvitation;
 use App\Models\Company;
-use App\Models\Department;
 use App\Models\User;
 use App\Services\API\VerificationService;
 use Carbon\Carbon;
@@ -89,10 +88,36 @@ class EmployeeDetails extends BaseComponent
     public $countrySearch = '';
     public bool $showAllDepartments = false;
 
-    protected $listeners = ['handleDelation'];
+    protected $listeners = ['handleDelation', 'openDocumentModal'];
+
+    public $selectedDocTypeId;
+    public $selectedFileUrl;
+    public $selectedExpiresAt;
+    public $selectedComment;
+    public $selectedDocId;
+
+    public function openDocumentModal($docId)
+    {
+        $this->selectedFileUrl = '';
+        $this->selectedExpiresAt = '';
+        $this->selectedComment = '';
+        $this->selectedDocId = null;
 
 
+        $this->selectedDocId = $docId;
 
+        if ($docId) {
+            $document = EmpDocument::find($docId);
+            $this->selectedDocTypeId = $document->doc_type_id;
+            $this->selectedFileUrl = $document->document_url;
+            $this->selectedExpiresAt = $document->expires_at;
+            $this->selectedComment = $document->comment;
+        } else {
+            $this->selectedFileUrl = '';
+            $this->selectedExpiresAt = '';
+            $this->selectedComment = '';
+        }
+    }
 
     public function updatedCountrySearch($value)
     {
@@ -182,9 +207,11 @@ class EmployeeDetails extends BaseComponent
 
 
     /* 🔹 Delete document */
-    public function deleteDocument($id)
+    public function deleteDocument()
     {
-        $doc = EmpDocument::findOrFail($id);
+        if (!$this->selectedDocId) return;
+
+        $doc = EmpDocument::findOrFail($this->selectedDocId);
 
         if ($doc->file_path && file_exists(storage_path('app/public/' . $doc->file_path))) {
             unlink(storage_path('app/public/' . $doc->file_path));
@@ -193,6 +220,11 @@ class EmployeeDetails extends BaseComponent
         $doc->delete();
 
         $this->employee->refresh();
+
+        $this->selectedDocId = null;
+        $this->selectedFileUrl = '';
+        $this->selectedExpiresAt = '';
+        $this->selectedComment = '';
 
         $this->toast('Document deleted successfully', 'success');
     }
@@ -286,7 +318,7 @@ class EmployeeDetails extends BaseComponent
             $this->date_of_birth = $profile->date_of_birth;
             $this->street_1 = $profile->street_1;
             $this->street_2 = $profile->street_2;
-            $this->city = $profile->city ?: "Select City";
+            $this->city = $profile->city ?: null;
             $this->state = $profile->state ?: null;
             $this->postcode = $profile->postcode;
             $this->country = $profile->country ?: 'United Kingdom';
@@ -730,8 +762,6 @@ class EmployeeDetails extends BaseComponent
 
         );
     }
-
-
 
 
 

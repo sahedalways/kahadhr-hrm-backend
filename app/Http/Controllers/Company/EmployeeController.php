@@ -33,18 +33,4 @@ class EmployeeController extends Controller
             'message' => 'Password updated successfully!'
         ]);
     }
-
-
-    public function destroy($company, $id)
-    {
-        $doc = EmpDocument::findOrFail($id);
-
-
-        if ($doc->file_path && file_exists(storage_path('app/public/' . $doc->file_path))) {
-            unlink(storage_path('app/public/' . $doc->file_path));
-        }
-        $doc->delete();
-
-        return response()->json(['success' => true, 'message' => 'Document deleted successfully.']);
-    }
 }

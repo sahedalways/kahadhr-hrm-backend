@@ -64,8 +64,7 @@
                                         <th>Last Name</th>
                                         <th>Email</th>
                                         <th>Job Title</th>
-                                        <th>Department</th>
-                                        <th>Team</th>
+
                                         <th>Status</th>
                                         <th>Is Verified</th>
                                         <th>Action</th>
@@ -99,8 +98,7 @@
                                                 </span>
                                             </td>
                                             <td>{{ $employee->job_title ?? 'N/A' }}</td>
-                                            <td>{{ $employee->department->name ?? 'N/A' }}</td>
-                                            <td>{{ $employee->team->name ?? 'N/A' }}</td>
+
 
 
                                             <td>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('emp_documents', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
             // Document Type
             $table->foreignId('doc_type_id')
                 ->constrained('document_types')

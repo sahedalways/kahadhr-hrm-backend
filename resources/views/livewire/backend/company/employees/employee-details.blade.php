@@ -542,9 +542,9 @@
                                                         @foreach ($docsForType as $doc)
                                                             <div class="rounded p-3 mb-2 border border-light position-relative doc-item"
                                                                 data-doc-id="{{ $doc->id }}"
-                                                                onclick="openDocumentModal({{ $type->id }}, {{ $doc->id }}, '{{ $doc->document_url }}', '{{ $doc->expires_at }}', '{{ $doc->comment }}')"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#openDocumentModal"
+                                                                wire:click.prevent="$dispatch('openDocumentModal', {{ json_encode(['docId' => $doc->id]) }})"
                                                                 style="cursor:pointer; background-color:white; transition: all .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 
                                                                 <div class="d-flex align-items-center">
@@ -585,10 +585,10 @@
 
                                                                 @if ($isExpired)
                                                                     <span
-                                                                        class="badge bg-danger position-absolute top-0 end-0 m-2">EXPIRED</span>
+                                                                        class="badge bg-danger position-absolute top-0 end-3 m-2">EXPIRED</span>
                                                                 @elseif ($isSoon)
                                                                     <span
-                                                                        class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Expires
+                                                                        class="badge bg-warning text-dark position-absolute top-0 end-3 m-2">Expires
                                                                         Soon</span>
                                                                 @endif
                                                             </div>
@@ -596,11 +596,7 @@
 
                                                     </div>
 
-                                                    <div class="mt-auto pt-2">
-                                                        <button class="btn btn-sm btn-outline-secondary w-100">
-                                                            <i class="bi bi-cloud-arrow-up me-1"></i> Upload New
-                                                        </button>
-                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -618,161 +614,174 @@
                 <!-- Personal Info -->
                 <div class="tab-pane fade" id="personalInfo" role="tabpanel" aria-labelledby="personalInfo-tab">
 
-                    <h4 class="mb-4 fw-bold text-dark d-flex align-items-center">
-                        <i class="fas fa-id-badge me-3 text-info"></i>
+                    <h4 class="mb-0 fw-bold text-dark d-flex align-items-center mb-3">
+                        <i class="fas fa-id-badge" style="margin-right:0.75rem; color:#0dcaf0;"></i>
                         Personal Information
                     </h4>
 
-                    <div class="row g-4">
+                    <div style="display:flex; flex-wrap:wrap; gap:1rem;">
 
-                        <div class="col-xl-6">
-                            <div class="card border-0 shadow-lg h-100" style="border-radius: 1rem;">
-                                <div class="card-header bg-info text-white fw-bold py-3"
-                                    style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                    <i class="bi bi-person me-2"></i> Core Details & Contact
+                        {{-- ================= CORE DETAILS ================= --}}
+                        <div style="flex:1 1 48%;">
+                            <div
+                                style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0; height:100%;">
+                                <div
+                                    style="background:#0dcaf0; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                    <i class="bi bi-person" style="margin-right:0.5rem;"></i> Core Details & Contact
                                 </div>
-                                <div class="card-body p-4">
-                                    <dl class="row mb-0">
-                                        <dt class="col-sm-5 text-muted">Date of Birth:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->date_of_birth
-                                                ? \Carbon\Carbon::parse(optional($employee->profile)->date_of_birth)->format('d F, Y')
-                                                : 'N/A' }}
+                                <div style="padding:1rem;">
+                                    <dl style="margin:0;">
+                                        @php $profile = $employee->profile; @endphp
+
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Date of Birth</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->date_of_birth) ? \Carbon\Carbon::parse($profile->date_of_birth)->format('d F, Y') : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Gender:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->gender ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Gender</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->gender) ? $profile->gender : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Marital Status:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->marital_status ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Marital Status</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->marital_status) ? $profile->marital_status : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Nationality:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->nationality ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Nationality</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->nationality) ? $profile->nationality : 'N/A' }}
                                         </dd>
 
-                                        <hr class="my-3">
+                                        <hr style="margin:0.75rem 0; border-color:#dee2e6;">
 
-                                        <dt class="col-sm-5 text-muted">Personal Email:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3 text-truncate">
-                                            {{ optional($employee->profile)->personal_email ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Personal Email</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem; word-break:break-word;">
+                                            {{ !empty($profile->personal_email) ? $profile->personal_email : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Mobile Phone:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->mobile_phone ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Mobile Phone</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->mobile_phone) ? $profile->mobile_phone : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Home Phone:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->home_phone ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Home Phone</dt>
+                                        <dd style="font-weight:600;">
+                                            {{ !empty($profile->home_phone) ? $profile->home_phone : 'N/A' }}
                                         </dd>
                                     </dl>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-6">
-                            <div class="card border-0 shadow-lg mb-4" style="border-radius: 1rem;">
-                                <div class="card-header bg-secondary text-white fw-bold py-3"
-                                    style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                    <i class="bi bi-geo-alt me-2"></i> Permanent Address
+                        {{-- ================= ADDRESS + ID ================= --}}
+                        <div style="flex:1 1 48%; display:flex; flex-direction:column; gap:1rem;">
+
+                            {{-- ADDRESS --}}
+                            <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
+                                <div
+                                    style="background:#6c757d; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                    <i class="bi bi-geo-alt" style="margin-right:0.5rem;"></i> Permanent Address
                                 </div>
-                                <div class="card-body p-4">
-                                    <dl class="row mb-0">
-                                        <dt class="col-sm-4 text-muted">Street 1 / 2:</dt>
-                                        <dd class="col-sm-8 fw-medium mb-3">
-                                            {{ optional($employee->profile)->street_1 ?? 'N/A' }}<br>
-                                            <span
-                                                class="small text-secondary">{{ optional($employee->profile)->street_2 ?? '' }}</span>
+                                <div style="padding:1rem;">
+                                    <dl style="margin:0;">
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Street</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->street_1) ? $profile->street_1 : 'N/A' }}<br>
+                                            <span style="font-size:0.85rem; color:#868e96;">
+                                                {{ !empty($profile->street_2) ? $profile->street_2 : '' }}
+                                            </span>
                                         </dd>
 
-                                        <dt class="col-sm-4 text-muted">City, State:</dt>
-                                        <dd class="col-sm-8 fw-medium mb-3">
-                                            {{ optional($employee->profile)->city ?? 'N/A' }},
-                                            {{ optional($employee->profile)->state ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">City / State</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->city) ? $profile->city : 'N/A' }},
+                                            {{ !empty($profile->state) ? $profile->state : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-4 text-muted">Postcode:</dt>
-                                        <dd class="col-sm-8 fw-medium mb-3">
-                                            {{ optional($employee->profile)->postcode ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Postcode</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->postcode) ? $profile->postcode : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-4 text-muted">Country:</dt>
-                                        <dd class="col-sm-8 fw-medium mb-3">
-                                            {{ optional($employee->profile)->country ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Country</dt>
+                                        <dd style="font-weight:600;">
+                                            {{ !empty($profile->country) ? $profile->country : 'N/A' }}
                                         </dd>
                                     </dl>
                                 </div>
                             </div>
 
-                            <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
-                                <div class="card-header bg-warning text-dark fw-bold py-3"
-                                    style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                    <i class="bi bi-passport me-2"></i> ID & Compliance
+                            {{-- ID & COMPLIANCE --}}
+                            <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
+                                <div
+                                    style="background:#ffc107; color:#212529; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                    <i class="bi bi-passport" style="margin-right:0.5rem;"></i> ID & Compliance
                                 </div>
-                                <div class="card-body p-4">
-                                    <dl class="row mb-0">
-                                        <dt class="col-sm-5 text-muted">Tax Ref No:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->tax_reference_number ?? 'N/A' }}
+                                <div style="padding:1rem;">
+                                    <dl style="margin:0;">
+
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Tax Ref No</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->tax_reference_number) ? $profile->tax_reference_number : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Visa/Status:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->immigration_status ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Visa / Status</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->immigration_status) ? $profile->immigration_status : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">RTW Expiry:</dt>
+                                        @php
+                                            $rtw = $profile->right_to_work_expiry;
+                                            $rtwExpired = $rtw && \Carbon\Carbon::parse($rtw)->isPast();
+                                        @endphp
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">RTW Expiry</dt>
                                         <dd
-                                            class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($employee->profile)->right_to_work_expiry)->isPast()) text-danger @endif">
-                                            {{ optional($employee->profile)->right_to_work_expiry
-                                                ? \Carbon\Carbon::parse(optional($employee->profile)->right_to_work_expiry)->format('d F, Y')
-                                                : 'N/A' }}
+                                            style="font-weight:600; margin-bottom:0.75rem; color: {{ $rtwExpired ? '#dc3545' : '#212529' }};">
+                                            {{ $rtw ? \Carbon\Carbon::parse($rtw)->format('d F, Y') : 'N/A' }}
                                         </dd>
 
-                                        <hr class="my-3">
+                                        <hr style="margin:0.75rem 0; border-color:#dee2e6;">
 
-                                        <dt class="col-sm-5 text-muted">Passport No:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->passport_number ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport No</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->passport_number) ? $profile->passport_number : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">Passport Expiry:</dt>
+                                        @php
+                                            $passport = $profile->passport_expiry;
+                                            $passportExpired = $passport && \Carbon\Carbon::parse($passport)->isPast();
+                                        @endphp
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport Expiry</dt>
                                         <dd
-                                            class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($employee->profile)->passport_expiry)->isPast()) text-danger @endif">
-                                            {{ optional($employee->profile)->passport_expiry
-                                                ? \Carbon\Carbon::parse(optional($employee->profile)->passport_expiry)->format('d F, Y')
-                                                : 'N/A' }}
+                                            style="font-weight:600; margin-bottom:0.75rem; color: {{ $passportExpired ? '#dc3545' : '#212529' }};">
+                                            {{ $passport ? \Carbon\Carbon::parse($passport)->format('d F, Y') : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">BRP Number:</dt>
-                                        <dd class="col-sm-7 fw-medium mb-3">
-                                            {{ optional($employee->profile)->brp_number ?? 'N/A' }}
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Number</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->brp_number) ? $profile->brp_number : 'N/A' }}
                                         </dd>
 
-                                        <dt class="col-sm-5 text-muted">BRP Expiry:</dt>
+                                        @php
+                                            $brp = $profile->brp_expiry_date;
+                                            $brpExpired = $brp && \Carbon\Carbon::parse($brp)->isPast();
+                                        @endphp
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Expiry</dt>
                                         <dd
-                                            class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($employee->profile)->brp_expiry_date)->isPast()) text-danger @endif">
-                                            {{ optional($employee->profile)->brp_expiry_date
-                                                ? \Carbon\Carbon::parse(optional($employee->profile)->brp_expiry_date)->format('d F, Y')
-                                                : 'N/A' }}
+                                            style="font-weight:600; color: {{ $brpExpired ? '#dc3545' : '#212529' }};">
+                                            {{ $brp ? \Carbon\Carbon::parse($brp)->format('d F, Y') : 'N/A' }}
                                         </dd>
+
                                     </dl>
                                 </div>
                             </div>
+
                         </div>
-
-
                     </div>
                 </div>
+
+
 
 
                 <!-- Settings -->
@@ -1586,14 +1595,5 @@
                 }
             }
         });
-    });
-</script>
-
-
-<script>
-    window.addEventListener('redirect-to-employees', event => {
-        setTimeout(() => {
-            window.location.href = event.detail.url;
-        }, 1000);
     });
 </script>

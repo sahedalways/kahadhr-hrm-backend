@@ -31,51 +31,50 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-               
-                    <div class="card-body">
-                        <div class="row g-3 align-items-center mb-3">
-                            <!-- Search Input -->
-                            <div class="col-lg-8 col-md-6 col-12">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text" class="form-control border-start-0"
-                                        placeholder="Search by company name, email, or phone" wire:model="search"
-                                        wire:keyup="set('search', $event.target.value)" />
-                                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 align-items-center mb-3">
+                        <!-- Search Input -->
+                        <div class="col-lg-8 col-md-6 col-12">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" class="form-control border-start-0"
+                                    placeholder="Search by company name, email, or phone" wire:model="search"
+                                    wire:keyup="set('search', $event.target.value)" />
                             </div>
-
-                            <!-- Sort Dropdown -->
-                            <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
-                                <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
-                                    <option value="desc">Newest First</option>
-                                    <option value="asc">Oldest First</option>
-                                </select>
-
-
-                                <select class="form-select form-select-lg"
-                                    wire:change="handleFilter($event.target.value)">
-                                    <option value="">All Status</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-
                         </div>
 
-                        <!-- Live Search Result Indicator -->
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <p class="text-muted small mb-0">
-                                Showing results for: <strong>{{ $search ?: 'All Companies' }}</strong>
-                            </p>
-                            <div wire:loading wire:target="search">
-                                <span class="spinner-border spinner-border-sm text-primary" role="status"
-                                    aria-hidden="true"></span>
-                                <span class="text-primary small">Searching...</span>
-                            </div>
+                        <!-- Sort Dropdown -->
+                        <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
+                            <select class="form-select form-select-lg" wire:change="handleSort($event.target.value)">
+                                <option value="desc">Newest First</option>
+                                <option value="asc">Oldest First</option>
+                            </select>
+
+
+                            <select class="form-select form-select-lg" wire:change="handleFilter($event.target.value)">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Search Result Indicator -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <p class="text-muted small mb-0">
+                            Showing results for: <strong>{{ $search ?: 'All Companies' }}</strong>
+                        </p>
+                        <div wire:loading wire:target="search">
+                            <span class="spinner-border spinner-border-sm text-primary" role="status"
+                                aria-hidden="true"></span>
+                            <span class="text-primary small">Searching...</span>
                         </div>
                     </div>
-             
+                </div>
+
             </div>
         </div>
     </div>
@@ -83,7 +82,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                                <div class="card-body">
+                <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered text-center align-middle">
                             <thead class="table-light">
@@ -292,7 +291,7 @@
 
                             {{-- Registered Domain --}}
                             <div class="col-md-6 mb-2">
-                                <label class="form-label">Registered Domain</label>
+                                <label class="form-label">Website URL</label>
                                 <input type="text" class="form-control shadow-sm" wire:model="registered_domain"
                                     pattern="^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,11}?$"
                                     title="Enter a valid domain, e.g., example.com"
@@ -507,7 +506,6 @@
                                     @for ($i = 0; $i < 6; $i++)
                                         <input type="text" wire:model="otp.{{ $i }}"
                                             class="form-control text-center otp-field" maxlength="1" placeholder="-"
-                                            
                                             oninput="handleOtpInput(this)"
                                             onkeydown="handleOtpBackspace(event, this)">
                                     @endfor

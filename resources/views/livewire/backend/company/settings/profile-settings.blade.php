@@ -37,8 +37,8 @@
                                     value="{{ $sub_domain ? $sub_domain . '.' . config('app.base_domain') : '' }}"
                                     readonly>
 
-                                <button class="border btn btn-outline-secondary btn-sm btn-no-hover shadow-none" type="button"
-                                    onclick="copyFullDomain()"
+                                <button class="border btn btn-outline-secondary btn-sm btn-no-hover shadow-none"
+                                    type="button" onclick="copyFullDomain()"
                                     style="height: 100%; padding: 2px 10px; font-size: 13px;">
                                     Copy
                                 </button>
@@ -113,7 +113,7 @@
 
                             <!-- Registered Domain -->
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-semibold">Registered Domain</label>
+                                <label class="form-label fw-semibold">Website URL</label>
                                 <input type="text" class="form-control shadow-sm" wire:model="registered_domain"
                                     placeholder="yourdomain.com">
                                 @error('registered_domain')

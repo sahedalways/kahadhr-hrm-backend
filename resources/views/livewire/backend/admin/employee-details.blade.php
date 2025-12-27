@@ -112,96 +112,9 @@
                                 </h4>
                             </div>
 
-                            {{--<div class="card-body p-4 pt-0">
-                                <div class="row g-4">
-
-                                    <div class="col-lg-3 col-md-4 text-center border-md-end">
-                                        <div class="d-flex flex-column align-items-center p-3">
-                                            <div class="position-relative mb-3">
-                                                <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
-                                                    class="img-fluid shadow-sm clickable-image"
-                                                    style="min-width: 120px; width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
-                                                    data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
-                                                    alt="Employee Avatar">
-
-                                                <span
-                                                    class="badge rounded-pill position-absolute bottom-0 end-0 p-2 
-                                  {{ $details->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
-                                                    style="transform: translate(25%, 25%);">
-                                                    <i
-                                                        class="bi {{ $details->is_active ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
-                                                </span>
-                                            </div>
-
-                                            <h4 class="mb-1 fw-bold">{{ $details->full_name }}</h4>
-                                            <p class="text-muted small mb-0">{{ $details->job_title ?: 'N/A' }}</p>
 
 
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-9 col-md-8">
-                                        <h5 class="fw-bold mb-3 text-info text-center text-md-start">
-                                            Employment & Contact
-                                        </h5>
-
-                                        <div class="row g-3">
-
-                                            <!-- Left -->
-                                            <div class="col-12">
-                                                <div class=" rounded bg-light-subtle h-100">
-                                                    <dl class="row mb-0 small">
-
-                                                        <dt class="col-5 text-muted fw-semibold">Work Email</dt>
-                                                        <dd class="col-7 fw-medium text-truncate mb-2">
-                                                            {{ $details->email }}
-                                                        </dd>
-
-                                                        <dt class="col-5 text-muted fw-semibold">Work Phone</dt>
-                                                        <dd class="col-7 fw-medium mb-2">
-                                                            {{ $details->user->phone_no ?? 'N/A' }}
-                                                        </dd>
-
-                                                        <dt class="col-5 text-muted fw-semibold">Role</dt>
-                                                        <dd class="col-7 fw-medium">
-                                                            {{ ucfirst($details->role) }}
-                                                        </dd>
-
-                                                    </dl>
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- Right -->
-                                            <div class="col-12">
-                                                <div class=" rounded bg-light-subtle h-100">
-                                                    <dl class="row mb-0 small">
-
-                                                        <dt class="col-5 text-muted fw-semibold">Company</dt>
-                                                        <dd class="col-7 fw-medium mb-2">
-                                                            {{ $details->company->company_name ?? 'N/A' }}
-                                                        </dd>
-
-                                                        <dt class="col-5 text-muted fw-semibold">Department</dt>
-                                                        <dd class="col-7 fw-medium mb-2">
-                                                            {{ $details->department?->name ?? 'N/A' }}
-                                                        </dd>
-
-                                                        <dt class="col-5 text-muted fw-semibold">Team</dt>
-                                                        <dd class="col-7 fw-medium">
-                                                            {{ $details->team?->name ?? 'N/A' }}
-                                                        </dd>
-
-                                                    </dl>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>--}}
-
-                             <div class="card-body p-4 pt-0">
+                            <div class="card-body p-4 pt-0">
                                 <div class="row g-4 align-items-start">
 
                                     <!-- Profile -->
@@ -214,7 +127,7 @@
                                         <div class="d-flex flex-column align-items-center p-3">
 
                                             <div class="position-relative mb-3">
-                                               <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
+                                                <img src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
                                                     class="img-fluid shadow-sm clickable-image"
                                                     style="min-width: 120px; width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--bs-info); cursor: pointer;"
                                                     data-src="{{ $details->avatar_url ?? asset('assets/default-user.jpg') }}"
@@ -231,7 +144,8 @@
                                             </div>
 
                                             <h5 class="mb-1 fw-bold">{{ $details->full_name }}</h5>
-                                            <p class="text-muted small fw-bold mb-0">{{ $details->job_title ?: 'N/A' }}</p>
+                                            <p class="text-muted small fw-bold mb-0">{{ $details->job_title ?: 'N/A' }}
+                                            </p>
 
                                         </div>
                                     </div>
@@ -274,6 +188,10 @@
                                                 </div>
                                             </div>
 
+
+
+
+
                                             <!-- Right Info -->
                                             <div class="col-md-6">
                                                 <div class="p-3 rounded bg-light-subtle h-100">
@@ -285,18 +203,70 @@
                                                         </div>
                                                     </div>
 
+
                                                     <div class="mb-3">
-                                                        <div class="text-muted small fw-bold">Department</div>
-                                                        <div>
-                                                            {{ $details->department?->name ?? 'N/A' }}
-                                                        </div>
+                                                        <div class="text-muted fw-bold small mb-1">Departments</div>
+
+                                                        @php
+
+                                                            $max = 5;
+                                                        @endphp
+
+                                                        @if ($departments->isEmpty())
+                                                            <span class="text-muted fst-italic">N/A</span>
+                                                        @else
+                                                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                                                @foreach ($departments->take($max) as $department)
+                                                                    <span
+                                                                        class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                                                        {{ $department->name }}
+                                                                    </span>
+                                                                @endforeach
+
+
+                                                            </div>
+                                                        @endif
                                                     </div>
 
+
+
                                                     <div>
-                                                        <div class="text-muted small fw-bold">Team</div>
-                                                        <div>
-                                                            {{ $details->team?->name ?? 'N/A' }}
-                                                        </div>
+                                                        <div class="text-muted fw-bold small mb-1">Teams</div>
+
+                                                        @php
+                                                            $assignedTeams = $details->user
+                                                                ? $details->user->teams
+                                                                : collect();
+                                                            $max = 5;
+                                                        @endphp
+
+                                                        @if ($assignedTeams->isEmpty())
+                                                            <span class="text-muted fst-italic">N/A</span>
+                                                        @else
+                                                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                                                @foreach ($assignedTeams->take($max) as $team)
+                                                                    @php
+                                                                        $isLead =
+                                                                            $team->team_lead_id === $details->user_id;
+                                                                    @endphp
+
+                                                                    <span
+                                                                        class="badge rounded-pill px-3 py-2
+                    {{ $isLead ? 'bg-primary text-white' : 'bg-light text-dark border' }}">
+
+                                                                        {{ $team->name }}
+
+                                                                        @if ($isLead)
+                                                                            <span class="ms-1 fw-semibold">
+                                                                                ⭐ Leader
+                                                                            </span>
+                                                                        @endif
+                                                                    </span>
+                                                                @endforeach
+
+
+                                                            </div>
+                                                        @endif
                                                     </div>
 
                                                 </div>
@@ -431,6 +401,7 @@
 
                                     @php
                                         $hasDocs = $details->documents->isNotEmpty();
+
                                     @endphp
 
                                     @if (!$hasDocs)
@@ -512,10 +483,10 @@
 
                                                                     @if ($isExpired)
                                                                         <span
-                                                                            class="badge bg-danger position-absolute top-0 end-0 m-2">EXPIRED</span>
+                                                                            class="badge bg-danger position-absolute top-0 end-3 m-2">EXPIRED</span>
                                                                     @elseif ($isSoon)
                                                                         <span
-                                                                            class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">Expires
+                                                                            class="badge bg-warning text-dark position-absolute top-0 end-3 m-2">Expires
                                                                             Soon</span>
                                                                     @endif
                                                                 </div>
@@ -523,11 +494,7 @@
 
                                                         </div>
 
-                                                        <div class="mt-auto pt-2">
-                                                            <button class="btn btn-sm btn-outline-secondary w-100">
-                                                                <i class="bi bi-cloud-arrow-up me-1"></i> Upload New
-                                                            </button>
-                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -545,168 +512,182 @@
                     <!-- Personal Info -->
                     <div class="tab-pane fade" id="personalInfo" role="tabpanel" aria-labelledby="personalInfo-tab">
 
-                        <h4 class="mb-4 fw-bold text-dark d-flex align-items-center">
-                            <i class="fas fa-id-badge me-3 text-info"></i>
+                        <h4 class="mb-0 fw-bold text-dark d-flex align-items-center mb-3">
+                            <i class="fas fa-id-badge" style="margin-right:0.75rem; color:#0dcaf0;"></i>
                             Personal Information
                         </h4>
 
-                        <div class="row g-4">
+                        <div style="display:flex; flex-wrap:wrap; gap:1rem;">
 
-                            <div class="col-xl-6">
-                                <div class="card border-0 shadow-lg h-100" style="border-radius: 1rem;">
-                                    <div class="card-header bg-info text-white fw-bold py-3"
-                                        style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                        <i class="bi bi-person me-2"></i> Core Details & Contact
+                            {{-- ================= CORE DETAILS ================= --}}
+                            <div style="flex:1 1 48%;">
+                                <div
+                                    style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0; height:100%;">
+                                    <div
+                                        style="background:#0dcaf0; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                        <i class="bi bi-person" style="margin-right:0.5rem;"></i> Core Details &
+                                        Contact
                                     </div>
-                                    <div class="card-body p-4">
-                                        <dl class="row mb-0">
-                                            <dt class="col-sm-5 text-muted">Date of Birth:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->date_of_birth
-                                                    ? \Carbon\Carbon::parse(optional($details->profile)->date_of_birth)->format('d F, Y')
-                                                    : 'N/A' }}
+                                    <div style="padding:1rem;">
+                                        <dl style="margin:0;">
+                                            @php $profile = $details->profile; @endphp
+
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Date of Birth</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->date_of_birth) ? \Carbon\Carbon::parse($profile->date_of_birth)->format('d F, Y') : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Gender:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->gender ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Gender</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->gender) ? $profile->gender : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Marital Status:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->marital_status ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Marital Status</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->marital_status) ? $profile->marital_status : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Nationality:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->nationality ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Nationality</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->nationality) ? $profile->nationality : 'N/A' }}
                                             </dd>
 
-                                            <hr class="my-3">
+                                            <hr style="margin:0.75rem 0; border-color:#dee2e6;">
 
-                                            <dt class="col-sm-5 text-muted">Personal Email:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3 text-truncate">
-                                                {{ optional($details->profile)->personal_email ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Personal Email</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem; word-break:break-word;">
+                                                {{ !empty($profile->personal_email) ? $profile->personal_email : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Mobile Phone:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->mobile_phone ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Mobile Phone</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->mobile_phone) ? $profile->mobile_phone : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Home Phone:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->home_phone ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Home Phone</dt>
+                                            <dd style="font-weight:600;">
+                                                {{ !empty($profile->home_phone) ? $profile->home_phone : 'N/A' }}
                                             </dd>
                                         </dl>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-xl-6">
-                                <div class="card border-0 shadow-lg mb-4" style="border-radius: 1rem;">
-                                    <div class="card-header bg-secondary text-white fw-bold py-3"
-                                        style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                        <i class="bi bi-geo-alt me-2"></i> Permanent Address
+                            {{-- ================= ADDRESS + ID ================= --}}
+                            <div style="flex:1 1 48%; display:flex; flex-direction:column; gap:1rem;">
+
+                                {{-- ADDRESS --}}
+                                <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
+                                    <div
+                                        style="background:#6c757d; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                        <i class="bi bi-geo-alt" style="margin-right:0.5rem;"></i> Permanent Address
                                     </div>
-                                    <div class="card-body p-4">
-                                        <dl class="row mb-0">
-                                            <dt class="col-sm-4 text-muted">Street 1 / 2:</dt>
-                                            <dd class="col-sm-8 fw-medium mb-3">
-                                                {{ optional($details->profile)->street_1 ?? 'N/A' }}<br>
-                                                <span
-                                                    class="small text-secondary">{{ optional($details->profile)->street_2 ?? '' }}</span>
+                                    <div style="padding:1rem;">
+                                        <dl style="margin:0;">
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Street</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->street_1) ? $profile->street_1 : 'N/A' }}<br>
+                                                <span style="font-size:0.85rem; color:#868e96;">
+                                                    {{ !empty($profile->street_2) ? $profile->street_2 : '' }}
+                                                </span>
                                             </dd>
 
-                                            <dt class="col-sm-4 text-muted">City, State:</dt>
-                                            <dd class="col-sm-8 fw-medium mb-3">
-                                                {{ optional($details->profile)->city ?? 'N/A' }},
-                                                {{ optional($details->profile)->state ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">City / State</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->city) ? $profile->city : 'N/A' }},
+                                                {{ !empty($profile->state) ? $profile->state : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-4 text-muted">Postcode:</dt>
-                                            <dd class="col-sm-8 fw-medium mb-3">
-                                                {{ optional($details->profile)->postcode ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Postcode</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->postcode) ? $profile->postcode : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-4 text-muted">Country:</dt>
-                                            <dd class="col-sm-8 fw-medium mb-3">
-                                                {{ optional($details->profile)->country ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Country</dt>
+                                            <dd style="font-weight:600;">
+                                                {{ !empty($profile->country) ? $profile->country : 'N/A' }}
                                             </dd>
                                         </dl>
                                     </div>
                                 </div>
 
-                                <div class="card border-0 shadow-lg" style="border-radius: 1rem;">
-                                    <div class="card-header bg-warning text-dark fw-bold py-3"
-                                        style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                                        <i class="bi bi-passport me-2"></i> ID & Compliance
+                                {{-- ID & COMPLIANCE --}}
+                                <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
+                                    <div
+                                        style="background:#ffc107; color:#212529; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
+                                        <i class="bi bi-passport" style="margin-right:0.5rem;"></i> ID & Compliance
                                     </div>
-                                    <div class="card-body p-4">
-                                        <dl class="row mb-0">
-                                            <dt class="col-sm-5 text-muted">Tax Ref No:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->tax_reference_number ?? 'N/A' }}
+                                    <div style="padding:1rem;">
+                                        <dl style="margin:0;">
+
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Tax Ref No</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->tax_reference_number) ? $profile->tax_reference_number : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Visa/Status:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->immigration_status ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Visa / Status</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->immigration_status) ? $profile->immigration_status : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">RTW Expiry:</dt>
+                                            @php
+                                                $rtw = $profile->right_to_work_expiry;
+                                                $rtwExpired = $rtw && \Carbon\Carbon::parse($rtw)->isPast();
+                                            @endphp
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">RTW Expiry</dt>
                                             <dd
-                                                class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($details->profile)->right_to_work_expiry)->isPast()) text-danger @endif">
-                                                {{ optional($details->profile)->right_to_work_expiry
-                                                    ? \Carbon\Carbon::parse(optional($details->profile)->right_to_work_expiry)->format('d F, Y')
-                                                    : 'N/A' }}
+                                                style="font-weight:600; margin-bottom:0.75rem; color: {{ $rtwExpired ? '#dc3545' : '#212529' }};">
+                                                {{ $rtw ? \Carbon\Carbon::parse($rtw)->format('d F, Y') : 'N/A' }}
                                             </dd>
 
-                                            <hr class="my-3">
+                                            <hr style="margin:0.75rem 0; border-color:#dee2e6;">
 
-                                            <dt class="col-sm-5 text-muted">Passport No:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->passport_number ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport No</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->passport_number) ? $profile->passport_number : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">Passport Expiry:</dt>
+                                            @php
+                                                $passport = $profile->passport_expiry;
+                                                $passportExpired =
+                                                    $passport && \Carbon\Carbon::parse($passport)->isPast();
+                                            @endphp
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport Expiry</dt>
                                             <dd
-                                                class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($details->profile)->passport_expiry)->isPast()) text-danger @endif">
-                                                {{ optional($details->profile)->passport_expiry
-                                                    ? \Carbon\Carbon::parse(optional($details->profile)->passport_expiry)->format('d F, Y')
-                                                    : 'N/A' }}
+                                                style="font-weight:600; margin-bottom:0.75rem; color: {{ $passportExpired ? '#dc3545' : '#212529' }};">
+                                                {{ $passport ? \Carbon\Carbon::parse($passport)->format('d F, Y') : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">BRP Number:</dt>
-                                            <dd class="col-sm-7 fw-medium mb-3">
-                                                {{ optional($details->profile)->brp_number ?? 'N/A' }}
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Number</dt>
+                                            <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                                {{ !empty($profile->brp_number) ? $profile->brp_number : 'N/A' }}
                                             </dd>
 
-                                            <dt class="col-sm-5 text-muted">BRP Expiry:</dt>
+                                            @php
+                                                $brp = $profile->brp_expiry_date;
+                                                $brpExpired = $brp && \Carbon\Carbon::parse($brp)->isPast();
+                                            @endphp
+                                            <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Expiry</dt>
                                             <dd
-                                                class="col-sm-7 fw-bold mb-3 
-                            @if (\Carbon\Carbon::parse(optional($details->profile)->brp_expiry_date)->isPast()) text-danger @endif">
-                                                {{ optional($details->profile)->brp_expiry_date
-                                                    ? \Carbon\Carbon::parse(optional($details->profile)->brp_expiry_date)->format('d F, Y')
-                                                    : 'N/A' }}
+                                                style="font-weight:600; color: {{ $brpExpired ? '#dc3545' : '#212529' }};">
+                                                {{ $brp ? \Carbon\Carbon::parse($brp)->format('d F, Y') : 'N/A' }}
                                             </dd>
+
                                         </dl>
                                     </div>
                                 </div>
+
                             </div>
-
-
                         </div>
                     </div>
+
 
 
                 </div>
             </div>
         </div>
 
-        <!-- Image Preview Modal -->
+
         @include('livewire.backend.company.components.document-view')
 
     </div>

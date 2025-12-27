@@ -2,29 +2,20 @@
 
 namespace App\Livewire\Backend\Admin;
 
-use App\Jobs\SendEmployeeInvitation;
 use App\Livewire\Backend\Components\BaseComponent;
-use App\Models\Company;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\API\VerificationService;
 use App\Traits\Exportable;
-use Carbon\Carbon;
-use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Str;
-
 
 class ManageEmployees extends BaseComponent
 {
-    use WithFileUploads;
-    use Exportable;
+    use WithFileUploads, Exportable;
 
     public $employees, $employee, $employee_id, $title;
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
-
 
     public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
         $nationality, $home_phone, $mobile_phone, $personal_email,
@@ -32,11 +23,9 @@ class ManageEmployees extends BaseComponent
         $immigration_status, $brp_number, $brp_expiry_date,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
 
-
     public $perPage = 10;
     public $sortOrder = 'desc';
     public $statusFilter = '';
-
     public $loaded;
     public $lastId = null;
     public $hasMore = true;
@@ -52,30 +41,20 @@ class ManageEmployees extends BaseComponent
 
     public $departments, $teams;
     public $csv_file;
-
     public $addMethod = 'manual';
 
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
-
 
     protected $rulesCsv = [
         'csv_file' => 'required|file|mimes:csv,txt|max:2048',
     ];
 
-
-    public function openModal($field)
-    {
-        $this->resetVerificationFields();
-        $this->updating_field = $field;
-        $this->code_sent = false;
-        $this->verification_code = null;
-    }
     public function mount()
     {
         $this->loaded = collect();
         $this->departments = Department::all();
         $this->teams = Team::all();
-        $this->loadMore();
+        $this->resetLoaded();
     }
 
     public function render()
@@ -85,59 +64,74 @@ class ManageEmployees extends BaseComponent
         ]);
     }
 
-
-
-
-
-    /* Load more employees */
-    public function loadMore()
+    /**
+     * Build the base query for employees (with search & filter)
+     */
+    private function baseQuery()
     {
-        if (!$this->hasMore) return;
-
         $query = Employee::query();
 
-        if ($this->search && $this->search != '') {
+        // Apply search
+        if ($this->search) {
             $searchTerm = '%' . $this->search . '%';
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('f_name', 'like', "%{$searchTerm}%")
-                    ->orWhere('l_name', 'like', "%{$searchTerm}%")
-                    ->orWhere('job_title', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('user', function ($q2) use ($searchTerm) {
-                        $q2->where('email', 'like', "%{$searchTerm}%");
-                    });
+                $q->where('f_name', 'like', $searchTerm)
+                    ->orWhere('l_name', 'like', $searchTerm)
+                    ->orWhere('job_title', 'like', $searchTerm)
+                    ->orWhereHas('user', fn($q2) => $q2->where('email', 'like', $searchTerm));
             });
         }
 
+        // Apply status filter
         if ($this->statusFilter !== '') {
             $query->where('is_active', $this->statusFilter === 'active' ? 1 : 0);
         }
 
+        return $query;
+    }
+
+    /**
+     * Load more employees
+     */
+    public function loadMore()
+    {
+        if (!$this->hasMore) return;
+
+        $query = $this->baseQuery();
+
+        // Apply lastId pagination
         if ($this->lastId) {
-            if ($this->sortOrder === 'desc') {
-                $query->where('id', '<', $this->lastId);
-            } else {
-                $query->where('id', '>', $this->lastId);
-            }
+            $query->where('id', $this->sortOrder === 'desc' ? '<' : '>', $this->lastId);
+        }
+
+        // Exclude already loaded employees to prevent duplicates
+        if ($this->loaded->isNotEmpty()) {
+            $query->whereNotIn('id', $this->loaded->pluck('id'));
         }
 
         $items = $query->orderBy('id', $this->sortOrder)
             ->limit($this->perPage)
             ->get();
 
-        if ($items->count() == 0) {
+        if ($items->isEmpty()) {
             $this->hasMore = false;
             return;
         }
 
+        $this->lastId = $this->sortOrder === 'desc' ? $items->last()->id : $items->first()->id;
+
+        // Merge and make sure no duplicates
+        $this->loaded = $this->loaded->merge($items)->unique('id');
+
+        // If less than perPage, mark hasMore false
         if ($items->count() < $this->perPage) {
             $this->hasMore = false;
         }
-
-        $this->lastId = $this->sortOrder === 'desc' ? $items->last()->id : $items->first()->id;
-        $this->loaded = $this->loaded->merge($items);
     }
 
-    /* Reset loaded */
+    /**
+     * Reset loaded employees and pagination
+     */
     private function resetLoaded()
     {
         $this->loaded = collect();
@@ -146,27 +140,31 @@ class ManageEmployees extends BaseComponent
         $this->loadMore();
     }
 
-
-    /* Handle sort */
+    /**
+     * Sort handler
+     */
     public function handleSort($value)
     {
         $this->sortOrder = $value;
         $this->resetLoaded();
     }
 
-    /* Handle filter */
+    /**
+     * Filter handler
+     */
     public function handleFilter($value)
     {
         $this->statusFilter = $value;
         $this->resetLoaded();
     }
 
-    /* Search updated */
+    /**
+     * Search updated
+     */
     public function updatedSearch()
     {
         $this->resetLoaded();
     }
-
 
 
 

@@ -5,19 +5,37 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentType;
 use App\Models\Employee;
-use Illuminate\Http\Request;
+
 
 class EmployeeController extends Controller
 {
 
     public function employeeDetails($id)
     {
-        $details = Employee::with('documents', 'documents.documentType', 'profile')->findOrFail($id);
+        $details = Employee::with(
+            'documents',
+            'documents.documentType',
+            'profile',
+            'user',
+            'company',
+            'department',
+            'user.teams'
+        )->findOrFail($id);
 
 
         $types = DocumentType::all();
 
 
-        return view('livewire.backend.admin.employee-details', compact('details'));
+
+        $departments = $details->user
+            ? $details->user->teams
+            ->pluck('department')
+            ->filter()
+            ->unique('id')
+            ->values()
+            : collect();
+
+
+        return view('livewire.backend.admin.employee-details', compact('details', 'departments', 'types'));
     }
 }

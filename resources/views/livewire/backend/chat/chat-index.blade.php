@@ -1001,14 +1001,16 @@
                                         <label class="form-label fw-bold">Selected Members</label>
                                         <div class="d-flex flex-wrap gap-2">
                                             @foreach ($selectedTeamMembersList as $member)
-                                                <div class="badge bg-secondary d-flex align-items-center">
+                                                <div class="badge bg-secondary d-flex align-items-center gap-3">
                                                     {{ $member->f_name }} {{ $member->l_name }}
 
 
-                                                    <button type="button" class="btn btn-sm btn-danger ms-2"
+                                                    <a href="javascript:void(0)"
+                                                        class="icon-20 rounded-circle bg-white"
                                                         wire:click.prevent="removeTeamMember({{ $member->id }})">
                                                         <i class="fas fa-times"></i>
-                                                    </button>
+                                                    </a>
+
 
 
                                                 </div>

@@ -286,10 +286,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/chat*') ? 'active' : '' }}"
                         href="{{ route('company.dashboard.chat.index', ['company' => app('authUser')->company->sub_domain]) }}"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="Group / Chat"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Team Chat"
                         data-bs-trigger="manual">
                         <i class="fas fa-comments"></i>
-                        <span class="nav-link-text ms-1">Group / Chat</span>
+                        <span class="nav-link-text ms-1">Team Chat</span>
                     </a>
                 </li>
 
@@ -483,10 +483,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('employee/dashboard/chat*') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard.chat.index', ['company' => app('authUser')->employee->company->sub_domain]) }}"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="Group / Chat"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="Team Chat"
                         data-bs-trigger="manual">
                         <i class="fas fa-comments"></i>
-                        <span class="nav-link-text ms-1">Group / Chat</span>
+                        <span class="nav-link-text ms-1">Team Chat</span>
                     </a>
                 </li>
 

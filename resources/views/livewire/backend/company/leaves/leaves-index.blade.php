@@ -51,7 +51,7 @@
                 <div class="card-body p-0">
                     <div class="timeline-container">
                         <div class="timeline-grid timeline-header">
-                            <div class="input-group mb-4 shadow-sm">
+                            <div class="input-group pb-4 shadow-sm p-2 sticky-col rounded-0">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
                                         class="fas fa-search"></i></span>
                                 <input type="text" class="form-control border-start-0 ps-2"
@@ -80,16 +80,17 @@
 
                             <div class="timeline-grid timeline-row" wire:key="emp-{{ $emp->id }}" wire:ignore>
                                 <div class="employee-cell sticky-col border-bottom bg-white">
-                                    <div class="d-flex align-items-center p-2 employee-clickable
+                                    <div class="d-flex align-items-center p-2 gap-2 employee-clickable
         {{ $filterEmployeeId === $emp->id ? 'employee-active' : '' }}"
                                         wire:click="filterByEmployee({{ $emp->id }})">
                                         <img src="{{ $emp->avatar_url ?? 'https://ui-avatars.com/api/?name=' . $emp->full_name }}"
-                                            class="rounded-circle border border-2 border-primary-subtle me-2"
+                                            class="rounded-circle border border-2 border-primary-subtle"
                                             style="width: 40px; height: 40px; object-fit: cover;"
                                             alt="{{ $emp->full_name }}">
 
 
-                                        <div class="flex-grow-1">
+                                        <div class="d-flex gap-2 flex-column">
+                                            <div class="flex-grow-1">
                                             <h6 class="fw-bold text-dark lh-sm mb-0" style="font-size: 12px;">
                                                 {{ $emp->full_name }}</h6>
                                             <small class="text-secondary d-block"
@@ -121,6 +122,7 @@
                                                 <i class="fas fa-building me-1"></i>
                                                 {{ $emp->department->name ?? 'Unknown' }}
                                             </span>
+                                        </div>
                                         </div>
 
 
@@ -169,7 +171,7 @@
 
 
 
-            <div class="col-lg-6">
+            <div class="col-lg-6 mx-auto">
                 <div class="card shadow-sm mb-4">
 
                     <div class="card shadow-sm border-0">

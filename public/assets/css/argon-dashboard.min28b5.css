@@ -22564,7 +22564,7 @@ hr.horizontal.gray-light {
 }
 
 .sidenav[data-color=primary] .navbar-nav>.nav-item>.nav-link.active:after {
-    color: #fff
+    color: #a2a1be;
 }
 
 .sidenav[data-color=secondary] .navbar-nav>.nav-item>.nav-link.active {

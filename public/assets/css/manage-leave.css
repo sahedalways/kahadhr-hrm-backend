@@ -61,13 +61,14 @@
 
 .timeline-grid {
     display: grid;
-    /* 250px for employee name, then 31 columns of 40px each */
-    grid-template-columns: 200px repeat(31, 40px);
-    min-width: fit-content;
+    grid-template-columns: 200px repeat(31, minmax(40px, 1fr));
+    width: 100%; /* take full container width */
 }
 
+
+
 .employee-cell {
-    padding: 10px 15px;
+    padding: 5px 10px;
     border-bottom: 1px solid #eee;
     z-index: 2;
 }
@@ -80,14 +81,14 @@
 }
 
 .day-cell {
-    height: 60px;
+    /*height: 60px;*/
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .timeline-header .day-cell {
-    height: 50px;
+    /*height: 50px;*/
     background: #f8f9fa;
     border-bottom: 2px solid #dee2e6;
 }

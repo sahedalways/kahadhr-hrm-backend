@@ -529,6 +529,13 @@ class EmployeeDetails extends BaseComponent
         }
 
 
+        $user = $this->employee->user;
+
+        if ($user && $this->team_id) {
+            $user->teams()->syncWithoutDetaching([
+                $this->team_id => ['is_team_lead' => false]
+            ]);
+        }
 
         // Reset form and close modal
         $this->resetInputFields();

@@ -329,15 +329,17 @@
                                                     <div class="text-muted fw-bold small mb-1">Teams</div>
 
                                                     @php
-                                                        $teams = $employee->user ? $employee->user->teams : collect();
+                                                        $assignedTeams = $employee->user
+                                                            ? $employee->user->teams
+                                                            : collect();
                                                         $max = 5;
                                                     @endphp
 
-                                                    @if ($teams->isEmpty())
+                                                    @if ($assignedTeams->isEmpty())
                                                         <span class="text-muted fst-italic">N/A</span>
                                                     @else
                                                         <div class="d-flex flex-wrap align-items-center gap-2">
-                                                            @foreach ($teams->take($showAllTeams ? $teams->count() : $max) as $team)
+                                                            @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
                                                                 @php
                                                                     $isLead =
                                                                         $team->team_lead_id === $employee->user_id;
@@ -357,7 +359,7 @@
                                                                 </span>
                                                             @endforeach
 
-                                                            @if ($teams->count() > $max)
+                                                            @if ($assignedTeams->count() > $max)
                                                                 <button wire:click="toggleTeams"
                                                                     class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
                                                                     {{ $showAllTeams ? 'See less' : 'View more' }}
@@ -1065,7 +1067,20 @@
 
 
 
+                        <div class="col-md-6">
+                            <label class="form-label">Team <span class="text-danger">*</span></label>
+                            <select class="form-select" wire:model="team_id">
+                                <option value="">Select Team</option>
+                                @foreach ($teams as $team)
+                                    <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                @endforeach
+                            </select>
 
+
+                            @error('team_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
                         <!-- Salary Type -->
                         <div class="col-md-6">

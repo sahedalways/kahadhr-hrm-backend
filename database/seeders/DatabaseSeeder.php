@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             SocialSettingSeeder::class,
             CompanyChargeSeeder::class,
             LeaveTypeSeeder::class,
+            LeaveBalancesSeeder::class,
         ]);
     }
 }

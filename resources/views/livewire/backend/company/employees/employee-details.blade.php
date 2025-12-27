@@ -215,7 +215,8 @@
             right: 8px ">
                                                 <a href="#"
                                                     wire:click.prevent="toggleStatus({{ $employee->id }})"
-                                                    class="status-toggle tooltip-btn" data-tooltip="click to change status"
+                                                    class="status-toggle tooltip-btn"
+                                                    data-tooltip="click to change status"
                                                     aria-label="Toggle employee status">
 
                                                     <span

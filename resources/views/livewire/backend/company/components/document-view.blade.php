@@ -57,12 +57,16 @@
 
                 <!-- Footer Buttons -->
                 @if (auth()->user()->user_type !== 'superAdmin')
-                    <button type="button" class="btn btn-danger text-center" wire:click="deleteDocument"
-                        wire:loading.attr="disabled" wire:target="deleteDocument">
-                        <span wire:loading.remove wire:target="deleteDocument">Delete</span>
-                        <span class="spinner-border spinner-border-sm" wire:loading wire:target="deleteDocument"></span>
-                    </button>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="button" class="btn btn-danger text-center" wire:click="deleteDocument"
+                            wire:loading.attr="disabled" wire:target="deleteDocument">
+                            <span wire:loading.remove wire:target="deleteDocument">Delete</span>
+                            <span class="spinner-border spinner-border-sm" wire:loading
+                                wire:target="deleteDocument"></span>
+                        </button>
+                    </div>
                 @endif
+
 
             </form>
         </div>

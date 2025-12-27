@@ -226,6 +226,8 @@ class EmployeeDetails extends BaseComponent
         $this->selectedExpiresAt = '';
         $this->selectedComment = '';
 
+        $this->dispatch('closemodal');
+
         $this->toast('Document deleted successfully', 'success');
     }
 

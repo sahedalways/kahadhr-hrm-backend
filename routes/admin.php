@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\EmployeeController;
+use App\Livewire\Backend\Admin\AdminEmpDetails;
 use App\Livewire\Backend\Admin\Auth\AdminLogin;
 use App\Livewire\Backend\Admin\BillingPayments;
 use App\Livewire\Backend\Admin\Dashboard;
@@ -31,7 +31,10 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
   Route::get('/', Dashboard::class)->name('home');
 
   Route::prefix('employees')->name('dashboard.')->group(function () {
-    Route::get('/details/{id}', [EmployeeController::class, 'employeeDetails'])->name('employees.details');
+    Route::get(
+      '/details/{employee}',
+      AdminEmpDetails::class
+    )->name('employees.details');
   });
 
   // Manage Companies

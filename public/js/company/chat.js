@@ -4,12 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var companyId = parseInt(
         document.getElementById("current_company_id").value
     );
-    const currentUserId = parseInt(
-        document.getElementById("current_user_id").value
-    );
-    var currentReceiverId = parseInt(
-        document.getElementById("currentReceiverId").value
-    );
 
     // Initialize Pusher
     var pusher = new Pusher(pusherKey, {
@@ -23,31 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
         Livewire.dispatch("incomingMessage", { id: data.message.id });
     });
 
-    // const typingChannelAll = pusher.subscribe(
-    //     `chat-${companyId}-between-all-users`
-    // );
-    // typingChannelAll.bind("UserTyping", function (data) {
-    //     if (currentReceiverId !== "group") return;
-    //     if (data.user_id === currentUserId) return;
-
-    //     showTypingIndicator(data.user_name);
-    // });
-
-    // const typingChannelTwo = pusher.subscribe(
-    //     `chat-${companyId}-${currentReceiverId}`
-    // );
-    // typingChannelTwo.bind("UserTyping", function (data) {
-    //     if (currentReceiverId == "group") return;
-    //     if (data.user_id === currentUserId) return;
-
-    //     showTypingIndicator(data.user_name);
-    // });
-
     const attachmentBtn = document.getElementById("attachmentBtn");
     const attachmentPopup = document.getElementById("attachmentPopup");
 
+    const mentionBtn = document.getElementById("mentionBtn");
+    const mentionPopup = document.getElementById("mentionPopup");
+
     attachmentBtn.addEventListener("click", () => {
-        // toggle popup visibility
         attachmentPopup.style.display =
             attachmentPopup.style.display === "block" ? "none" : "block";
     });
@@ -58,6 +34,20 @@ document.addEventListener("DOMContentLoaded", function () {
             !attachmentPopup.contains(e.target)
         ) {
             attachmentPopup.style.display = "none";
+        }
+    });
+
+    mentionBtn.addEventListener("click", () => {
+        mentionPopup.style.display =
+            mentionPopup.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (
+            !mentionBtn.contains(e.target) &&
+            !mentionPopup.contains(e.target)
+        ) {
+            mentionPopup.style.display = "none";
         }
     });
 

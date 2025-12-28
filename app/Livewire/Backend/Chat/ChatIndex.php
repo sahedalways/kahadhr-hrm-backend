@@ -322,8 +322,12 @@ class ChatIndex extends BaseComponent
                 $groupId = intval(str_replace('teamGroup_', '', $this->receiverId));
                 $group = $this->teamGroups->firstWhere('id', $groupId);
 
+
+
                 if ($group) {
-                    $this->mentionUsers = $group->members->map(fn($m) => $m->user)->filter()->values();
+                    $this->mentionUsers = $group->members
+                        ->filter()
+                        ->values();
                 } else {
                     $this->mentionUsers = collect();
                 }
@@ -1046,12 +1050,12 @@ class ChatIndex extends BaseComponent
         $user = auth()->user();
 
         if (in_array($user->user_type, ['employee', 'teamLead'])) {
-            $groups = ChatGroup::whereHas('members', fn($q) => $q->where('user_id', $user->id))
+            $groups = ChatGroup::with('members')->whereHas('members', fn($q) => $q->where('user_id', $user->id))
                 ->where('company_id', currentCompanyId())
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-            $groups = ChatGroup::where('company_id', currentCompanyId())
+            $groups = ChatGroup::with('members')->where('company_id', currentCompanyId())
                 ->orderBy('created_at', 'desc')
                 ->get();
         }

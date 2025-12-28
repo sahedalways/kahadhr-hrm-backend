@@ -236,7 +236,7 @@
                                                     <a class="dropdown-item"
                                                         wire:click="selectEmployee({{ $employee->user_id }})">
                                                         {{ $employee->full_name }}
-                                                        ({{ $employee->department->name ?? 'N/A' }})
+
                                                     </a>
                                                 </li>
                                             @endforeach

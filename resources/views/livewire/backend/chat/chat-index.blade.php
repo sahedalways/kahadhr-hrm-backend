@@ -677,21 +677,23 @@
                                 <!-- Emoji -->
                                 <button id="show_emoji_box" class="btn btn-light rounded-circle icon-30">😊</button>
 
-                                <!-- Mention -->
-                                <button type="button" class="btn btn-light rounded-circle icon-30"
-                                    wire:click="toggleMentionBox">@</button>
+                                <div class="position-relative" x-data
+                                    @click.outside="$wire.set('showMentionBox', false)">
 
-                                <!-- Mention Dropdown -->
-                                <div class="position-relative">
+                                    <button type="button" class="btn btn-light rounded-circle icon-30"
+                                        wire:click="toggleMentionBox">
+                                        @
+                                    </button>
+
                                     @if ($showMentionBox)
                                         <div id="mentionBox"
-                                            class="position-absolute bg-white border shadow-sm p-2 dropdown-scroll"
+                                            class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
                                             style="bottom:45px; left:0; width:200px; z-index:2000;">
 
                                             <input type="text" class="form-control mb-1" placeholder="Search..."
-                                                wire:model="mentionSearch">
+                                                wire:model.live="mentionSearch">
 
-                                            @foreach ($mentionUsers as $user)
+                                            @forelse ($mentionUsers as $user)
                                                 @php
                                                     $displayName =
                                                         $user->user_type === 'company'
@@ -704,15 +706,15 @@
                                                     wire:click="selectMention({{ $user->id }})">
                                                     {{ $displayName }}
                                                 </div>
-                                            @endforeach
-
-                                            @if (empty($mentionUsers))
+                                            @empty
                                                 <div class="text-muted p-2">No users found</div>
-                                            @endif
+                                            @endforelse
 
                                         </div>
                                     @endif
                                 </div>
+
+
 
                             </div>
 
@@ -1814,21 +1816,26 @@
                                 <!-- Emoji -->
                                 <button id="show_emoji_box" class="btn btn-light rounded-circle icon-30">😊</button>
 
-                                <!-- Mention -->
-                                <button type="button" class="btn btn-light rounded-circle icon-30"
-                                    wire:click="toggleMentionBox">@</button>
 
-                                <!-- Mention Dropdown -->
-                                <div class="position-relative">
+
+
+                                <div class="position-relative" x-data
+                                    @click.outside="$wire.set('showMentionBox', false)">
+
+                                    <button type="button" class="btn btn-light rounded-circle icon-30"
+                                        wire:click="toggleMentionBox">
+                                        @
+                                    </button>
+
                                     @if ($showMentionBox)
                                         <div id="mentionBox"
-                                            class="position-absolute bg-white border shadow-sm p-2 dropdown-scroll"
+                                            class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
                                             style="bottom:45px; left:0; width:200px; z-index:2000;">
 
                                             <input type="text" class="form-control mb-1" placeholder="Search..."
-                                                wire:model="mentionSearch">
+                                                wire:model.live="mentionSearch">
 
-                                            @foreach ($mentionUsers as $user)
+                                            @forelse ($mentionUsers as $user)
                                                 @php
                                                     $displayName =
                                                         $user->user_type === 'company'
@@ -1841,15 +1848,14 @@
                                                     wire:click="selectMention({{ $user->id }})">
                                                     {{ $displayName }}
                                                 </div>
-                                            @endforeach
-
-                                            @if (empty($mentionUsers))
+                                            @empty
                                                 <div class="text-muted p-2">No users found</div>
-                                            @endif
+                                            @endforelse
 
                                         </div>
                                     @endif
                                 </div>
+
 
                             </div>
 

@@ -61,108 +61,116 @@
 
         <div class="card mt-4">
             <div class="card-body">
-                <div class="text-center ">
-                    <h1 class="display-5 fw-bold ">📢 Onboarding Announcements</h1>
-                    <p class="lead ">All onboarding-related media and instructions are listed below.</p>
+                <div class="text-center px-2">
+                    <h1 class="fw-bold fs-4 fs-md-3 fs-lg-2 mb-2">
+                        📢 Onboarding Announcements
+                    </h1>
+                    <p class="text-muted fs-6 fs-md-5 mb-0">
+                        All onboarding-related media and instructions are listed below.
+                    </p>
                 </div>
+
 
 
                 <div class="row g-4">
 
-            @forelse ($infos as $item)
-                <div class="col-md-6 col-lg-4 d-flex">
-                    <div class="card onboarding-step shadow-sm w-100 position-relative">
-
-                      
+                    @forelse ($infos as $item)
+                        <div class="col-md-6 col-lg-4 d-flex">
+                            <div class="card onboarding-step shadow-sm w-100 position-relative">
 
 
-                        {{-- Media --}}
-                        <div class="media-container text-center p-3 position-relative">
-                              {{-- 🔵 Hover View Button --}}
-                        <div class="view-overlay">
-                            <a href="{{ route('company.dashboard.onboarding.view', [
-                                'id' => $item->id,
-                                'company' => app('authUser')->company->sub_domain,
-                            ]) }}"
-                                class="btn btn-primary btn-sm">
-                                View
-                            </a>
-                        </div>
 
-                            @php
-                                $media = strtolower($item->media ?? '');
-                                $isImage = Str::endsWith($media, ['.jpg', '.jpeg', '.png', '.gif', '.webp']);
-                                $isVideo = Str::endsWith($media, ['.mp4', '.mov', '.avi']);
-                                $isAudio = Str::endsWith($media, ['.mp3', '.wav']);
-                            @endphp
 
-                            @if ($item->media && $isImage)
-                                <img src="{{ asset('storage/' . $item->media) }}" class="card-img-top rounded"
-                                    alt="media">
-                            @elseif ($item->media && $isVideo)
-                                <video class="w-100 rounded" controls>
-                                    <source src="{{ asset('storage/' . $item->media) }}" type="video/mp4">
-                                </video>
-                            @elseif ($item->media && $isAudio)
-                                <audio controls class="w-100">
-                                    <source src="{{ asset('storage/' . $item->media) }}">
-                                </audio>
-                            @else
-                                <div class="media-placeholder">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                    <p class="small text-muted">No media uploaded</p>
-                                </div>
-                            @endif
-                        </div>
+                                {{-- Media --}}
+                                <div class="media-container text-center p-3 position-relative">
+                                    {{-- 🔵 Hover View Button --}}
+                                    <div class="view-overlay">
+                                        <a href="{{ route('company.dashboard.onboarding.view', [
+                                            'id' => $item->id,
+                                            'company' => app('authUser')->company->sub_domain,
+                                        ]) }}"
+                                            class="btn btn-primary btn-sm">
+                                            View
+                                        </a>
+                                    </div>
 
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">{{ $item->title }}</h5>
-                            <p class="card-text text-muted">
-                                {!! \Illuminate\Support\Str::limit($item->description, 120) !!}
-                            </p>
-                        </div>
+                                    @php
+                                        $media = strtolower($item->media ?? '');
+                                        $isImage = Str::endsWith($media, ['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+                                        $isVideo = Str::endsWith($media, ['.mp4', '.mov', '.avi']);
+                                        $isAudio = Str::endsWith($media, ['.mp3', '.wav']);
+                                    @endphp
 
-                        <div class="card-footer gap-4 flex-wrap bg-light border-0 d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <span class="badge bg-secondary">
-                                    @if (isset($item->creator) && $item->creator->user_type === 'company')
-                                        Company Admin
+                                    @if ($item->media && $isImage)
+                                        <img src="{{ asset('storage/' . $item->media) }}" class="card-img-top rounded"
+                                            alt="media">
+                                    @elseif ($item->media && $isVideo)
+                                        <video class="w-100 rounded" controls>
+                                            <source src="{{ asset('storage/' . $item->media) }}" type="video/mp4">
+                                        </video>
+                                    @elseif ($item->media && $isAudio)
+                                        <audio controls class="w-100">
+                                            <source src="{{ asset('storage/' . $item->media) }}">
+                                        </audio>
                                     @else
-                                        {{ $item->creator->full_name ?? 'Admin' }}
+                                        <div class="media-placeholder">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                            <p class="small text-muted">No media uploaded</p>
+                                        </div>
                                     @endif
-                                </span>
+                                </div>
 
-                                <small class="text-muted ms-2">
-                                    {{ $item->created_at->format('d M Y') }}
-                                </small>
-                            </div>
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">{{ $item->title }}</h5>
+                                    <p class="card-text text-muted">
+                                        {!! \Illuminate\Support\Str::limit($item->description, 120) !!}
+                                    </p>
+                                </div>
 
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary btn-sm" wire:click="edit({{ $item->id }})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <div
+                                    class="card-footer gap-4 flex-wrap bg-light border-0 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <span class="badge bg-secondary">
+                                            @if (isset($item->creator) && $item->creator->user_type === 'company')
+                                                Company Admin
+                                            @else
+                                                {{ $item->creator->full_name ?? 'Admin' }}
+                                            @endif
+                                        </span>
 
-                                <button class="btn btn-danger btn-sm"
-                                    wire:click.prevent="$dispatch('confirmDelete', {{ $item->id }})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                        <small class="text-muted ms-2">
+                                            {{ $item->created_at->format('d M Y') }}
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary btn-sm" wire:click="edit({{ $item->id }})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+
+                                        <button class="btn btn-danger btn-sm"
+                                            wire:click.prevent="$dispatch('confirmDelete', {{ $item->id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+
                             </div>
                         </div>
 
 
-                    </div>
-                </div>
 
-            @empty
-                <div class="col-12 text-center ">
-                    <h4>No announcements found.</h4>
+                    @empty
+                        <div class="col-12 text-center mt-5">
+                            <h6>No announcements found.</h6>
+                        </div>
+                    @endforelse
                 </div>
-            @endforelse
-        </div>
             </div>
         </div>
 
-        
+
 
 
         {{-- Load More --}}

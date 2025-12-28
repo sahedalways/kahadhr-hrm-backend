@@ -468,20 +468,26 @@
                                                     <div class="mb-3 flex-grow-1">
 
                                                         @foreach ($docsForType as $doc)
-                                                            <div class="rounded p-3 mb-2 border border-light position-relative doc-item"
+                                                            <div class="doc-item rounded-3 p-3 mb-2 border border-light position-relative"
                                                                 data-doc-id="{{ $doc->id }}"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#openDocumentModal"
                                                                 wire:click.prevent="$dispatch('openDocumentModal', {{ json_encode(['docId' => $doc->id]) }})"
-                                                                style="cursor:pointer; background-color:white; transition: all .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                                                style="
+            cursor: pointer;
+            background-color: #fff;
+            transition: all .2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        ">
 
-                                                                <div class="d-flex align-items-center">
-                                                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-3"
-                                                                        style="font-size: 32px;"></i>
+                                                                <div class="d-flex align-items-start gap-3">
+                                                                    <!-- PDF ICON -->
+                                                                    <i class="bi bi-file-earmark-pdf-fill text-danger flex-shrink-0"
+                                                                        style="font-size: 30px;"></i>
 
+                                                                    <!-- CONTENT -->
                                                                     <div class="flex-grow-1">
-                                                                        <div class="fw-semibold text-truncate"
-                                                                            style="max-width: 100%;">
+                                                                        <div class="fw-semibold text-truncate">
                                                                             {{ $doc->name ?? 'Document File' }}
                                                                         </div>
 
@@ -503,24 +509,31 @@
                                                                                     !$isExpired;
                                                                             @endphp
                                                                             <span
-                                                                                class="fw-medium 
-                                                                @if ($isExpired) text-danger @elseif($isSoon) text-warning @else text-dark @endif">
+                                                                                class="fw-medium
+                        @if ($isExpired) text-danger
+                        @elseif ($isSoon) text-warning
+                        @else text-dark @endif">
                                                                                 {{ $expiryDate ? $expiryDate->format('d M, Y') : 'No Expiry' }}
                                                                             </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
+                                                                <!-- STATUS BADGE -->
                                                                 @if ($isExpired)
                                                                     <span
-                                                                        class="badge bg-danger position-absolute top-0 end-3 m-2">EXPIRED</span>
+                                                                        class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                                                        EXPIRED
+                                                                    </span>
                                                                 @elseif ($isSoon)
                                                                     <span
-                                                                        class="badge bg-warning text-dark position-absolute top-0 end-3 m-2">Expires
-                                                                        Soon</span>
+                                                                        class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                                                                        Expires Soon
+                                                                    </span>
                                                                 @endif
                                                             </div>
                                                         @endforeach
+
 
                                                     </div>
 

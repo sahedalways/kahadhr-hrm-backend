@@ -128,7 +128,7 @@
             {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
          ">
 
-                                <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-start justify-content-between">
                                     <div class="d-flex align-items-center flex-wrap">
                                         <div class="rounded-circle p-2 me-3"
                                             style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
@@ -139,7 +139,7 @@
                                         <div>
                                             <div class="fw-bold">{{ $group->name }}</div>
                                             <small class="text-muted">
-                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
+                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 20) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
                                                 {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
@@ -150,47 +150,47 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div style="display:flex; align-items:flex-end;">
+                                        <div class="dropdown" wire:ignore>
+                                            <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v text-muted"></i>
+                                            </button>
 
-                                </div>
-
-
-
-                                <div style="display:flex; align-items:flex-end;">
-                                    <div class="dropdown" wire:ignore>
-                                        <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v text-muted"></i>
-                                        </button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                            <li>
-                                                <button type="button"
-                                                    class="dropdown-item text-danger d-flex align-items-center"
-                                                    wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')"
-                                                    wire:loading.attr="disabled"
-                                                    wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
-
-                                                    <!-- Spinner while deleting -->
-                                                    <span wire:loading
-                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')"
-                                                        class="spinner-border spinner-border-sm me-2"></span>
-
-                                                    <span wire:loading.remove
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <button type="button"
+                                                        class="dropdown-item text-danger d-flex align-items-center"
+                                                        wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                        wire:loading.attr="disabled"
                                                         wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
-                                                        <i class="bi bi-trash me-1"></i> Delete Conversation
-                                                    </span>
 
-                                                    <!-- Optional: text change during loading -->
-                                                    <span wire:loading
-                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
-                                                        Deleting...
-                                                    </span>
+                                                        <!-- Spinner while deleting -->
+                                                        <span wire:loading
+                                                            wire:target="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                            class="spinner-border spinner-border-sm me-2"></span>
 
-                                                </button>
-                                            </li>
-                                        </ul>
+                                                        <span wire:loading.remove
+                                                            wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                            <i class="bi bi-trash me-1"></i> Delete Conversation
+                                                        </span>
+
+                                                        <!-- Optional: text change during loading -->
+                                                        <span wire:loading
+                                                            wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                            Deleting...
+                                                        </span>
+
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
+
+
+
+
 
 
                             </div>
@@ -334,7 +334,7 @@
                                         <div>
                                             <div class="fw-bold">{{ $group->name }}</div>
                                             <small class="text-muted">
-                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
+                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 20) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
                                                 {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
@@ -1203,7 +1203,7 @@
         <div class="d-flex h-100">
 
             {{-- SIDEBAR --}}
-            <div class="d-flex flex-column p-0 sidebar mobile-chat-sidebar">
+            <div class="d-flex flex-column p-0 sidebar mobile-chat-sidebar ">
 
                 {{-- Add new --}}
                 <div style="min-height: 77px"
@@ -1336,7 +1336,7 @@
                                         <div>
                                             <div class="fw-bold">{{ $group->name }}</div>
                                             <small class="text-muted">
-                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
+                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 20) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
                                                 {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
@@ -1499,7 +1499,7 @@
                                         <div>
                                             <div class="fw-bold">{{ $group->name }}</div>
                                             <small class="text-muted">
-                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
+                                                {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 20) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
                                                 {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}

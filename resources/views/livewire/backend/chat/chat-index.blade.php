@@ -129,7 +129,7 @@
          ">
 
                                 <div class="d-flex align-items-start justify-content-between">
-                                    <div class="d-flex align-items-center flex-wrap">
+                                    <div class="d-flex align-items-center">
                                         <div class="rounded-circle p-2 me-3"
                                             style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
                                             <img src="{{ $group->image ? asset($group->image_url) : asset('/assets/img/chat/group-icon.png') }}"
@@ -152,9 +152,9 @@
                                     </div>
                                     <div style="display:flex; align-items:flex-end;">
                                         <div class="dropdown" wire:ignore>
-                                            <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                            <button style="padding: 4px 8px;" class="btn btn-sm btn-light border-0" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v text-muted"></i>
+                                                <i class="fa-solid fa-ellipsis text-muted"></i>
                                             </button>
 
                                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -349,9 +349,9 @@
 
                                 <div style="display:flex; align-items:flex-end;">
                                     <div class="dropdown" wire:ignore>
-                                        <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                        <button class="btn btn-sm btn-light border-0 py-2 px-1" type="button"
                                             data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v text-muted"></i>
+                                            <i class="fa-solid fa-ellipsis text-muted"></i>
                                         </button>
 
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">

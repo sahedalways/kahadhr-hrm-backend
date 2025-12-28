@@ -387,20 +387,25 @@ body {
 #sidenav-collapse-main ul ul li:nth-child(4) i {
     color: #fb6340;
 }
+
 #sidenav-collapse-main ul ul li:nth-child(5) i {
-    color: #11cdef; /* cyan */
+    color: #11cdef;
+    /* cyan */
 }
 
 #sidenav-collapse-main ul ul li:nth-child(6) i {
-    color: #8965e0; /* purple */
+    color: #8965e0;
+    /* purple */
 }
 
 #sidenav-collapse-main ul ul li:nth-child(7) i {
-    color: #ffd600; /* yellow */
+    color: #ffd600;
+    /* yellow */
 }
 
 #sidenav-collapse-main ul ul li:nth-child(8) i {
-    color: #8898aa; /* gray-blue */
+    color: #8898aa;
+    /* gray-blue */
 }
 
 
@@ -496,6 +501,11 @@ table.fc-scrollgrid-sync-table {
 
 .tooltip-wrapper {
     min-width: 1.8rem;
+}
+
+.employee-doc-card:hover .zoom-effect {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
 }
 
 @media (max-width: 1199px) {

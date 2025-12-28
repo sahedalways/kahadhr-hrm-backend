@@ -532,8 +532,8 @@
                                             @continue
                                         @endif
 
-                                        <div class="col-xl-3 col-md-6 col-sm-12">
-                                            <div class="card border-0 shadow-sm rounded-4 h-100"
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="card border-0 shadow-sm rounded-4 h-100 employee-doc-card"
                                                 style="background-color: #fcfcfc;">
 
                                                 <div class="card-header bg-info text-white fw-bold d-flex align-items-center py-3"
@@ -553,11 +553,12 @@
                                                                 wire:click.prevent="$dispatch('openDocumentModal', {{ json_encode(['docId' => $doc->id]) }})"
                                                                 style="cursor:pointer; background-color:white; transition: all .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 
-                                                                <div class="d-flex align-items-center">
-                                                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-3"
-                                                                        style="font-size: 32px;"></i>
+                                                                <div class="d-flex align-items-start gap-3">
+                                                                    <i
+                                                                        class="fa-solid fa-file-pdf text-danger fs-4"></i>
 
-                                                                    <div class="flex-grow-1">
+
+                                                                    <div class="flex-grow-1 lh-1">
                                                                         <div class="fw-semibold text-truncate"
                                                                             style="max-width: 100%;">
                                                                             {{ $doc->name ?? 'Document File' }}
@@ -587,16 +588,16 @@
                                                                             </span>
                                                                         </div>
                                                                     </div>
+                                                                    @if ($isExpired)
+                                                                        <span class="badge bg-danger zoom zoom-effect">EXPIRED</span>
+                                                                    @elseif ($isSoon)
+                                                                        <span
+                                                                            class="badge bg-warning text-dark zoom-effect">Expires
+                                                                            Soon</span>
+                                                                    @endif
                                                                 </div>
 
-                                                                @if ($isExpired)
-                                                                    <span
-                                                                        class="badge bg-danger position-absolute top-0 end-3 m-2">EXPIRED</span>
-                                                                @elseif ($isSoon)
-                                                                    <span
-                                                                        class="badge bg-warning text-dark position-absolute top-0 end-3 m-2">Expires
-                                                                        Soon</span>
-                                                                @endif
+
                                                             </div>
                                                         @endforeach
 

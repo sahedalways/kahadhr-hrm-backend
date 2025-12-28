@@ -130,7 +130,9 @@
             </p>
 
             <p>
-                <a href="{{ config('app.url') }}" target="_blank">{{ config('app.url') }}</a>
+                <a href="{{ config('app.frontend_url') }}" target="_blank">
+                    {{ config('app.frontend_url') }}
+                </a>
             </p>
         </div>
 

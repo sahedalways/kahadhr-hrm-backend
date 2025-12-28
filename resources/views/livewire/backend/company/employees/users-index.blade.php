@@ -229,7 +229,8 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="f_name">
+                                    <input type="text" class="form-control" wire:model="f_name"
+                                        placeholder="Enter first name">
                                     @error('f_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -238,7 +239,8 @@
                                 <!-- Last Name -->
                                 <div class="col-md-6">
                                     <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="l_name">
+                                    <input type="text" class="form-control" wire:model="l_name"
+                                        placeholder="Enter last name">
                                     @error('l_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -248,7 +250,8 @@
                                 <!-- Email -->
                                 <div class="col-md-6">
                                     <label class="form-label">Email <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" wire:model="email" required>
+                                    <input type="email" class="form-control" wire:model="email" required
+                                        placeholder="Enter email">
                                     @error('email')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -257,7 +260,8 @@
                                 <!-- Job Title -->
                                 <div class="col-md-6">
                                     <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="job_title">
+                                    <input type="text" class="form-control" wire:model="job_title"
+                                        placeholder="Enter job title">
                                     @error('job_title')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -284,7 +288,7 @@
                                         <label class="form-label">Contract Hours (Weekly)<span
                                                 class="text-danger">*</span></label>
                                         <input type="number" step="0.01" class="form-control"
-                                            wire:model="contract_hours">
+                                            wire:model="contract_hours" placeholder="Enter contract hours">
                                         @error('contract_hours')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror

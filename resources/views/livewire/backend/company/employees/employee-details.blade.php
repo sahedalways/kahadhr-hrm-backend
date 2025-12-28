@@ -1098,7 +1098,8 @@
 
                         <div class="col-md-6">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model="f_name">
+                            <input type="text" class="form-control" wire:model="f_name"
+                                placeholder="Enter first name">
                             @error('f_name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1107,7 +1108,8 @@
                         <!-- Last Name -->
                         <div class="col-md-6">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model="l_name">
+                            <input type="text" class="form-control" wire:model="l_name"
+                                placeholder="Enter last name">
                             @error('l_name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1117,7 +1119,8 @@
                             <div class="flex-grow-1">
                                 <label class="form-label"> Mobile No.<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control shadow-sm" wire:model="phone_no" readonly
-                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                    placeholder="Enter phone no.">
                                 @error('phone_no')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -1132,7 +1135,8 @@
                         <div class="col-md-6 d-flex align-items-end">
                             <div class="flex-grow-1">
                                 <label class="form-label"> Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" wire:model="email" readonly>
+                                <input type="email" class="form-control" wire:model="email" readonly
+                                    placeholder="Enter email address">
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -1148,7 +1152,8 @@
                         <!-- Job Title -->
                         <div class="col-md-6">
                             <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" wire:model="job_title">
+                            <input type="text" class="form-control" wire:model="job_title"
+                                placeholder="Enter job title">
 
                             @error('job_title')
                                 <span class="text-danger">{{ $message }}</span>
@@ -1193,7 +1198,7 @@
                                 <label class="form-label">Contract Hours (Weekly) <span
                                         class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control"
-                                    wire:model="contract_hours">
+                                    wire:model="contract_hours" placeholder="Enter contract hours">
 
                                 @error('contract_hours')
                                     <span class="text-danger">{{ $message }}</span>
@@ -1237,7 +1242,8 @@
                         <!-- Street 1 -->
                         <div class="col-md-6">
                             <label class="form-label">Street 1</label>
-                            <input type="text" class="form-control" wire:model="street_1">
+                            <input type="text" class="form-control" wire:model="street_1"
+                                placeholder="Enter street 1">
                             @error('street_1')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1246,7 +1252,8 @@
                         <!-- Street 2 -->
                         <div class="col-md-6">
                             <label class="form-label">Street 2</label>
-                            <input type="text" class="form-control" wire:model="street_2">
+                            <input type="text" class="form-control" wire:model="street_2"
+                                placeholder="Enter street 2">
                             @error('street_2')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1259,7 +1266,7 @@
                                 <!-- Button -->
                                 <button class="btn btn-sm w-100 text-start" type="button" id="stateDropdownButton"
                                     style="border:1px solid #ccc; background:#fff;">
-                                    {{ $state ?? 'Select State' }}
+                                    {{ !empty($state) ? $state : 'Select State' }}
                                 </button>
 
                                 <!-- Dropdown -->
@@ -1290,7 +1297,8 @@
                                 <button class="btn btn-sm w-100 text-start" type="button" id="cityDropdownButton"
                                     style="border:1px solid #ccc; background:#fff;"
                                     @if (!$cities) disabled @endif>
-                                    {{ $city ?? 'Select City' }}
+
+                                    {{ !empty($city) ? $city : 'Select City' }}
                                 </button>
 
                                 <!-- Dropdown -->
@@ -1317,7 +1325,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Postcode</label>
                             <input type="text" class="form-control" wire:model="postcode"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Enter postal code">
                             @error('postcode')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1331,7 +1340,8 @@
                                 <!-- Button -->
                                 <button class="btn btn-sm w-100 text-start" type="button" id="countryDropdownButton"
                                     style="border:1px solid #ccc; background:#fff;">
-                                    {{ $country ?? 'Select Country' }}
+
+                                    {{ !empty($country) ? $country : 'Select Country' }}
                                 </button>
 
                                 <!-- Dropdown -->
@@ -1362,7 +1372,8 @@
                         <!-- Nationality -->
                         <div class="col-md-6">
                             <label class="form-label">Nationality</label>
-                            <input type="text" class="form-control" wire:model="nationality">
+                            <input type="text" class="form-control" wire:model="nationality"
+                                placeholder="Enter nationality">
                             @error('nationality')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1372,7 +1383,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Home Phone</label>
                             <input type="text" class="form-control" wire:model="home_phone"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Enter home phone no.">
                             @error('home_phone')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1383,7 +1395,8 @@
                         <!-- Personal Email -->
                         <div class="col-md-6">
                             <label class="form-label">Personal Email</label>
-                            <input type="email" class="form-control" wire:model="personal_email">
+                            <input type="email" class="form-control" wire:model="personal_email"
+                                placeholder="Enter personal email address">
                             @error('personal_email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1460,7 +1473,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Tax Reference Number</label>
                             <input type="text" class="form-control" wire:model="tax_reference_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Enter tax reference no.">
                             @error('tax_reference_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1474,7 +1488,8 @@
                                 <!-- Button -->
                                 <button class="btn btn-sm w-100 text-start" type="button"
                                     id="immigrationDropdownButton" style="border:1px solid #ccc; background:#fff;">
-                                    {{ $immigration_status ?? 'Select Immigration Status / Visa Type' }}
+
+                                    {{ !empty($immigration_status) ? $immigration_status : 'Select Immigration Status / Visa Type' }}
                                 </button>
 
                                 <!-- Dropdown -->
@@ -1503,7 +1518,7 @@
                         <div class="col-md-6">
                             <label class="form-label">BRP Number</label>
                             <input type="text" class="form-control" wire:model="brp_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter BRP no.">
                             @error('brp_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -1531,7 +1546,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Passport Number</label>
                             <input type="text" class="form-control" wire:model="passport_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                placeholder="Enter passport no.">
                             @error('passport_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

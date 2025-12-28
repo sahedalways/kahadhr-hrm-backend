@@ -106,7 +106,7 @@ class Company extends Model
                 'logo'              =>  $superAdminSetting->logo ?? null,
                 'favicon'           =>  $superAdminSetting->favicon ?? null,
                 'site_phone_number' => $company->company_mobile ?? null,
-                'site_email'        => $company->company_email ?? null,
+                'site_email'        => $superAdminSetting->site_email ?? null,
                 'copyright_text'    => $copyrightText,
             ]);
 

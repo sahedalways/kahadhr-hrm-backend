@@ -80,6 +80,12 @@ class SiteSetting extends Model
                 self::whereNotNull('company_id')
                     ->update(['favicon' => $setting->favicon]);
             }
+
+
+            if (is_null($setting->company_id) && $setting->site_email) {
+                self::whereNotNull('company_id')
+                    ->update(['site_email' => $setting->site_email]);
+            }
         });
 
 
@@ -87,6 +93,12 @@ class SiteSetting extends Model
             if (is_null($setting->company_id) && $setting->wasChanged('favicon')) {
                 self::whereNotNull('company_id')
                     ->update(['favicon' => $setting->favicon]);
+            }
+
+
+            if (is_null($setting->company_id) && $setting->wasChanged('site_email')) {
+                self::whereNotNull('company_id')
+                    ->update(['site_email' => $setting->site_email]);
             }
 
 

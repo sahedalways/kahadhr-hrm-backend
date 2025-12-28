@@ -54,7 +54,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
     'base_domain' => env('APP_DOMAIN', 'localhost'),
 

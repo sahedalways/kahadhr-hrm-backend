@@ -152,12 +152,14 @@
                                     </div>
                                     <div style="display:flex; align-items:flex-end;">
                                         <div class="dropdown" wire:ignore>
-                                            <button style="padding: 4px 8px;" class="btn btn-sm btn-light border-0" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button
+                                                class="btn btn-sm btn-light border-0 d-flex align-items-center justify-content-center dropdown-toggle"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                style="width: 28px; height: 28px; padding: 0;">
                                                 <i class="fa-solid fa-ellipsis text-muted"></i>
                                             </button>
 
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm hide-arrow">
                                                 <li>
                                                     <button type="button"
                                                         class="dropdown-item text-danger d-flex align-items-center"
@@ -165,7 +167,6 @@
                                                         wire:loading.attr="disabled"
                                                         wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
 
-                                                        <!-- Spinner while deleting -->
                                                         <span wire:loading
                                                             wire:target="deleteConversation('teamGroup_{{ $group->id }}')"
                                                             class="spinner-border spinner-border-sm me-2"></span>
@@ -175,16 +176,15 @@
                                                             <i class="bi bi-trash me-1"></i> Delete Conversation
                                                         </span>
 
-                                                        <!-- Optional: text change during loading -->
                                                         <span wire:loading
                                                             wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
                                                             Deleting...
                                                         </span>
-
                                                     </button>
                                                 </li>
                                             </ul>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -2124,7 +2124,14 @@
         </div>
 
 
-
+        <style>
+            .dropdown-toggle::after {
+                display: none;
+            }
+            .hide-arrow::before{
+                display: none;
+            }
+        </style>
     </div>
 </div>
 

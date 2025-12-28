@@ -20593,7 +20593,7 @@ fieldset:disabled .btn {
     }
 
     .dropdown:not(.dropdown-hover) .dropdown-menu {
-        margin-top: 45px !important
+        margin-top: 35px !important
     }
 
     .dropdown .dropdown-menu:before {
@@ -20690,7 +20690,7 @@ fieldset:disabled .btn {
     }
 
     .dropdown:not(.dropdown-hover) .dropdown-menu {
-        margin-top: 45px !important
+        margin-top: 35px !important
     }
 
     .dropdown .dropdown-menu.show {

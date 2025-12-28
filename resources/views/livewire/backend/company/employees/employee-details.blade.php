@@ -908,14 +908,16 @@
                     <div class="modal-body">
 
                         @if (!$passwordVerified)
-                            <div class="mb-3 position-relative" wire:ignore>
+                            <div class="mb-3" wire:ignore>
                                 <label>Enter Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control extra-padding shadow-sm" id="password"
-                                    wire:model.defer="passwordInput">
-                                <span class="icon-position " style="cursor:pointer;"
-                                    onclick="togglePassword('password', this)">
-                                    <i class="fas fa-eye"></i>
-                                </span>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control extra-padding shadow-sm"
+                                        id="password" wire:model.defer="passwordInput">
+                                    <span class="icon-position " style="cursor:pointer;"
+                                        onclick="togglePassword('password', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                </div>
 
 
                             </div>

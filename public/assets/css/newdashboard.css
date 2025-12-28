@@ -346,7 +346,7 @@ body {
 }
 
 #sidenav-collapse-main>ul>li:nth-child(7) i {
-    color: #2dce89;
+    color: #782dce;
     /* Settings */
 }
 
@@ -386,6 +386,21 @@ body {
 
 #sidenav-collapse-main ul ul li:nth-child(4) i {
     color: #fb6340;
+}
+#sidenav-collapse-main ul ul li:nth-child(5) i {
+    color: #11cdef; /* cyan */
+}
+
+#sidenav-collapse-main ul ul li:nth-child(6) i {
+    color: #8965e0; /* purple */
+}
+
+#sidenav-collapse-main ul ul li:nth-child(7) i {
+    color: #ffd600; /* yellow */
+}
+
+#sidenav-collapse-main ul ul li:nth-child(8) i {
+    color: #8898aa; /* gray-blue */
 }
 
 

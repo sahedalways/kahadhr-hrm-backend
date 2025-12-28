@@ -733,42 +733,48 @@
                                 <!-- Emoji -->
                                 <button id="show_emoji_box" class="btn btn-light rounded-circle icon-30">😊</button>
 
-                                <div class="position-relative" x-data
-                                    @click.outside="$wire.set('showMentionBox', false)">
 
-                                    <button type="button" class="btn btn-light rounded-circle icon-30"
-                                        wire:click="toggleMentionBox">
-                                        @
-                                    </button>
+                                @if (!is_numeric($this->receiverId))
+                                    <div class="position-relative" x-data
+                                        @click.outside="$wire.set('showMentionBox', false)">
 
-                                    @if ($showMentionBox)
-                                        <div id="mentionBox"
-                                            class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
-                                            style="bottom:40px; left:0; width:200px; z-index:2000;">
+                                        <button type="button" class="btn btn-light rounded-circle icon-30"
+                                            wire:click="toggleMentionBox">
+                                            @
+                                        </button>
 
-                                            <input type="text" class="form-control mb-1" placeholder="Search..."
-                                                wire:model.live="mentionSearch">
+                                        @if ($showMentionBox)
+                                            <div id="mentionBox"
+                                                class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
+                                                style="bottom:40px; left:0; width:200px; z-index:2000;">
 
-                                            @forelse ($mentionUsers as $user)
-                                                @php
-                                                    $displayName =
-                                                        $user->user_type === 'company'
-                                                            ? 'Company Admin'
-                                                            : trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                                    $displayName = $displayName ?: $user->email;
-                                                @endphp
+                                                <input type="text" class="form-control mb-1"
+                                                    placeholder="Search..." wire:model.live="mentionSearch">
 
-                                                <div class="p-2 hover-bg-light cursor-pointer"
-                                                    wire:click="selectMention({{ $user->id }})">
-                                                    {{ $displayName }}
-                                                </div>
-                                            @empty
-                                                <div class="text-muted p-2">No users found</div>
-                                            @endforelse
+                                                @forelse ($mentionUsers as $user)
+                                                    @php
+                                                        $displayName =
+                                                            $user->user_type === 'company'
+                                                                ? 'Company Admin'
+                                                                : trim(
+                                                                    ($user->f_name ?? '') . ' ' . ($user->l_name ?? ''),
+                                                                );
+                                                        $displayName = $displayName ?: $user->email;
+                                                    @endphp
 
-                                        </div>
-                                    @endif
-                                </div>
+                                                    <div class="p-2 hover-bg-light cursor-pointer"
+                                                        wire:click="selectMention({{ $user->id }})">
+                                                        {{ $displayName }}
+                                                    </div>
+                                                @empty
+                                                    <div class="text-muted p-2">No users found</div>
+                                                @endforelse
+
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+
 
 
 
@@ -1869,44 +1875,48 @@
                                 <button id="show_emoji_box" class="btn btn-light rounded-circle icon-30">😊</button>
 
 
+                                @if (!is_numeric($this->receiverId))
+                                    <div class="position-relative" x-data
+                                        @click.outside="$wire.set('showMentionBox', false)">
+
+                                        <button type="button" class="btn btn-light rounded-circle icon-30"
+                                            wire:click="toggleMentionBox">
+                                            @
+                                        </button>
+
+                                        @if ($showMentionBox)
+                                            <div id="mentionBox"
+                                                class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
+                                                style="bottom:45px; left:0; width:200px; z-index:2000;">
+
+                                                <input type="text" class="form-control mb-1"
+                                                    placeholder="Search..." wire:model.live="mentionSearch">
+
+                                                @forelse ($mentionUsers as $user)
+                                                    @php
+                                                        $displayName =
+                                                            $user->user_type === 'company'
+                                                                ? 'Company Admin'
+                                                                : trim(
+                                                                    ($user->f_name ?? '') . ' ' . ($user->l_name ?? ''),
+                                                                );
+                                                        $displayName = $displayName ?: $user->email;
+                                                    @endphp
+
+                                                    <div class="p-2 hover-bg-light cursor-pointer"
+                                                        wire:click="selectMention({{ $user->id }})">
+                                                        {{ $displayName }}
+                                                    </div>
+                                                @empty
+                                                    <div class="text-muted p-2">No users found</div>
+                                                @endforelse
+
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
 
 
-                                <div class="position-relative" x-data
-                                    @click.outside="$wire.set('showMentionBox', false)">
-
-                                    <button type="button" class="btn btn-light rounded-circle icon-30"
-                                        wire:click="toggleMentionBox">
-                                        @
-                                    </button>
-
-                                    @if ($showMentionBox)
-                                        <div id="mentionBox"
-                                            class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
-                                            style="bottom:45px; left:0; width:200px; z-index:2000;">
-
-                                            <input type="text" class="form-control mb-1" placeholder="Search..."
-                                                wire:model.live="mentionSearch">
-
-                                            @forelse ($mentionUsers as $user)
-                                                @php
-                                                    $displayName =
-                                                        $user->user_type === 'company'
-                                                            ? 'Company Admin'
-                                                            : trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                                    $displayName = $displayName ?: $user->email;
-                                                @endphp
-
-                                                <div class="p-2 hover-bg-light cursor-pointer"
-                                                    wire:click="selectMention({{ $user->id }})">
-                                                    {{ $displayName }}
-                                                </div>
-                                            @empty
-                                                <div class="text-muted p-2">No users found</div>
-                                            @endforelse
-
-                                        </div>
-                                    @endif
-                                </div>
 
 
                             </div>

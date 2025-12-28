@@ -94,7 +94,7 @@
 
                                         <div class="text-muted small">
 
-                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, h:i A') : '' }}
                                         </div>
 
                                         @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
@@ -142,7 +142,7 @@
                                                 {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
-                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
                                             </div>
                                             @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                                 <span
@@ -240,7 +240,7 @@
                                         @endif
 
                                         <div class="text-muted small">
-                                            {{ isset($lastMessageTimes[$itemKey]) ? $lastMessageTimes[$itemKey]->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes[$itemKey]) ? $lastMessageTimes[$itemKey]->format('d M, h:i A') : '' }}
                                         </div>
                                     </div>
                                 </div>
@@ -289,7 +289,7 @@
 
                                         <div class="text-muted small">
 
-                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, h:i A') : '' }}
                                         </div>
 
                                         @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
@@ -337,7 +337,7 @@
                                                 {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
-                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
                                             </div>
                                             @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                                 <span
@@ -650,7 +650,7 @@
                                 <small class="text-muted mt-1" style="font-size: 0.7rem;">
                                     {{ $msg->sender->user_type === 'company' ? 'Company Admin' : trim($msg->sender->f_name . ' ' . $msg->sender->l_name) }}
                                     .
-                                    {{ $msg->created_at->format('H:i') }}
+                                    {{ $msg->created_at->format('h:i A') }}
                                 </small>
 
                             </div>
@@ -1291,7 +1291,7 @@
 
                                         <div class="text-muted small">
 
-                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, h:i A') : '' }}
                                         </div>
 
                                         @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
@@ -1339,7 +1339,7 @@
                                                 {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
-                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
                                             </div>
                                             @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                                 <span
@@ -1406,7 +1406,7 @@
                                         @endif
 
                                         <div class="text-muted small">
-                                            {{ isset($lastMessageTimes[$itemKey]) ? $lastMessageTimes[$itemKey]->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes[$itemKey]) ? $lastMessageTimes[$itemKey]->format('d M, h:i A') : '' }}
                                         </div>
                                     </div>
                                 </div>
@@ -1455,7 +1455,7 @@
 
                                         <div class="text-muted small">
 
-                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, H:i') : '' }}
+                                            {{ isset($lastMessageTimes['group']) ? $lastMessageTimes['group']->format('d M, h:i A') : '' }}
                                         </div>
 
                                         @if (isset($lastMessages['group']) && $lastMessages['group'] && ($unreadCounts['group'] ?? 0) > 0)
@@ -1502,7 +1502,7 @@
                                                 {{ isset($lastMessages['teamGroup_' . $group->id]) ? Str::limit($lastMessages['teamGroup_' . $group->id], 50) : 'Start a conversation' }}
                                             </small>
                                             <div class="text-muted small">
-                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, H:i') : '' }}
+                                                {{ isset($lastMessageTimes['teamGroup_' . $group->id]) ? $lastMessageTimes['teamGroup_' . $group->id]->format('d M, h:i A') : '' }}
                                             </div>
                                             @if (isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0)
                                                 <span

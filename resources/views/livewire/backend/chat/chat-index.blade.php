@@ -148,20 +148,50 @@
                                                 <span
                                                     class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
                                             @endif
-                                        </div>                                      
+                                        </div>
                                     </div>
-                                    
+
                                 </div>
 
-                                <!-- Dropdown context menu -->
-                                <div x-show="showMenu" x-cloak
-                                    class="position-absolute bg-white border rounded shadow-sm"
-                                    style="top: 0.5rem; right: 2rem; z-index:1000; min-width: 140px;">
-                                    <button type="button" class="dropdown-item text-danger"
-                                        wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')">
-                                        <i class="bi bi-trash me-1"></i> Delete Conversation
-                                    </button>
+
+
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div class="dropdown" wire:ignore>
+                                        <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v text-muted"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <li>
+                                                <button type="button"
+                                                    class="dropdown-item text-danger d-flex align-items-center"
+                                                    wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+
+                                                    <!-- Spinner while deleting -->
+                                                    <span wire:loading
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                        class="spinner-border spinner-border-sm me-2"></span>
+
+                                                    <span wire:loading.remove
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                        <i class="bi bi-trash me-1"></i> Delete Conversation
+                                                    </span>
+
+                                                    <!-- Optional: text change during loading -->
+                                                    <span wire:loading
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                        Deleting...
+                                                    </span>
+
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+
 
                             </div>
                         @endforeach
@@ -293,7 +323,7 @@
          ">
 
                                 <div class="d-flex align-items-center justify-content-between">
-                                    
+
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle p-2 me-3 flex-wrap"
                                             style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
@@ -317,15 +347,43 @@
                                     </div>
                                 </div>
 
-                                <!-- Dropdown context menu -->
-                                <div x-show="showMenu" x-cloak
-                                    class="position-absolute bg-white border rounded shadow-sm"
-                                    style="top: 0.5rem; right: 2rem; z-index:1000; min-width: 140px;">
-                                    <button type="button" class="dropdown-item text-danger"
-                                        wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')">
-                                        <i class="bi bi-trash me-1"></i> Delete Conversation
-                                    </button>
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div class="dropdown" wire:ignore>
+                                        <button class="btn btn-sm btn-light border-0 px-md-3 px-2" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v text-muted"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <li>
+                                                <button type="button"
+                                                    class="dropdown-item text-danger d-flex align-items-center"
+                                                    wire:click.stop="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+
+                                                    <!-- Spinner while deleting -->
+                                                    <span wire:loading
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')"
+                                                        class="spinner-border spinner-border-sm me-2"></span>
+
+                                                    <span wire:loading.remove
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                        <i class="bi bi-trash me-1"></i> Delete Conversation
+                                                    </span>
+
+                                                    <!-- Optional: text change during loading -->
+                                                    <span wire:loading
+                                                        wire:target="deleteConversation('teamGroup_{{ $group->id }}')">
+                                                        Deleting...
+                                                    </span>
+
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+
 
                             </div>
                         @endforeach
@@ -461,10 +519,7 @@
                         </div>
                     </div>
 
-                    {{-- <div>
-                    <i class="fa-solid fa-magnifying-glass text-muted me-3" style="cursor: pointer;"></i>
-                    <i class="fa-solid fa-ellipsis-vertical text-muted" style="cursor: pointer;"></i>
-                </div> --}}
+
 
                 </div>
 
@@ -604,9 +659,6 @@
                 </div>
 
 
-                {{-- <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
-                <span id="typingUser"></span> is typing...
-            </div> --}}
 
                 <div class="text-center my-2 d-none align-items-center px-4" wire:loading.flex
                     wire:target="sendMessage, loadMore">
@@ -645,34 +697,31 @@
                                     <!-- Popup -->
                                     <div id="attachmentPopup"
                                         class="bg-white border rounded shadow-sm p-2 position-absolute"
-                                        style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;">
+                                        style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;"
+                                        wire:ignore>
                                         <div class="d-flex gap-2">
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-image mb-1"></i>
                                                 <small>Image</small>
                                                 <input type="file" wire:model="attachment" accept="image/*"
                                                     hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-video mb-1"></i>
                                                 <small>Video</small>
                                                 <input type="file" wire:model="attachment" accept="video/*"
                                                     hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-file-video mb-1"></i>
                                                 <small>GIF</small>
                                                 <input type="file" wire:model="attachment" accept=".gif" hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
-                                             class="btn btn-light d-flex flex-column align-items-center p-2">
+                                            <label style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-file-alt mb-1"></i>
                                                 <small>File</small>
                                                 <input type="file" wire:model="attachment" accept=".pdf" hidden>
@@ -1291,7 +1340,7 @@
                                                     class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
                                             @endif
                                         </div>
-                                    </div>                                   
+                                    </div>
                                 </div>
 
                                 <!-- Dropdown context menu -->
@@ -1604,10 +1653,6 @@
                         </div>
                     </div>
 
-                    {{-- <div>
-                    <i class="fa-solid fa-magnifying-glass text-muted me-3" style="cursor: pointer;"></i>
-                    <i class="fa-solid fa-ellipsis-vertical text-muted" style="cursor: pointer;"></i>
-                </div> --}}
 
                 </div>
 
@@ -1748,9 +1793,7 @@
                 </div>
 
 
-                {{-- <div id="typingIndicator" class="text-red mb-2" style="font-size:0.8rem; display:none;">
-                <span id="typingUser"></span> is typing...
-            </div> --}}
+
 
                 <div class="text-center my-2 d-none align-items-center px-4" wire:loading.flex
                     wire:target="sendMessage, loadMore">
@@ -1787,37 +1830,33 @@
                                     </button>
 
                                     <!-- Popup -->
-<!-- Popup -->
                                     <div id="attachmentPopup"
                                         class="bg-white border rounded shadow-sm p-2 position-absolute"
-                                        style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;">
+                                        style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;"
+                                        wire:ignore>
                                         <div class="d-flex gap-2">
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-image mb-1"></i>
                                                 <small>Image</small>
                                                 <input type="file" wire:model="attachment" accept="image/*"
                                                     hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-video mb-1"></i>
                                                 <small>Video</small>
                                                 <input type="file" wire:model="attachment" accept="video/*"
                                                     hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
+                                            <label style="min-width: 50px;"
                                                 class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-file-video mb-1"></i>
                                                 <small>GIF</small>
                                                 <input type="file" wire:model="attachment" accept=".gif" hidden>
                                             </label>
-                                            <label
-                                            style="min-width: 50px;"
-                                             class="btn btn-light d-flex flex-column align-items-center p-2">
+                                            <label style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
                                                 <i class="fas fa-file-alt mb-1"></i>
                                                 <small>File</small>
                                                 <input type="file" wire:model="attachment" accept=".pdf" hidden>

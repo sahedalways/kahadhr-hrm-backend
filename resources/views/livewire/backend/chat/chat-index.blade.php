@@ -148,8 +148,9 @@
                                                 <span
                                                     class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
                                             @endif
-                                        </div>
+                                        </div>                                      
                                     </div>
+                                    
                                 </div>
 
                                 <!-- Dropdown context menu -->
@@ -292,6 +293,7 @@
          ">
 
                                 <div class="d-flex align-items-center justify-content-between">
+                                    
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle p-2 me-3 flex-wrap"
                                             style="width: 40px; height: 40px; display:flex; justify-content:center; align-items:center;">
@@ -644,29 +646,34 @@
                                     <div id="attachmentPopup"
                                         class="bg-white border rounded shadow-sm p-2 position-absolute"
                                         style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;">
-                                        <div class="d-flex">
+                                        <div class="d-flex gap-2">
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-image fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-image mb-1"></i>
                                                 <small>Image</small>
                                                 <input type="file" wire:model="attachment" accept="image/*"
                                                     hidden>
                                             </label>
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-video fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-video mb-1"></i>
                                                 <small>Video</small>
                                                 <input type="file" wire:model="attachment" accept="video/*"
                                                     hidden>
                                             </label>
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-file-video fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-file-video mb-1"></i>
                                                 <small>GIF</small>
                                                 <input type="file" wire:model="attachment" accept=".gif" hidden>
                                             </label>
-                                            <label class="btn btn-light d-flex flex-column align-items-center p-2">
-                                                <i class="fas fa-file-alt fa-lg mb-1"></i>
+                                            <label
+                                            style="min-width: 50px;"
+                                             class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-file-alt mb-1"></i>
                                                 <small>File</small>
                                                 <input type="file" wire:model="attachment" accept=".pdf" hidden>
                                             </label>
@@ -688,7 +695,7 @@
                                     @if ($showMentionBox)
                                         <div id="mentionBox"
                                             class="position-absolute bg-white border rounded shadow-sm p-2 dropdown-scroll"
-                                            style="bottom:45px; left:0; width:200px; z-index:2000;">
+                                            style="bottom:40px; left:0; width:200px; z-index:2000;">
 
                                             <input type="text" class="form-control mb-1" placeholder="Search..."
                                                 wire:model.live="mentionSearch">
@@ -1284,7 +1291,7 @@
                                                     class="badge bg-danger">{{ $unreadCounts['teamGroup_' . $group->id] }}</span>
                                             @endif
                                         </div>
-                                    </div>
+                                    </div>                                   
                                 </div>
 
                                 <!-- Dropdown context menu -->
@@ -1780,32 +1787,38 @@
                                     </button>
 
                                     <!-- Popup -->
+<!-- Popup -->
                                     <div id="attachmentPopup"
                                         class="bg-white border rounded shadow-sm p-2 position-absolute"
                                         style="display: {{ $showAttachmentPopup ? 'block' : 'none' }}; bottom:40px; left:0; z-index:2000;">
-                                        <div class="d-flex">
+                                        <div class="d-flex gap-2">
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-image fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-image mb-1"></i>
                                                 <small>Image</small>
                                                 <input type="file" wire:model="attachment" accept="image/*"
                                                     hidden>
                                             </label>
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-video fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-video mb-1"></i>
                                                 <small>Video</small>
                                                 <input type="file" wire:model="attachment" accept="video/*"
                                                     hidden>
                                             </label>
                                             <label
-                                                class="btn btn-light d-flex flex-column align-items-center p-2 me-2">
-                                                <i class="fas fa-file-video fa-lg mb-1"></i>
+                                            style="min-width: 50px;"
+                                                class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-file-video mb-1"></i>
                                                 <small>GIF</small>
                                                 <input type="file" wire:model="attachment" accept=".gif" hidden>
                                             </label>
-                                            <label class="btn btn-light d-flex flex-column align-items-center p-2">
-                                                <i class="fas fa-file-alt fa-lg mb-1"></i>
+                                            <label
+                                            style="min-width: 50px;"
+                                             class="btn btn-light d-flex flex-column align-items-center p-2">
+                                                <i class="fas fa-file-alt mb-1"></i>
                                                 <small>File</small>
                                                 <input type="file" wire:model="attachment" accept=".pdf" hidden>
                                             </label>

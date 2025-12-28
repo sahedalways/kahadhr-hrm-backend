@@ -15,7 +15,7 @@
 
                 {{-- Add new --}}
                 <div style="min-height: 77px" class="p-3 d-flex justify-content-between align-items-center border-bottom">
-                    <div class="dropdown">
+                    <div class="dropdown" wire:ignore>
                         <button class="mb-0 btn btn-primary gap-1 d-flex align-items-center dropdown-toggle"
                             type="button" id="addNewDropdown" data-bs-toggle="dropdown"
                             style="border-radius: 20px; font-weight: 600;">
@@ -1205,7 +1205,7 @@
                     <button class="btn btn-outline-danger d-md-none" id="sidebarClose">
                         <i class="fa-solid fa-xmark text-danger"></i>
                     </button>
-                    <div class="dropdown">
+                    <div class="dropdown" wire:ignore>
                         <button class="mb-0 btn btn-primary gap-1 d-flex align-items-center dropdown-toggle"
                             type="button" id="addNewDropdown" data-bs-toggle="dropdown"
                             style="border-radius: 20px; font-weight: 600;">

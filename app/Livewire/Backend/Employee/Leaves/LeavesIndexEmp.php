@@ -122,6 +122,7 @@ class LeavesIndexEmp extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->employee->company_id,
             'user_id' => null,
+            'notifiable_id' => $leave->id,
             'type' => 'submitted_leave_request',
 
             'data' => [

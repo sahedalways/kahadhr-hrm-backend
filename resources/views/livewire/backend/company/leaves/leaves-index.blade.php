@@ -187,8 +187,6 @@
                                     <div class="leave-list-container"
                                          style="max-height: 350px; overflow-y: auto;">
                                         <li class="list-group-item d-flex align-items-center justify-content-between px-0 leave-request-item"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewRequestInfo"
                                             wire:click="viewRequestInfo({{ $leave->id }})">
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $leave->user->employee->avatar_url }}"
@@ -687,51 +685,61 @@
                     </button>
 
                     <div>
-                        <div>
+                        @if ($requestDetails)
 
-                            <button type="button"
-                                    class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
-                                    wire:click="rejectRequest({{ $requestDetails->id ?? 0 }})"
-                                    wire:loading.attr="disabled"
-                                    wire:target="rejectRequest">
+                            @if ($requestDetails->status === 'pending')
+                                <div>
+                                    <button type="button"
+                                            class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
+                                            wire:click="rejectRequest({{ $requestDetails->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="rejectRequest">
 
-                                <span wire:loading.remove
-                                      wire:target="rejectRequest">
-                                    <i class="fas fa-times-circle me-1"></i> Reject
+                                        <span wire:loading.remove
+                                              wire:target="rejectRequest">
+                                            <i class="fas fa-times-circle me-1"></i> Reject
+                                        </span>
+
+                                        <span wire:loading.delay
+                                              wire:target="rejectRequest">
+                                            <span class="spinner-border spinner-border-sm me-1"></span>
+                                            Rejecting...
+                                        </span>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-primary rounded-pill px-4 shadow-sm"
+                                            wire:click="approveRequest({{ $requestDetails->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="approveRequest">
+
+                                        <span wire:loading.remove
+                                              wire:target="approveRequest">
+                                            <i class="fas fa-check-circle me-1"></i> Approve
+                                        </span>
+
+                                        <span wire:loading.delay
+                                              wire:target="approveRequest">
+                                            <span class="spinner-border spinner-border-sm me-1"></span>
+                                            Approving...
+                                        </span>
+                                    </button>
+                                </div>
+                            @else
+                                <span
+                                      class="badge
+                @if ($requestDetails->status === 'approved') bg-success
+                @elseif ($requestDetails->status === 'rejected') bg-danger
+                @elseif ($requestDetails->status === 'cancelled') bg-secondary
+                @else bg-info @endif
+                px-3 py-2 fs-6">
+                                    {{ ucfirst($requestDetails->status) }}
                                 </span>
+                            @endif
 
-                                <span wire:loading.delay
-                                      wire:target="rejectRequest">
-                                    <span class="spinner-border spinner-border-sm me-1"></span>
-                                    Rejecting...
-                                </span>
-                            </button>
-
-
-
-
-                            <button type="button"
-                                    class="btn btn-primary rounded-pill px-4 shadow-sm me-2"
-                                    wire:click="approveRequest({{ $requestDetails->id ?? 0 }})"
-                                    wire:loading.attr="disabled"
-                                    wire:target="approveRequest">
-
-                                <span wire:loading.remove
-                                      wire:target="approveRequest">
-                                    <i class="fas fa-check-circle me-1"></i> Approve
-                                </span>
-
-                                <span wire:loading.delay
-                                      wire:target="approveRequest">
-                                    <span class="spinner-border spinner-border-sm me-1"></span>
-                                    Approving...
-                                </span>
-                            </button>
-
-
-                        </div>
-
+                        @endif
                     </div>
+
                 </div>
             </div>
         </div>
@@ -929,7 +937,20 @@
 <script>
     document.addEventListener('livewire:init', () => {
         Livewire.on('reload-page', () => {
-            window.location.reload();
+            const url = new URL(window.location.href);
+            url.searchParams.delete('leave');
+
+            window.history.replaceState({}, document.title, url.toString());
         });
+    });
+</script>
+
+<script>
+    window.addEventListener('show-leave-modal-for-status-change', function() {
+        let modalEl = document.getElementById('viewRequestInfo');
+        if (!modalEl) return;
+
+        let modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
     });
 </script>

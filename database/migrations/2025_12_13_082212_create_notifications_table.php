@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('notifiable_id')->nullable();
             $table->string('type');
             $table->text('data');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
+
+            $table->index(['notifiable_id', 'type']);
         });
     }
 

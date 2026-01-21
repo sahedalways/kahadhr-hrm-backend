@@ -1,3 +1,8 @@
+@php
+    $selectedLeaveId = request('leave');
+@endphp
+
+
 <div>
     <div class="row mb-3 align-items-center justify-content-between">
         <div class="col-auto">
@@ -5,15 +10,18 @@
         </div>
 
         <div class="col-auto d-flex gap-2">
-            <button wire:click="exportLeaveEmp('pdf')" class="btn btn-sm btn-white text-primary">
+            <button wire:click="exportLeaveEmp('pdf')"
+                    class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
 
-            <button wire:click="exportLeaveEmp('excel')" class="btn btn-sm btn-white text-success">
+            <button wire:click="exportLeaveEmp('excel')"
+                    class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
 
-            <button wire:click="exportLeaveEmp('csv')" class="btn btn-sm btn-white text-info">
+            <button wire:click="exportLeaveEmp('csv')"
+                    class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
         </div>
@@ -21,8 +29,10 @@
 
 
         <div class="col-auto">
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLeave"
-                wire:click="resetInputFields">
+            <button class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addLeave"
+                    wire:click="resetInputFields">
                 <i class="fa fa-plus me-1"></i> New Leave Request
             </button>
 
@@ -40,13 +50,17 @@
 
                 <!-- Search -->
                 <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Search by leave type" wire:model="search"
-                        wire:keyup="set('search', $event.target.value)" />
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search by leave type"
+                           wire:model="search"
+                           wire:keyup="set('search', $event.target.value)" />
                 </div>
 
                 <!-- Sort -->
                 <div class="col-md-3">
-                    <select class="form-select form-select-lg" wire:change="handleSort($event.target.value)">
+                    <select class="form-select form-select-lg"
+                            wire:change="handleSort($event.target.value)">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>
                     </select>
@@ -108,16 +122,14 @@
                     </thead>
                     <tbody>
                         @forelse($leaveRequests as $i => $leave)
-                            <tr>
+                            <tr class="{{ $selectedLeaveId == $leave->id ? 'table-primary' : '' }}">
                                 <td>{{ $i + 1 }}</td>
                                 <td>
                                     {!! ($leave->leaveType->emoji ?? '') . ' ' . ($leave->leaveType->name ?? 'N/A') !!}
                                 </td>
-
                                 <td>{{ $leave->start_date ? date('d M, Y', strtotime($leave->start_date)) : 'N/A' }}
                                 </td>
                                 <td>{{ $leave->end_date ? date('d M, Y', strtotime($leave->end_date)) : 'N/A' }}</td>
-
                                 <td>{{ $leave->total_hours }}</td>
                                 <td>
                                     @if ($leave->paid_status === 'paid')
@@ -128,8 +140,6 @@
                                         <span class="badge bg-light text-muted">N/A</span>
                                     @endif
                                 </td>
-
-
                                 <td>
                                     @if ($leave->paid_hours > 0)
                                         <span class="badge bg-info text-dark">{{ $leave->paid_hours }} hrs</span>
@@ -137,8 +147,6 @@
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-
-
                                 <td>
                                     @if ($leave->status == 'pending')
                                         <span class="badge bg-warning">Pending</span>
@@ -150,20 +158,22 @@
                                         <span class="badge bg-danger">Rejected</span>
                                     @endif
                                 </td>
-
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="text-center">No leave requests found</td>
+                                <td colspan="12"
+                                    class="text-center">No leave requests found</td>
                             </tr>
                         @endforelse
                     </tbody>
+
                 </table>
             </div>
         </div>
         @if ($hasMore)
             <div class="text-center mt-4">
-                <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <button wire:click="loadMore"
+                        class="btn btn-outline-primary rounded-pill px-4 py-2">
                     Load More
                 </button>
             </div>
@@ -172,20 +182,29 @@
     </div>
 
     <!-- Add Leave Modal -->
-    <div wire:ignore.self class="modal fade" id="addLeave" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="addLeave"
+         data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form wire:submit.prevent="save">
                     <div class="modal-header">
                         <h6 class="modal-title">New Leave Request</h6>
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border:none;">
-                            <i class="fas fa-times" style="color:black;"></i>
+                        <button type="button"
+                                class="btn btn-light"
+                                data-bs-dismiss="modal"
+                                style="border:none;">
+                            <i class="fas fa-times"
+                               style="color:black;"></i>
                         </button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-2">
                             <label>Leave Type <span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model.live="leave_type_id" wire:key="leave_type_id">
+                            <select class="form-select"
+                                    wire:model.live="leave_type_id"
+                                    wire:key="leave_type_id">
                                 <option value="">-- Select --</option>
                                 @foreach ($leaveTypes as $type)
                                     <option value="{{ $type->id }}">
@@ -202,8 +221,10 @@
                         @if ($leave_type_id && optional($leaveTypes->firstWhere('id', $leave_type_id))->name === 'Others')
                             <div class="mb-2">
                                 <label>Specify Other Leave Type <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="other_leave_reason"
-                                    placeholder="Enter reason">
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model="other_leave_reason"
+                                       placeholder="Enter reason">
                                 @error('other_leave_reason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -213,8 +234,10 @@
 
                         <div class="mb-2">
                             <label>Start Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" wire:model="start_date"
-                                min="{{ now()->toDateString() }}">
+                            <input type="date"
+                                   class="form-control"
+                                   wire:model="start_date"
+                                   min="{{ now()->toDateString() }}">
                             @error('start_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -222,8 +245,10 @@
 
                         <div class="mb-2">
                             <label>End Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" wire:model="end_date"
-                                min="{{ now()->toDateString() }}">
+                            <input type="date"
+                                   class="form-control"
+                                   wire:model="end_date"
+                                   min="{{ now()->toDateString() }}">
                             @error('end_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -238,13 +263,19 @@
 
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="save">
-                            <span wire:loading wire:target="save">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="save">
+                            <span wire:loading
+                                  wire:target="save">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Submitting ...
                             </span>
-                            <span wire:loading.remove wire:target="save">Submit Request</span>
+                            <span wire:loading.remove
+                                  wire:target="save">Submit Request</span>
                         </button>
                     </div>
 

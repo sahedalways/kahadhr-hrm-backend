@@ -1,3 +1,7 @@
+@php
+    $authUser = app('authUser');
+@endphp
+
 <div>
     <ul class="list-group list-group-flush"
         style="max-height: 400px; overflow-y: auto; background-color: #ffffff;">
@@ -18,7 +22,24 @@
 
 
             <a
-               href="{{ $notification['type'] === 'submitted_leave_request' ? route('company.dashboard.leaves.index', ['company' => app('authUser')->company->sub_domain]) : '#' }}">
+               href="
+@if ($authUser->user_type === 'company') {{ route('company.dashboard.leaves.index', [
+    'company' => $authUser->company->sub_domain,
+    'leave' => $notification['notifiable_id'] ?? null,
+]) }}
+
+@elseif (
+    $authUser->user_type === 'employee' &&
+        in_array($notification['type'], ['leave_request_approved', 'leave_request_rejected', 'manual_leave_approved']))
+
+    {{ route('employee.dashboard.leaves.index', [
+        'company' => $authUser->employee->company->sub_domain,
+        'leave' => $notification['notifiable_id'] ?? null,
+    ]) }}
+
+@else
+    # @endif
+">
                 <li class="{{ $itemClasses }}"
                     style="{{ $itemStyle }} {{ $commonStyle }}"
                     data-bs-toggle="{{ !$isRead ? 'tooltip' : '' }}"

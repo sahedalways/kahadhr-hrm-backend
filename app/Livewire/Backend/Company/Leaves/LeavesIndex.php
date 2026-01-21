@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 class LeavesIndex extends BaseComponent
 {
     public $employees;
+    public $openLeaveId = null;
     public $requestDetails;
     public $calendarLeaveInfo;
     public $leaveRequests;
@@ -49,6 +50,14 @@ class LeavesIndex extends BaseComponent
         if (!$this->company) {
             abort(403, 'Company not found.');
         }
+
+        if (request()->has('leave')) {
+                $this->openLeaveId = request('leave');
+
+
+         $this->viewRequestInfo($this->openLeaveId);
+    }
+
 
         // Get all employees of the company
         $this->employees = Employee::with('leaves')->where('company_id', $this->company->id)
@@ -142,7 +151,7 @@ class LeavesIndex extends BaseComponent
 
     public function viewRequestInfo($id)
     {
-        $this->requestDetails = null;
+     $this->requestDetails = null;
         $this->paidStatus = null;
         $this->paidHours = null;
 
@@ -152,7 +161,11 @@ class LeavesIndex extends BaseComponent
 
         $this->requestDetails = LeaveRequest::with('leaveType', 'user.employee')->find($id);
         $this->setPaidStatusDefault();
+
+        $this->dispatch('show-leave-modal-for-status-change');
     }
+
+
 
 
 
@@ -230,6 +243,7 @@ class LeavesIndex extends BaseComponent
             'company_id' => $companyId,
             'user_id'    => $userId,
             'type'       => 'leave_request_approved',
+            'notifiable_id' => $id,
             'data'       => [
                 'message' => $message
             ],
@@ -244,6 +258,7 @@ class LeavesIndex extends BaseComponent
         $this->dispatch('reload-page');
 
         $this->toast('Request approved successfully!', 'success');
+
     }
 
 
@@ -344,6 +359,7 @@ class LeavesIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
             'user_id'    => $this->selectedEmployee,
+            'notifiable_id' => $request->id,
             'type'       => 'manual_leave_approved',
             'data'       => [
                 'message' => $message
@@ -403,7 +419,8 @@ class LeavesIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
             'user_id'    => $request->user_id,
-            'type'       => 'manual_leave_rejected',
+            'notifiable_id' => $id,
+            'type'       => 'leave_request_rejected',
             'data'       => [
                 'message' => $message
             ],

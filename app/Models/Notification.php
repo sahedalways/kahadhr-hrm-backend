@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use FilterByUserType;
-    protected $fillable = ['company_id', 'user_id', 'type', 'data', 'is_read'];
+    protected $fillable = ['company_id', 'user_id', 'type', 'data', 'is_read', 'notifiable_id'];
 
     protected $casts = [
         'data' => 'array',

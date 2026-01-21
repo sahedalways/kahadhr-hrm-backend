@@ -259,6 +259,7 @@ class TrainingIndex extends BaseComponent
             $notification = Notification::create([
                 'company_id' => $this->company_id,
                 'user_id'    => $emp['id'],
+                'notifiable_id' => $training ->id,
                 'type'       => 'assigned_training',
                 'data'       => [
                     'message' => $message

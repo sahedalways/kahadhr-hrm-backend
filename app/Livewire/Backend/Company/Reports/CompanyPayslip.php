@@ -32,7 +32,7 @@ class CompanyPayslip extends BaseComponent
 
     public $employees;
 
-    // Upload fields  
+    // Upload fields
     public $period;
     public $file;
     public $user_id;
@@ -198,7 +198,7 @@ class CompanyPayslip extends BaseComponent
         $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.pdf';
         $path = $this->file->storeAs('company/payslips', $fileName, 'public');
 
-        PaySlip::create([
+       $item = PaySlip::create([
             'company_id' => $this->company_id,
             'user_id' => $this->user_id,
             'period' => $this->month . ' ' . $this->year,
@@ -213,6 +213,7 @@ class CompanyPayslip extends BaseComponent
         $notification = Notification::create([
             'company_id' => $this->company_id,
             'user_id' => $this->user_id,
+            'notifiable_id' => $item->id,
             'type' => 'submitted_payslip',
             'data' => [
                 'message' => $message

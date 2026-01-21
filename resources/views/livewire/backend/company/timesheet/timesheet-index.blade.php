@@ -1,6 +1,8 @@
 @push('styles')
-    <link href="{{ asset('assets/css/timesheet.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/company-schedule.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/timesheet.css') }}"
+          rel="stylesheet">
+    <link href="{{ asset('assets/css/company-schedule.css') }}"
+          rel="stylesheet" />
 @endpush
 @php
     use Carbon\Carbon;
@@ -15,20 +17,30 @@
 
             {{-- CURRENT TIME --}}
             <div class="time-display text-white mb-5">
-                <h1 class="current-time text-white" id="current-time" wire:ignore>10:00:00 AM</h1>
-                <div class="current-date" id="current-date" wire:ignore>Monday, Oct 26, 2024</div>
+                <h1 class="current-time text-white"
+                    id="current-time"
+                    wire:ignore>10:00:00 AM</h1>
+                <div class="current-date"
+                     id="current-date"
+                     wire:ignore>Monday, Oct 26, 2024</div>
             </div>
 
             {{-- ACTION BUTTONS --}}
             <div class="action-card mb-3">
-                <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#manualEntryModal">
+                <a href="#"
+                   class="action-link"
+                   data-bs-toggle="modal"
+                   data-bs-target="#manualEntryModal">
                     <i class="fas fa-user-clock"></i>
                     <span>Submit Manual Entry</span>
                 </a>
             </div>
 
             <div class="action-card">
-                <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#timeSheetModal">
+                <a href="#"
+                   class="action-link"
+                   data-bs-toggle="modal"
+                   data-bs-target="#timeSheetModal">
                     <i class="fas fa-list-alt"></i>
                     <span>View Time Records</span>
                 </a>
@@ -43,23 +55,29 @@
             <div class="filter-section mb-5 text-white">
                 <div class="row g-2">
 
-                    <div class="col position-relative dropdown" wire:ignore>
+                    <div class="col position-relative dropdown"
+                         wire:ignore>
 
                         <!-- Dropdown Button -->
-                        <button
-                            class="btn btn-secondary shadow-none w-100 min-width-fit d-flex align-items-center justify-content-between dropdown-toggle"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-secondary shadow-none w-100 min-width-fit d-flex align-items-center justify-content-between dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
                             Filter by Employees
                         </button>
 
                         <!-- Dropdown Menu -->
-                        <div class="dropdown-menu w-100 p-2" data-bs-auto-close="outside">
+                        <div class="dropdown-menu w-100 p-2"
+                             data-bs-auto-close="outside">
 
                             <!-- All Employees -->
                             <div class="form-check mb-2 border-bottom pb-2">
-                                <input class="form-check-input" type="checkbox" wire:model.live="selectAllUsers"
-                                    id="emp-all">
-                                <label class="form-check-label fw-semibold" for="emp-all">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       wire:model.live="selectAllUsers"
+                                       id="emp-all">
+                                <label class="form-check-label fw-semibold"
+                                       for="emp-all">
                                     All Employees
                                 </label>
                             </div>
@@ -71,9 +89,13 @@
                             <!-- Employees List -->
                             @foreach ($employees as $emp)
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ $emp->user_id }}"
-                                        wire:model.live="filterUsers" id="emp{{ $emp->user_id }}">
-                                    <label class="form-check-label" for="emp{{ $emp->user_id }}">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value="{{ $emp->user_id }}"
+                                           wire:model.live="filterUsers"
+                                           id="emp{{ $emp->user_id }}">
+                                    <label class="form-check-label"
+                                           for="emp{{ $emp->user_id }}">
                                         {{ $emp->full_name }}
                                     </label>
                                 </div>
@@ -90,10 +112,14 @@
 
                 <div class="row g-2 mt-2">
                     <div class="col-md-6">
-                        <input type="date" wire:model.live="dateFrom" class="form-control">
+                        <input type="date"
+                               wire:model.live="dateFrom"
+                               class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <input type="date" wire:model.live="dateTo" class="form-control">
+                        <input type="date"
+                               wire:model.live="dateTo"
+                               class="form-control">
                     </div>
                 </div>
             </div>
@@ -116,7 +142,8 @@
                         <div class="request-item mb-2 border-bottom pb-2 gap-4">
                             {{-- Header (clickable) --}}
                             <div class="request-info d-flex justify-content-between align-items-center"
-                                wire:click="toggleReason({{ $req->id }})" style="cursor: pointer;">
+                                 wire:click="toggleReason({{ $req->id }})"
+                                 style="cursor: pointer;">
                                 <div>
                                     <p class="mb-0 request-name">
                                         {{ $record->user->full_name }}
@@ -138,7 +165,7 @@
 
                                 <div class="toggle-icon">
                                     <i class="fas"
-                                        :class="{ 'fa-chevron-down': {{ $expandedRequest === $req->id ? 'true' : 'false' }}, 'fa-chevron-right': {{ $expandedRequest === $req->id ? 'false' : 'true' }} }"></i>
+                                       :class="{ 'fa-chevron-down': {{ $expandedRequest === $req->id ? 'true' : 'false' }}, 'fa-chevron-right': {{ $expandedRequest === $req->id ? 'false' : 'true' }} }"></i>
                                 </div>
                             </div>
 
@@ -147,25 +174,31 @@
                             {{-- Action Buttons --}}
                             <div class="request-actions mt-2">
                                 <button class="btn btn-sm action-btn approve-btn"
-                                    wire:click="approveRequest({{ $req->id }})"
-                                    onclick="return confirm('Are you sure you want to approve this request?')"
-                                    wire:loading.attr="disabled" wire:target="approveRequest({{ $req->id }})">
-                                    <span wire:loading wire:target="approveRequest({{ $req->id }})">
+                                        wire:click="approveRequest({{ $req->id }})"
+                                        onclick="return confirm('Are you sure you want to approve this request?')"
+                                        wire:loading.attr="disabled"
+                                        wire:target="approveRequest({{ $req->id }})">
+                                    <span wire:loading
+                                          wire:target="approveRequest({{ $req->id }})">
                                         <i class="fas fa-spinner fa-spin"></i>
                                     </span>
-                                    <span wire:loading.remove wire:target="approveRequest({{ $req->id }})">
+                                    <span wire:loading.remove
+                                          wire:target="approveRequest({{ $req->id }})">
                                         <i class="fas fa-check"></i>
                                     </span>
                                 </button>
 
                                 <button class="btn btn-sm action-btn reject-btn"
-                                    wire:click="rejectRequest({{ $req->id }})"
-                                    onclick="return confirm('Are you sure you want to reject this request?')"
-                                    wire:loading.attr="disabled" wire:target="rejectRequest({{ $req->id }})">
-                                    <span wire:loading wire:target="rejectRequest({{ $req->id }})">
+                                        wire:click="rejectRequest({{ $req->id }})"
+                                        onclick="return confirm('Are you sure you want to reject this request?')"
+                                        wire:loading.attr="disabled"
+                                        wire:target="rejectRequest({{ $req->id }})">
+                                    <span wire:loading
+                                          wire:target="rejectRequest({{ $req->id }})">
                                         <i class="fas fa-spinner fa-spin"></i>
                                     </span>
-                                    <span wire:loading.remove wire:target="rejectRequest({{ $req->id }})">
+                                    <span wire:loading.remove
+                                          wire:target="rejectRequest({{ $req->id }})">
                                         <i class="fas fa-times"></i>
                                     </span>
                                 </button>
@@ -174,7 +207,7 @@
 
                         {{-- Reason (FAQ style) --}}
                         <div class="request-reason mt-2 transition-all duration-300 overflow-hidden"
-                            style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
+                             style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
                             <div class="card">
                                 <div class="card-body py-2 px-3">
                                     <small class="d-block fw-bold">Reason: {{ $req->reason }}</small>
@@ -193,15 +226,22 @@
 
     </div>
 
-    <div wire:ignore.self class="modal fade" id="timeSheetModal" tabindex="-1" aria-hidden="true"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+    <div wire:ignore.self
+         class="modal fade"
+         id="timeSheetModal"
+         tabindex="-1"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
 
         <div class="modal-dialog modal-md">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Time Sheet</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -282,12 +322,12 @@
                                                 @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
                                                     @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
                                                         <div class="position-absolute bottom-0 start-50 translate-middle-x mb-1"
-                                                            style="width:80%; cursor:pointer;"
-                                                            wire:click="showAbsentDetails('{{ $dateKey }}')">
+                                                             style="width:80%; cursor:pointer;"
+                                                             wire:click="showAbsentDetails('{{ $dateKey }}')">
 
                                                             {{-- Absent count badge --}}
                                                             <span
-                                                                class="badge bg-danger d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill small shadow-sm w-100 text-center">
+                                                                  class="badge bg-danger d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill small shadow-sm w-100 text-center">
                                                                 <i class="fas fa-user-times"></i>
                                                                 {{ $absentUsers->count() }} Absent
                                                             </span>
@@ -312,9 +352,11 @@
                         {{-- sidebar --}}
                         <div class="mt-n3">
                             <div class="schedule-sidebar p-2 border-end"
-                                style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
-                                <input type="text" class="form-control form-control-sm mb-3"
-                                    placeholder="Search employees..." wire:model.live="employeeSearch">
+                                 style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
+                                <input type="text"
+                                       class="form-control form-control-sm mb-3"
+                                       placeholder="Search employees..."
+                                       wire:model.live="employeeSearch">
 
                                 <h6 class="fw-bold text-muted text-uppercase mb-2">Employees</h6>
 
@@ -328,19 +370,19 @@
                                         @foreach ($employees as $emp)
                                             {{-- single loop --}}
                                             <div class="d-flex align-items-center py-4 px-2 employee-row shadow-sm rounded mb-2"
-                                                title="{{ $emp->full_name }}">
+                                                 title="{{ $emp->full_name }}">
 
                                                 {{-- avatar (optional) --}}
                                                 <div class="position-relative me-3">
                                                     <img src="{{ $emp->avatar_url ?? asset('assets/img/default-avatar.png') }}"
-                                                        alt="{{ $emp->full_name }}"
-                                                        class="rounded-circle employee-avatar">
+                                                         alt="{{ $emp->full_name }}"
+                                                         class="rounded-circle employee-avatar">
                                                 </div>
 
                                                 <div class="d-flex flex-column">
                                                     <span class="fw-semibold">{{ $emp->full_name }}</span>
                                                     <small
-                                                        class="text-muted">{{ ucfirst($emp->role ?? 'Employee') }}</small>
+                                                           class="text-muted">{{ ucfirst($emp->role ?? 'Employee') }}</small>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -405,9 +447,9 @@
                                                         {{-- Absent: Shift exists + past date + no attendance --}}
                                                     @elseif ($hasShift && ($isPastDate || $isToday))
                                                         <div
-                                                            class="absent-badge d-flex justify-content-center align-items-center py-1">
+                                                             class="absent-badge d-flex justify-content-center align-items-center py-1">
                                                             <span
-                                                                class="badge bg-danger d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill shadow-sm">
+                                                                  class="badge bg-danger d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill shadow-sm">
                                                                 <i class="fas fa-user-times"></i>
                                                                 Absent
                                                             </span>
@@ -433,7 +475,10 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="attendanceDetailModal" tabindex="-1">
+    <div wire:ignore.self
+         class="modal fade"
+         id="attendanceDetailModal"
+         tabindex="-1">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content shadow-lg border-0 rounded-4">
 
@@ -451,7 +496,8 @@
                         @endif
                     </div>
 
-                    <button class="btn btn-sm btn-outline-secondary rounded-circle" data-bs-dismiss="modal">
+                    <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -466,7 +512,8 @@
                         {{-- Employee Info --}}
                         <div class="d-flex align-items-center mb-4">
                             <img src="{{ $selectedAttendance->user->employee->avatar_url ?? asset('assets/img/default-avatar.png') }}"
-                                class="rounded-circle me-3" style="width:45px;height:45px;object-fit:cover;">
+                                 class="rounded-circle me-3"
+                                 style="width:45px;height:45px;object-fit:cover;">
 
                             <div>
                                 <div class="fw-semibold">
@@ -497,25 +544,29 @@
                                         <div class="dropdown">
 
                                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                data-bs-toggle="dropdown" wire:loading.attr="disabled"
-                                                wire:target="approveAttendance,rejectAttendance">
+                                                    data-bs-toggle="dropdown"
+                                                    wire:loading.attr="disabled"
+                                                    wire:target="approveAttendance,rejectAttendance">
                                                 Actions
                                             </button>
 
                                             <div class="dropdown-menu dropdown-menu-end shadow-sm p-2"
-                                                style="min-width: 220px;">
+                                                 style="min-width: 220px;">
 
                                                 {{-- Approve --}}
                                                 <button type="button"
-                                                    class="dropdown-item d-flex align-items-center gap-2 text-success rounded"
-                                                    wire:click="approveAttendance({{ $selectedAttendance->id }})"
-                                                    wire:loading.attr="disabled" wire:target="approveAttendance">
+                                                        class="dropdown-item d-flex align-items-center gap-2 text-success rounded"
+                                                        wire:click="approveAttendance({{ $selectedAttendance->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="approveAttendance">
 
-                                                    <span wire:loading.remove wire:target="approveAttendance">
+                                                    <span wire:loading.remove
+                                                          wire:target="approveAttendance">
                                                         <i class="fas fa-check-circle"></i>
                                                     </span>
 
-                                                    <span wire:loading wire:target="approveAttendance">
+                                                    <span wire:loading
+                                                          wire:target="approveAttendance">
                                                         <i class="fas fa-spinner fa-spin"></i>
                                                     </span>
 
@@ -531,15 +582,18 @@
 
                                                 {{-- Reject --}}
                                                 <button type="button"
-                                                    class="dropdown-item d-flex align-items-center gap-2 text-danger rounded"
-                                                    wire:click="rejectAttendance({{ $selectedAttendance->id }})"
-                                                    wire:loading.attr="disabled" wire:target="rejectAttendance">
+                                                        class="dropdown-item d-flex align-items-center gap-2 text-danger rounded"
+                                                        wire:click="rejectAttendance({{ $selectedAttendance->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="rejectAttendance">
 
-                                                    <span wire:loading.remove wire:target="rejectAttendance">
+                                                    <span wire:loading.remove
+                                                          wire:target="rejectAttendance">
                                                         <i class="fas fa-times-circle"></i>
                                                     </span>
 
-                                                    <span wire:loading wire:target="rejectAttendance">
+                                                    <span wire:loading
+                                                          wire:target="rejectAttendance">
                                                         <i class="fas fa-spinner fa-spin"></i>
                                                     </span>
 
@@ -679,14 +733,24 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog"
-        aria-labelledby="manualEntryModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-md" role="document">
+    <div wire:ignore.self
+         class="modal fade"
+         id="manualEntryModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="manualEntryModal"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-md"
+             role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Submit Manual Attendance</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -698,8 +762,11 @@
                             {{-- Employee Dropdown --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Employee <span class="text-danger">*</span></label>
-                                <select class="form-select shadow-sm" wire:model="employeeId" required>
-                                    <option value="" selected>Select Employee</option>
+                                <select class="form-select shadow-sm"
+                                        wire:model="employeeId"
+                                        required>
+                                    <option value=""
+                                            selected>Select Employee</option>
                                     @foreach ($employees as $emp)
                                         <option value="{{ $emp->user_id }}">{{ $emp->full_name }}</option>
                                     @endforeach
@@ -710,10 +777,12 @@
                             </div>
 
                             {{-- Date --}}
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-12 mb-2">
                                 <label class="form-label">Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control shadow-sm" wire:model="manualDate"
-                                    required>
+                                <input type="date"
+                                       class="form-control shadow-sm"
+                                       wire:model="manualDate"
+                                       required>
                                 @error('manualDate')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -722,8 +791,10 @@
                             {{-- Clock In --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Clock In <span class="text-danger">*</span></label>
-                                <input type="time" class="form-control shadow-sm" wire:model="clockInTime"
-                                    required>
+                                <input type="time"
+                                       class="form-control shadow-sm"
+                                       wire:model="clockInTime"
+                                       required>
                                 @error('clockInTime')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -732,7 +803,9 @@
                             {{-- Clock Out --}}
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Clock Out</label>
-                                <input type="time" class="form-control shadow-sm" wire:model="clockOutTime">
+                                <input type="time"
+                                       class="form-control shadow-sm"
+                                       wire:model="clockOutTime">
                                 @error('clockOutTime')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -741,7 +814,9 @@
                             {{-- Reason --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Reason</label>
-                                <textarea class="form-control shadow-sm" wire:model="reason" placeholder="Optional reason"></textarea>
+                                <textarea class="form-control shadow-sm"
+                                          wire:model="reason"
+                                          placeholder="Optional reason"></textarea>
                                 @error('reason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -751,13 +826,19 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="submitManualEntry">
-                            <span wire:loading wire:target="submitManualEntry">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="submitManualEntry">
+                            <span wire:loading
+                                  wire:target="submitManualEntry">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Submitting...
                             </span>
-                            <span wire:loading.remove wire:target="submitManualEntry">Submit</span>
+                            <span wire:loading.remove
+                                  wire:target="submitManualEntry">Submit</span>
                         </button>
                     </div>
                 </form>
@@ -769,12 +850,17 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="absentModal" tabindex="-1">
+    <div wire:ignore.self
+         class="modal fade"
+         id="absentModal"
+         tabindex="-1">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Absent Details - {{ $absentDate }}</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>

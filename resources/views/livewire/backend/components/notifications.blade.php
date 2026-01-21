@@ -21,25 +21,53 @@
             @endphp
 
 
-            <a
-               href="
-@if ($authUser->user_type === 'company') {{ route('company.dashboard.leaves.index', [
-    'company' => $authUser->company->sub_domain,
-    'leave' => $notification['notifiable_id'] ?? null,
-]) }}
+            @php
+                $authUser = app('authUser');
 
-@elseif (
-    $authUser->user_type === 'employee' &&
-        in_array($notification['type'], ['leave_request_approved', 'leave_request_rejected', 'manual_leave_approved']))
+                $route = '';
+                $params = [];
 
-    {{ route('employee.dashboard.leaves.index', [
-        'company' => $authUser->employee->company->sub_domain,
-        'leave' => $notification['notifiable_id'] ?? null,
-    ]) }}
+                // common company param
+                $companySubDomain =
+                    $authUser->user_type === 'company'
+                        ? $authUser->company->sub_domain
+                        : $authUser->employee->company->sub_domain;
 
-@else
-    # @endif
-">
+                if ($authUser->user_type === 'employee') {
+                    if ($notification['type'] === 'manual_attendance_submitted') {
+                        $route = route('employee.dashboard.clock.index', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif (
+                        in_array($notification['type'], [
+                            'leave_request_approved',
+                            'leave_request_rejected',
+                            'manual_leave_approved',
+                        ])
+                    ) {
+                        $route = route('employee.dashboard.leaves.index', [
+                            'company' => $companySubDomain,
+                            'leave' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } else {
+                        // default route if needed
+                        $route = '#';
+                    }
+                } elseif ($authUser->user_type === 'company') {
+                    if ($notification['type'] === 'submitted_leave_request') {
+                        $route = route('company.dashboard.leaves.index', [
+                            'company' => $companySubDomain,
+                            'leave' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } else {
+                        $route = '#';
+                    }
+                }
+            @endphp
+
+
+            <a href="{{ $route }}">
                 <li class="{{ $itemClasses }}"
                     style="{{ $itemStyle }} {{ $commonStyle }}"
                     data-bs-toggle="{{ !$isRead ? 'tooltip' : '' }}"

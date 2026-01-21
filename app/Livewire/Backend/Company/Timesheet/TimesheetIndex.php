@@ -606,6 +606,7 @@ class TimesheetIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
             'user_id'    => $request->user_id,
+            'notifiable_id' => $request->id,
             'type'       => 'attendance_request_approved',
             'data'       => [
                 'message' => $message
@@ -643,6 +644,7 @@ class TimesheetIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
             'user_id'    => $request->user_id,
+            'notifiable_id' => $request->id,
             'type'       => 'attendance_request_rejected',
             'data'       => [
                 'message' => $message
@@ -749,6 +751,7 @@ class TimesheetIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->company->id,
             'user_id'    => $this->employeeId,
+            'notifiable_id' => $attendance->id,
             'type'       => 'manual_attendance_submitted',
             'data'       => [
                 'message' => $message

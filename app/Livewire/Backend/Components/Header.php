@@ -15,6 +15,7 @@ class Header extends Component
     public $loadingMore = false;
 
     protected $listeners = [
+        'newNotificationForDetails' => 'newNotification',
         'update-header-timer' => 'updateTimer',
         'tick' => 'increaseOneSecond',
     ];
@@ -49,23 +50,32 @@ class Header extends Component
     {
 
         $this->unreadCount = 0;
+
+        $this->dispatch('markAllAsRead');
+
     }
 
 
 
 
-    public function newNotification($notification)
-    {
-        $authId = auth()->id();
+public function newNotification($notification)
+{
+    $authId   = auth()->id();
+    $userType = auth()->user()->user_type;
 
+    if (array_key_exists('user_id', $notification)) {
 
         if (
-            isset($notification['user_id']) &&
-            ($notification['user_id'] == $authId || $notification['user_id'] === null)
+            ($userType === 'company' && $notification['user_id'] === null) ||
+            ($userType !== 'company' && (int)$notification['user_id'] === (int)$authId)
         ) {
+            $notification['is_read'] = 0;
             $this->unreadCount++;
+
         }
     }
+}
+
 
     public function mount()
     {
@@ -100,11 +110,15 @@ class Header extends Component
     public function loadUnreadCount()
     {
         $userId = Auth::id();
+        $userType = Auth::user()->user_type;
 
         $this->unreadCount = Notification::where('company_id', currentCompanyId())
-            ->where(function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                    ->orWhereNull('user_id');
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType == 'company') {
+                    $q->whereNull('user_id');
+                } else {
+                    $q->where('user_id', $userId);
+                }
             })
             ->where('is_read', 0)
             ->count();

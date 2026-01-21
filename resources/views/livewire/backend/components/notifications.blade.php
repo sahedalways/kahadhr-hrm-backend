@@ -1,5 +1,6 @@
 <div>
-    <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto; background-color: #ffffff;">
+    <ul class="list-group list-group-flush"
+        style="max-height: 400px; overflow-y: auto; background-color: #ffffff;">
 
         @forelse($notifications as $notification)
             @php
@@ -15,25 +16,34 @@
                 $commonStyle = 'transition: all 0.2s ease-in-out; cursor: pointer;';
             @endphp
 
-            <li class="{{ $itemClasses }}" style="{{ $itemStyle }} {{ $commonStyle }}"
-                data-bs-toggle="{{ !$isRead ? 'tooltip' : '' }}"
-                onmouseover="this.style.backgroundColor='{{ $isRead ? '#f5f5ff' : '#e6d3ff' }}'"
-                onmouseout="this.style.backgroundColor='{{ $isRead ? '#ffffff' : '#f0e6ff' }}'">
 
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                    <p class="mb-0 small flex-grow-1" style="line-height: 1.4; white-space: normal;">
-                        {{ \Illuminate\Support\Str::limit($notification['data']['message'] ?? '', 60) }}
-                    </p>
+            <a
+               href="{{ $notification['type'] === 'submitted_leave_request' ? route('company.dashboard.leaves.index', ['company' => app('authUser')->company->sub_domain]) : '#' }}">
+                <li class="{{ $itemClasses }}"
+                    style="{{ $itemStyle }} {{ $commonStyle }}"
+                    data-bs-toggle="{{ !$isRead ? 'tooltip' : '' }}"
+                    onmouseover="this.style.backgroundColor='{{ $isRead ? '#f5f5ff' : '#e6d3ff' }}'"
+                    onmouseout="this.style.backgroundColor='{{ $isRead ? '#ffffff' : '#f0e6ff' }}'">
 
-                    <small class="text-secondary flex-shrink-0" style="font-size: 0.7rem;">
-                        {{ \Carbon\Carbon::parse($notification['created_at'])->diffForHumans() }}
-                    </small>
-                </div>
-            </li>
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <p class="mb-0 small flex-grow-1"
+                           style="line-height: 1.4; white-space: normal;">
+                            {{ \Illuminate\Support\Str::limit($notification['data']['message'] ?? '', 60) }}
+                        </p>
+
+                        <small class="text-secondary flex-shrink-0"
+                               style="font-size: 0.7rem;">
+                            {{ \Carbon\Carbon::parse($notification['created_at'])->diffForHumans() }}
+                        </small>
+                    </div>
+                </li>
+            </a>
+
 
         @empty
             <li class="list-group-item text-center text-muted fst-italic py-5">
-                <i class="fa-regular fa-face-smile me-2" style="font-size: 1.5rem;"></i>
+                <i class="fa-regular fa-face-smile me-2"
+                   style="font-size: 1.5rem;"></i>
                 <p class="mb-0 mt-2">All caught up! No new notifications.</p>
             </li>
         @endforelse
@@ -41,8 +51,9 @@
 
     <div class="card-footer text-center border-top p-3">
         @if (count($notifications) >= $perPage)
-            <button wire:click="loadMore" class="btn btn-sm btn-link text-primary"
-                @if ($loadingMore) disabled @endif>
+            <button wire:click="loadMore"
+                    class="btn btn-sm btn-link text-primary"
+                    @if ($loadingMore) disabled @endif>
 
                 @if ($loadingMore)
                     <span class="spinner-border spinner-border-sm"></span>
@@ -65,6 +76,8 @@
     document.addEventListener("DOMContentLoaded", function() {
         var pusherKey = document.getElementById("pusher_key").value;
         var pusherCluster = document.getElementById("pusher_cluster").value;
+
+
         var companyId = parseInt(
             document.getElementById("current_company_id").value
         );

@@ -17,7 +17,8 @@ class Notifications extends Component
     {
         return [
             'newNotificationForDetails' => 'newNotification',
-            'markAllUiRead' => 'markAllUiRead'
+            'markAllUiRead' => 'markAllUiRead',
+            'markAllAsRead' => 'markAllAsRead',
         ];
     }
 
@@ -58,9 +59,6 @@ class Notifications extends Component
 
     $this->notifications = $notifications->toArray();
 
-    Notification::whereIn('id', $notifications->pluck('id'))
-        ->where('is_read', 0)
-        ->update(['is_read' => 1]);
 
     $this->dispatch('mark-notifications-read-after-delay');
 }
@@ -73,6 +71,17 @@ class Notifications extends Component
         foreach ($this->notifications as &$notification) {
             $notification['is_read'] = 1;
         }
+    }
+
+
+   public function markAllAsRead()
+    {
+    $notificationIds = collect($this->notifications)->pluck('id')->toArray();
+
+
+       Notification::whereIn('id', $notificationIds)
+        ->where('is_read', 0)
+        ->update(['is_read' => 1]);
     }
 
 
@@ -90,28 +99,22 @@ class Notifications extends Component
 
 public function newNotification($notification)
 {
-    $authId = auth()->id();
+    $authId   = auth()->id();
     $userType = auth()->user()->user_type;
 
-    if (isset($notification['user_id'])) {
+    if (array_key_exists('user_id', $notification)) {
 
         if (
-            ($userType == 'company' && $notification['user_id'] === null) ||
-            ($userType != 'company' && $notification['user_id'] == $authId)
+            ($userType === 'company' && $notification['user_id'] === null) ||
+            ($userType !== 'company' && (int)$notification['user_id'] === (int)$authId)
         ) {
-            $notification['is_read'] = 0;
-            array_unshift($this->notifications, $notification);
+            $this->loadNotifications();
         }
-    }
-
-    if (isset($notification['id'])) {
-        Notification::where('id', $notification['id'])
-            ->where('is_read', 0)
-            ->update(['is_read' => 1]);
     }
 
     $this->dispatch('mark-notifications-read-after-delay');
 }
+
 
 
     public function render()

@@ -107,7 +107,7 @@ class ExpensesIndex extends BaseComponent
 
         $notification = Notification::create([
             'company_id' => auth()->user()->employee->company_id,
-            'user_id' => auth()->user()->employee->company->user_id,
+            'user_id' => null,
             'type' => 'submitted_expense',
 
             'data' => [

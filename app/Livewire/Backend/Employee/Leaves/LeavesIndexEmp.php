@@ -117,11 +117,11 @@ class LeavesIndexEmp extends BaseComponent
         $startDate = Carbon::parse($this->start_date)->format('d M Y');
         $endDate   = Carbon::parse($this->end_date)->format('d M Y');
 
-        $message = "Employee '{$submitterName}' has submitted a leave request for {$leaveTypeName}";
+        $message = "Employee '{$submitterName}' has submitted a leave request.";
 
         $notification = Notification::create([
             'company_id' => auth()->user()->employee->company_id,
-            'user_id' => auth()->user()->employee->company->user_id,
+            'user_id' => null,
             'type' => 'submitted_leave_request',
 
             'data' => [

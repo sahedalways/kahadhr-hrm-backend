@@ -39,32 +39,32 @@ class Notifications extends Component
     }
 
 
-    public function loadNotifications()
-    {
-        $userId = Auth::id();
+   public function loadNotifications()
+{
+    $userId = Auth::id();
+    $userType = Auth::user()->user_type;
 
+    $notifications = Notification::where('company_id', currentCompanyId())
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType == 'company') {
+                $q->whereNull('user_id');
+            } else {
+                $q->where('user_id', $userId);
+            }
+        })
+        ->orderBy('created_at', 'desc')
+        ->take($this->perPage)
+        ->get();
 
-        $this->notifications = Notification::where('company_id', currentCompanyId())
-            ->where(function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                    ->orWhereNull('user_id');
-            })
-            ->orderBy('created_at', 'desc')
-            ->take($this->perPage)
-            ->get()->toArray();
+    $this->notifications = $notifications->toArray();
 
+    Notification::whereIn('id', $notifications->pluck('id'))
+        ->where('is_read', 0)
+        ->update(['is_read' => 1]);
 
-        Notification::where('company_id', currentCompanyId())
-            ->where(function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                    ->orWhereNull('user_id');
-            })
-            ->where('is_read', 0)
-            ->update(['is_read' => 1]);
+    $this->dispatch('mark-notifications-read-after-delay');
+}
 
-
-        $this->dispatch('mark-notifications-read-after-delay');
-    }
 
 
     public function markAllUiRead()
@@ -88,30 +88,30 @@ class Notifications extends Component
 
 
 
-    public function newNotification($notification)
-    {
-        $authId = auth()->id();
+public function newNotification($notification)
+{
+    $authId = auth()->id();
+    $userType = auth()->user()->user_type;
 
+    if (isset($notification['user_id'])) {
 
         if (
-            isset($notification['user_id']) &&
-            ($notification['user_id'] == $authId || $notification['user_id'] === null)
+            ($userType == 'company' && $notification['user_id'] === null) ||
+            ($userType != 'company' && $notification['user_id'] == $authId)
         ) {
-
             $notification['is_read'] = 0;
-
             array_unshift($this->notifications, $notification);
         }
-
-        if (isset($notification['id'])) {
-            Notification::where('id', $notification['id'])
-                ->where('is_read', 0)
-                ->update(['is_read' => 1]);
-        }
-
-
-        $this->dispatch('mark-notifications-read-after-delay');
     }
+
+    if (isset($notification['id'])) {
+        Notification::where('id', $notification['id'])
+            ->where('is_read', 0)
+            ->update(['is_read' => 1]);
+    }
+
+    $this->dispatch('mark-notifications-read-after-delay');
+}
 
 
     public function render()

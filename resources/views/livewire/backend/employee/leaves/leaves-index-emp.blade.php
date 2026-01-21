@@ -214,7 +214,7 @@
                         <div class="mb-2">
                             <label>Start Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" wire:model="start_date"
-                                min="{{ now()->toDateString() }}">>
+                                min="{{ now()->toDateString() }}">
                             @error('start_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -223,7 +223,7 @@
                         <div class="mb-2">
                             <label>End Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" wire:model="end_date"
-                                min="{{ now()->toDateString() }}">>
+                                min="{{ now()->toDateString() }}">
                             @error('end_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

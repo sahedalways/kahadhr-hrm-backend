@@ -154,7 +154,7 @@ class AssignedDocuments extends BaseComponent
 
         $notification = Notification::create([
             'company_id' => $employee->company_id,
-            'user_id' => $employee->company->user_id,
+            'user_id' => null,
             'type' => 'added_signature',
 
             'data' => [

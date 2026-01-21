@@ -1,5 +1,6 @@
 @push('styles')
-    <link href="{{ asset('assets/css/manage-leave.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/manage-leave.css') }}"
+          rel="stylesheet" />
 @endpush
 
 <div>
@@ -38,11 +39,11 @@
                     <h5 class="mb-0">{{ $currentDate->format('F Y') }}</h5>
                     <div class="btn-group">
                         <a href="?year={{ $prevMonth->year }}&month={{ $prevMonth->month }}"
-                            class="btn btn-sm btn-outline-secondary">
+                           class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                         <a href="?year={{ $nextMonth->year }}&month={{ $nextMonth->month }}"
-                            class="btn btn-sm btn-outline-secondary">
+                           class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                     </div>
@@ -53,16 +54,18 @@
                         <div class="timeline-grid timeline-header">
                             <div class="input-group pb-4 shadow-sm p-2 sticky-col rounded-0">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i
-                                        class="fas fa-search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-2"
-                                    placeholder="Search by name" wire:model="search"
-                                    wire:keyup="set('search', $event.target.value)">
+                                       class="fas fa-search"></i></span>
+                                <input type="text"
+                                       class="form-control border-start-0 ps-2"
+                                       placeholder="Search by name"
+                                       wire:model="search"
+                                       wire:keyup="set('search', $event.target.value)">
                             </div>
 
 
                             @foreach ($dates as $d)
                                 <div
-                                    class="day-cell header-cell border-start border-bottom text-center {{ $d['is_weekend'] ? 'weekend-bg' : '' }}">
+                                     class="day-cell header-cell border-start border-bottom text-center {{ $d['is_weekend'] ? 'weekend-bg' : '' }}">
                                     <div class="day-letter text-muted small">{{ $d['letter'] }}</div>
                                 </div>
                             @endforeach
@@ -78,23 +81,26 @@
 
 
 
-                            <div class="timeline-grid timeline-row" wire:key="emp-{{ $emp->id }}" wire:ignore>
+                            <div class="timeline-grid timeline-row"
+                                 wire:key="emp-{{ $emp->id }}"
+                                 wire:ignore>
                                 <div class="employee-cell sticky-col border-bottom bg-white">
                                     <div class="d-flex align-items-center p-2 gap-2 employee-clickable
         {{ $filterEmployeeId === $emp->id ? 'employee-active' : '' }}"
-                                        wire:click="filterByEmployee({{ $emp->id }})">
+                                         wire:click="filterByEmployee({{ $emp->id }})">
                                         <img src="{{ $emp->avatar_url ?? 'https://ui-avatars.com/api/?name=' . $emp->full_name }}"
-                                            class="rounded-circle border border-2 border-primary-subtle"
-                                            style="width: 40px; height: 40px; object-fit: cover;"
-                                            alt="{{ $emp->full_name }}">
+                                             class="rounded-circle border border-2 border-primary-subtle"
+                                             style="width: 40px; height: 40px; object-fit: cover;"
+                                             alt="{{ $emp->full_name }}">
 
 
                                         <div class="d-flex gap-2 flex-column">
                                             <div class="flex-grow-1">
-                                                <h6 class="fw-bold text-dark lh-sm mb-0" style="font-size: 12px;">
+                                                <h6 class="fw-bold text-dark lh-sm mb-0"
+                                                    style="font-size: 12px;">
                                                     {{ $emp->full_name }}</h6>
                                                 <small class="text-secondary d-block"
-                                                    style="font-size: 10px;">{{ $emp->job_title ?? '' }}</small>
+                                                       style="font-size: 10px;">{{ $emp->job_title ?? '' }}</small>
                                             </div>
 
 
@@ -110,7 +116,7 @@
 
                                                 @if ($totalLeaveDays > 0)
                                                     <span
-                                                        class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                          class="badge bg-danger-subtle text-danger border border-danger-subtle">
                                                         <i class="fas fa-plane-departure me-1"></i>
                                                         {{ $totalLeaveDays }} Days
                                                     </span>
@@ -130,17 +136,18 @@
                                         $leave = $emp->leaves->first(function ($l) use ($d) {
                                             return $l->start_date <= $d['date'] && $l->end_date >= $d['date'];
                                         });
-                                        $bgColor = $leave ? $leave->leaveType->color ?? '#fd7e14' : null;
+                                        $bgColor = $leave ? $leave->leaveType->color ?? '#f8b195' : null;
                                         $emoji = $leave ? $leave->leaveType->emoji ?? '🌴' : '';
                                     @endphp
 
                                     <div class="day-cell border-start border-bottom position-relative {{ $d['is_weekend'] ? 'weekend-bg' : '' }}"
-                                        style="cursor: pointer;"
-                                        @if ($leave) onclick="Livewire.dispatch('showLeaveRequestInfo', { id: {{ $leave->id }} })" @endif
-                                        wire:key="emp-{{ $emp->id }}-date-{{ $d['date'] }}">
+                                         style="cursor: pointer;"
+                                         @if ($leave) onclick="Livewire.dispatch('showLeaveRequestInfo', { id: {{ $leave->id }} })" @endif
+                                         wire:key="emp-{{ $emp->id }}-date-{{ $d['date'] }}">
                                         @if ($leave)
-                                            <div class="leave-bar" style="background-color: {{ $bgColor }}"
-                                                title="{{ $leave->leaveType->name }}">
+                                            <div class="leave-bar"
+                                                 style="background-color: {{ $bgColor }}"
+                                                 title="{{ $leave->leaveType->name }}">
                                                 {{ $emoji }}
                                             </div>
                                         @else
@@ -177,19 +184,21 @@
 
                             <ul class="list-group list-group-flush mb-4">
                                 @forelse ($leaveRequests as $leave)
-                                    <div class="leave-list-container" style="max-height: 350px; overflow-y: auto;">
+                                    <div class="leave-list-container"
+                                         style="max-height: 350px; overflow-y: auto;">
                                         <li class="list-group-item d-flex align-items-center justify-content-between px-0 leave-request-item"
-                                            data-bs-toggle="modal" data-bs-target="#viewRequestInfo"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewRequestInfo"
                                             wire:click="viewRequestInfo({{ $leave->id }})">
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $leave->user->employee->avatar_url }}"
-                                                    class="rounded-circle me-3 border border-2 border-light-subtle"
-                                                    style="width: 45px; height: 45px; object-fit: cover;"
-                                                    alt="{{ $leave->user->full_name }}">
+                                                     class="rounded-circle me-3 border border-2 border-light-subtle"
+                                                     style="width: 45px; height: 45px; object-fit: cover;"
+                                                     alt="{{ $leave->user->full_name }}">
                                                 <div>
                                                     <div class="fw-bold text-dark">{{ $leave->user->full_name }}</div>
                                                     <small class="text-muted text-uppercase fw-medium"
-                                                        style="font-size: 0.75rem;">
+                                                           style="font-size: 0.75rem;">
                                                         {{ $leave->user->employee->department->name ?? 'N/A Department' }}
                                                     </small>
                                                 </div>
@@ -200,7 +209,8 @@
                                                     {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays(\Carbon\Carbon::parse($leave->end_date)) + 1 }}
                                                     Days
                                                 </span>
-                                                <small class="d-block text-muted mt-1" style="font-size: 0.75rem;">
+                                                <small class="d-block text-muted mt-1"
+                                                       style="font-size: 0.75rem;">
                                                     {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
                                                     {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
                                                 </small>
@@ -222,19 +232,23 @@
                             <form wire:submit.prevent="saveRequest">
                                 {{-- Employee Select --}}
                                 <div class="mb-3">
-                                    <label for="employeeSelect" class="form-label fw-medium">Select Employee <span
-                                            class="text-danger">*</span></label>
+                                    <label for="employeeSelect"
+                                           class="form-label fw-medium">Select Employee <span
+                                              class="text-danger">*</span></label>
                                     <div class="dropdown">
-                                        <button class="btn btn-light form-select text-start w-100" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn btn-light form-select text-start w-100"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
                                             {{ $selectedEmployeeName ?? '-- Select Employee --' }}
                                         </button>
 
-                                        <ul class="dropdown-menu w-100" style="max-height:200px; overflow-y:auto;">
+                                        <ul class="dropdown-menu w-100"
+                                            style="max-height:200px; overflow-y:auto;">
                                             @foreach ($employees as $employee)
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        wire:click="selectEmployee({{ $employee->user_id }})">
+                                                       wire:click="selectEmployee({{ $employee->user_id }})">
                                                         {{ $employee->full_name }}
 
                                                     </a>
@@ -255,8 +269,9 @@
 
                                 <div class="mb-3">
                                     <label>Leave Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" wire:model.live="leave_type_id"
-                                        wire:key="leave_type_id">
+                                    <select class="form-select"
+                                            wire:model.live="leave_type_id"
+                                            wire:key="leave_type_id">
                                         <option value="">-- Select --</option>
                                         @foreach ($leaveTypes as $type)
                                             <option value="{{ $type->id }}">
@@ -274,8 +289,10 @@
                                 @if ($leave_type_id && optional($leaveTypes->firstWhere('id', $leave_type_id))->name === 'Others')
                                     <div class="mb-2">
                                         <label>Specify Other Leave Type <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" wire:model="other_leave_reason"
-                                            placeholder="Enter reason">
+                                        <input type="text"
+                                               class="form-control"
+                                               wire:model="other_leave_reason"
+                                               placeholder="Enter reason">
                                         @error('other_leave_reason')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -292,9 +309,10 @@
 
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Leave Payment Status <span
-                                                class="text-danger">*</span></label>
+                                                  class="text-danger">*</span></label>
 
-                                        <select class="form-select" wire:model.live="paidStatus">
+                                        <select class="form-select"
+                                                wire:model.live="paidStatus">
                                             <option value="">Select Status</option>
                                             <option value="paid">Paid</option>
                                             <option value="unpaid">Unpaid</option>
@@ -309,9 +327,12 @@
                                     @if ($paidStatus === 'paid')
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Paid Hours <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="number" step="0.01" class="form-control"
-                                                wire:model="paidHours" placeholder="Enter hours">
+                                                      class="text-danger">*</span></label>
+                                            <input type="number"
+                                                   step="0.01"
+                                                   class="form-control"
+                                                   wire:model="paidHours"
+                                                   placeholder="Enter hours">
 
                                             @error('paidHours')
                                                 <span class="text-danger">{{ $message }}</span>
@@ -326,19 +347,27 @@
                                 {{-- Date Range --}}
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-3 mb-md-0">
-                                        <label for="start_date" class="form-label fw-medium">From Date <span
-                                                class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="start_date"
-                                            wire:model="start_date" min="{{ date('Y-m-d') }}">
+                                        <label for="start_date"
+                                               class="form-label fw-medium">From Date <span
+                                                  class="text-danger">*</span></label>
+                                        <input type="date"
+                                               class="form-control"
+                                               id="start_date"
+                                               wire:model="start_date"
+                                               min="{{ date('Y-m-d') }}">
                                         @error('start_date')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="end_date" class="form-label fw-medium">End Date <span
-                                                class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="end_date"
-                                            wire:model="end_date" min="{{ date('Y-m-d') }}">
+                                        <label for="end_date"
+                                               class="form-label fw-medium">End Date <span
+                                                  class="text-danger">*</span></label>
+                                        <input type="date"
+                                               class="form-control"
+                                               id="end_date"
+                                               wire:model="end_date"
+                                               min="{{ date('Y-m-d') }}">
                                         @error('end_date')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -356,13 +385,17 @@
 
 
 
-                                <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 shadow-sm"
-                                    wire:loading.attr="disabled" wire:target="saveRequest">
-                                    <span wire:loading wire:target="saveRequest">
+                                <button type="submit"
+                                        class="btn btn-primary btn-lg w-100 mt-3 shadow-sm"
+                                        wire:loading.attr="disabled"
+                                        wire:target="saveRequest">
+                                    <span wire:loading
+                                          wire:target="saveRequest">
                                         <i class="fas fa-spinner fa-spin me-2"></i> Submitting ...
                                     </span>
-                                    <span wire:loading.remove wire:target="saveRequest"> <i
-                                            class="fas fa-plus-circle me-2"></i> Add Leave Manually</span>
+                                    <span wire:loading.remove
+                                          wire:target="saveRequest"> <i class="fas fa-plus-circle me-2"></i> Add Leave
+                                        Manually</span>
                                 </button>
                             </form>
                         </div>
@@ -377,16 +410,24 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="editLeaveModal" data-bs-backdrop="static" tabindex="-1"
-        aria-labelledby="editLeaveModalLabel" aria-hidden="true">
+    <div wire:ignore.self
+         class="modal fade"
+         id="editLeaveModal"
+         data-bs-backdrop="static"
+         tabindex="-1"
+         aria-labelledby="editLeaveModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="editLeaveModalLabel">Edit Leave</h5>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <h5 class="modal-title fw-bold"
+                        id="editLeaveModalLabel">Edit Leave</h5>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -397,15 +438,16 @@
                         <!-- 1. Employee Card -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
                             <img src="{{ $calendarLeaveInfo->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
-                                class="rounded-circle me-3 border border-1"
-                                alt="{{ $calendarLeaveInfo->user->full_name }}"
-                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                                 class="rounded-circle me-3 border border-1"
+                                 alt="{{ $calendarLeaveInfo->user->full_name }}"
+                                 style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                             <div class="fw-bold text-dark flex-grow-1">{{ $calendarLeaveInfo->user->full_name }}</div>
                         </div>
 
                         <!-- 2. Leave Type -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
-                            <div class="me-3 fs-5" style="min-width: 25px;">
+                            <div class="me-3 fs-5"
+                                 style="min-width: 25px;">
                                 {!! $calendarLeaveInfo->leaveType->emoji !!}
                             </div>
                             <div class="fw-medium text-dark flex-grow-1">
@@ -415,8 +457,9 @@
 
                         <!-- 3. Reason/Description -->
                         <div
-                            class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
-                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
+                             class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
+                               style="min-width: 25px;"></i>
                             <div class="fw-normal text-dark flex-grow-1">
                                 {{ $calendarLeaveInfo->other_reason ?? '-' }}
                             </div>
@@ -426,17 +469,21 @@
                         <div class="row g-2 mb-4 px-2">
                             <div class="col-12">
                                 <label class="form-label fw-bold">Start Date <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model="editStartDate"
-                                    min="{{ date('Y-m-d') }}">
+                                          class="text-danger">*</span></label>
+                                <input type="date"
+                                       class="form-control"
+                                       wire:model="editStartDate"
+                                       min="{{ date('Y-m-d') }}">
                                 @error('editStartDate')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="col-12 mt-3">
                                 <label class="form-label fw-bold">End Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model="editEndDate"
-                                    min="{{ date('Y-m-d') }}">
+                                <input type="date"
+                                       class="form-control"
+                                       wire:model="editEndDate"
+                                       min="{{ date('Y-m-d') }}">
                                 @error('editEndDate')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -482,16 +529,21 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button"
+                            class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cancel</button>
 
-                    <button type="button" class="btn btn-primary rounded-pill px-4"
-                        wire:click="updateLeave({{ $calendarLeaveInfo->id ?? 0 }})" wire:loading.attr="disabled"
-                        wire:target="updateLeave">
-                        <span wire:loading.remove wire:target="updateLeave">
+                    <button type="button"
+                            class="btn btn-primary rounded-pill px-4"
+                            wire:click="updateLeave({{ $calendarLeaveInfo->id ?? 0 }})"
+                            wire:loading.attr="disabled"
+                            wire:target="updateLeave">
+                        <span wire:loading.remove
+                              wire:target="updateLeave">
                             <i class="fas fa-save me-1"></i> Save Changes
                         </span>
-                        <span wire:loading wire:target="updateLeave">
+                        <span wire:loading
+                              wire:target="updateLeave">
                             <span class="spinner-border spinner-border-sm me-1"></span>
                             Saving...
                         </span>
@@ -504,16 +556,24 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="viewRequestInfo" data-bs-backdrop="static" tabindex="-1"
-        aria-labelledby="viewRequestInfoLabel" aria-hidden="true">
+    <div wire:ignore.self
+         class="modal fade"
+         id="viewRequestInfo"
+         data-bs-backdrop="static"
+         tabindex="-1"
+         aria-labelledby="viewRequestInfoLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="viewRequestInfoLabel">Leave Request</h5>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <h5 class="modal-title fw-bold"
+                        id="viewRequestInfoLabel">Leave Request</h5>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -524,16 +584,17 @@
                         <!-- 1. Employee Card -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
                             <img src="{{ $requestDetails->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
-                                class="rounded-circle me-3 border border-1"
-                                alt="{{ $requestDetails->user->full_name }}"
-                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                                 class="rounded-circle me-3 border border-1"
+                                 alt="{{ $requestDetails->user->full_name }}"
+                                 style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                             <div class="fw-bold text-dark flex-grow-1">{{ $requestDetails->user->full_name }}</div>
                             <i class="fas fa-chevron-right text-muted"></i>
                         </div>
 
                         <!-- 2. Leave Type -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
-                            <div class="me-3 fs-5" style="min-width: 25px;">
+                            <div class="me-3 fs-5"
+                                 style="min-width: 25px;">
                                 {!! $requestDetails->leaveType->emoji !!}
                             </div>
                             <div class="fw-medium text-dark flex-grow-1">
@@ -544,8 +605,9 @@
 
                         <!-- 3. Reason/Description -->
                         <div
-                            class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
-                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
+                             class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
+                               style="min-width: 25px;"></i>
                             <div class="fw-normal text-dark flex-grow-1">{{ $requestDetails->other_reason ?? '-' }}
                             </div>
                         </div>
@@ -554,7 +616,8 @@
                         <div class="row g-2 mb-4 px-2">
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center py-2">
-                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">From</div>
+                                    <div class="text-muted fw-medium me-3"
+                                         style="min-width: 50px;">From</div>
                                     <div class="fw-bold text-dark flex-grow-1">
                                         {{ \Carbon\Carbon::parse($requestDetails->start_date)->format('D, d M') }}
                                     </div>
@@ -564,7 +627,8 @@
                             <hr class="text-light-subtle my-0">
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center py-2">
-                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">To</div>
+                                    <div class="text-muted fw-medium me-3"
+                                         style="min-width: 50px;">To</div>
                                     <div class="fw-bold text-dark flex-grow-1">
                                         {{ \Carbon\Carbon::parse($requestDetails->end_date)->format('D, d M, Y') }}
                                     </div>
@@ -577,9 +641,10 @@
                         @if (in_array($requestDetails->leave_type_id, [2, 3, 4, 6]))
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Leave Type Option <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" wire:model.live="paidStatus"
-                                    @if ($requestDetails->leave_type_id == 4) disabled @endif>
+                                          class="text-danger">*</span></label>
+                                <select class="form-select"
+                                        wire:model.live="paidStatus"
+                                        @if ($requestDetails->leave_type_id == 4) disabled @endif>
                                     <option value="">Select Status</option>
                                     <option value="paid">Paid</option>
                                     <option value="unpaid">Unpaid</option>
@@ -589,8 +654,12 @@
                             @if ($paidStatus === 'paid')
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Hours <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" min="0" step="0.25"
-                                        wire:model.defer="paidHours" placeholder="Enter leave hours">
+                                    <input type="number"
+                                           class="form-control"
+                                           min="0"
+                                           step="0.25"
+                                           wire:model.defer="paidHours"
+                                           placeholder="Enter leave hours">
                                 </div>
                             @endif
                         @endif
@@ -611,23 +680,28 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                        data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">
                         Cancel
                     </button>
 
                     <div>
                         <div>
 
-                            <button type="button" class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
-                                wire:click="rejectRequest({{ $requestDetails->id ?? 0 }})"
-                                wire:loading.attr="disabled" wire:target="rejectRequest">
+                            <button type="button"
+                                    class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
+                                    wire:click="rejectRequest({{ $requestDetails->id ?? 0 }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="rejectRequest">
 
-                                <span wire:loading.remove wire:target="rejectRequest">
+                                <span wire:loading.remove
+                                      wire:target="rejectRequest">
                                     <i class="fas fa-times-circle me-1"></i> Reject
                                 </span>
 
-                                <span wire:loading.delay wire:target="rejectRequest">
+                                <span wire:loading.delay
+                                      wire:target="rejectRequest">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Rejecting...
                                 </span>
@@ -636,15 +710,19 @@
 
 
 
-                            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm me-2"
-                                wire:click="approveRequest({{ $requestDetails->id ?? 0 }})"
-                                wire:loading.attr="disabled" wire:target="approveRequest">
+                            <button type="button"
+                                    class="btn btn-primary rounded-pill px-4 shadow-sm me-2"
+                                    wire:click="approveRequest({{ $requestDetails->id ?? 0 }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="approveRequest">
 
-                                <span wire:loading.remove wire:target="approveRequest">
+                                <span wire:loading.remove
+                                      wire:target="approveRequest">
                                     <i class="fas fa-check-circle me-1"></i> Approve
                                 </span>
 
-                                <span wire:loading.delay wire:target="approveRequest">
+                                <span wire:loading.delay
+                                      wire:target="approveRequest">
                                     <span class="spinner-border spinner-border-sm me-1"></span>
                                     Approving...
                                 </span>
@@ -661,16 +739,24 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="viewRequestInfoFromCalendar" data-bs-backdrop="static"
-        tabindex="-1" aria-labelledby="viewRequestInfoFromCalendar" aria-hidden="true">
+    <div wire:ignore.self
+         class="modal fade"
+         id="viewRequestInfoFromCalendar"
+         data-bs-backdrop="static"
+         tabindex="-1"
+         aria-labelledby="viewRequestInfoFromCalendar"
+         aria-hidden="true">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="viewRequestInfoFromCalendar">Leave Request</h5>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <h5 class="modal-title fw-bold"
+                        id="viewRequestInfoFromCalendar">Leave Request</h5>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -681,16 +767,17 @@
                         <!-- 1. Employee Card -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
                             <img src="{{ $calendarLeaveInfo->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
-                                class="rounded-circle me-3 border border-1"
-                                alt="{{ $calendarLeaveInfo->user->full_name }}"
-                                style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                                 class="rounded-circle me-3 border border-1"
+                                 alt="{{ $calendarLeaveInfo->user->full_name }}"
+                                 style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
                             <div class="fw-bold text-dark flex-grow-1">{{ $calendarLeaveInfo->user->full_name }}</div>
 
                         </div>
 
                         <!-- 2. Leave Type -->
                         <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
-                            <div class="me-3 fs-5" style="min-width: 25px;">
+                            <div class="me-3 fs-5"
+                                 style="min-width: 25px;">
                                 {!! $calendarLeaveInfo->leaveType->emoji !!}
                             </div>
                             <div class="fw-medium text-dark flex-grow-1">
@@ -701,8 +788,9 @@
 
                         <!-- 3. Reason/Description -->
                         <div
-                            class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
-                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon" style="min-width: 25px;"></i>
+                             class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
+                               style="min-width: 25px;"></i>
                             <div class="fw-normal text-dark flex-grow-1">{{ $calendarLeaveInfo->other_reason ?? '-' }}
                             </div>
                         </div>
@@ -711,7 +799,8 @@
                         <div class="row g-2 mb-4 px-2">
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center py-2">
-                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">From</div>
+                                    <div class="text-muted fw-medium me-3"
+                                         style="min-width: 50px;">From</div>
                                     <div class="fw-bold text-dark flex-grow-1">
                                         {{ \Carbon\Carbon::parse($calendarLeaveInfo->start_date)->format('D, d M') }}
                                     </div>
@@ -721,7 +810,8 @@
                             <hr class="text-light-subtle my-0">
                             <div class="col-12">
                                 <div class="d-flex justify-content-between align-items-center py-2">
-                                    <div class="text-muted fw-medium me-3" style="min-width: 50px;">To</div>
+                                    <div class="text-muted fw-medium me-3"
+                                         style="min-width: 50px;">To</div>
                                     <div class="fw-bold text-dark flex-grow-1">
                                         {{ \Carbon\Carbon::parse($calendarLeaveInfo->end_date)->format('D, d M, Y') }}
                                     </div>
@@ -779,24 +869,30 @@
                     <div class="modal-footer d-flex justify-content-between">
 
                         <!-- Left: Cancel Leave -->
-                        <button type="button" class="btn btn-outline-danger rounded-pill px-4"
-                            onclick="confirmCancel({{ $calendarLeaveInfo->id }})" wire:loading.attr="disabled"
-                            wire:target="cancelLeave">
+                        <button type="button"
+                                class="btn btn-outline-danger rounded-pill px-4"
+                                onclick="confirmCancel({{ $calendarLeaveInfo->id }})"
+                                wire:loading.attr="disabled"
+                                wire:target="cancelLeave">
 
-                            <span wire:loading.remove wire:target="cancelLeave">
+                            <span wire:loading.remove
+                                  wire:target="cancelLeave">
                                 <i class="fas fa-ban me-1"></i> Cancel Leave
                             </span>
 
-                            <span wire:loading wire:target="cancelLeave">
+                            <span wire:loading
+                                  wire:target="cancelLeave">
                                 <span class="spinner-border spinner-border-sm me-1"></span>
                                 Cancelling...
                             </span>
                         </button>
 
                         <!-- Right: Edit Leave -->
-                        <button type="button" class="btn btn-primary rounded-pill px-4"
-                            wire:click="editLeave({{ $calendarLeaveInfo->id }})" data-bs-toggle="modal"
-                            data-bs-target="#editLeaveModal">
+                        <button type="button"
+                                class="btn btn-primary rounded-pill px-4"
+                                wire:click="editLeave({{ $calendarLeaveInfo->id }})"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editLeaveModal">
 
                             <i class="fas fa-edit me-1"></i> Edit Leave
                         </button>

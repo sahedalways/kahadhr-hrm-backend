@@ -11,17 +11,19 @@
 @endphp
 
 <div>
-    <div class="card mt-4 shadow-sm border-0" style="border-radius: 20px;">
+    <div class="card mt-4 shadow-sm border-0"
+         style="border-radius: 20px;">
         <div class="card-body p-4">
 
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold text-dark mb-0">
-                    <i class="bi bi-credit-card-2-front-fill me-2 text-primary"></i>Payment Method
+                    <i class="bi bi-credit-card-2-front-fill me-2 text-primary"></i>Subscription Payment Method
                 </h5>
                 @if ($stripe_payment_method_id)
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#editCardModal">
+                    <button class="btn btn-outline-secondary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editCardModal">
                         <i class="bi bi-pencil-fill me-1"></i> Update
                     </button>
                 @endif
@@ -31,23 +33,26 @@
             <!-- Card Info -->
             @if ($stripe_payment_method_id)
                 <div class="card shadow-sm text-white p-4"
-                    style="background: {{ $cardBg }}; border-radius: 15px; max-width: 400px;">
+                     style="background: {{ $cardBg }}; border-radius: 15px; max-width: 400px;">
 
                     <!-- Brand & Icon -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="fw-bold text-uppercase" style="font-size: 1rem;">{{ $card_brand }}</span>
-                        <i class="bi bi-credit-card-2-front-fill" style="font-size: 1.5rem; opacity: 0.8;"></i>
+                        <span class="fw-bold text-uppercase"
+                              style="font-size: 1rem;">{{ $card_brand }}</span>
+                        <i class="bi bi-credit-card-2-front-fill"
+                           style="font-size: 1.5rem; opacity: 0.8;"></i>
                     </div>
 
                     <!-- Card Number -->
                     <div class="mb-3"
-                        style="font-family: 'Courier New', monospace; font-size: 1.4rem; letter-spacing: 2px;">
+                         style="font-family: 'Courier New', monospace; font-size: 1.4rem; letter-spacing: 2px;">
                         <span>**** **** **** </span>
                         <strong class="text-warning">{{ $card_last4 }}</strong>
                     </div>
 
                     <!-- Card Holder & Expiry -->
-                    <div class="d-flex justify-content-between align-items-end" style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between align-items-end"
+                         style="font-size: 0.85rem;">
                         <div>
                             <small class="text-light opacity-75 d-block">Card Holder</small>
                             <strong class="text-uppercase">{{ $card_holder_name ?? 'N/A' }}</strong>
@@ -66,9 +71,12 @@
                 </p>
             @else
                 <!-- No Card -->
-                <div class="card border border-dashed rounded text-center p-4 shadow-sm" style="max-width: 400px;">
+                <div class="card border border-dashed rounded text-center p-4 shadow-sm"
+                     style="max-width: 400px;">
                     <p class="text-muted mb-3"><i class="bi bi-info-circle-fill me-1"></i>No card saved yet.</p>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCardModal">
+                    <button class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editCardModal">
                         <i class="bi bi-plus-circle-fill me-1"></i> Add New Card
                     </button>
                 </div>
@@ -77,14 +85,21 @@
         </div>
     </div>
 
-    <input type="hidden" id="stripe-key" value="{{ config('services.stripe.key') }}">
+    <input type="hidden"
+           id="stripe-key"
+           value="{{ config('services.stripe.key') }}">
 
     <!-- Edit/Add Card Modal -->
-    <div class="modal fade" id="editCardModal" tabindex="-1" aria-labelledby="editCardModalLabel" aria-hidden="true">
+    <div class="modal fade"
+         id="editCardModal"
+         tabindex="-1"
+         aria-labelledby="editCardModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editCardModalLabel">
+                    <h5 class="modal-title"
+                        id="editCardModalLabel">
                         @if ($stripe_payment_method_id)
                             Edit Card
                         @else
@@ -92,14 +107,17 @@
                         @endif
                     </h5>
                     <button type="button"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
-                        data-bs-dismiss="modal" style="width: 28px; height: 28px; padding: 0;">
-                        <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
+                            class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                            data-bs-dismiss="modal"
+                            style="width: 28px; height: 28px; padding: 0;">
+                        <i class="fas fa-times"
+                           style="font-size: 14px; color: #000;"></i>
                     </button>
 
                 </div>
                 <div class="modal-body">
-                    <form id="bank-form" class="row g-3">
+                    <form id="bank-form"
+                          class="row g-3">
 
 
                         <hr>
@@ -109,26 +127,34 @@
                             <label class="form-label fw-semibold">
                                 Card Holder Name <span class="text-danger">*</span>
                             </label>
-                            <input type="text" class="form-control" id="card-holder-name"
-                                placeholder="Enter Card Holder Name">
+                            <input type="text"
+                                   class="form-control"
+                                   id="card-holder-name"
+                                   placeholder="Enter Card Holder Name">
                         </div>
 
 
                         <!-- Stripe Card Element -->
-                        <div class="col-md-6" wire:ignore>
+                        <div class="col-md-6"
+                             wire:ignore>
                             <label class="form-label fw-semibold">
                                 Card Details <span class="text-danger">*</span>
                             </label>
-                            <div id="card-element" class="form-control p-2"></div>
-                            <small id="card-error" class="text-danger"></small>
+                            <div id="card-element"
+                                 class="form-control p-2"></div>
+                            <small id="card-error"
+                                   class="text-danger"></small>
                         </div>
 
 
 
                         <div class="d-flex justify-content-end">
-                            <button type="button" id="save-card-btn" class="btn btn-success">
+                            <button type="button"
+                                    id="save-card-btn"
+                                    class="btn btn-success">
                                 <span id="btn-text">Save Card</span>
-                                <span id="btn-loading" class="d-none">
+                                <span id="btn-loading"
+                                      class="d-none">
                                     <i class="fas fa-spinner fa-spin me-2"></i>Submitting...
                                 </span>
                             </button>
@@ -151,13 +177,16 @@
 
             {{-- RIGHT: Export --}}
             <div class="col-auto d-flex gap-2">
-                <button wire:click="exportInvoices('pdf')" class="btn btn-sm btn-white text-primary">
+                <button wire:click="exportInvoices('pdf')"
+                        class="btn btn-sm btn-white text-primary">
                     <i class="fa fa-file-pdf me-1"></i> PDF
                 </button>
-                <button wire:click="exportInvoices('excel')" class="btn btn-sm btn-white text-success">
+                <button wire:click="exportInvoices('excel')"
+                        class="btn btn-sm btn-white text-success">
                     <i class="fa fa-file-excel me-1"></i> Excel
                 </button>
-                <button wire:click="exportInvoices('csv')" class="btn btn-sm btn-white text-info">
+                <button wire:click="exportInvoices('csv')"
+                        class="btn btn-sm btn-white text-info">
                     <i class="fa fa-file-csv me-1"></i> CSV
                 </button>
             </div>
@@ -172,7 +201,8 @@
                 <div class="row mb-3 g-4">
 
                     <div class="col-md-3">
-                        <select class="form-select" wire:change="handleDateFilter($event.target.value)">
+                        <select class="form-select"
+                                wire:change="handleDateFilter($event.target.value)">
                             <option value="">All Dates</option>
                             <option value="day">Today</option>
                             <option value="week">This Week</option>
@@ -184,22 +214,28 @@
 
                     @if ($filterDate === 'custom')
                         <div class="col-md-2">
-                            <input type="date" class="form-control"
-                                wire:change="handleDateFrom($event.target.value)" wire:model="date_from">
+                            <input type="date"
+                                   class="form-control"
+                                   wire:change="handleDateFrom($event.target.value)"
+                                   wire:model="date_from">
                         </div>
                         <div class="col-md-2">
-                            <input type="date" class="form-control"
-                                wire:change="handleDateTo($event.target.value)" wire:model="date_to">
+                            <input type="date"
+                                   class="form-control"
+                                   wire:change="handleDateTo($event.target.value)"
+                                   wire:model="date_to">
                         </div>
                     @endif
 
                     <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0"><i
-                                    class="fa-solid fa-magnifying-glass"></i></span>
-                            <input type="text" class="form-control border-start-0"
-                                placeholder="Search by invoice number" wire:model="search"
-                                wire:keyup="set('search', $event.target.value)" />
+                                   class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text"
+                                   class="form-control border-start-0"
+                                   placeholder="Search by invoice number"
+                                   wire:model="search"
+                                   wire:keyup="set('search', $event.target.value)" />
                         </div>
                     </div>
                 </div>
@@ -245,8 +281,8 @@
                                         <td>{{ $invoice->created_at->format('d M, Y') }}</td>
                                         <td>
                                             <a href="#"
-                                                wire:click.prevent="downloadInvoice({{ $invoice->id }})"
-                                                class="badge bg-primary text-white">
+                                               wire:click.prevent="downloadInvoice({{ $invoice->id }})"
+                                               class="badge bg-primary text-white">
                                                 PDF
                                             </a>
 
@@ -254,7 +290,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">No invoices found</td>
+                                        <td colspan="10"
+                                            class="text-center">No invoices found</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -264,7 +301,7 @@
                         @if ($hasMore)
                             <div class="text-center mt-4">
                                 <button wire:click="loadMore"
-                                    class="btn btn-outline-primary rounded-pill px-4 py-2">Load
+                                        class="btn btn-outline-primary rounded-pill px-4 py-2">Load
                                     More</button>
                             </div>
                         @endif

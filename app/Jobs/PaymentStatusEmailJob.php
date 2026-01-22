@@ -37,7 +37,7 @@ class PaymentStatusEmailJob implements ShouldQueue
 
         $subject = match ($this->type) {
             'subscription_suspended' => 'Subscription Suspended – Action Required',
-            'card_reminder' => 'Add Payment Method – Subscription Ending Soon',
+            'card_reminder' => 'Subscribe Now! – Subscription Ending Soon',
             default => 'Payment Failed – Please Update Card',
         };
 

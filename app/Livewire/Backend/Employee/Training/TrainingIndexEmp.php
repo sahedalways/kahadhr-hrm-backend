@@ -125,6 +125,7 @@ class TrainingIndexEmp extends BaseComponent
                 $notification = Notification::create([
                     'company_id' => auth()->user()->employee->company_id,
                     'user_id' => null,
+                    'notifiable_id' => $this->training->id,
                     'type' => 'training_completed',
 
                     'data' => [
@@ -169,6 +170,7 @@ class TrainingIndexEmp extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->employee->company_id,
             'user_id' => null,
+            'notifiable_id' => $this->training->id,
             'type' => 'training_completed',
 
             'data' => [

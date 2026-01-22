@@ -4,6 +4,12 @@
     <link href="{{ asset('assets/css/company-schedule.css') }}"
           rel="stylesheet" />
 @endpush
+
+@php
+    $highlightId = request('id');
+@endphp
+
+
 @php
     use Carbon\Carbon;
 @endphp
@@ -130,17 +136,30 @@
                     Pending Requests ({{ $records->sum(fn($r) => $r->requests->where('status', 'pending')->count()) }})
                 </h3>
 
+
+
                 @foreach ($records as $record)
-                    @foreach ($record->requests->where('status', 'pending') as $req)
+                    @php
+                        $pendingRequests = $record->requests
+                            ->where('status', 'pending')
+                            ->sortByDesc(fn($r) => $r->id == $highlightId);
+                    @endphp
+
+                    @foreach ($pendingRequests as $req)
                         @php
                             $location =
                                 $req->type === 'late_clock_in'
                                     ? $record->clock_in_location
                                     : $record->clock_out_location;
+
+                            $isHighlighted = $req->id == $highlightId;
                         @endphp
 
-                        <div class="request-item mb-2 border-bottom pb-2 gap-4">
-                            {{-- Header (clickable) --}}
+                        <div
+                             class="request-item mb-2 border-bottom pb-2 gap-4
+            {{ $isHighlighted ? 'bg-warning-subtle border-warning rounded-2 p-2' : '' }}">
+
+                            {{-- Header --}}
                             <div class="request-info d-flex justify-content-between align-items-center"
                                  wire:click="toggleReason({{ $req->id }})"
                                  style="cursor: pointer;">
@@ -169,9 +188,7 @@
                                 </div>
                             </div>
 
-
-
-                            {{-- Action Buttons --}}
+                            {{-- Actions --}}
                             <div class="request-actions mt-2">
                                 <button class="btn btn-sm action-btn approve-btn"
                                         wire:click="approveRequest({{ $req->id }})"
@@ -205,7 +222,7 @@
                             </div>
                         </div>
 
-                        {{-- Reason (FAQ style) --}}
+                        {{-- Reason --}}
                         <div class="request-reason mt-2 transition-all duration-300 overflow-hidden"
                              style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
                             <div class="card">

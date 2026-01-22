@@ -164,6 +164,7 @@ class AssignedDocuments extends BaseComponent
         $notification = Notification::create([
             'company_id' => $employee->company_id,
             'user_id' => null,
+            'notifiable_id' => $this->currentDocument->id,
             'type' => 'added_signature',
 
             'data' => [
@@ -177,7 +178,7 @@ class AssignedDocuments extends BaseComponent
 
 
 
-        $this->toast('Signature added to PDF successfully!', 'success');
+        $this->toast('Signature added to document successfully!', 'success');
         $this->resetLoaded();
     }
 

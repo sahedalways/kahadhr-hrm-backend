@@ -16,6 +16,7 @@ class CompanyPayslip extends BaseComponent
     use WithPagination, WithFileUploads;
 
     public $company_id;
+    public $openPayslipId = null;
 
     public $showEmployeeFilter = false;
 
@@ -53,7 +54,7 @@ class CompanyPayslip extends BaseComponent
 
     protected $listeners = [
         'deletePayslip' => 'deletePayslip',
-        'deleteRequest' => 'deleteRequest',
+        'confirmRequestDelete' => 'deleteRequest',
     ];
 
     public function mount()
@@ -69,8 +70,17 @@ class CompanyPayslip extends BaseComponent
             ->where('status', 'pending')
             ->get();
 
+
+
         $this->loaded = collect();
         $this->loadMore();
+
+        if (request()->has('id')) {
+         $this->openPayslipId = request('id');
+
+
+         $this->loadRequests($this->openPayslipId);
+    }
     }
 
     public function render()
@@ -302,6 +312,8 @@ class CompanyPayslip extends BaseComponent
         $this->requests = PaySlipRequest::where('company_id', $this->company_id)
             ->where('status', 'pending')
             ->get();
+
+        $this->dispatch('show-requested-payslip-modal');
     }
 
 
@@ -367,8 +379,12 @@ class CompanyPayslip extends BaseComponent
 
     // ─── DELETE ─────────────────────────────────────────────────────
 
-    public function deletePayslip($id)
+    public function deletePayslip($payload)
     {
+            $id = $payload['id'] ?? null;
+            if (!$id) return;
+
+
         $ps = PaySlip::find($id);
 
         if ($ps) {

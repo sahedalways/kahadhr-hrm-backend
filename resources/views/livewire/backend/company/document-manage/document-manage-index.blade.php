@@ -1,3 +1,10 @@
+@php
+    $id = request('id');
+@endphp
+
+
+
+
 <div>
     <div class="row g-3 align-items-center justify-content-between mb-4">
 
@@ -8,22 +15,27 @@
 
         <!-- RIGHT: Export Buttons -->
         <div class="col-auto d-flex gap-2">
-            <button wire:click="exportDocuments('pdf')" class="btn btn-sm btn-white text-primary">
+            <button wire:click="exportDocuments('pdf')"
+                    class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
 
-            <button wire:click="exportDocuments('excel')" class="btn btn-sm btn-white text-success">
+            <button wire:click="exportDocuments('excel')"
+                    class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
 
-            <button wire:click="exportDocuments('csv')" class="btn btn-sm btn-white text-info">
+            <button wire:click="exportDocuments('csv')"
+                    class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
         </div>
 
         <div class="col-auto">
-            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
-                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+            <a data-bs-toggle="modal"
+               data-bs-target="#add"
+               wire:click="resetInputFields"
+               class="btn btn-icon btn-3 btn-white text-primary mb-0">
                 <i class="fa fa-plus me-2"></i> Add New Document
             </a>
         </div>
@@ -41,24 +53,27 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i
-                                            class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text" class="form-control border-start-0"
-                                        placeholder="Search by document name" wire:model="search"
-                                        wire:keyup="set('search', $event.target.value)" />
+                                           class="fa-solid fa-magnifying-glass"></i></span>
+                                    <input type="text"
+                                           class="form-control border-start-0"
+                                           placeholder="Search by document name"
+                                           wire:model="search"
+                                           wire:keyup="set('search', $event.target.value)" />
                                 </div>
                             </div>
 
                             <!-- Sort -->
                             <div class="col-md-3 d-flex gap-2">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
+                                        wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
                                 </select>
                             </div>
 
                             <div class="col-md-3">
-                                <select class="form-select" wire:change="handleFilter($event.target.value)">
+                                <select class="form-select"
+                                        wire:change="handleFilter($event.target.value)">
                                     <option value="">All Status</option>
                                     <option value="pending">Pending</option>
                                     <option value="signed">Signed</option>
@@ -72,7 +87,8 @@
                             <p class="text-muted small mb-0">
                                 Showing results for: <strong>{{ $search ?: 'All Documents' }}</strong>
                             </p>
-                            <div wire:loading wire:target="search">
+                            <div wire:loading
+                                 wire:target="search">
                                 <span class="spinner-border spinner-border-sm text-primary"></span>
                                 <span class="text-primary small">Searching...</span>
                             </div>
@@ -110,12 +126,14 @@
                             <tbody>
                                 @php $i = 1; @endphp
                                 @forelse($infos as $row)
-                                    <tr>
+                                    <tr class="{{ $id == $row->id ? 'table-primary' : '' }}">
                                         <td>{{ $i++ }}</td>
 
                                         <td>
                                             <span onclick="copyToClipboard('{{ $row->name ?? '' }}')"
-                                                style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to copy">
+                                                  style="cursor:pointer;"
+                                                  data-bs-toggle="tooltip"
+                                                  title="Click to copy">
                                                 {{ $row->name ?? 'N/A' }}
                                             </span>
                                         </td>
@@ -127,8 +145,9 @@
 
                                         <td>
                                             @if ($row->document_url)
-                                                <a href="{{ $row->document_url }}" target="_blank"
-                                                    class="text-primary">View</a>
+                                                <a href="{{ $row->document_url }}"
+                                                   target="_blank"
+                                                   class="text-primary">View</a>
                                             @else
                                                 <span class="text-muted">No File</span>
                                             @endif
@@ -148,22 +167,26 @@
                                         </td>
 
                                         <td>
-                                            <a href="#" data-bs-toggle="modal" data-bs-target="#edit"
-                                                wire:click="edit({{ $row->id }})"
-                                                class="badge badge-info badge-xs fw-600 text-xs"
-                                                style="background-color:#4ba3f7;color:#fff;">
+                                            <a href="#"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#edit"
+                                               wire:click="edit({{ $row->id }})"
+                                               class="badge badge-info badge-xs fw-600 text-xs"
+                                               style="background-color:#4ba3f7;color:#fff;">
                                                 Edit
                                             </a>
 
-                                            <a href="#" class="badge badge-danger badge-xs fw-600 text-xs"
-                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                            <a href="#"
+                                               class="badge badge-danger badge-xs fw-600 text-xs"
+                                               wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
                                                 Delete
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">No documents found</td>
+                                        <td colspan="7"
+                                            class="text-center">No documents found</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -172,7 +195,8 @@
 
                         @if ($hasMore)
                             <div class="text-center mt-4">
-                                <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                <button wire:click="loadMore"
+                                        class="btn btn-outline-primary rounded-pill px-4 py-2">
                                     Load More
                                 </button>
                             </div>
@@ -185,13 +209,18 @@
     </div>
 
     <!-- Add Modal -->
-    <div wire:ignore.self class="modal fade" id="add" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="add"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Add New Document</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -202,7 +231,9 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Document Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="name">
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model="name">
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -210,9 +241,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Assign Employee </label>
-                                <select id="employeeSelect" class="form-select" wire:model.live="emp_id"
-                                    wire:key="emp_id">
-                                    <option value="" selected>-- Select Employee --</option>
+                                <select id="employeeSelect"
+                                        class="form-select"
+                                        wire:model.live="emp_id"
+                                        wire:key="emp_id">
+                                    <option value=""
+                                            selected>-- Select Employee --</option>
                                     @foreach ($employees as $emp)
                                         <option value="{{ $emp->id }}">
                                             {{ trim(($emp->f_name ?? '') . ' ' . ($emp->l_name ?? '')) ?: $emp->email }}
@@ -229,8 +263,10 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">File <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control" wire:model="file_path"
-                                    accept="application/pdf">
+                                <input type="file"
+                                       class="form-control"
+                                       wire:model="file_path"
+                                       accept="application/pdf">
                                 @error('file_path')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -238,8 +274,10 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Expires At</label>
-                                <input type="date" class="form-control" wire:model="expires_at"
-                                    min="{{ date('Y-m-d') }}">
+                                <input type="date"
+                                       class="form-control"
+                                       wire:model="expires_at"
+                                       min="{{ date('Y-m-d') }}">
 
                                 @error('expires_at')
                                     <span class="text-danger">{{ $message }}</span>
@@ -247,9 +285,12 @@
                             </div>
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" wire:model="send_email"
-                                    id="emailCheck">
-                                <label class="form-check-label fw-bold" for="emailCheck">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       wire:model="send_email"
+                                       id="emailCheck">
+                                <label class="form-check-label fw-bold"
+                                       for="emailCheck">
                                     Send employee an email notification
                                 </label>
                             </div>
@@ -259,12 +300,17 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="save">
-                            <span wire:loading wire:target="save"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
-                            <span wire:loading.remove wire:target="save">Save</span>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="save">
+                            <span wire:loading
+                                  wire:target="save"><i class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                            <span wire:loading.remove
+                                  wire:target="save">Save</span>
                         </button>
                     </div>
 
@@ -275,13 +321,18 @@
     </div>
 
     <!-- Edit Modal (Same as Add) -->
-    <div wire:ignore.self class="modal fade" id="edit" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="edit"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Edit Document</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -292,7 +343,9 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Document Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="name">
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model="name">
 
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
@@ -301,9 +354,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Assign Employee </label>
-                                <select id="employeeSelect" class="form-select" wire:model.live="emp_id"
-                                    wire:key="emp_id">
-                                    <option value="" selected>-- Select Employee --</option>
+                                <select id="employeeSelect"
+                                        class="form-select"
+                                        wire:model.live="emp_id"
+                                        wire:key="emp_id">
+                                    <option value=""
+                                            selected>-- Select Employee --</option>
                                     @foreach ($employees as $emp)
                                         <option value="{{ $emp->id }}">
                                             {{ trim(($emp->f_name ?? '') . ' ' . ($emp->l_name ?? '')) ?: $emp->email }}
@@ -320,8 +376,10 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Replace File </label>
-                                <input type="file" class="form-control" wire:model="file_path"
-                                    accept="application/pdf">
+                                <input type="file"
+                                       class="form-control"
+                                       wire:model="file_path"
+                                       accept="application/pdf">
                                 @error('file_path')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -329,8 +387,9 @@
 
                             @if (!empty($existingDocument))
                                 <div class="mt-2">
-                                    <a href="{{ $existingDocument }}" target="_blank"
-                                        class="btn btn-primary btn-sm">
+                                    <a href="{{ $existingDocument }}"
+                                       target="_blank"
+                                       class="btn btn-primary btn-sm">
                                         View Previous Document
                                     </a>
                                 </div>
@@ -340,8 +399,10 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Expires At</label>
-                                <input type="date" class="form-control" wire:model="expires_at"
-                                    min="{{ date('Y-m-d') }}">
+                                <input type="date"
+                                       class="form-control"
+                                       wire:model="expires_at"
+                                       min="{{ date('Y-m-d') }}">
 
                                 @error('expires_at')
                                     <span class="text-danger">{{ $message }}</span>
@@ -352,7 +413,8 @@
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Status <span class="text-danger">*</span></label>
-                                <select class="form-select" wire:model="status">
+                                <select class="form-select"
+                                        wire:model="status">
                                     <option value="pending">Pending</option>
                                     <option value="signed">Signed</option>
                                     <option value="expired">Expired</option>
@@ -368,12 +430,17 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="save">
-                            <span wire:loading wire:target="update"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
-                            <span wire:loading.remove wire:target="update">Save</span>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="save">
+                            <span wire:loading
+                                  wire:target="update"><i class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                            <span wire:loading.remove
+                                  wire:target="update">Save</span>
                         </button>
                     </div>
 

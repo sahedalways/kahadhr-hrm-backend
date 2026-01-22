@@ -85,7 +85,7 @@ class ClockModal extends BaseComponent
         ]);
 
         if ($needsApproval) {
-            AttendanceRequest::create([
+            $item = AttendanceRequest::create([
                 'user_id' => Auth::id(),
                 'attendance_id' => $attendance->id,
                 'type' => 'late_clock_in',
@@ -100,6 +100,7 @@ class ClockModal extends BaseComponent
             $notification = Notification::create([
                 'company_id' => auth()->user()->employee->company_id,
                 'user_id' => null,
+                'notifiable_id' => $item->id,
                 'type' => 'late_clock_in',
 
                 'data' => [
@@ -186,7 +187,7 @@ class ClockModal extends BaseComponent
         ]);
 
         if ($needsApproval) {
-            AttendanceRequest::create([
+           $item = AttendanceRequest::create([
                 'user_id' => Auth::id(),
                 'attendance_id' => $attendance->id,
                 'type' => $type,
@@ -201,6 +202,7 @@ class ClockModal extends BaseComponent
             $notification = Notification::create([
                 'company_id' => auth()->user()->employee->company_id,
                 'user_id' => null,
+                'notifiable_id' => $item->id,
                 'type' => 'late_clock_out',
 
                 'data' => [

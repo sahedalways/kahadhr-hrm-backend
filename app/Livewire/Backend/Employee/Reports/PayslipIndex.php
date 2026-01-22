@@ -16,6 +16,7 @@ class PayslipIndex extends BaseComponent
     use WithPagination;
 
     public $filterMonth = '';
+
     public $filterYear = '';
     public $sortOrder = 'desc';
     public $perPage = 20;
@@ -33,6 +34,7 @@ class PayslipIndex extends BaseComponent
 
     public function mount()
     {
+
         $this->loaded = collect();
         $this->loadMore();
     }
@@ -148,6 +150,7 @@ class PayslipIndex extends BaseComponent
         $notification = Notification::create([
             'company_id' => auth()->user()->employee->company_id,
             'user_id' => null,
+            'notifiable_id' => $request->id,
             'type' => 'requested_payslip',
 
             'data' => [

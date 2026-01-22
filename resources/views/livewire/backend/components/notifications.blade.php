@@ -81,6 +81,26 @@
                             'company' => $companySubDomain,
                             'leave' => $notification['notifiable_id'] ?? null,
                         ]);
+                    } elseif ($notification['type'] === 'added_signature') {
+                        $route = route('company.dashboard.document-manage.index', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif ($notification['type'] === 'training_completed') {
+                        $route = route('company.dashboard.training.index', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif ($notification['type'] === 'requested_payslip') {
+                        $route = route('company.dashboard.reports.payslips', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif (in_array($notification['type'], ['late_clock_in', 'late_clock_out', 'early_clock_out'])) {
+                        $route = route('company.dashboard.timesheet.index', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
                     } else {
                         $route = '#';
                     }

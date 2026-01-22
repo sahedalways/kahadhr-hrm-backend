@@ -43,6 +43,7 @@ class TrainingIndex extends BaseComponent
 
     public bool $require_proof = false;
     public $send_email = false;
+    public $openTrainingId = null;
     public $employees;
 
     public $trainingId;
@@ -74,6 +75,13 @@ class TrainingIndex extends BaseComponent
 
 
         $this->loadMore();
+
+         if (request()->has('id')) {
+         $this->openTrainingId = request('id');
+
+
+         $this->viewReport($this->openTrainingId);
+    }
     }
 
     public function render()
@@ -424,6 +432,8 @@ class TrainingIndex extends BaseComponent
 
         $this->training = Training::with(['assignments.user'])
             ->findOrFail($trainingId);
+
+       $this->dispatch('show-training-modal');
     }
 
 

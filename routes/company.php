@@ -163,10 +163,10 @@ Route::get('/employees/csv-template', function () {
   $callback = function () {
     $file = fopen('php://output', 'w');
 
-    fputcsv($file, ['f_name', 'l_name', 'email', 'department', 'role']);
+    fputcsv($file, ['f_name', 'l_name', 'email', 'job_title', 'nationality','share_code', 'date_of_birth','salary_type', 'contract_hours']);
 
 
-    fputcsv($file, ['John', 'Doe', 'john@example.com', 'HR', 'Employee']);
+    fputcsv($file, ['John', 'Doe', 'john@example.com', 'Officer', 'British','ABC123', '1990-01-01', 'hourly / monthly', '40']);
 
     fclose($file);
   };

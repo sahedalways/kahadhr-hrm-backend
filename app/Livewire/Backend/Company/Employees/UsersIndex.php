@@ -27,6 +27,10 @@ class UsersIndex extends BaseComponent
 
     public $filteredCountries = [];
 
+    public $nationality = 'British';
+    public $share_code;
+    public $nationalities = [];
+
 
     public $countrySearch = '';
 
@@ -35,7 +39,7 @@ class UsersIndex extends BaseComponent
 
 
     public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
-        $nationality, $home_phone, $mobile_phone, $personal_email,
+        $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status, $brp_number, $brp_expiry_date,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
@@ -123,6 +127,26 @@ class UsersIndex extends BaseComponent
         $this->code_sent = false;
         $this->verification_code = null;
     }
+
+
+
+    public function updatedState($value)
+    {
+        $this->cities = collect($this->locations)
+            ->firstWhere('state', $value)['cities'] ?? [];
+        $this->city = null;
+    }
+
+
+    public function render()
+    {
+        return view('livewire.backend.company.employees.users-index', [
+            'infos' => $this->loaded
+        ]);
+
+    }
+
+
     public function mount()
     {
         $this->loaded = collect();
@@ -155,22 +179,59 @@ class UsersIndex extends BaseComponent
         $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
             ->orderBy('id')
             ->get();
-    }
 
 
-    public function updatedState($value)
-    {
-        $this->cities = collect($this->locations)
-            ->firstWhere('state', $value)['cities'] ?? [];
-        $this->city = null;
-    }
+
+    $this->nationalities = [
+        'British',
+        'Bangladeshi',
+        'Indian',
+        'Pakistani',
+        'Sri Lankan',
+        'Nepalese',
+        'Afghan',
+        'Chinese',
+        'Japanese',
+        'Korean',
+        'Thai',
+        'Malaysian',
+        'Indonesian',
+        'Filipino',
+        'Saudi',
+        'UAE',
+        'Qatari',
+        'Kuwaiti',
+        'Omani',
+        'Egyptian',
+        'Nigerian',
+        'Kenyan',
+        'South African',
+        'American',
+        'Canadian',
+        'Mexican',
+        'Brazilian',
+        'Argentinian',
+        'German',
+        'French',
+        'Italian',
+        'Spanish',
+        'Portuguese',
+        'Dutch',
+        'Belgian',
+        'Swedish',
+        'Norwegian',
+        'Danish',
+        'Finnish',
+        'Russian',
+        'Ukrainian',
+        'Polish',
+        'Romanian',
+        'Australian',
+        'New Zealander',
+    ];
 
 
-    public function render()
-    {
-        return view('livewire.backend.company.employees.users-index', [
-            'infos' => $this->loaded
-        ]);
+
     }
 
     /* Reset input fields */
@@ -184,6 +245,7 @@ class UsersIndex extends BaseComponent
         $this->phone_no = '';
         $this->job_title = '';
         $this->title = '';
+        $this->nationality = 'British';
         $this->department_id = '';
         $this->team_id = '';
         $this->role = '';
@@ -265,6 +327,11 @@ class UsersIndex extends BaseComponent
 
     public function submitEmployee()
     {
+
+        if($this->nationality == ''){
+            $this->nationality = 'British';
+        }
+
         // Validation rules
         $rules = [
             'email' => ['required', 'email', function ($attribute, $value, $fail) {
@@ -279,9 +346,19 @@ class UsersIndex extends BaseComponent
 
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
+            'nationality' => 'required|string',
+            'date_of_birth' => 'required|date',
             'job_title' => ['nullable', 'string', 'max:255'],
             'salary_type' => ['required', 'in:hourly,monthly'],
+
         ];
+
+
+        if ($this->nationality !== 'British') {
+            $rules['share_code'] = 'required|string|max:20';
+        }else{
+            $this->share_code = null;
+        }
 
         // Contract hours only required if hourly
         if ($this->salary_type === 'hourly') {
@@ -298,7 +375,10 @@ class UsersIndex extends BaseComponent
             'email' => $this->email,
             'f_name' => $this->f_name,
             'l_name' => $this->l_name,
-            'job_title' => $this->job_title,
+            'job_title' => $this->job_title == '' || $this->job_title === null ? null : $this->job_title,
+            'nationality' => $this->nationality,
+            'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
+            'share_code' => $this->share_code ?? null,
             'role' => 'employee',
             'salary_type' => $this->salary_type,
             'contract_hours' => $this->salary_type === 'hourly' ? $this->contract_hours : null,
@@ -331,6 +411,10 @@ class UsersIndex extends BaseComponent
     }
 
 
+    public function updatedShareCode($value)
+    {
+     $this->share_code = strtoupper($value);
+    }
 
 
     /* Load more employees */
@@ -570,7 +654,7 @@ class UsersIndex extends BaseComponent
                 continue;
             }
 
-            $department = Department::where('name', $rowAssoc['department'] ?? '')->first();
+
 
             try {
                 Employee::create([
@@ -578,9 +662,14 @@ class UsersIndex extends BaseComponent
                     'email' => $rowAssoc['email'],
                     'f_name' => $rowAssoc['f_name'] ?? null,
                     'l_name' => $rowAssoc['l_name'] ?? null,
-                    'department_id' => $department?->id,
+                    'nationality' => $rowAssoc['nationality'] ?? null,
+                    'share_code' =>  $rowAssoc['nationality'] == 'British' ? null : $rowAssoc['share_code'] ?? null,
+                    'date_of_birth' => $rowAssoc['date_of_birth'] ?? null,
+                    'salary_type' => $rowAssoc['salary_type'] ?? null,
+                    'contract_hours' => $rowAssoc['salary_type'] == 'monthly' ? null : $rowAssoc['contract_hours'] ?? null,
                     'billable_from' => now()->addDays(3),
-                    'role' => in_array($rowAssoc['role'] ?? '', config('roles')) ? $rowAssoc['role'] : 'employee',
+                    'role' => 'employee',
+                    'job_title' => $rowAssoc['job_title'] ?? null,
                 ]);
             } catch (\Exception $e) {
                 $this->toast("Row " . ($index + 2) . ": " . $e->getMessage(), 'error');

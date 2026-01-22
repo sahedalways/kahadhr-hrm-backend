@@ -8,13 +8,16 @@
 
         <!-- RIGHT: Export Buttons -->
         <div class="col-auto d-flex gap-2">
-            <button wire:click="exportEmployees('pdf')" class="btn btn-sm btn-white text-primary">
+            <button wire:click="exportEmployees('pdf')"
+                    class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
-            <button wire:click="exportEmployees('excel')" class="btn btn-sm btn-white text-success">
+            <button wire:click="exportEmployees('excel')"
+                    class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
-            <button wire:click="exportEmployees('csv')" class="btn btn-sm btn-white text-info">
+            <button wire:click="exportEmployees('csv')"
+                    class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
         </div>
@@ -34,14 +37,18 @@
 
 
         <div class="col-auto">
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#customFieldModal">
+            <button class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#customFieldModal">
                 <i class="fa fa-sliders-h me-1"></i> Custom Fields
             </button>
         </div>
 
         <div class="col-auto">
-            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
-                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+            <a data-bs-toggle="modal"
+               data-bs-target="#add"
+               wire:click="resetInputFields"
+               class="btn btn-icon btn-3 btn-white text-primary mb-0">
                 <i class="fa fa-plus me-2"></i> Add New Employee
             </a>
         </div>
@@ -52,18 +59,24 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-lg-8 col-md-6 col-12">
-                    <input type="text" class="form-control shadow-sm" placeholder="Search by name, email, job title"
-                        wire:model="search" wire:keyup="set('search', $event.target.value)">
+                    <input type="text"
+                           class="form-control shadow-sm"
+                           placeholder="Search by name, email, job title"
+                           wire:model="search"
+                           wire:keyup="set('search', $event.target.value)">
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
-                    <select class="form-select" wire:change="handleSort($event.target.value)">
+                    <select class="form-select"
+                            wire:change="handleSort($event.target.value)">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>
                     </select>
-                    <select class="form-select" wire:change="handleFilter($event.target.value)">
+                    <select class="form-select"
+                            wire:change="handleFilter($event.target.value)">
                         <option value="">All Status</option>
-                        <option value="active" selected>Active Member</option>
+                        <option value="active"
+                                selected>Active Member</option>
                         <option value="former">Former Member</option>
                     </select>
                 </div>
@@ -98,12 +111,15 @@
 
                                             <td>
                                                 <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
-                                                    style="cursor:pointer; padding:2px 4px; border-radius:4px;"
-                                                    onmouseover="this.style.backgroundColor='#f0f0f0';"
-                                                    onmouseout="this.style.backgroundColor='transparent';"
-                                                    style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top" class="tooltip-btn"
-                                                    data-tooltip="Click to copy" aria-label="copy email">
+                                                      style="cursor:pointer; padding:2px 4px; border-radius:4px;"
+                                                      onmouseover="this.style.backgroundColor='#f0f0f0';"
+                                                      onmouseout="this.style.backgroundColor='transparent';"
+                                                      style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      class="tooltip-btn"
+                                                      data-tooltip="Click to copy"
+                                                      aria-label="copy email">
                                                     {{ $employee->email ?? 'N/A' }}
                                                 </span>
                                             </td>
@@ -116,7 +132,8 @@
                                                     'company' => app('authUser')->company->sub_domain,
                                                     'employee' => $employee->id,
                                                 ]) }}"
-                                                    class="badge badge-xs text-white" style="background-color:#5acaa3;">
+                                                   class="badge badge-xs text-white"
+                                                   style="background-color:#5acaa3;">
                                                     View Details
                                                 </a>
 
@@ -127,7 +144,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="text-center">No employees found</td>
+                                            <td colspan="9"
+                                                class="text-center">No employees found</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -135,7 +153,8 @@
 
                             @if ($hasMore)
                                 <div class="text-center my-3">
-                                    <button wire:click="loadMore" class="btn btn-outline-primary">Load More</button>
+                                    <button wire:click="loadMore"
+                                            class="btn btn-outline-primary">Load More</button>
                                 </div>
                             @endif
                         </div>
@@ -144,7 +163,8 @@
 
                         @if ($hasMore)
                             <div class="text-center my-3">
-                                <button wire:click="loadMore" class="btn btn-outline-primary">Load More</button>
+                                <button wire:click="loadMore"
+                                        class="btn btn-outline-primary">Load More</button>
                             </div>
                         @endif
 
@@ -173,13 +193,19 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="add" tabindex="-1" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="add"
+         tabindex="-1"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Add Employee</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -190,7 +216,9 @@
                     <!-- Select Add Method -->
                     <div class="mb-3">
                         <label class="form-label">Add Employee Via</label>
-                        <select class="form-select" wire:model.live="addMethod" wire:key="addMethod">
+                        <select class="form-select"
+                                wire:model.live="addMethod"
+                                wire:key="addMethod">
                             <option value="manual">Manual Entry</option>
                             <option value="csv">Import CSV</option>
                         </select>
@@ -198,39 +226,87 @@
 
                     <!-- Conditional: CSV Import -->
                     @if ($addMethod === 'csv')
-                        <div class="mb-3" wire:key="csv-field">
-                            <label class="form-label">Upload CSV File <span class="text-danger">*</span></label>
-                            <input type="file" wire:model="csv_file" accept=".csv" class="form-control">
-                            @error('csv_file')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                            <small class="text-muted">CSV must include headers: f_name, l_name, email,
-                                department, role</small>
+                        <div class="card shadow-sm border-0 mb-4"
+                             wire:key="csv-field">
+                            <div class="card-body">
 
+                                <h6 class="fw-semibold mb-3">
+                                    <i class="fas fa-file-csv text-success me-2"></i>
+                                    Bulk Employee Upload
+                                </h6>
 
-                            <a href="{{ route('employees.csv.template') }}"
-                                class="btn btn-sm btn-outline-secondary mt-2 ms-5">
-                                <i class="fas fa-download me-1"></i> Download CSV Template
-                            </a>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">
+                                        Upload CSV File <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="file"
+                                           wire:model="csv_file"
+                                           accept=".csv"
+                                           class="form-control">
+
+                                    @error('csv_file')
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="bg-light border rounded p-3 mb-3">
+                                    <small class="text-muted d-block mb-1">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        CSV file must contain the following headers:
+                                    </small>
+
+                                    <code class="d-block text-dark">
+                                        f_name, l_name, email, job_title, nationality, share_code, date_of_birth,
+                                        salary_type, contract_hours
+                                    </code>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <a href="{{ route('employees.csv.template') }}"
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-download me-1"></i>
+                                        Download CSV Template
+                                    </a>
+
+                                    @if ($csv_file)
+                                        <span class="text-success small">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            File selected successfully
+                                        </span>
+                                    @endif
+                                </div>
+
+                            </div>
                         </div>
 
 
-                        <button class="btn btn-primary" wire:click="importCsv" wire:loading.attr="disabled">
-                            <span wire:loading wire:target="importCsv"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Importing...</span>
-                            <span wire:loading.remove wire:target="importCsv">Import CSV</span>
+
+                        <button class="btn btn-primary"
+                                wire:click="importCsv"
+                                wire:loading.attr="disabled">
+                            <span wire:loading
+                                  wire:target="importCsv"><i
+                                   class="fas fa-spinner fa-spin me-2"></i>Importing...</span>
+                            <span wire:loading.remove
+                                  wire:target="importCsv">Import CSV</span>
                         </button>
                     @endif
 
                     <!-- Conditional: Manual Entry -->
                     @if ($addMethod === 'manual')
-                        <form wire:submit.prevent="submitEmployee" wire:key="manual-field">
+                        <form wire:submit.prevent="submitEmployee"
+                              wire:key="manual-field">
                             <div class="row g-2">
 
                                 <div class="col-md-6">
                                     <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="f_name"
-                                        placeholder="Enter first name">
+                                    <input type="text"
+                                           class="form-control"
+                                           wire:model="f_name"
+                                           placeholder="Enter first name">
                                     @error('f_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -239,9 +315,24 @@
                                 <!-- Last Name -->
                                 <div class="col-md-6">
                                     <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="l_name"
-                                        placeholder="Enter last name">
+                                    <input type="text"
+                                           class="form-control"
+                                           wire:model="l_name"
+                                           placeholder="Enter last name">
                                     @error('l_name')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label">
+                                        Date of Birth <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date"
+                                           class="form-control"
+                                           wire:model="date_of_birth">
+
+                                    @error('date_of_birth')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -250,22 +341,65 @@
                                 <!-- Email -->
                                 <div class="col-md-6">
                                     <label class="form-label">Email <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" wire:model="email" required
-                                        placeholder="Enter email">
+                                    <input type="email"
+                                           class="form-control"
+                                           wire:model="email"
+                                           placeholder="Enter email">
                                     @error('email')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
 
+
+
+
                                 <!-- Job Title -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" wire:model="job_title"
-                                        placeholder="Enter job title">
+                                    <label class="form-label">Job Title </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           wire:model="job_title"
+                                           placeholder="Enter job title">
                                     @error('job_title')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Nationality <span class="text-danger">*</span>
+                                    </label>
+
+                                    <select class="form-select"
+                                            wire:model.live="nationality">
+                                        @foreach ($nationalities as $nation)
+                                            <option value="{{ $nation }}">{{ $nation }}</option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('nationality')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+
+
+                                @if ($nationality && $nationality !== 'British')
+                                    <div class="col-md-6 mt-2">
+                                        <label class="form-label">
+                                            Share Code <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control"
+                                               wire:model.live="share_code"
+                                               placeholder="Example: WLE JFZ 6FT">
+
+                                        @error('share_code')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                @endif
 
 
 
@@ -273,8 +407,12 @@
                                 <!-- Salary Type -->
                                 <div class="col-md-6">
                                     <label class="form-label">Salary Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" wire:model.live="salary_type" wire:key="salary_type">
-                                        <option value="" selected disabled>Select Salary Type</option>
+                                    <select class="form-select"
+                                            wire:model.live="salary_type"
+                                            wire:key="salary_type">
+                                        <option value=""
+                                                selected
+                                                disabled>Select Salary Type</option>
                                         <option value="hourly">Hourly</option>
                                         <option value="monthly">Monthly</option>
                                     </select>
@@ -284,11 +422,15 @@
                                 </div>
 
                                 @if ($salary_type === 'hourly')
-                                    <div class="col-md-6" wire:key="contract-hours-field">
+                                    <div class="col-md-6"
+                                         wire:key="contract-hours-field">
                                         <label class="form-label">Contract Hours (Weekly)<span
-                                                class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" class="form-control"
-                                            wire:model="contract_hours" placeholder="Enter contract hours">
+                                                  class="text-danger">*</span></label>
+                                        <input type="number"
+                                               step="0.01"
+                                               class="form-control"
+                                               wire:model="contract_hours"
+                                               placeholder="Enter contract hours">
                                         @error('contract_hours')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -297,13 +439,18 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                                    wire:target="submitEmployee">
-                                    <span wire:loading wire:target="submitEmployee"><i
-                                            class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
-                                    <span wire:loading.remove wire:target="submitEmployee">Save</span>
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit"
+                                        class="btn btn-success"
+                                        wire:loading.attr="disabled"
+                                        wire:target="submitEmployee">
+                                    <span wire:loading
+                                          wire:target="submitEmployee"><i
+                                           class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                                    <span wire:loading.remove
+                                          wire:target="submitEmployee">Save</span>
                                 </button>
                             </div>
                         </form>
@@ -317,24 +464,31 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="customFieldModal" tabindex="-1">
+    <div wire:ignore.self
+         class="modal fade"
+         id="customFieldModal"
+         tabindex="-1">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Add Custom Employee Field</h6>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                    <button class="btn-close"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Field Label</label>
-                        <input type="text" class="form-control" wire:model="customField.label"
-                            placeholder="e.g. Emergency Contact Name">
+                        <input type="text"
+                               class="form-control"
+                               wire:model="customField.label"
+                               placeholder="e.g. Emergency Contact Name">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Field Type</label>
-                        <select class="form-select" wire:model="customField.type">
+                        <select class="form-select"
+                                wire:model="customField.type">
                             <option value="text">Text</option>
                             <option value="number">Number</option>
                             <option value="date">Date</option>
@@ -346,14 +500,19 @@
                     @if ($customField['type'] === 'select')
                         <div class="mb-3">
                             <label class="form-label">Options (comma separated)</label>
-                            <input type="text" class="form-control" wire:model="customField.options"
-                                placeholder="A+, B+, O+">
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="customField.options"
+                                   placeholder="A+, B+, O+">
                         </div>
                     @endif
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="requiredField"
-                            wire:model="customField.required">
-                        <label class="form-check-label" for="requiredField">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="requiredField"
+                               wire:model="customField.required">
+                        <label class="form-check-label"
+                               for="requiredField">
                             Required Field
                         </label>
                     </div>
@@ -361,20 +520,25 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
                     <div class="modal-footer">
 
 
-                        <button class="btn btn-primary" wire:click="saveCustomField" wire:loading.attr="disabled"
-                            wire:target="saveCustomField">
+                        <button class="btn btn-primary"
+                                wire:click="saveCustomField"
+                                wire:loading.attr="disabled"
+                                wire:target="saveCustomField">
 
 
-                            <span wire:loading wire:target="saveCustomField">
+                            <span wire:loading
+                                  wire:target="saveCustomField">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Saving...
                             </span>
 
 
-                            <span wire:loading.remove wire:target="saveCustomField">
+                            <span wire:loading.remove
+                                  wire:target="saveCustomField">
                                 Save Field
                             </span>
                         </button>

@@ -15,6 +15,9 @@ class Employee extends Model
         'company_id',
         'f_name',
         'l_name',
+        'nationality',
+        'share_code',
+        'date_of_birth',
         'title',
         'is_active',
         'role',
@@ -35,6 +38,8 @@ class Employee extends Model
         'billable_from',
         'deleted_at',
     ];
+
+
 
     protected $casts = [
         'is_active'        => 'boolean',

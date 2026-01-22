@@ -114,6 +114,8 @@ class UserTableSeeder extends Seeder
         'company_id' => $company1->id,
         'role' => 'employee',
         'email' => $emp['email'],
+        'nationality' => 'British',
+        'date_of_birth' => now()->subYears(24),
         'f_name' => $emp['f_name'],   // Added
         'l_name' => $emp['l_name'],   // Added
         'contract_hours' => 0,
@@ -141,6 +143,8 @@ class UserTableSeeder extends Seeder
         'company_id' => $company2->id,
         'role' => 'employee',
         'email' => $emp['email'],
+        'nationality' => 'British',
+        'date_of_birth' => now()->subYears(30),
         'f_name' => $emp['f_name'],   // Added
         'l_name' => $emp['l_name'],   // Added
         'contract_hours' => 50,

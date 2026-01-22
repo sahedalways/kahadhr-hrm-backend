@@ -9,7 +9,8 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body p-lg-5 p-4 shadow-sm border rounded-3 bg-white">
-                    <form class="row g-4 align-items-center" wire:submit.prevent="save">
+                    <form class="row g-4 align-items-center"
+                          wire:submit.prevent="save">
 
                         <!-- PERSONAL INFORMATION -->
                         <h5 class="fw-bold mb-0">Personal Information</h5>
@@ -18,8 +19,10 @@
                         <!-- First Name -->
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control shadow-sm" wire:model="f_name"
-                                placeholder="Enter First Name">
+                            <input type="text"
+                                   class="form-control shadow-sm"
+                                   wire:model="f_name"
+                                   placeholder="Enter First Name">
                             @error('f_name')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
@@ -28,8 +31,10 @@
                         <!-- Last Name -->
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control shadow-sm" wire:model="l_name"
-                                placeholder="Enter Last Name">
+                            <input type="text"
+                                   class="form-control shadow-sm"
+                                   wire:model="l_name"
+                                   placeholder="Enter Last Name">
                             @error('l_name')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
@@ -106,33 +111,39 @@
 
                         <!-- Date of Birth -->
                         <div class="col-md-6">
-                            <label class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" wire:model="date_of_birth">
+                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                            <input type="date"
+                                   class="form-control"
+                                   wire:model="date_of_birth">
                             @error('date_of_birth')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- Gender -->
-                        <div class="col-md-6" id="genderDropdownContainer">
+                        <div class="col-md-6"
+                             id="genderDropdownContainer">
                             <label class="form-label">Gender</label>
 
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button" id="genderDropdownButton"
-                                    style="border:1px solid #ccc; background:#fff;">
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="genderDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;">
                                     {{ $gender ? ucfirst($gender) : 'Select Gender' }}
                                 </button>
 
                                 <!-- Dropdown -->
                                 <div id="genderDropdownMenu"
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
 
 
                                     @foreach ($genderOptions as $option)
                                         @if (str_contains(strtolower($option), strtolower($genderSearch ?? '')))
-                                            <a href="#" class="dropdown-item"
-                                                wire:click.prevent="$set('gender', '{{ $option }}'); closeDropdown('gender')">
+                                            <a href="#"
+                                               class="dropdown-item"
+                                               wire:click.prevent="$set('gender', '{{ $option }}'); closeDropdown('gender')">
                                                 {{ ucfirst($option) }}
                                             </a>
                                         @endif
@@ -147,25 +158,29 @@
 
 
                         <!-- Marital Status -->
-                        <div class="col-md-6" id="maritalDropdownContainer">
+                        <div class="col-md-6"
+                             id="maritalDropdownContainer">
                             <label class="form-label">Marital Status</label>
 
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button" id="maritalDropdownButton"
-                                    style="border:1px solid #ccc; background:#fff;">
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="maritalDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;">
                                     {{ $marital_status ? ucfirst($marital_status) : 'Select Status' }}
                                 </button>
 
                                 <!-- Dropdown -->
                                 <div id="maritalDropdownMenu"
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
 
 
                                     @foreach ($maritalOptions as $option)
                                         @if (str_contains(strtolower($option), strtolower($maritalSearch ?? '')))
-                                            <a href="#" class="dropdown-item"
-                                                wire:click.prevent="$set('marital_status', '{{ $option }}'); closeDropdown('marital')">
+                                            <a href="#"
+                                               class="dropdown-item"
+                                               wire:click.prevent="$set('marital_status', '{{ $option }}'); closeDropdown('marital')">
                                                 {{ ucfirst($option) }}
                                             </a>
                                         @endif
@@ -182,7 +197,10 @@
                         <!-- Address -->
                         <div class="col-md-6">
                             <label class="form-label">Street 1</label>
-                            <input type="text" class="form-control" wire:model="street_1">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter Street 1"
+                                   wire:model="street_1">
                             @error('street_1')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -190,31 +208,38 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Street 2</label>
-                            <input type="text" class="form-control" wire:model="street_2">
+                            <input type="text"
+                                   placeholder="Enter Street 2"
+                                   class="form-control"
+                                   wire:model="street_2">
                             @error('street_2')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <!-- State Dropdown -->
-                        <div class="col-md-6" id="stateDropdownContainer">
+                        <div class="col-md-6"
+                             id="stateDropdownContainer">
                             <label class="form-label">State</label>
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button" id="stateDropdownButton"
-                                    style="border:1px solid #ccc; background:#fff;">
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="stateDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;">
                                     {{ $state ?? 'Select State' }}
                                 </button>
 
                                 <!-- Dropdown -->
                                 <div id="stateDropdownMenu"
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
 
 
                                     @foreach ($locations as $loc)
                                         @if (str_contains(strtolower($loc['state']), strtolower($stateSearch ?? '')))
-                                            <a href="#" class="dropdown-item d-flex align-items-center"
-                                                wire:click.prevent="$set('state', '{{ $loc['state'] }}'); selectState('{{ $loc['state'] }}'); closeDropdown('state')">
+                                            <a href="#"
+                                               class="dropdown-item d-flex align-items-center"
+                                               wire:click.prevent="$set('state', '{{ $loc['state'] }}'); selectState('{{ $loc['state'] }}'); closeDropdown('state')">
                                                 {{ $loc['state'] }}
                                             </a>
                                         @endif
@@ -227,25 +252,29 @@
                         </div>
 
                         <!-- City Dropdown -->
-                        <div class="col-md-6" id="cityDropdownContainer">
+                        <div class="col-md-6"
+                             id="cityDropdownContainer">
                             <label class="form-label">City</label>
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button" id="cityDropdownButton"
-                                    style="border:1px solid #ccc; background:#fff;"
-                                    @if (!$cities) disabled @endif>
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="cityDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;"
+                                        @if (!$cities) disabled @endif>
                                     {{ $city ?? 'Select City' }}
                                 </button>
 
                                 <!-- Dropdown -->
                                 <div id="cityDropdownMenu"
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
 
 
                                     @foreach ($cities as $c)
                                         @if (str_contains(strtolower($c), strtolower($citySearch ?? '')))
-                                            <a href="#" class="dropdown-item d-flex align-items-center"
-                                                wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown('city')">
+                                            <a href="#"
+                                               class="dropdown-item d-flex align-items-center"
+                                               wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown('city')">
                                                 {{ $c }}
                                             </a>
                                         @endif
@@ -260,36 +289,47 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Postcode</label>
-                            <input type="text" class="form-control" wire:model="postcode"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter Postcode"
+                                   wire:model="postcode"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('postcode')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <div class="col-md-6" id="countryDropdownContainer">
+                        <div class="col-md-6"
+                             id="countryDropdownContainer">
                             <label class="form-label">Country</label>
 
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button" id="countryDropdownButton"
-                                    style="border:1px solid #ccc; background:#fff;">
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="countryDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;">
                                     {{ $country ?? 'Select Country' }}
                                 </button>
 
                                 <!-- Dropdown -->
-                                <div id="countryDropdownMenu" wire:ignore.self
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search country..."
-                                        wire:model.live="countrySearch">
+                                <div id="countryDropdownMenu"
+                                     wire:ignore.self
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                    <input type="text"
+                                           class="form-control mb-2"
+                                           placeholder="Search country..."
+                                           wire:model.live="countrySearch">
 
                                     @foreach ($filteredCountries as $c)
-                                        <a href="#" class="dropdown-item d-flex align-items-center"
-                                            wire:click.prevent="$set('country', '{{ $c['name'] }}'); closeDropdown()">
+                                        <a href="#"
+                                           class="dropdown-item d-flex align-items-center"
+                                           wire:click.prevent="$set('country', '{{ $c['name'] }}'); closeDropdown()">
 
                                             <!-- Flag Image -->
-                                            <img src="{{ $c['image'] }}" alt="{{ $c['name'] }}"
-                                                style="width:20px; height:15px; margin-right:8px;">
+                                            <img src="{{ $c['image'] }}"
+                                                 alt="{{ $c['name'] }}"
+                                                 style="width:20px; height:15px; margin-right:8px;">
 
                                             {{ $c['name'] }}
                                         </a>
@@ -304,20 +344,50 @@
 
 
 
-                        <!-- Nationality -->
                         <div class="col-md-6">
-                            <label class="form-label">Nationality</label>
-                            <input type="text" class="form-control" wire:model="nationality">
+                            <label class="form-label">
+                                Nationality <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select"
+                                    wire:model.live="nationality">
+                                @foreach ($nationalities as $nation)
+                                    <option value="{{ $nation }}">{{ $nation }}</option>
+                                @endforeach
+                            </select>
+
                             @error('nationality')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
+
+
+                        @if ($nationality && $nationality !== 'British')
+                            <div class="col-md-6 mt-2">
+                                <label class="form-label">
+                                    Share Code <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model.live="share_code"
+                                       placeholder="Example: WLE JFZ 6FT">
+
+                                @error('share_code')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
+
+
                         <!-- Phones & Email -->
                         <div class="col-md-6">
                             <label class="form-label">Home Phone</label>
-                            <input type="text" class="form-control" wire:model="home_phone"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="home_phone"
+                                   placeholder="Enter Home Phone"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('home_phone')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -325,7 +395,10 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Personal Email</label>
-                            <input type="email" class="form-control" wire:model="personal_email">
+                            <input type="email"
+                                   class="form-control"
+                                   placeholder="Enter Personal Email"
+                                   wire:model="personal_email">
                             @error('personal_email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -334,32 +407,39 @@
                         <!-- Tax, Immigration, BRP & Passport -->
                         <div class="col-md-6">
                             <label class="form-label">Tax Reference Number</label>
-                            <input type="text" class="form-control" wire:model="tax_reference_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter Tax Reference No."
+                                   wire:model="tax_reference_number"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('tax_reference_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <div class="col-md-6" id="immigrationDropdownContainer">
+                        <div class="col-md-6"
+                             id="immigrationDropdownContainer">
                             <label class="form-label">Immigration Status / Visa Type</label>
 
                             <div style="position:relative;">
                                 <!-- Button -->
-                                <button class="btn btn-sm w-100 text-start" type="button"
-                                    id="immigrationDropdownButton" style="border:1px solid #ccc; background:#fff;">
+                                <button class="btn btn-sm w-100 text-start"
+                                        type="button"
+                                        id="immigrationDropdownButton"
+                                        style="border:1px solid #ccc; background:#fff;">
                                     {{ $immigration_status ?? 'Select Immigration Status / Visa Type' }}
                                 </button>
 
                                 <!-- Dropdown -->
                                 <div id="immigrationDropdownMenu"
-                                    style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px;">
 
 
                                     @foreach ($immigrationOptions as $option)
                                         @if (str_contains(strtolower($option), strtolower($immigrationSearch ?? '')))
-                                            <a href="#" class="dropdown-item"
-                                                wire:click.prevent="$set('immigration_status', '{{ $option }}'); closeDropdown('immigration')">
+                                            <a href="#"
+                                               class="dropdown-item"
+                                               wire:click.prevent="$set('immigration_status', '{{ $option }}'); closeDropdown('immigration')">
                                                 {{ $option }}
                                             </a>
                                         @endif
@@ -374,8 +454,11 @@
 
                         <div class="col-md-6">
                             <label class="form-label">BRP Number</label>
-                            <input type="text" class="form-control" wire:model="brp_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter BRP No."
+                                   wire:model="brp_number"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('brp_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -383,7 +466,10 @@
 
                         <div class="col-md-6">
                             <label class="form-label">BRP Expiry Date</label>
-                            <input type="date" class="form-control" wire:model="brp_expiry_date">
+                            <input type="date"
+                                   class="form-control"
+                                   placeholder="Enter BRP Expiry Date"
+                                   wire:model="brp_expiry_date">
                             @error('brp_expiry_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -391,7 +477,10 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Right to Work Expiry Date</label>
-                            <input type="date" class="form-control" wire:model="right_to_work_expiry_date">
+                            <input type="date"
+                                   placeholder="Enter Right to Work Expiry Date"
+                                   class="form-control"
+                                   wire:model="right_to_work_expiry_date">
                             @error('right_to_work_expiry_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -399,8 +488,11 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Passport Number</label>
-                            <input type="text" class="form-control" wire:model="passport_number"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Enter Passport No."
+                                   wire:model="passport_number"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('passport_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -408,7 +500,9 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Passport Expiry Date</label>
-                            <input type="date" class="form-control" wire:model="passport_expiry_date">
+                            <input type="date"
+                                   class="form-control"
+                                   wire:model="passport_expiry_date">
                             @error('passport_expiry_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -430,18 +524,22 @@
                                     </label>
 
                                     @if ($field->type === 'text')
-                                        <input type="text" class="form-control"
-                                            placeholder="Enter {{ $field->name }}"
-                                            wire:model.defer="customValues.{{ $field->id }}">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="Enter {{ $field->name }}"
+                                               wire:model.defer="customValues.{{ $field->id }}">
                                     @elseif($field->type === 'date')
-                                        <input type="date" class="form-control" placeholder="{{ $field->name }}"
-                                            wire:model.defer="customValues.{{ $field->id }}">
+                                        <input type="date"
+                                               class="form-control"
+                                               placeholder="{{ $field->name }}"
+                                               wire:model.defer="customValues.{{ $field->id }}">
                                     @elseif($field->type === 'textarea')
-                                        <textarea class="form-control" placeholder="Enter {{ $field->name }}"
-                                            wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                        <textarea class="form-control"
+                                                  placeholder="Enter {{ $field->name }}"
+                                                  wire:model.defer="customValues.{{ $field->id }}"></textarea>
                                     @elseif($field->type === 'select')
                                         <select class="form-select"
-                                            wire:model.defer="customValues.{{ $field->id }}">
+                                                wire:model.defer="customValues.{{ $field->id }}">
                                             <option value="">{{ $field->name }}</option>
                                             @foreach ($field->options ?? [] as $opt)
                                                 <option value="{{ $opt }}">{{ $opt }}</option>
@@ -457,12 +555,16 @@
                         <!-- SUBMIT -->
                         <hr class="mt-4">
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-success px-4 py-2 shadow-sm"
-                                wire:loading.attr="disabled" wire:target="save">
-                                <span wire:loading wire:target="save">
+                            <button type="submit"
+                                    class="btn btn-success px-4 py-2 shadow-sm"
+                                    wire:loading.attr="disabled"
+                                    wire:target="save">
+                                <span wire:loading
+                                      wire:target="save">
                                     <i class="fas fa-spinner fa-spin me-2"></i> Saving...
                                 </span>
-                                <span wire:loading.remove wire:target="save">Save</span>
+                                <span wire:loading.remove
+                                      wire:target="save">Save</span>
                             </button>
                         </div>
 

@@ -35,11 +35,15 @@ class EmployeeDetails extends BaseComponent
 
     public $employees, $employee_id, $title;
 
+    public $nationality = 'British';
+    public $share_code;
+    public $nationalities = [];
+
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
 
     public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
-        $nationality, $home_phone, $mobile_phone, $personal_email,
+       $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status, $brp_number, $brp_expiry_date,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
@@ -211,6 +215,55 @@ class EmployeeDetails extends BaseComponent
         $this->customValues = $this->employee->customFieldValues
             ->pluck('value', 'field_id')
             ->toArray();
+
+
+    $this->nationalities = [
+        'British',
+        'Bangladeshi',
+        'Indian',
+        'Pakistani',
+        'Sri Lankan',
+        'Nepalese',
+        'Afghan',
+        'Chinese',
+        'Japanese',
+        'Korean',
+        'Thai',
+        'Malaysian',
+        'Indonesian',
+        'Filipino',
+        'Saudi',
+        'UAE',
+        'Qatari',
+        'Kuwaiti',
+        'Omani',
+        'Egyptian',
+        'Nigerian',
+        'Kenyan',
+        'South African',
+        'American',
+        'Canadian',
+        'Mexican',
+        'Brazilian',
+        'Argentinian',
+        'German',
+        'French',
+        'Italian',
+        'Spanish',
+        'Portuguese',
+        'Dutch',
+        'Belgian',
+        'Swedish',
+        'Norwegian',
+        'Danish',
+        'Finnish',
+        'Russian',
+        'Ukrainian',
+        'Polish',
+        'Romanian',
+        'Australian',
+        'New Zealander',
+    ];
     }
 
 
@@ -219,6 +272,11 @@ class EmployeeDetails extends BaseComponent
         $this->cities = collect($this->locations)
             ->firstWhere('state', $value)['cities'] ?? [];
         $this->city = null;
+    }
+
+    public function updatedShareCode($value)
+    {
+        $this->share_code = strtoupper($value);
     }
 
 
@@ -269,6 +327,7 @@ class EmployeeDetails extends BaseComponent
         $this->end_date = '';
         $this->is_active = 1;
 
+
         // Avatar
         $this->avatar_preview = '';
         $this->avatar = '';
@@ -312,10 +371,14 @@ class EmployeeDetails extends BaseComponent
             return;
         }
 
+
         // Load all relevant fields
         $this->f_name = $this->employee->f_name;
         $this->l_name = $this->employee->l_name;
         $this->title = $this->employee->title;
+        $this->nationality = $this->employee->nationality;
+        $this->date_of_birth = $this->employee->date_of_birth;
+        $this->share_code = $this->employee->share_code ?? null;
         $this->email = $this->employee->email;
         $this->job_title = $this->employee->job_title;
         $this->department_id = $this->employee->department_id;
@@ -333,14 +396,12 @@ class EmployeeDetails extends BaseComponent
         $profile = $this->employee->profile;
 
         if ($profile) {
-            $this->date_of_birth = $profile->date_of_birth;
             $this->street_1 = $profile->street_1;
             $this->street_2 = $profile->street_2;
             $this->city = $profile->city ?: null;
             $this->state = $profile->state ?: null;
             $this->postcode = $profile->postcode;
             $this->country = $profile->country ?: 'United Kingdom';
-            $this->nationality = $profile->nationality;
             $this->home_phone = $profile->home_phone;
             $this->mobile_phone = $profile->mobile_phone;
             $this->personal_email = $profile->personal_email;
@@ -450,6 +511,10 @@ class EmployeeDetails extends BaseComponent
             return;
         }
 
+         if($this->nationality == ''){
+            $this->nationality = 'British';
+        }
+
         // Validation rules
         $rules = [
             'f_name' => 'required|string|max:255',
@@ -463,14 +528,14 @@ class EmployeeDetails extends BaseComponent
             'avatar' => 'nullable|image|max:2048',
 
 
-            'date_of_birth' => 'nullable|date',
             'street_1' => 'nullable|string|max:255',
             'street_2' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
             'postcode' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
-            'nationality' => 'nullable|string|max:100',
+            'nationality' => 'required|string',
+            'date_of_birth' => 'required|date',
 
 
             'home_phone' => 'nullable|string|max:20',
@@ -500,6 +565,12 @@ class EmployeeDetails extends BaseComponent
             $this->contract_hours = null;
         }
 
+         if ($this->nationality !== 'British') {
+            $rules['share_code'] = 'required|string|max:20';
+        }else{
+            $this->share_code = null;
+        }
+
         $validatedData = $this->validate($rules);
 
 
@@ -518,6 +589,9 @@ class EmployeeDetails extends BaseComponent
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
             'title' => $this->title,
+            'nationality' => $this->nationality,
+            'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
+            'share_code' => $this->share_code ?? null,
 
             'role' => 'employee',
             'salary_type' => $this->salary_type,

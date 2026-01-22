@@ -27,6 +27,10 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'teamLead'])->default('employee');
 
+            $table->string('nationality');
+            $table->string('share_code')->nullable();
+            $table->date('date_of_birth');
+
             $table->string('job_title')->nullable();
             $table->foreignId('department_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('set null');
@@ -38,6 +42,7 @@ return new class extends Migration
             $table->timestamp('invite_token_expires_at')->nullable();
             $table->boolean('verified')->default(false);
             $table->date('billable_from')->nullable();
+
 
             $table->softDeletes();
 

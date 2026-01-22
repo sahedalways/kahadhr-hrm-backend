@@ -10,16 +10,24 @@
 <div class="position-relative">
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky
         @if (in_array($userType, ['admin', 'superAdmin'])) admin-fixed-header @endif"
-        id="navbarBlur" data-scroll="false">
+         id="navbarBlur"
+         data-scroll="false">
         <div class="container-fluid py-1 px-3 position-relative">
 
 
 
-            <input type="hidden" id="pusher_key" value="{{ config('broadcasting.connections.pusher.key') }}">
-            <input type="hidden" id="pusher_cluster"
-                value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
-            <input type="hidden" id="current_company_id" value="{{ currentCompanyId() }}">
-            <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
+            <input type="hidden"
+                   id="pusher_key"
+                   value="{{ config('broadcasting.connections.pusher.key') }}">
+            <input type="hidden"
+                   id="pusher_cluster"
+                   value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+            <input type="hidden"
+                   id="current_company_id"
+                   value="{{ currentCompanyId() }}">
+            <input type="hidden"
+                   id="current_user_id"
+                   value="{{ auth()->id() }}">
 
             <!-- RIGHT SIDE ICON + PROFILE -->
             <div class="d-flex align-items-center gap-3 position-relative w-100">
@@ -28,8 +36,8 @@
 
                 @if (auth()->user()->user_type == 'employee' || auth()->user()->user_type == 'manager')
                     <div x-data
-                        x-on:header-timer-update.window="$wire.updateTimer($event.detail.time, $event.detail.running)"
-                        class="d-flex align-items-center gap-2">
+                         x-on:header-timer-update.window="$wire.updateTimer($event.detail.time, $event.detail.running)"
+                         class="d-flex align-items-center gap-2">
 
                         <div class="
             d-inline-flex align-items-center gap-2
@@ -41,7 +49,7 @@
             border border-1 border-white-10
             bg-gradient-to-r from-primary to-info
         "
-                            style="--bs-bg-opacity:.15;
+                             style="--bs-bg-opacity:.15;
                background: linear-gradient(135deg, rgba(var(--bs-primary-rgb),.85) 0%, rgba(var(--bs-info-rgb),.75) 100%);
                backdrop-filter: blur(4px);
                -webkit-backdrop-filter: blur(4px);">
@@ -54,7 +62,7 @@
 
                             @if ($isRunning)
                                 <div class="timer-running-dot rounded-circle bg-white"
-                                    style="width:8px;height:8px;animation:pulse 1.2s infinite"></div>
+                                     style="width:8px;height:8px;animation:pulse 1.2s infinite"></div>
                             @endif
                         </div>
                     </div>
@@ -82,13 +90,14 @@
 
                     <!-- NOTIFICATION ICON -->
                     @if ($userType !== 'superAdmin')
-                        <span class="d-flex position-relative cursor-pointer" id="notificationBell"
-                            wire:click="markAllAsRead">
+                        <span class="d-flex position-relative cursor-pointer"
+                              id="notificationBell"
+                              wire:click="markAllAsRead">
                             <i class="fa-regular fa-bell fs-4 text-white"></i>
 
                             @if ($unreadCount > 0)
                                 <span
-                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1 fs-6">
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-1 fs-6">
                                     {{ $unreadCount }}
                                 </span>
                             @endif
@@ -97,7 +106,9 @@
 
                         <!-- NOTIFICATION DROPDOWN -->
 
-                        <div class="notification-dropdown px-2" id="notificationDropdown" wire:ignore>
+                        <div class="notification-dropdown px-2"
+                             id="notificationDropdown"
+                             wire:ignore>
                             @livewire('backend.components.notifications')
                         </div>
                     @endif
@@ -106,23 +117,29 @@
                         <div class="dropdown">
 
 
-                            <div id="profileDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false"
-                                class="cursor-pointer d-flex flex-nowrap align-items-center gap-2">
+                            <div id="profileDropdownToggle"
+                                 data-bs-toggle="dropdown"
+                                 aria-expanded="false"
+                                 class="cursor-pointer d-flex flex-nowrap align-items-center gap-2">
                                 <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
-                                    alt="Avatar" class="rounded-circle cursor-pointer dropdown-toggle" width="40"
-                                    height="40">
+                                     alt="Avatar"
+                                     class="rounded-circle cursor-pointer dropdown-toggle"
+                                     width="40"
+                                     height="40">
                                 <i class="fa-solid fa-caret-down"></i>
                             </div>
 
 
-                            <ul class="dropdown-menu dropdown-menu-end profile-dropdown" id="profileDropdown"
-                                wire:ignore style="min-width: 280px; max-height: 400px; overflow-y: auto;">
+                            <ul class="dropdown-menu dropdown-menu-end profile-dropdown"
+                                id="profileDropdown"
+                                wire:ignore
+                                style="min-width: 280px; max-height: 400px; overflow-y: auto;">
 
                                 {{-- My Profile Link --}}
                                 @if (in_array($userType, ['employee', 'manager']))
                                     <li>
                                         <a class="dropdown-item"
-                                            href="{{ route('employee.dashboard.profile.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                           href="{{ route('employee.dashboard.profile.index', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                                             <i class="fas fa-user-circle me-2"></i> My Profile
                                         </a>
                                     </li>
@@ -132,9 +149,11 @@
                                 <li class="dropdown-submenu">
 
                                     <a class="dropdown-item d-flex justify-content-between align-items-center"
-                                        data-bs-toggle="collapse" href="#settingsCollapse" role="button"
-                                        aria-expanded="{{ Request::is('*dashboard/settings*') ? 'true' : 'false' }}"
-                                        aria-controls="settingsCollapse">
+                                       data-bs-toggle="collapse"
+                                       href="#settingsCollapse"
+                                       role="button"
+                                       aria-expanded="{{ Request::is('*dashboard/settings*') ? 'true' : 'false' }}"
+                                       aria-controls="settingsCollapse">
                                         <span class="d-flex align-items-center"><i class="fas fa-cog me-2"></i>
                                             Settings</span>
                                         <i class="fas fa-chevron-right"></i>
@@ -142,57 +161,58 @@
 
 
                                     <div class="collapse {{ Request::is('*dashboard/settings*') ? 'show' : '' }} nested-settings-menu"
-                                        id="settingsCollapse" **wire:ignore.self**>
+                                         id="settingsCollapse"
+                                         **wire:ignore.self**>
 
 
                                         <ul class="list-unstyled ms-4 p-0">
                                             @if ($userType === 'company')
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.profile', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-user me-2"></i> Profile Settings
                                                     </a>
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.bank-info', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-university me-2"></i> Subscriptions Settings
                                                     </a>
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.verification-center', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.verification-center', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-shield-alt me-2"></i> Verification Center
                                                     </a>
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-envelope me-2"></i> Mail Settings
                                                     </a>
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.calendar-year', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.calendar-year', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-calendar-alt me-2"></i> Calendar Year Settings
                                                     </a>
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                       href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
                                                         <i class="fas fa-lock me-2"></i> Password Settings
                                                     </a>
                                                 </li>
                                             @elseif(in_array($userType, ['employee', 'manager']))
                                                 <li class="p-0 mt-1">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('employee.dashboard.settings.verification-center', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                                       href="{{ route('employee.dashboard.settings.verification-center', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                                                         <i class="fas fa-shield-alt me-2"></i> Verification Center
                                                     </a>
                                                 </li>
                                                 <li class="p-0 mt-1">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                                       href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
                                                         <i class="fas fa-lock me-2"></i> Password Settings
                                                     </a>
                                                 </li>
@@ -207,11 +227,12 @@
                                 </li>
 
 
-                                <li><a class="dropdown-item" href="#"><i
-                                            class="fas fa-question-circle me-2"></i>
+                                <li><a class="dropdown-item"
+                                       href="#"><i class="fas fa-question-circle me-2"></i>
                                         Help
                                         Center</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-headset me-2"></i>
+                                <li><a class="dropdown-item"
+                                       href="#"><i class="fas fa-headset me-2"></i>
                                         Support</a>
                                 </li>
 
@@ -221,8 +242,9 @@
                                 </li>
                                 <li>
 
-                                    <a class="dropdown-item" href="#" wire:click.prevent="logout"><i
-                                            class="fas fa-sign-out-alt me-2"></i>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       wire:click.prevent="logout"><i class="fas fa-sign-out-alt me-2"></i>
                                         Logout</a>
                                 </li>
                             </ul>
@@ -236,7 +258,8 @@
 
                     <!-- CLOCK ICON -->
                     @if (auth()->user()->user_type == 'employee')
-                        <span class="d-flex cursor-pointer text-white" onclick="checkTodaysShift()">
+                        <span class="d-flex cursor-pointer text-white"
+                              onclick="checkTodaysShift()">
                             <i class="fa-regular fa-clock fs-4"></i>
                         </span>
                     @endif

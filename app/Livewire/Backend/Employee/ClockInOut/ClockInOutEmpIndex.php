@@ -21,6 +21,7 @@ class ClockInOutEmpIndex extends BaseComponent
     public $loaded;
     public $lastId = null;
     public $hasMore = true;
+    public $isRunning = false;
     public $startDate;
     public $endDate;
 
@@ -30,6 +31,8 @@ class ClockInOutEmpIndex extends BaseComponent
     {
         $this->loaded = collect();
         $this->loadMore();
+
+        $this->checkRunningAttendance();
     }
 
     public function render()
@@ -38,6 +41,28 @@ class ClockInOutEmpIndex extends BaseComponent
             'infos' => $this->loaded
         ]);
     }
+
+
+
+    public function checkRunningAttendance()
+{
+    $user = auth()->user();
+
+    if (!$user || $user->user_type !== 'employee') {
+        $this->isRunning = false;
+        return;
+    }
+
+    $runningAttendance = Attendance::where('user_id', $user->id)
+        ->whereDate('clock_in', Carbon::today())
+        ->whereNotNull('clock_in')
+        ->whereNull('clock_out')
+        ->latest()
+        ->first();
+
+    $this->isRunning = $runningAttendance ? true : false;
+}
+
 
     public function updatedSearch()
     {

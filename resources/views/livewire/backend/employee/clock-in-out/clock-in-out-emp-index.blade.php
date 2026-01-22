@@ -6,27 +6,49 @@
 
 <div>
     <!-- Header -->
-    <div class="row mb-3 align-items-center justify-content-between">
-        <div class="col-auto">
-            <h5 class="fw-500">My Clock In / Out</h5>
+    <div class="row mb-3 align-items-center">
+
+        <!-- Left: Title -->
+        <div class="col-md-4 col-12 mb-2 mb-md-0">
+            <h5 class="fw-500 mb-0">My Clock In / Out</h5>
         </div>
 
-        <div class="col-auto d-flex gap-2">
-            <!-- Export buttons -->
+        <!-- Middle: Clock Status -->
+        <div class="col-md-4 col-12 text-md-center mb-2 mb-md-0">
+            @if (auth()->user()->user_type === 'employee')
+                @if ($isRunning)
+                    <span class="badge bg-success-subtle text-success px-3 py-2 border border-success-subtle">
+                        🟢 Clocked In
+                    </span>
+                @else
+                    <span class="badge bg-danger-subtle text-danger px-3 py-2 border border-danger-subtle">
+                        🔴 Clocked Out
+                    </span>
+                @endif
+
+            @endif
+        </div>
+
+        <!-- Right: Export Buttons -->
+        <div class="col-md-4 col-12 d-flex justify-content-md-end gap-2">
             <button wire:click="exportAttendance('pdf')"
                     class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
+
             <button wire:click="exportAttendance('excel')"
                     class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
+
             <button wire:click="exportAttendance('csv')"
                     class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
         </div>
+
     </div>
+
 
     <!-- Search + Sort -->
     <div class="row mb-3 align-items-end mt-4 g-3">

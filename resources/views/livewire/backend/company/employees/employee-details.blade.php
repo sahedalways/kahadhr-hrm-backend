@@ -708,7 +708,11 @@
 
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Nationality</dt>
                                         <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->nationality) ? $profile->nationality : 'N/A' }}
+                                            {{ !empty($profile->employee->nationality) ? $profile->employee->nationality : 'N/A' }}
+                                        </dd>
+                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Share Code</dt>
+                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
+                                            {{ !empty($profile->employee->share_code) ? $profile->employee->share_code : 'N/A' }}
                                         </dd>
 
                                         <hr style="margin:0.75rem 0; border-color:#dee2e6;">

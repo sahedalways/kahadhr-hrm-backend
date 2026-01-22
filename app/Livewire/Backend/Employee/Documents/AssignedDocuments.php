@@ -16,6 +16,7 @@ class AssignedDocuments extends BaseComponent
     use WithPagination;
 
     public $perPage = 12;
+    public $openDocId = null;
     public $search = '';
     public $sortOrder = 'desc';
     public $loaded;
@@ -28,6 +29,14 @@ class AssignedDocuments extends BaseComponent
 
     public function mount()
     {
+     if (request()->has('id')) {
+         $this->openDocId = request('id');
+
+
+         $this->openDocumentModal($this->openDocId);
+    }
+
+
         $this->loaded = collect();
         $this->loadMore();
     }
@@ -185,5 +194,7 @@ class AssignedDocuments extends BaseComponent
     public function openDocumentModal($docId)
     {
         $this->currentDocument = CompanyDocument::find($docId);
+
+         $this->dispatch('show-doc-modal');
     }
 }

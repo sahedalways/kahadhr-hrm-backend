@@ -1,3 +1,9 @@
+@php
+    $id = request('id');
+@endphp
+
+
+
 <div>
     <div class="row g-3 align-items-center justify-content-between mb-4">
 
@@ -9,8 +15,9 @@
 
         <div class="col-auto">
 
-            <a data-bs-toggle="modal" data-bs-target="#requestPayslipModal"
-                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+            <a data-bs-toggle="modal"
+               data-bs-target="#requestPayslipModal"
+               class="btn btn-icon btn-3 btn-white text-primary mb-0">
                 <i class="fa-solid fa-file-invoice me-2"></i> Request for Payslip
             </a>
 
@@ -27,7 +34,7 @@
 
                             <div class="col-md-3">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleMonthFilter($event.target.value)">
+                                        wire:change="handleMonthFilter($event.target.value)">
                                     <option value="">All Months</option>
                                     @foreach (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $m)
                                         <option value="{{ $m }}">{{ $m }}</option>
@@ -37,7 +44,7 @@
 
                             <div class="col-md-3">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleYearFilter($event.target.value)">
+                                        wire:change="handleYearFilter($event.target.value)">
                                     <option value="">All Years</option>
                                     @for ($y = date('Y') - 5; $y <= date('Y') + 5; $y++)
                                         <option value="{{ $y }}">{{ $y }}</option>
@@ -47,7 +54,7 @@
 
                             <div class="col-md-3">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
+                                        wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
                                 </select>
@@ -67,57 +74,65 @@
         <div class="col-12">
             <div class="card">
 
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Period</th>
-                                <th>File</th>
-                                <th>Uploaded At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $i = 1; @endphp
-                            @forelse($infos as $row)
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>{{ $i++ }}</td>
-                                    <td>{{ $row->period }}</td>
-                                    <td>
-                                        <a href="{{ asset('storage/' . $row->file_path) }}" target="_blank"
-                                            class="btn btn-sm btn-primary">View</a>
-                                    </td>
-                                    <td>{{ date('d M, Y', strtotime($row->created_at)) }}</td>
-
+                                    <th>#</th>
+                                    <th>Period</th>
+                                    <th>File</th>
+                                    <th>Uploaded At</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">No payslips found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @php $i = 1; @endphp
+                                @forelse($infos as $row)
+                                    <tr class="{{ $id == $row->id ? 'table-primary' : '' }}">
+                                        <td>{{ $i++ }}</td>
+                                        <td>{{ $row->period }}</td>
+                                        <td>
+                                            <a href="{{ asset('storage/' . $row->file_path) }}"
+                                               target="_blank"
+                                               class="btn btn-sm btn-primary">View</a>
+                                        </td>
+                                        <td>{{ date('d M, Y', strtotime($row->created_at)) }}</td>
 
-                    @if ($hasMore)
-                        <div class="text-center mt-4">
-                            <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
-                                Load More
-                            </button>
-                        </div>
-                    @endif
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5"
+                                            class="text-center">No payslips found</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+
+                        @if ($hasMore)
+                            <div class="text-center mt-4">
+                                <button wire:click="loadMore"
+                                        class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                    Load More
+                                </button>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="requestPayslipModal" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="requestPayslipModal"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Upload Payslip</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -130,7 +145,8 @@
                             <label class="form-label">Period <span class="text-danger">*</span></label>
                             <div class="d-flex gap-2">
                                 {{-- Month --}}
-                                <select class="form-select" wire:model="month">
+                                <select class="form-select"
+                                        wire:model="month">
                                     <option value="">Month</option>
                                     @foreach (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $m)
                                         <option value="{{ $m }}">{{ $m }}</option>
@@ -138,7 +154,8 @@
                                 </select>
 
                                 {{-- Year --}}
-                                <select class="form-select" wire:model="year">
+                                <select class="form-select"
+                                        wire:model="year">
                                     <option value="">Year</option>
                                     @for ($y = date('Y') - 5; $y <= date('Y') + 5; $y++)
                                         <option value="{{ $y }}">{{ $y }}</option>
@@ -157,12 +174,19 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled" wire:target="send">
-                            <span wire:loading wire:target="send">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="send">
+                            <span wire:loading
+                                  wire:target="send">
                                 <i class="fas fa-spinner fa-spin me-2"></i>Requesting ...
                             </span>
-                            <span wire:loading.remove wire:target="send">Send Request</span>
+                            <span wire:loading.remove
+                                  wire:target="send">Send Request</span>
                         </button>
                     </div>
                 </form>

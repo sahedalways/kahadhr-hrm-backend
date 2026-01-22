@@ -34,7 +34,13 @@
                         : $authUser->employee->company->sub_domain;
 
                 if ($authUser->user_type === 'employee') {
-                    if ($notification['type'] === 'manual_attendance_submitted') {
+                    if (
+                        in_array($notification['type'], [
+                            'manual_attendance_submitted',
+                            'attendance_request_approved',
+                            'attendance_request_rejected',
+                        ])
+                    ) {
                         $route = route('employee.dashboard.clock.index', [
                             'company' => $companySubDomain,
                             'id' => $notification['notifiable_id'] ?? null,
@@ -49,6 +55,21 @@
                         $route = route('employee.dashboard.leaves.index', [
                             'company' => $companySubDomain,
                             'leave' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif (in_array($notification['type'], ['assigned_training'])) {
+                        $route = route('employee.dashboard.training.index', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif (in_array($notification['type'], ['submitted_payslip'])) {
+                        $route = route('employee.dashboard.reports.payslips', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
+                    } elseif (in_array($notification['type'], ['assigned_document'])) {
+                        $route = route('employee.dashboard.documents.assigned', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
                         ]);
                     } else {
                         // default route if needed

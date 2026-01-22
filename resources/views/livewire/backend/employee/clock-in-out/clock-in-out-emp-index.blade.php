@@ -17,14 +17,25 @@
         <div class="col-md-4 col-12 text-md-center mb-2 mb-md-0">
             @if (auth()->user()->user_type === 'employee')
                 @if ($isRunning)
-                    <span class="badge bg-success-subtle text-success px-3 py-2 border border-success-subtle">
-                        🟢 Clocked In
+                    <span
+                          class="d-inline-flex align-items-center gap-2
+                 px-3 py-2 rounded-pill
+                 bg-success-subtle text-success border border-success-subtle fw-medium">
+                        <i class="fas fa-circle text-success"
+                           style="font-size: 10px;"></i>
+                        Clocked In
                     </span>
                 @else
-                    <span class="badge bg-danger-subtle text-danger px-3 py-2 border border-danger-subtle">
-                        🔴 Clocked Out
+                    <span
+                          class="d-inline-flex align-items-center gap-2
+                 px-3 py-2 rounded-pill
+                 bg-danger-subtle text-danger border border-danger-subtle fw-medium">
+                        <i class="fas fa-circle text-danger"
+                           style="font-size: 10px;"></i>
+                        Clocked Out
                     </span>
                 @endif
+
 
             @endif
         </div>

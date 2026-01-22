@@ -60,7 +60,7 @@ class ClockModal extends BaseComponent
 
         $needsApproval = false;
 
-        if ($bdTime->gt($shiftStart->copy()->addMinutes($grace))) {
+        if ($ukTime->gt($shiftStart->copy()->addMinutes($grace))) {
             $needsApproval = true;
             $this->showClockInReason = true;
 
@@ -77,7 +77,7 @@ class ClockModal extends BaseComponent
         $attendance = Attendance::create([
             'user_id' => Auth::id(),
             'company_id' => Auth::user()->employee->company_id,
-            'clock_in' => $bdTime,
+            'clock_in' => $ukTime,
             'clock_in_location' => $this->clockInLocation,
             'is_manual' => false,
             'needs_approval' => $needsApproval,
@@ -154,7 +154,7 @@ class ClockModal extends BaseComponent
         $type = null;
 
         // Late clock out or early clock out
-        if ($bdTime->lt($shiftEnd->copy()->subMinutes($grace))) {
+        if ($ukTime->lt($shiftEnd->copy()->subMinutes($grace))) {
             $needsApproval = true;
             $type = 'early_clock_out';
 
@@ -166,7 +166,7 @@ class ClockModal extends BaseComponent
             } else {
                 $this->showClockOutReason = false;
             }
-        } elseif ($bdTime->gt($shiftEnd->copy()->addMinutes($grace))) {
+        } elseif ($ukTime->gt($shiftEnd->copy()->addMinutes($grace))) {
             $needsApproval = true;
             $type = 'late_clock_out';
             if (empty($this->clockOutReason)) {

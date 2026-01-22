@@ -1610,7 +1610,7 @@
 
 
                         <div class="col-md-6">
-                            <label class="form-label">Date of Birth</label>
+                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
                             <input type="date"
                                    class="form-control"
                                    wire:model="date_of_birth">

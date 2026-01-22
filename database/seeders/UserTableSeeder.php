@@ -174,32 +174,32 @@ class UserTableSeeder extends Seeder
     // --------------------------
     // 5. Teams
     // --------------------------
-    $teams1 = [];
-    foreach ($departments1 as $dept) {
-      $teams1[] = Team::create([
-        'company_id' => $company1->id,
-        'department_id' => $dept->id,
-        'name' => $dept->name . ' Team 1',
-      ]);
-      $teams1[] = Team::create([
-        'company_id' => $company1->id,
-        'department_id' => $dept->id,
-        'name' => $dept->name . ' Team 2',
-      ]);
-    }
+    // $teams1 = [];
+    // foreach ($departments1 as $dept) {
+    //   $teams1[] = Team::create([
+    //     'company_id' => $company1->id,
+    //     'department_id' => $dept->id,
+    //     'name' => $dept->name . ' Team 1',
+    //   ]);
+    //   $teams1[] = Team::create([
+    //     'company_id' => $company1->id,
+    //     'department_id' => $dept->id,
+    //     'name' => $dept->name . ' Team 2',
+    //   ]);
+    // }
 
-    $teams2 = [];
-    foreach ($departments2 as $dept) {
-      $teams2[] = Team::create([
-        'company_id' => $company2->id,
-        'department_id' => $dept->id,
-        'name' => $dept->name . ' Team 1',
-      ]);
-      $teams2[] = Team::create([
-        'company_id' => $company2->id,
-        'department_id' => $dept->id,
-        'name' => $dept->name . ' Team 2',
-      ]);
-    }
+    // $teams2 = [];
+    // foreach ($departments2 as $dept) {
+    //   $teams2[] = Team::create([
+    //     'company_id' => $company2->id,
+    //     'department_id' => $dept->id,
+    //     'name' => $dept->name . ' Team 1',
+    //   ]);
+    //   $teams2[] = Team::create([
+    //     'company_id' => $company2->id,
+    //     'department_id' => $dept->id,
+    //     'name' => $dept->name . ' Team 2',
+    //   ]);
+    // }
   }
 }

@@ -323,7 +323,7 @@ class TimesheetIndex extends BaseComponent
                 'full_date' => $current->format('Y-m-d'),
 
                 'day' => $this->viewMode === 'weekly' ? $current->format('D') : $current->format('j'),
-                'date' => $current->format('m/d'),
+                'date' => $current->format('d/m'),
                 'highlight' => $current->equalTo($this->currentDate->copy()->startOfDay()),
             ];
             $current->addDay();

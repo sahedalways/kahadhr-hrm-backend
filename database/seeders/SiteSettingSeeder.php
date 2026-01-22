@@ -11,7 +11,7 @@ class SiteSettingSeeder extends Seeder
   {
     SiteSetting::create([
       'site_title'        => 'Kahadhr',
-      'logo'              => 'png',
+      'logo'              => 'jpg',
       'favicon'           => 'png',
       'hero_image'        => 'webp',
       'site_phone_number' => '+8801877556633',

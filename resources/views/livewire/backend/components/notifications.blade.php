@@ -66,6 +66,11 @@
                             'company' => $companySubDomain,
                             'id' => $notification['notifiable_id'] ?? null,
                         ]);
+                    } elseif ($notification['type'] === 'document_expired') {
+                        $route = route('employee.dashboard.documents.manage', [
+                            'company' => $companySubDomain,
+                            'id' => $notification['notifiable_id'] ?? null,
+                        ]);
                     } elseif (in_array($notification['type'], ['assigned_document'])) {
                         $route = route('employee.dashboard.documents.assigned', [
                             'company' => $companySubDomain,

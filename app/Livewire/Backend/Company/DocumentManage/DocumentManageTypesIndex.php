@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Backend\Company\DocumentManage;
 
-
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\DocumentType;
 use App\Models\EmailSetting;
 use App\Models\EmpDocument;
 use App\Models\Employee;
+use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
 use Livewire\WithFileUploads;
@@ -67,6 +68,33 @@ class DocumentManageTypesIndex extends BaseComponent
         $this->loadMore();
     }
 
+
+    public function notifyEmployee($typeId, $employeeId)
+    {
+        $docType = DocumentType::findOrFail($typeId);
+
+        $companyId = auth()->user()->company->id;
+        $emp    = Employee::with('user')->find($employeeId);
+
+
+        $message = "Your {$docType->name} document has expired. Please upload an updated document.";
+
+
+        $notification = Notification::create([
+            'company_id'     => $companyId,
+            'user_id'        => $emp->user->id,
+            'type'           => 'document_expired',
+            'notifiable_id'  => $docType->id,
+            'data'           => [
+                'message'          => $message,
+            ],
+        ]);
+
+        event(new NotificationEvent($notification));
+
+
+        $this->toast('Employee notified successfully', 'success');
+    }
 
 
 

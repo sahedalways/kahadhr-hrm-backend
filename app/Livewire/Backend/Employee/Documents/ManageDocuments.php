@@ -23,7 +23,7 @@ class ManageDocuments extends BaseComponent
     public $filterType = null;
     public $file_path;
     public $expires_at;
-    public $comment;
+
     public $lastId = null;
     public $hasMore = true;
     public $statusFilter = null;
@@ -32,6 +32,9 @@ class ManageDocuments extends BaseComponent
     public $date_of_birth;
 
     public $existingDocument = null;
+
+    public $modalDocument;
+    public $modalFileIndex;
 
     protected $listeners = ['refreshDocuments' => '$refresh'];
     public $currentDocument;
@@ -159,7 +162,6 @@ class ManageDocuments extends BaseComponent
     {
 
         $this->file_path = null;
-        $this->comment = null;
         $this->expires_at = null;
         $this->statusFilter = null;
         $this->selectedType = null;
@@ -171,20 +173,16 @@ class ManageDocuments extends BaseComponent
 
         $this->dispatch('reset-file-url');
 
-        $employeeId = auth()->user()->employee->id ?? null;
-        $this->existingDocument = EmpDocument::where('emp_id', $employeeId)
-            ->where('doc_type_id', $typeId)
-            ->latest()
-            ->first();
+
+        $this->selectedType = $typeId;
 
 
-        $this->selectedDocName = optional($this->documentTypes->where('id', $typeId)->first())->name;
+        $docType = DocumentType::find($typeId);
 
-        if ($this->existingDocument) {
-            $this->comment = $this->existingDocument->comment;
-            $this->expires_at = $this->existingDocument->expires_at;
+
+        if ($docType && $docType->name === 'Share Code') {
+            $this->selectedDocName = 'Share Code';
         }
-
 
         $this->share_code = auth()->user()->employee->share_code ?? null;
         $this->date_of_birth = auth()->user()->employee->date_of_birth ?? null;
@@ -196,6 +194,15 @@ class ManageDocuments extends BaseComponent
     public function updatedShareCode($value)
     {
         $this->share_code = strtoupper($value);
+    }
+
+    public function openDocModal($docId, $index)
+    {
+        $this->modalDocument = EmpDocument::with('documentType', 'employee')
+            ->find($docId);
+
+        $this->modalFileIndex = $index;
+        $this->dispatch('documentModalOpened');
     }
 
     public function saveDocument()
@@ -223,15 +230,18 @@ class ManageDocuments extends BaseComponent
                 'selectedDocName',
             ]);
 
+
+
+
             $this->dispatch('closemodal');
             $this->toast('Share Code saved successfully!', 'success');
-
+            $this->dispatch('clear-notification-route');
             return;
         }
 
 
         $this->validate([
-            'comment' => 'required|string|max:255',
+
             'expires_at' => 'required|date',
             'file_path' => 'required|file|mimes:pdf,jpg,png|max:20480',
         ]);
@@ -240,7 +250,7 @@ class ManageDocuments extends BaseComponent
 
         EmpDocument::create([
             'doc_type_id' => $this->selectedType,
-            'comment' => $this->comment,
+
             'expires_at' => $this->expires_at,
             'emp_id'      => auth()->user()->employee->id,
             'company_id'  => auth()->user()->employee->company_id,
@@ -249,7 +259,7 @@ class ManageDocuments extends BaseComponent
 
         $this->statusFilter = null;
         $this->file_path = null;
-        $this->comment = null;
+
         $this->expires_at = null;
         $this->statusFilter = null;
         $this->selectedType = null;
@@ -257,10 +267,12 @@ class ManageDocuments extends BaseComponent
         $this->date_of_birth = null;
         $this->share_code = null;
 
+
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
 
         $this->resetLoaded();
+        $this->dispatch('clear-notification-route');
     }
 
     public function getFilteredDocumentTypesProperty()

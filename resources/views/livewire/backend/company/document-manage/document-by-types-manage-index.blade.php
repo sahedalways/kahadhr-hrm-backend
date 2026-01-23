@@ -118,7 +118,7 @@
                                 <tr>
                                     <th>Employee</th>
                                     <th>Documents</th>
-                                    <th>Action</th>
+
                                 </tr>
                             </thead>
 
@@ -198,9 +198,11 @@
 
                                             @if ($employee->documents && $employee->documents->count() > 0)
                                                 @php
-                                                    $grouped = $employee->documents->groupBy(function ($doc) {
-                                                        return $doc->documentType->name ?? 'Unknown Type';
-                                                    });
+                                                    $grouped = $employee->documents
+                                                        ->sortByDesc('created_at')
+                                                        ->groupBy(function ($doc) {
+                                                            return $doc->documentType->name ?? 'Unknown Type';
+                                                        });
                                                 @endphp
 
 
@@ -213,10 +215,67 @@
                                                             ->sortByDesc('created_at')
                                                             ->take(3)
                                                             ->values();
+
+                                                        $latestDoc = $docs->sortByDesc('created_at')->first();
+                                                        $latestExpiresAt =
+                                                            $latestDoc && $latestDoc->expires_at
+                                                                ? \Carbon\Carbon::parse($latestDoc->expires_at)
+                                                                : null;
+                                                        $showTypeNotify =
+                                                            $latestExpiresAt && $latestExpiresAt->isPast();
+
                                                     @endphp
 
                                                     <div class="border rounded p-2 mb-2"
-                                                         style="max-width:240px;">
+                                                         style="max-width:240px; position:relative;">
+
+                                                        @if ($showTypeNotify)
+                                                            <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})"
+                                                                  wire:loading.attr="disabled"
+                                                                  title="Notify employee"
+                                                                  style="
+            position:absolute;
+            top:6px;
+            right:6px;
+            background:#dc3545;
+            color:#fff;
+            width:22px;
+            height:22px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
+            cursor:pointer;
+            transition:all 0.25s ease;
+            box-shadow:0 3px 8px rgba(0,0,0,0.25);
+        "
+                                                                  onmouseover="
+            this.style.transform='scale(1.2)';
+            this.style.background='#b02a37';
+        "
+                                                                  onmouseout="
+            this.style.transform='scale(1)';
+            this.style.background='#dc3545';
+        ">
+
+                                                                <!-- 🔔 Normal Icon -->
+                                                                <i class="bi bi-bell-fill"
+                                                                   wire:loading.remove
+                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})">
+                                                                </i>
+
+                                                                <!-- ⏳ Loading Icon -->
+                                                                <i class="bi bi-arrow-repeat"
+                                                                   wire:loading
+                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})"
+                                                                   style="animation:spin 1s linear infinite;">
+                                                                </i>
+
+                                                            </span>
+                                                        @endif
+
+
 
                                                         <div class="mb-2">
                                                             <strong>{{ $type }}</strong>
@@ -257,20 +316,27 @@
                                                                         !$isExpired &&
                                                                         $expiresAt->isFuture() &&
                                                                         $expiresAt->lte(now()->addDays(60));
+                                                                    $zIndex = count($latestDocs) - $index;
 
                                                                 @endphp
 
+                                                                @php
+                                                                    $zIndex = count($latestDocs) - $index;
+                                                                @endphp
+
+
+
                                                                 <div class="doc-card-wrapper"
                                                                      style="
-                                position:relative;
-                                min-width:90px;
-                                margin-right:-70px;
-                                z-index:{{ $index }};
-                                transition:all 0.4s cubic-bezier(0.165,0.84,0.44,1);
-                                cursor:pointer;
-                             "
+            position:relative;
+            min-width:90px;
+            margin-right:-70px;
+            z-index:{{ $zIndex }};
+            transition:all 0.4s cubic-bezier(0.165,0.84,0.44,1);
+            cursor:pointer;
+         "
                                                                      onmouseover="this.style.zIndex='999';this.style.transform='translateY(-12px) scale(1.08)';this.style.marginRight='10px';"
-                                                                     onmouseout="this.style.zIndex='{{ $index }}';this.style.transform='translateY(0) scale(1)';this.style.marginRight='-70px';"
+                                                                     onmouseout="this.style.zIndex='{{ $zIndex }}';this.style.transform='translateY(0) scale(1)';this.style.marginRight='-70px';"
                                                                      data-bs-toggle="modal"
                                                                      data-bs-target="#documentModal"
                                                                      wire:click="openDocModal({{ $doc->id }})">

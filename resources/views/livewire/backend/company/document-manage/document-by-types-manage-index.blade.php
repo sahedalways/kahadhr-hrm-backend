@@ -118,84 +118,197 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Employee Name</th>
-                                    <th>Document Name</th>
-                                    <th>File</th>
-                                    <th>Expires At</th>
-                                    <th>Status</th>
+                                    <th>Documents</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
 
                             <tbody>
                                 @php $i = 1; @endphp
-                                @forelse($infos as $row)
-                                    <tr class="{{ $id == $row->id ? 'table-primary' : '' }}">
+
+                                @forelse($infos as $employee)
+                                    <tr class="{{ $id == $employee->id ? 'table-primary' : '' }}">
                                         <td>{{ $i++ }}</td>
 
                                         <td>
-                                            {{ trim(($row->employee->f_name ?? '') . ' ' . ($row->employee->l_name ?? '')) ?: $row->employee->email ?? 'N/A' }}
+                                            {{ trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? '')) ?: $employee->email ?? 'N/A' }}
                                         </td>
 
+                                        <td class="text-start"
+                                            style="width:260px; max-width:260px; white-space:nowrap;">
 
-                                        <td>
-                                            <span onclick="copyToClipboard('{{ $row->name ?? '' }}')"
-                                                  style="cursor:pointer;"
-                                                  data-bs-toggle="tooltip"
-                                                  title="Click to copy">
-                                                {{ $row->name ?? 'N/A' }}
-                                            </span>
-                                        </td>
+                                            @if ($employee->documents && $employee->documents->count() > 0)
+                                                @php
+                                                    $grouped = $employee->documents->groupBy(function ($doc) {
+                                                        return $doc->documentType->name ?? 'Unknown Type';
+                                                    });
+                                                @endphp
+
+                                                @foreach ($grouped as $type => $docs)
+                                                    @php
+                                                        // Latest 3 documents only
+                                                        $latestDocs = $docs
+                                                            ->sortByDesc('created_at')
+                                                            ->take(3)
+                                                            ->values();
+                                                    @endphp
+
+                                                    <div class="border rounded p-2 mb-2"
+                                                         style="max-width:240px;">
+
+                                                        <div class="mb-2">
+                                                            <strong>{{ $type }}</strong>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-center"
+                                                             style="
+                        overflow-x:auto;
+                        overflow-y:hidden;
+                        padding:16px 8px;
+                        min-height:105px;
+                        max-width:230px;
+                        scrollbar-width:none;
+                     ">
+
+                                                            @foreach ($latestDocs as $index => $doc)
+                                                                @php
+                                                                    $colors = [
+                                                                        '#4e73df',
+                                                                        '#1cc88a',
+                                                                        '#36b9cc',
+                                                                        '#f6c23e',
+                                                                        '#e74a3b',
+                                                                    ];
+                                                                    $currentColor = $colors[$index % count($colors)];
+                                                                    $extension = pathinfo(
+                                                                        $doc->file_path,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                    $expiresAt = $doc->expires_at
+                                                                        ? \Carbon\Carbon::parse($doc->expires_at)
+                                                                        : null;
+
+                                                                    $isExpired = $expiresAt && $expiresAt->isPast();
+
+                                                                    $isExpiringSoon =
+                                                                        $expiresAt &&
+                                                                        !$isExpired &&
+                                                                        $expiresAt->isFuture() &&
+                                                                        $expiresAt->lte(now()->addDays(60));
+
+                                                                @endphp
+
+                                                                <div class="doc-card-wrapper"
+                                                                     style="
+                                position:relative;
+                                min-width:90px;
+                                margin-right:-70px;
+                                z-index:{{ $index }};
+                                transition:all 0.4s cubic-bezier(0.165,0.84,0.44,1);
+                                cursor:pointer;
+                             "
+                                                                     onmouseover="this.style.zIndex='999';this.style.transform='translateY(-12px) scale(1.08)';this.style.marginRight='10px';"
+                                                                     onmouseout="this.style.zIndex='{{ $index }}';this.style.transform='translateY(0) scale(1)';this.style.marginRight='-70px';"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#documentModal"
+                                                                     wire:click="openDocModal({{ $doc->id }})">
+
+                                                                    <div
+                                                                         style="
+                                background:white;
+                                border-radius:10px;
+                                padding:10px;
+                                box-shadow:-5px 0 12px rgba(0,0,0,0.08);
+                                border-top:3px solid {{ $currentColor }};
+                                text-align:center;
+                                border:1px solid #eee;
+                            ">
+
+                                                                        <!-- Icon -->
+                                                                        <div
+                                                                             style="
+                                    width:36px;
+                                    height:36px;
+                                    background:{{ $currentColor }}15;
+                                    color:{{ $currentColor }};
+                                    border-radius:50%;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    margin:0 auto 6px;
+                                    font-size:1.1rem;
+                                ">
+                                                                            @if (in_array($extension, ['jpg', 'png', 'jpeg']))
+                                                                                <i class="bi bi-image"></i>
+                                                                            @elseif ($extension === 'pdf')
+                                                                                <i class="bi bi-file-earmark-pdf"></i>
+                                                                            @else
+                                                                                <i class="bi bi-file-earmark-text"></i>
+                                                                            @endif
+                                                                        </div>
+
+                                                                        <!-- Filename -->
+                                                                        <div
+                                                                             style="font-weight:700;font-size:0.65rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                                            File-{{ $index + 1 }}.{{ $extension }}
+                                                                        </div>
+
+                                                                        <!-- Expiry -->
+                                                                        <div style="font-size:0.6rem;margin-top:4px;">
+                                                                            <div
+                                                                                 style="color:{{ $isExpired ? '#dc3545' : ($isExpiringSoon ? '#fd7e14' : '#999') }};">
+                                                                                {{ $doc->expires_at ? date('d M, Y', strtotime($doc->expires_at)) : 'No Expiry' }}
+                                                                            </div>
+
+                                                                            @if ($isExpired)
+                                                                                <span class="badge bg-danger mt-1"
+                                                                                      style="font-size:0.55rem;">Expired</span>
+                                                                            @elseif ($isExpiringSoon)
+                                                                                <span class="badge bg-warning text-dark mt-1"
+                                                                                      style="font-size:0.55rem;">Expires
+                                                                                    Soon</span>
+                                                                            @endif
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
 
 
 
+                                                    </div>
+                                                @endforeach
 
-                                        <td>
-                                            @if ($row->document_url)
-                                                <a href="{{ $row->document_url }}"
-                                                   target="_blank"
-                                                   class="text-primary">View</a>
+                                                <style>
+                                                    .d-flex::-webkit-scrollbar {
+                                                        display: none;
+                                                    }
+                                                </style>
+
+                                                <link rel="stylesheet"
+                                                      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
                                             @else
-                                                <span class="text-muted">No File</span>
+                                                <span class="text-muted">No documents found</span>
                                             @endif
                                         </td>
 
-                                        <td>{{ $row->expires_at ? date('d M, Y', strtotime($row->expires_at)) : 'N/A' }}
-                                        </td>
+
 
                                         <td>
-                                            @if ($row->status == 'pending')
-                                                <span class="badge bg-warning">Pending</span>
-                                            @elseif($row->status == 'signed')
-                                                <span class="badge bg-success">Signed</span>
-                                            @else
-                                                <span class="badge bg-danger">Expired</span>
-                                            @endif
-                                        </td>
 
-                                        <td>
-                                            <a href="#"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#edit"
-                                               wire:click="edit({{ $row->id }})"
-                                               class="badge badge-info badge-xs fw-600 text-xs"
-                                               style="background-color:#4ba3f7;color:#fff;">
-                                                Edit
-                                            </a>
-
-                                            <a href="#"
-                                               class="badge badge-danger badge-xs fw-600 text-xs"
-                                               wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
-                                                Delete
-                                            </a>
                                         </td>
                                     </tr>
+
                                 @empty
                                     <tr>
                                         <td colspan="7"
-                                            class="text-center">No documents found</td>
+                                            class="text-center">No employees found</td>
                                     </tr>
                                 @endforelse
                             </tbody>
+
+
 
                         </table>
 
@@ -472,6 +585,38 @@
         </div>
     </div>
 
+
+    <div wire:ignore.self
+         class="modal fade"
+         id="documentModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{ $modalDocument->name ?? 'Document' }}
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    @if ($modalDocument && $modalDocument->file_path)
+                        <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
+                                style="width:100%; height:500px;"></iframe>
+                    @else
+                        <p>No file found</p>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
 
 <script>
@@ -521,6 +666,13 @@
                 searchPlaceholderValue: 'Search employee...',
                 renderChoiceLimit: 5
             });
+        });
+    });
+
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('documentModalOpened', () => {
+            var modal = new bootstrap.Modal(document.getElementById('documentModal'));
+            modal.show();
         });
     });
 </script>

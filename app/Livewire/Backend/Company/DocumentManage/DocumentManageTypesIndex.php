@@ -6,7 +6,9 @@ use App\Events\NotificationEvent;
 use App\Jobs\EmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
+use App\Models\DocumentType;
 use App\Models\EmailSetting;
+use App\Models\EmpDocument;
 use App\Models\Employee;
 use App\Models\Notification;
 use App\Traits\Exportable;
@@ -26,7 +28,11 @@ class DocumentManageTypesIndex extends BaseComponent
     public $loaded, $lastId = null, $hasMore = true;
     public $employees;
     public $statusFilter = null;
+    public $docTypes;
     public $send_email = false;
+
+    public $modalDocument;
+    public $modalTitle;
     protected $listeners = [
         'deleteDocument' => 'deleteDocument',
         'sortUpdated' => 'handleSort'
@@ -41,10 +47,31 @@ class DocumentManageTypesIndex extends BaseComponent
             ->orderBy('f_name')
             ->get();
 
+
+        $this->docTypes = DocumentType::where('company_id', $this->company_id)
+            ->orderBy('name')
+            ->get()
+            ->unique('name')
+            ->values();
+
+
         $this->company_id = auth()->user()->company->id;
         $this->loaded = collect();
+
+        $this->modalTitle = '';
         $this->loadMore();
     }
+
+
+    public function openDocModal($docId)
+    {
+        $this->modalDocument = EmpDocument::with('documentType', 'employee')
+            ->find($docId);
+
+        $this->dispatch('documentModalOpened');
+    }
+
+
 
     public function render()
     {
@@ -54,7 +81,6 @@ class DocumentManageTypesIndex extends BaseComponent
 
         ]);
     }
-
 
 
     public function updatedSendEmail($value)
@@ -251,7 +277,8 @@ class DocumentManageTypesIndex extends BaseComponent
     {
         if (!$this->hasMore) return;
 
-        $query = CompanyDocument::where('company_id', $this->company_id);
+        $query = Employee::where('company_id', $this->company_id)
+            ->with(['documents.documentType']);
 
         if ($this->search) {
             $query->where('name', 'like', "%{$this->search}%");

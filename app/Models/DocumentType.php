@@ -25,4 +25,10 @@ class DocumentType extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+    public function documents()
+    {
+        return $this->hasMany(EmpDocument::class, 'doc_type_id');
+    }
 }

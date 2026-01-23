@@ -19,8 +19,10 @@ class ManageDocuments extends BaseComponent
     public $sortOrder = 'desc';
     public $loaded;
     public $documentTypes;
+
     public $selectedType = null;
     public $filterType = null;
+
     public $file_path;
     public $expires_at;
 
@@ -41,13 +43,12 @@ class ManageDocuments extends BaseComponent
 
     public function mount()
     {
-        $companyId = auth()->user()->employee->company_id ?? auth()->user()->employee->company_id ?? null;
+        $companyId = auth()->user()->employee->company_id ?? null;
 
         $this->documentTypes = DocumentType::query()
             ->where('company_id', $companyId)
             ->orderBy('name')
             ->get();
-
 
         $this->loaded = collect();
         $this->loadMore();
@@ -55,15 +56,12 @@ class ManageDocuments extends BaseComponent
 
     public function render()
     {
-
         return view('livewire.backend.employee.documents.manage-documents', [
             'documents' => $this->loaded,
             'documentTypes' => $this->documentTypes,
-            'selectedType' => $this->filterType,
+            'selectedType' => $this->selectedType,
         ]);
     }
-
-
 
     public function handleSort($value)
     {
@@ -71,33 +69,29 @@ class ManageDocuments extends BaseComponent
         $this->resetLoaded();
     }
 
-    /**
-     * Set selected type (called from Blade)
-     */
+    // Filter by type
     public function filterByType($typeId)
     {
-        // toggle: if clicking same type again, deselect
-        if ($this->filterType === $typeId) {
-            $this->filterType = null;
+        if ($this->selectedType === $typeId) {
+            $this->selectedType = null;
         } else {
-            $this->filterType = $typeId;
+            $this->selectedType = $typeId;
         }
 
         $this->statusFilter = null;
-
         $this->resetLoaded();
     }
 
+    // Filter by status
     public function handleFilter($value)
     {
         $this->statusFilter = $value;
-        $this->filterType = null;
+        $this->selectedType = null;
         $this->resetLoaded();
     }
 
     public function loadMore()
     {
-
         if (!$this->hasMore) return;
 
         $employeeId = auth()->user()->employee->id ?? null;
@@ -121,7 +115,6 @@ class ManageDocuments extends BaseComponent
             });
         }
 
-
         // Pagination by lastId
         if ($this->lastId) {
             $query->where('id', $this->sortOrder === 'desc' ? '<' : '>', $this->lastId);
@@ -129,14 +122,13 @@ class ManageDocuments extends BaseComponent
 
         $items = $query->limit($this->perPage)->get();
 
-
-
         if ($items->isEmpty()) {
             $this->hasMore = false;
             return;
         }
 
         $this->lastId = $this->sortOrder === 'desc' ? $items->last()->id : $items->first()->id;
+
         // Replace old items instead of merge to avoid stale data
         if ($this->lastId === $items->first()->id) {
             $this->loaded = $items;
@@ -149,7 +141,6 @@ class ManageDocuments extends BaseComponent
         }
     }
 
-
     public function resetLoaded()
     {
         $this->loaded = collect();
@@ -160,25 +151,19 @@ class ManageDocuments extends BaseComponent
 
     public function openUploadModal($typeId)
     {
-
         $this->file_path = null;
         $this->expires_at = null;
         $this->statusFilter = null;
-        $this->selectedType = null;
+
+        $this->selectedType = $typeId;
         $this->existingDocument = null;
         $this->selectedDocName = null;
         $this->date_of_birth = null;
         $this->share_code = null;
-        $this->selectedType = $typeId;
 
         $this->dispatch('reset-file-url');
 
-
-        $this->selectedType = $typeId;
-
-
         $docType = DocumentType::find($typeId);
-
 
         if ($docType && $docType->name === 'Share Code') {
             $this->selectedDocName = 'Share Code';
@@ -189,7 +174,6 @@ class ManageDocuments extends BaseComponent
 
         $this->dispatch('openUploadModal');
     }
-
 
     public function updatedShareCode($value)
     {
@@ -214,7 +198,6 @@ class ManageDocuments extends BaseComponent
                 'date_of_birth'  => 'required|date',
             ]);
 
-
             $employee = auth()->user()->employee;
 
             $employee->update([
@@ -222,26 +205,22 @@ class ManageDocuments extends BaseComponent
                 'date_of_birth'  => $this->date_of_birth,
             ]);
 
-            // Reset fields
             $this->reset([
                 'share_code',
                 'date_of_birth',
-                'selectedType',
                 'selectedDocName',
             ]);
 
-
-
-
             $this->dispatch('closemodal');
             $this->toast('Share Code saved successfully!', 'success');
+
+            // Keep the filter intact
+            $this->resetLoaded();
             $this->dispatch('clear-notification-route');
             return;
         }
 
-
         $this->validate([
-
             'expires_at' => 'required|date',
             'file_path' => 'required|file|mimes:pdf,jpg,png|max:20480',
         ]);
@@ -250,41 +229,38 @@ class ManageDocuments extends BaseComponent
 
         EmpDocument::create([
             'doc_type_id' => $this->selectedType,
-
-            'expires_at' => $this->expires_at,
+            'expires_at'  => $this->expires_at,
             'emp_id'      => auth()->user()->employee->id,
             'company_id'  => auth()->user()->employee->company_id,
             'file_path'   => $filePath ?: null,
         ]);
 
-        $this->statusFilter = null;
-        $this->file_path = null;
-
-        $this->expires_at = null;
-        $this->statusFilter = null;
-        $this->selectedType = null;
-        $this->selectedDocName = null;
-        $this->date_of_birth = null;
-        $this->share_code = null;
-
+        $this->reset([
+            'file_path',
+            'expires_at',
+            'selectedDocName',
+            'date_of_birth',
+            'share_code',
+        ]);
 
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
 
+        // Keep the filter intact
         $this->resetLoaded();
         $this->dispatch('clear-notification-route');
     }
 
+
     public function getFilteredDocumentTypesProperty()
     {
-        if (!$this->filterType && !$this->statusFilter) {
+        if (!$this->selectedType && !$this->statusFilter) {
             return $this->documentTypes;
         }
 
         return $this->documentTypes->filter(function ($type) {
             $docs = $this->loaded->where('doc_type_id', $type->id);
-
-            return $docs->isNotEmpty() || ($this->filterType && $this->filterType == $type->id);
+            return $docs->isNotEmpty() || ($this->selectedType && $this->selectedType == $type->id);
         });
     }
 }

@@ -26,13 +26,13 @@
                     </select>
 
                     <!-- Status Filter -->
-                    {{-- <select class="form-select form-select-lg"
+                    <select class="form-select form-select-lg"
                             style="min-width: 180px;"
                             wire:change="handleFilter($event.target.value)">
                         <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="expired">Expired</option>
-                    </select> --}}
+                    </select>
                 </div>
 
 
@@ -239,16 +239,91 @@
                                  wire:click="openUploadModal({{ $type->id }})">
 
                                 @if ($type->name === 'Share Code' && $hasShareCode)
-                                    <div class="text-center">
-                                        <div class="fw-semibold text-primary">
-                                            {{ $employee->share_code }}
+                                    <div class="text-center"
+                                         data-bs-toggle="tooltip"
+                                         data-bs-placement="top"
+                                         title="Change Share Code">
+                                        <div class="text-center">
+                                            <div
+                                                 style="
+                        font-weight: 800;
+                        font-size: 1.1rem;
+                        color: #4e73df;
+                        letter-spacing: 1px;
+                        text-transform: uppercase;
+                        margin-bottom: 4px;
+                    ">
+                                                {{ $employee->share_code }}
+                                            </div>
+
+                                            <div
+                                                 style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 5px;
+                        background: #fff3cd;
+                        color: #856404;
+                        padding: 4px 10px;
+                        border-radius: 50px;
+                        font-size: 0.65rem;
+                        font-weight: 600;
+                        border: 1px solid #ffeeba;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                    ">
+                                                <span
+                                                      style="
+                            height: 6px;
+                            width: 6px;
+                            background-color: #856404;
+                            border-radius: 50%;
+                            display: inline-block;
+                            animation: pulse 1.5s infinite;
+                        "></span>
+                                                Pending Verification
+                                            </div>
                                         </div>
-                                        <div class="small text-muted">
-                                            Pending Verification
-                                        </div>
+
+                                        <style>
+                                            @keyframes pulse {
+                                                0% {
+                                                    transform: scale(0.95);
+                                                    opacity: 0.7;
+                                                }
+
+                                                70% {
+                                                    transform: scale(1.2);
+                                                    opacity: 1;
+                                                }
+
+                                                100% {
+                                                    transform: scale(0.95);
+                                                    opacity: 0.7;
+                                                }
+                                            }
+                                        </style>
                                     </div>
                                 @else
-                                    <span class="fw-bold text-primary fs-4">+</span>
+                                    <button type="button"
+                                            wire:click="openUploadModal({{ $type->id }})"
+                                            style="
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 12px;
+                    border: 2px dashed #4e73df;
+                    background: #f8f9fc;
+                    color: #4e73df;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                    cursor: pointer;
+                "
+                                            onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
+                                            onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
+                                        <i class="bi bi-plus-lg"
+                                           style="font-size: 1.2rem;"></i>
+                                    </button>
                                 @endif
                             </div>
                         @endif

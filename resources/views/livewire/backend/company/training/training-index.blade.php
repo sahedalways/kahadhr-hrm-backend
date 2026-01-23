@@ -459,16 +459,29 @@
                             </label>
                         </div>
 
-                        <div class="form-check">
+                        <div class="form-check mb-1">
                             <input class="form-check-input"
                                    type="checkbox"
-                                   wire:model="send_email"
+                                   wire:model.live="send_email"
                                    id="emailCheck">
+
                             <label class="form-check-label fw-bold"
                                    for="emailCheck">
                                 Send employee an email notification
                             </label>
                         </div>
+
+
+                        @if ($emailGatewayMissing)
+                            <div class="small text-danger mt-1">
+                                ⚠️ Email notification is not configured yet.
+                                Please set up your email gateway from
+                                <a href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   class="text-decoration-underline fw-semibold">
+                                    Settings → Mail Settings
+                                </a>
+                            </div>
+                        @endif
 
 
                         <div class="modal-footer">

@@ -10,7 +10,7 @@
 
         <!-- LEFT: Title -->
         <div class="col-auto">
-            <h5 class="fw-500 text-primary m-0">Documents By Assigned</h5>
+            <h5 class="fw-500 text-primary m-0">Documents By Type</h5>
         </div>
 
         <!-- RIGHT: Export Buttons -->
@@ -36,7 +36,7 @@
                data-bs-target="#add"
                wire:click="resetInputFields"
                class="btn btn-icon btn-3 btn-white text-primary mb-0">
-                <i class="fa fa-plus me-2"></i> Assign New Document
+                <i class="fa fa-plus me-2"></i> Add New Document
             </a>
         </div>
     </div>
@@ -93,6 +93,9 @@
                                 <span class="text-primary small">Searching...</span>
                             </div>
                         </div>
+
+
+
                     </div>
                 </div>
 
@@ -222,7 +225,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h6 class="modal-title fw-600">Assign New Document</h6>
+                    <h6 class="modal-title fw-600">Add New Document</h6>
                     <button type="button"
                             class="btn btn-light"
                             data-bs-dismiss="modal">
@@ -245,7 +248,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Assign Employee </label>
+                                <label class="form-label">Select Employee </label>
                                 <select id="employeeSelect"
                                         class="form-select"
                                         wire:model.live="emp_id"

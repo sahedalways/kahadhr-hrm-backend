@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-class DocumentManageIndex extends BaseComponent
+class DocumentManageTypesIndex extends BaseComponent
 {
     use Exportable, WithPagination;
     use WithFileUploads;
@@ -49,7 +49,7 @@ class DocumentManageIndex extends BaseComponent
     public function render()
     {
 
-        return view('livewire.backend.company.document-manage.document-manage-index', [
+        return view('livewire.backend.company.document-manage.document-by-types-manage-index', [
             'infos' => $this->loaded,
 
         ]);

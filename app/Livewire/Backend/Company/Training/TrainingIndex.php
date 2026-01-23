@@ -47,6 +47,7 @@ class TrainingIndex extends BaseComponent
     public $employees;
 
     public $trainingId;
+    public $emailGatewayMissing = false;
 
     protected $listeners = ['deleteTraining', 'sortUpdated' => 'handleSort'];
 
@@ -91,6 +92,24 @@ class TrainingIndex extends BaseComponent
         ]);
     }
 
+
+       public function updatedSendEmail($value)
+    {
+        if ($value) {
+            $gateway = EmailSetting::where('company_id', $this->company_id)->first();
+
+            $this->emailGatewayMissing = $gateway ? false : true;
+
+
+            if (!$gateway) {
+                $this->send_email = false;
+            }
+        } else {
+            $this->emailGatewayMissing = false;
+        }
+    }
+
+
     /* Reset form fields */
     public function resetInputFields()
     {
@@ -105,6 +124,7 @@ class TrainingIndex extends BaseComponent
         $this->instruction_file = null;
         $this->instruction_text = null;
         $this->require_proof = false;
+        $this->emailGatewayMissing = false;
         $this->selectedEmployees = [];
 
         $this->resetErrorBag();

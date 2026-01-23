@@ -7,6 +7,7 @@ use App\Livewire\Backend\Chat\ChatIndex;
 use App\Livewire\Backend\Company\Auth\CompanyLogin;
 use App\Livewire\Backend\Company\Dashboard;
 use App\Livewire\Backend\Company\DocumentManage\DocumentManageIndex;
+use App\Livewire\Backend\Company\DocumentManage\DocumentManageTypesIndex;
 use App\Livewire\Backend\Company\DocumentType\DocumentTypesIndex;
 use App\Livewire\Backend\Company\Employees\EmployeeDetails;
 use App\Livewire\Backend\Company\Employees\UsersIndex;
@@ -145,7 +146,8 @@ Route::domain('company.' . config('app.base_domain'))
 
 
     Route::prefix('document-manage')->name('document-manage.')->group(function () {
-      Route::get('/', DocumentManageIndex::class)->name('index');
+      Route::get('/assigned', DocumentManageIndex::class)->name('index');
+      Route::get('/types', DocumentManageTypesIndex::class)->name('types.index');
     });
 
 

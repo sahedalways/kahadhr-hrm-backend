@@ -474,14 +474,27 @@
 
                             <!-- Manage Documents -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/document-manage*') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('dashboard/document-manage/assigned*') ? 'active' : '' }}"
                                    href="{{ route('company.dashboard.document-manage.index', ['company' => app('authUser')->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
-                                   title="Manage Documents"
+                                   title="Documents By Assiged"
                                    data-bs-trigger="manual">
                                     <i class="fas fa-folder-open sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Manage Documents </span>
+                                    <span class="sidenav-normal"> Documents By Assiged</span>
+                                </a>
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/document-manage/types*') ? 'active' : '' }}"
+                                   href="{{ route('company.dashboard.document-manage.types.index', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Documents By Type"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-file-alt sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Documents By Type</span>
                                 </a>
                             </li>
 

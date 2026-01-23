@@ -2,18 +2,15 @@
 
 namespace App\Livewire\Backend\Company\DocumentManage;
 
-use App\Events\NotificationEvent;
-use App\Jobs\EmployeeAssignedNotificationJob;
+
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\DocumentType;
 use App\Models\EmailSetting;
 use App\Models\EmpDocument;
 use App\Models\Employee;
-use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
@@ -22,7 +19,7 @@ class DocumentManageTypesIndex extends BaseComponent
     use Exportable, WithPagination;
     use WithFileUploads;
 
-    public $name, $expires_at, $status, $file_path, $emp_id, $existingDocument;
+    public $name, $expires_at, $status, $file_path, $emp_id, $doc_type_id, $existingDocument;
     public $document_id, $company_id;
     public $search, $sortOrder = 'desc', $perPage = 10;
     public $loaded, $lastId = null, $hasMore = true;
@@ -32,7 +29,13 @@ class DocumentManageTypesIndex extends BaseComponent
     public $send_email = false;
 
     public $modalDocument;
+
     public $modalTitle;
+
+    public $shareCodeFile;
+    public $shareCodeEmpId;
+    public $selectedType;
+
     protected $listeners = [
         'deleteDocument' => 'deleteDocument',
         'sortUpdated' => 'handleSort'
@@ -48,11 +51,13 @@ class DocumentManageTypesIndex extends BaseComponent
             ->get();
 
 
-        $this->docTypes = DocumentType::where('company_id', $this->company_id)
+        $this->docTypes = DocumentType::where('company_id', auth()->user()->company->id)
             ->orderBy('name')
             ->get()
             ->unique('name')
             ->values();
+
+
 
 
         $this->company_id = auth()->user()->company->id;
@@ -63,10 +68,14 @@ class DocumentManageTypesIndex extends BaseComponent
     }
 
 
+
+
     public function openDocModal($docId)
     {
+        $this->resetInputFields();
         $this->modalDocument = EmpDocument::with('documentType', 'employee')
             ->find($docId);
+
 
         $this->dispatch('documentModalOpened');
     }
@@ -105,21 +114,29 @@ class DocumentManageTypesIndex extends BaseComponent
     {
         $this->name = '';
         $this->expires_at = null;
-        $this->status = 'pending';
+
         $this->file_path = null;
+        $this->doc_type_id = null;
         $this->document_id = null;
         $this->emp_id = null;
+        $this->selectedType = null;
+        $this->shareCodeEmpId = null;
         $this->emailGatewayMissing = false;
 
         $this->resetErrorBag();
     }
 
+
+
+
+
+
     public function save()
     {
         $this->validate([
-            'name' => 'nullable|string|max:255',
-            'expires_at' => 'nullable|date',
-            'emp_id' => 'nullable|integer|exists:employees,id',
+            'doc_type_id' => 'required',
+            'expires_at' => 'required|date',
+            'emp_id' => 'required|integer|exists:employees,id',
             'file_path' => 'required|file|mimes:pdf|max:20240',
             'send_email' => 'boolean',
         ]);
@@ -134,114 +151,21 @@ class DocumentManageTypesIndex extends BaseComponent
             }
         }
 
+        $filePath = $this->file_path->store('pdf/employee/documents', 'public');
 
-        $filePath = $this->file_path->store('pdf/company/documents', 'public');
 
-
-        $doc =  CompanyDocument::create([
-            'company_id' => $this->company_id,
-            'emp_id' => $this->emp_id,
-            'name' => $this->name ? $this->name : $this->file_path->getClientOriginalName(),
-            'file_path' => $filePath,
+        EmpDocument::create([
+            'doc_type_id' => $this->doc_type_id,
+            'comment'      => 'Share Code File',
             'expires_at' => $this->expires_at,
-            'status' => 'pending',
+            'emp_id'       => $this->emp_id,
+            'company_id'   => auth()->user()->company->id,
+            'file_path'   => $filePath ?: null,
         ]);
 
-        if ($this->emp_id) {
-            EmployeeAssignedNotificationJob::dispatch($doc->id)->onConnection('sync')->onQueue('urgent');
-
-            $userId = Employee::where('id', $this->emp_id)
-                ->select('user_id')
-                ->first()
-                ->user_id;
 
 
-
-            $notification = Notification::create([
-                'company_id' => $this->company_id,
-                'user_id' => $userId,
-                'type' => 'assigned_document',
-                'notifiable_id' => $doc->id,
-                'data' => [
-                    'message' => "A new document '{$this->name}' has been assigned to you."
-                ],
-            ]);
-
-
-            event(new NotificationEvent($notification));
-        }
-
-        $this->toast('Document created successfully!', 'success');
-        $this->dispatch('closemodal');
-        $this->resetInputFields();
-        $this->resetLoaded();
-    }
-
-    public function edit($id)
-    {
-        $doc = CompanyDocument::where('company_id', $this->company_id)->find($id);
-
-        if (!$doc) {
-            $this->toast('Document not found!', 'error');
-            return;
-        }
-
-
-        $this->document_id = $doc->id;
-        $this->name = $doc->name;
-        $this->emp_id = $doc->emp_id;
-        $this->existingDocument = $doc->document_url;
-        $this->expires_at = $doc->expires_at;
-        $this->status = $doc->status;
-    }
-
-    public function update()
-    {
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'emp_id' => 'nullable|integer|exists:employees,id',
-            'status' => 'required|in:pending,signed,expired',
-            'expires_at' => 'nullable|date',
-            'file_path' => 'nullable|file|mimes:pdf|max:20240',
-        ]);
-
-        $doc = CompanyDocument::where('company_id', $this->company_id)
-            ->find($this->document_id);
-
-        if (!$doc) {
-            $this->toast('Document not found!', 'error');
-            return;
-        }
-
-        $oldEmpId = $doc->emp_id;
-
-
-        $newFilePath = $doc->file_path;
-
-        if ($this->file_path) {
-            if ($doc->file_path && Storage::disk('public')->exists($doc->file_path)) {
-                Storage::disk('public')->delete($doc->file_path);
-            }
-
-            // upload new file
-            $newFilePath = $this->file_path->store('pdf/company/documents', 'public');
-        }
-
-
-        $doc->update([
-            'name'       => $this->name,
-            'emp_id'     => $this->emp_id,
-            'status'     => $this->status,
-            'expires_at' => $this->expires_at !== '' ? $this->expires_at : null,
-
-            'file_path'  => $newFilePath,
-        ]);
-
-        if (!$oldEmpId && $this->emp_id) {
-            EmployeeAssignedNotificationJob::dispatch($doc->id);
-        }
-
-        $this->toast('Document updated successfully!', 'success');
+        $this->toast('Document uploaded successfully!', 'success');
         $this->dispatch('closemodal');
         $this->resetInputFields();
         $this->resetLoaded();

@@ -45,6 +45,7 @@ class ManageDocuments extends BaseComponent
             ->orderBy('name')
             ->get();
 
+
         $this->loaded = collect();
         $this->loadMore();
     }
@@ -185,48 +186,48 @@ class ManageDocuments extends BaseComponent
         }
 
 
-      $this->share_code = auth()->user()->employee->share_code ?? null;
-      $this->date_of_birth = auth()->user()->employee->date_of_birth ?? null;
+        $this->share_code = auth()->user()->employee->share_code ?? null;
+        $this->date_of_birth = auth()->user()->employee->date_of_birth ?? null;
 
-       $this->dispatch('openUploadModal');
+        $this->dispatch('openUploadModal');
     }
 
 
     public function updatedShareCode($value)
     {
-     $this->share_code = strtoupper($value);
+        $this->share_code = strtoupper($value);
     }
 
     public function saveDocument()
     {
         if ($this->selectedDocName === 'Share Code') {
 
-        $this->validate([
-            'share_code'     => 'required|string|max:20',
-            'date_of_birth'  => 'required|date',
-        ]);
+            $this->validate([
+                'share_code'     => 'required|string|max:20',
+                'date_of_birth'  => 'required|date',
+            ]);
 
 
-        $employee = auth()->user()->employee;
+            $employee = auth()->user()->employee;
 
-        $employee->update([
-            'share_code'     => strtoupper($this->share_code),
-            'date_of_birth'  => $this->date_of_birth,
-        ]);
+            $employee->update([
+                'share_code'     => strtoupper($this->share_code),
+                'date_of_birth'  => $this->date_of_birth,
+            ]);
 
-        // Reset fields
-        $this->reset([
-            'share_code',
-            'date_of_birth',
-            'selectedType',
-            'selectedDocName',
-        ]);
+            // Reset fields
+            $this->reset([
+                'share_code',
+                'date_of_birth',
+                'selectedType',
+                'selectedDocName',
+            ]);
 
-        $this->dispatch('closemodal');
-        $this->toast('Share Code saved successfully!', 'success');
+            $this->dispatch('closemodal');
+            $this->toast('Share Code saved successfully!', 'success');
 
-        return;
-    }
+            return;
+        }
 
 
         $this->validate([
@@ -243,7 +244,7 @@ class ManageDocuments extends BaseComponent
             'expires_at' => $this->expires_at,
             'emp_id'      => auth()->user()->employee->id,
             'company_id'  => auth()->user()->employee->company_id,
-            'file_path'   => $filePath,
+            'file_path'   => $filePath ?: null,
         ]);
 
         $this->statusFilter = null;

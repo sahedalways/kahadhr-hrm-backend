@@ -45,10 +45,15 @@
 
     <div class="row g-4">
         @foreach ($this->filteredDocumentTypes as $type)
+            @if (auth()->user()->employee->nationality === 'British' && $type->name === 'Share Code')
+                @continue
+            @endif
+
             <div class="col-lg-3 col-md-4">
 
 
-                <div class="card shadow-sm border-0 rounded-3 h-100">
+                <div class="card shadow-sm border-0 rounded-3 h-100"
+                     wire:ignore.self>
                     <!-- Card header / type name -->
                     <div class="card-header bg-light text-primary fw-semibold d-flex align-items-center">
                         <i class="fas fa-folder me-2"></i> {{ $type->name }}
@@ -66,8 +71,6 @@
                                      wire:key="doc-{{ $doc->id }}"
                                      style="cursor:pointer; background-color:#f9f9f9; transition: all 0.3s ease;"
                                      wire:click="openUploadModal({{ $doc->doc_type_id }})"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#openUploadModal"
                                      onmouseover="this.style.backgroundColor='#e6f0ff';"
                                      onmouseout="this.style.backgroundColor='#f9f9f9';">
 
@@ -98,21 +101,36 @@
                         </div>
 
 
-                        <!-- Smaller + button at bottom (show only if no documents) -->
+
                         @if ($docsForType->isEmpty())
-                            <div class="d-flex justify-content-center"
-                                 style="margin-top: 0;">
-                                <div class="shadow-sm rounded p-2 bg-light border-dashed d-inline-flex justify-content-center align-items-center"
-                                     style="cursor:pointer; width:170px; height:60px; transition: all 0.3s ease;"
-                                     wire:click="openUploadModal({{ $type->id }})"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#openUploadModal"
-                                     onmouseover="this.style.transform='scale(1.05)'; this.style.backgroundColor='#e9f5ff';"
-                                     onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='#f8f9fa';">
-                                    <span class="fw-bold text-primary fs-4">+</span>
+                            @php
+                                $employee = auth()->user()->employee;
+                                $hasShareCode = !empty($employee->share_code);
+                            @endphp
+
+                            <div class="d-flex justify-content-center">
+                                <div class="shadow-sm rounded p-2 bg-light border-dashed
+            d-inline-flex flex-column justify-content-center align-items-center"
+                                     style="cursor:pointer; width:170px; height:80px;"
+                                     wire:click="openUploadModal({{ $type->id }})">
+
+
+                                    @if ($type->name === 'Share Code' && $hasShareCode)
+                                        <div class="fw-semibold text-primary text-center mb-1">
+                                            {{ $employee->share_code }}
+                                        </div>
+
+                                        <div class="small text-muted mb-2">
+                                            Pending Verification
+                                        </div>
+                                    @else
+                                        <span class="fw-bold text-primary fs-4">+</span>
+                                    @endif
+
                                 </div>
                             </div>
                         @endif
+
 
 
                     </div>
@@ -149,8 +167,15 @@
              ">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        {{ $existingDocument ? 'View Document' : 'Upload Document' }}
+                        @if ($selectedDocName === 'Share Code')
+                            <i class="fas fa-user-check me-2"></i>
+                            {{ $existingDocument ? 'View Share Code' : 'Add Share Code' }}
+                        @else
+                            <i class="fas fa-file-alt me-2"></i>
+                            {{ $existingDocument ? 'View Document' : 'Upload Document' }}
+                        @endif
                     </h5>
+
                     <button type="button"
                             class="btn btn-light rounded-pill"
                             data-bs-dismiss="modal"
@@ -161,136 +186,280 @@
 
 
                 <form wire:submit.prevent="saveDocument">
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Left: Drag & Drop -->
+                    @if ($selectedDocName === 'Share Code')
+                        @if ($existingDocument)
+                            <div class="modal-body">
+                                <div class="alert alert-success text-center text-white">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Share Code already submitted
+                                </div>
 
-                            @if (!$existingDocument)
-                                <div class="col-lg-4 mb-3">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-4 mb-3">
 
-                                    <div class="border border-dashed rounded p-4 text-center"
-                                         :class="dragover ? 'border-primary bg-light' : ''"
-                                         style="cursor:pointer; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center;"
-                                         x-on:click="$refs.fileInput.click()">
-                                        <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
-                                        <div class="small text-muted">Drag & Drop your file here or click to select
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Share Code</label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ $share_code ?? 'N/A' }}"
+                                                   disabled>
                                         </div>
-                                        <input type="file"
-                                               x-ref="fileInput"
-                                               class="d-none"
-                                               accept="application/pdf"
-                                               x-on:change="
-                                           fileUrl = URL.createObjectURL($refs.fileInput.files[0]);
-                                       "
-                                               wire:model="file_path">
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Date of Birth</label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ $date_of_birth }}"
+                                                   disabled>
+                                        </div>
+
                                     </div>
 
-                                    @error('file_path')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
 
+                                    <div class="col-lg-8 mb-3"
+                                         wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
+                                        <label class="form-label fw-semibold">Document Preview</label>
+                                        <div class="border rounded p-2"
+                                             style="height: 70vh; overflow: auto;">
 
+                                            <!-- Show newly uploaded file if exists -->
+                                            <template x-if="fileUrl">
+                                                <embed :src="fileUrl"
+                                                       type="application/pdf"
+                                                       width="100%"
+                                                       height="100%"></embed>
+                                            </template>
 
+                                            <!-- Show existing document if no new file selected -->
+                                            <template x-if="!fileUrl && @js($existingDocument)">
+                                                <embed src="{{ $existingDocument ? $existingDocument->document_url : '' }}"
+                                                       type="application/pdf"
+                                                       width="100%"
+                                                       height="100%"></embed>
+                                            </template>
 
-                                    @if ($file_path)
-                                        <div class="mt-2 small text-success">
-                                            {{ $file_path->getClientOriginalName() }}
+                                            <!-- Placeholder if nothing exists -->
+                                            <template x-if="!fileUrl && !@js($existingDocument)">
+                                                <div class="border rounded p-4 text-center text-muted"
+                                                     style="height: 100%;">
+                                                    No document selected
+                                                </div>
+                                            </template>
+
                                         </div>
-                                    @endif
+                                    </div>
+                                </div>
+                            </div>
 
-                                    @if ($file_path)
+                            <div class="modal-footer justify-content-center">
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        wire:click="$dispatch('closemodal')">
+                                    Close
+                                </button>
+                            </div>
+                        @else
+                            <div class="modal-body">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-6">
+
+                                        <div class="alert alert-info mb-4 text-center text-white">
+                                            <strong>Note:</strong>
+                                            Please enter your Share Code and Date of Birth.
+                                            No document upload is required.
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Share Code <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text"
+                                                   class="form-control text-uppercase"
+                                                   wire:model.lazy="share_code"
+                                                   placeholder="Example: WLE JFZ 6FT">
+                                            @error('share_code')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Date of Birth <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date"
+                                                   class="form-control"
+                                                   wire:model="date_of_birth"
+                                                   max="{{ date('Y-m-d') }}">
+                                            @error('date_of_birth')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer justify-content-center">
+                                <button type="submit"
+                                        class="btn btn-primary"
+                                        wire:loading.attr="disabled"
+                                        wire:target="saveDocument">
+                                    <span wire:loading
+                                          wire:target="saveDocument">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>
+                                        Saving...
+                                    </span>
+                                    <span wire:loading.remove
+                                          wire:target="saveDocument">
+                                        Save Share Code
+                                    </span>
+                                </button>
+                            </div>
+                        @endif
+                    @else
+                        <div class="modal-body">
+                            <div class="row">
+                                <!-- Left: Drag & Drop -->
+
+                                @if (!$existingDocument)
+                                    <div class="col-lg-4 mb-3">
+
+                                        <div class="border border-dashed rounded p-4 text-center"
+                                             :class="dragover ? 'border-primary bg-light' : ''"
+                                             style="cursor:pointer; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center;"
+                                             x-on:click="$refs.fileInput.click()">
+                                            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                                            <div class="small text-muted">Drag & Drop your file here or click to select
+                                            </div>
+                                            <input type="file"
+                                                   x-ref="fileInput"
+                                                   class="d-none"
+                                                   accept="application/pdf"
+                                                   x-on:change="
+                                           fileUrl = URL.createObjectURL($refs.fileInput.files[0]);
+                                       "
+                                                   wire:model="file_path">
+                                        </div>
+
+                                        @error('file_path')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+
+
+
+
+                                        @if ($file_path)
+                                            <div class="mt-2 small text-success">
+                                                {{ $file_path->getClientOriginalName() }}
+                                            </div>
+                                        @endif
+
+                                        @if ($file_path)
+                                            <div class="row mt-3">
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label">Expires At <span
+                                                              class="text-danger">*</span></label>
+                                                    <input type="date"
+                                                           class="form-control"
+                                                           wire:model="expires_at"
+                                                           min="{{ date('Y-m-d') }}">
+                                                    @error('expires_at')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label">Comment <span
+                                                              class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           wire:model="comment">
+                                                    @error('comment')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="col-lg-4 mb-3">
                                         <div class="row mt-3">
                                             <div class="col-12 mb-3">
-                                                <label class="form-label">Expires At <span
-                                                          class="text-danger">*</span></label>
+                                                <label class="form-label">Expires At </label>
                                                 <input type="date"
                                                        class="form-control"
                                                        wire:model="expires_at"
-                                                       min="{{ date('Y-m-d') }}">
+                                                       min="{{ date('Y-m-d') }}"
+                                                       readonly>
                                                 @error('expires_at')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
 
                                             <div class="col-12 mb-3">
-                                                <label class="form-label">Comment <span
-                                                          class="text-danger">*</span></label>
+                                                <label class="form-label">Comment </label>
                                                 <input type="text"
                                                        class="form-control"
-                                                       wire:model="comment">
+                                                       wire:model="comment"
+                                                       readonly>
                                                 @error('comment')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
-                                    @endif
-                                </div>
-                            @else
-                                <div class="col-lg-4 mb-3">
-                                    <div class="row mt-3">
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Expires At </label>
-                                            <input type="date"
-                                                   class="form-control"
-                                                   wire:model="expires_at"
-                                                   min="{{ date('Y-m-d') }}"
-                                                   readonly>
-                                            @error('expires_at')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
+                                    </div>
+                                @endif
 
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Comment </label>
-                                            <input type="text"
-                                                   class="form-control"
-                                                   wire:model="comment"
-                                                   readonly>
-                                            @error('comment')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
-                                        </div>
+
+
+                                <div class="col-lg-8"
+                                     wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
+                                    <label class="form-label fw-semibold">Document Preview</label>
+                                    <div class="border rounded p-2"
+                                         style="height: 70vh; overflow: auto;">
+
+                                        <!-- Show newly uploaded file if exists -->
+                                        <template x-if="fileUrl">
+                                            <embed :src="fileUrl"
+                                                   type="application/pdf"
+                                                   width="100%"
+                                                   height="100%"></embed>
+                                        </template>
+
+                                        <!-- Show existing document if no new file selected -->
+                                        <template x-if="!fileUrl && @js($existingDocument)">
+                                            <embed src="{{ $existingDocument ? $existingDocument->document_url : '' }}"
+                                                   type="application/pdf"
+                                                   width="100%"
+                                                   height="100%"></embed>
+                                        </template>
+
+                                        <!-- Placeholder if nothing exists -->
+                                        <template x-if="!fileUrl && !@js($existingDocument)">
+                                            <div class="border rounded p-4 text-center text-muted"
+                                                 style="height: 100%;">
+                                                No document selected
+                                            </div>
+                                        </template>
+
                                     </div>
                                 </div>
-                            @endif
 
-
-                            <!-- Right: PDF Preview -->
-                            <div class="col-lg-8"
-                                 wire:key="preview-{{ $selectedType }}-{{ optional($existingDocument)->id }}">
-                                <label class="form-label fw-semibold">Document Preview</label>
-                                <div class="border rounded p-2"
-                                     style="height: 70vh; overflow: auto;">
-
-                                    <!-- Show newly uploaded file if exists -->
-                                    <template x-if="fileUrl">
-                                        <embed :src="fileUrl"
-                                               type="application/pdf"
-                                               width="100%"
-                                               height="100%"></embed>
-                                    </template>
-
-                                    <!-- Show existing document if no new file selected -->
-                                    <template x-if="!fileUrl && @js($existingDocument)">
-                                        <embed src="{{ $existingDocument ? $existingDocument->document_url : '' }}"
-                                               type="application/pdf"
-                                               width="100%"
-                                               height="100%"></embed>
-                                    </template>
-
-                                    <!-- Placeholder if nothing exists -->
-                                    <template x-if="!fileUrl && !@js($existingDocument)">
-                                        <div class="border rounded p-4 text-center text-muted"
-                                             style="height: 100%;">
-                                            No document selected
-                                        </div>
-                                    </template>
-
-                                </div>
                             </div>
-
                         </div>
-                    </div>
+                        @if ($existingDocument)
+                            <div class="modal-footer justify-content-center">
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        wire:click="$dispatch('closemodal')">
+                                    Close
+                                </button>
+                            </div>
+                        @endif
+                    @endif
+
+
+
                     @if (!$existingDocument)
                         <div class="d-flex justify-content-center mt-3">
                             <template x-if="fileUrl">
@@ -318,3 +487,14 @@
     </div>
 
 </div>
+
+
+<script>
+    window.addEventListener('openUploadModal', function() {
+        let modalEl = document.getElementById('openUploadModal');
+        if (!modalEl) return;
+
+        let modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+</script>

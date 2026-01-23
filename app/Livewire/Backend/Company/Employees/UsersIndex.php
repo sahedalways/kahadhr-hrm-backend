@@ -355,7 +355,7 @@ class UsersIndex extends BaseComponent
 
 
         if ($this->nationality !== 'British') {
-            $rules['share_code'] = 'required|string|max:20';
+            $rules['share_code'] = 'nullable|string|max:20';
         }else{
             $this->share_code = null;
         }
@@ -663,7 +663,6 @@ class UsersIndex extends BaseComponent
                     'f_name' => $rowAssoc['f_name'] ?? null,
                     'l_name' => $rowAssoc['l_name'] ?? null,
                     'nationality' => $rowAssoc['nationality'] ?? null,
-                    'share_code' =>  $rowAssoc['nationality'] == 'British' ? null : $rowAssoc['share_code'] ?? null,
                     'date_of_birth' => $rowAssoc['date_of_birth'] ?? null,
                     'salary_type' => $rowAssoc['salary_type'] ?? null,
                     'contract_hours' => $rowAssoc['salary_type'] == 'monthly' ? null : $rowAssoc['contract_hours'] ?? null,

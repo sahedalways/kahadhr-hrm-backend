@@ -20,12 +20,16 @@ class ManageDocuments extends BaseComponent
     public $loaded;
     public $documentTypes;
     public $selectedType = null;
+    public $filterType = null;
     public $file_path;
     public $expires_at;
     public $comment;
     public $lastId = null;
     public $hasMore = true;
     public $statusFilter = null;
+    public $selectedDocName = null;
+    public $share_code;
+    public $date_of_birth;
 
     public $existingDocument = null;
 
@@ -51,7 +55,7 @@ class ManageDocuments extends BaseComponent
         return view('livewire.backend.employee.documents.manage-documents', [
             'documents' => $this->loaded,
             'documentTypes' => $this->documentTypes,
-            'selectedType' => $this->selectedType,
+            'selectedType' => $this->filterType,
         ]);
     }
 
@@ -69,11 +73,13 @@ class ManageDocuments extends BaseComponent
     public function filterByType($typeId)
     {
         // toggle: if clicking same type again, deselect
-        if ($this->selectedType === $typeId) {
-            $this->selectedType = null;
+        if ($this->filterType === $typeId) {
+            $this->filterType = null;
         } else {
-            $this->selectedType = $typeId;
+            $this->filterType = $typeId;
         }
+
+        $this->statusFilter = null;
 
         $this->resetLoaded();
     }
@@ -81,6 +87,7 @@ class ManageDocuments extends BaseComponent
     public function handleFilter($value)
     {
         $this->statusFilter = $value;
+        $this->filterType = null;
         $this->resetLoaded();
     }
 
@@ -156,6 +163,9 @@ class ManageDocuments extends BaseComponent
         $this->statusFilter = null;
         $this->selectedType = null;
         $this->existingDocument = null;
+        $this->selectedDocName = null;
+        $this->date_of_birth = null;
+        $this->share_code = null;
         $this->selectedType = $typeId;
 
         $this->dispatch('reset-file-url');
@@ -166,14 +176,59 @@ class ManageDocuments extends BaseComponent
             ->latest()
             ->first();
 
+
+        $this->selectedDocName = optional($this->documentTypes->where('id', $typeId)->first())->name;
+
         if ($this->existingDocument) {
             $this->comment = $this->existingDocument->comment;
             $this->expires_at = $this->existingDocument->expires_at;
         }
+
+
+      $this->share_code = auth()->user()->employee->share_code ?? null;
+      $this->date_of_birth = auth()->user()->employee->date_of_birth ?? null;
+
+       $this->dispatch('openUploadModal');
+    }
+
+
+    public function updatedShareCode($value)
+    {
+     $this->share_code = strtoupper($value);
     }
 
     public function saveDocument()
     {
+        if ($this->selectedDocName === 'Share Code') {
+
+        $this->validate([
+            'share_code'     => 'required|string|max:20',
+            'date_of_birth'  => 'required|date',
+        ]);
+
+
+        $employee = auth()->user()->employee;
+
+        $employee->update([
+            'share_code'     => strtoupper($this->share_code),
+            'date_of_birth'  => $this->date_of_birth,
+        ]);
+
+        // Reset fields
+        $this->reset([
+            'share_code',
+            'date_of_birth',
+            'selectedType',
+            'selectedDocName',
+        ]);
+
+        $this->dispatch('closemodal');
+        $this->toast('Share Code saved successfully!', 'success');
+
+        return;
+    }
+
+
         $this->validate([
             'comment' => 'required|string|max:255',
             'expires_at' => 'required|date',
@@ -197,6 +252,9 @@ class ManageDocuments extends BaseComponent
         $this->expires_at = null;
         $this->statusFilter = null;
         $this->selectedType = null;
+        $this->selectedDocName = null;
+        $this->date_of_birth = null;
+        $this->share_code = null;
 
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
@@ -206,15 +264,14 @@ class ManageDocuments extends BaseComponent
 
     public function getFilteredDocumentTypesProperty()
     {
-        // If no filter applied, show all types
-        if (!$this->selectedType && !$this->statusFilter) {
+        if (!$this->filterType && !$this->statusFilter) {
             return $this->documentTypes;
         }
 
         return $this->documentTypes->filter(function ($type) {
             $docs = $this->loaded->where('doc_type_id', $type->id);
-            // Show type if it has matching documents OR is the selected type
-            return $docs->isNotEmpty() || ($this->selectedType && $this->selectedType == $type->id);
+
+            return $docs->isNotEmpty() || ($this->filterType && $this->filterType == $type->id);
         });
     }
 }

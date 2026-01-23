@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->enum('status', ['default', 'manual'])->default('manual');
             $table->timestamps();
         });
     }

@@ -259,7 +259,7 @@
                                     </small>
 
                                     <code class="d-block text-dark">
-                                        f_name, l_name, email, job_title, nationality, share_code, date_of_birth,
+                                        f_name, l_name, email, job_title, nationality, date_of_birth,
                                         salary_type, contract_hours
                                     </code>
                                 </div>
@@ -388,7 +388,7 @@
                                 @if ($nationality && $nationality !== 'British')
                                     <div class="col-md-6 mt-2">
                                         <label class="form-label">
-                                            Share Code <span class="text-danger">*</span>
+                                            Share Code
                                         </label>
                                         <input type="text"
                                                class="form-control"

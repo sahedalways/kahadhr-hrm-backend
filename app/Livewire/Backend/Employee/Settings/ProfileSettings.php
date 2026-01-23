@@ -248,7 +248,7 @@ class ProfileSettings extends BaseComponent
 
 
          if ($this->nationality !== 'British') {
-            $rules['share_code'] = 'required|string|max:20';
+            $rules['share_code'] = 'nullable|string|max:20';
         } else{
             $this->share_code = null;
         }

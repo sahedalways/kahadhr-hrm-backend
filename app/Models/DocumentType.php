@@ -13,6 +13,7 @@ class DocumentType extends Model
         'company_id',
         'user_id',
         'name',
+        'status',
     ];
 
     public function company()

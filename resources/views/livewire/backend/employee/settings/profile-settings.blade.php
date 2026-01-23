@@ -366,7 +366,7 @@
                         @if ($nationality && $nationality !== 'British')
                             <div class="col-md-6 mt-2">
                                 <label class="form-label">
-                                    Share Code <span class="text-danger">*</span>
+                                    Share Code
                                 </label>
                                 <input type="text"
                                        class="form-control"

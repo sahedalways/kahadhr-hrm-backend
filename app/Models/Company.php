@@ -115,7 +115,7 @@ class Company extends Model
             $defaultTypes = [
                 'Passport',
                 'Driving License',
-                'Right to Work',
+                'Share Code',
             ];
 
             foreach ($defaultTypes as $type) {
@@ -123,6 +123,7 @@ class Company extends Model
                     'company_id' => $company->id,
                     'user_id'    => $company->user_id,
                     'name'       => $type,
+                    'status'       => 'default',
                 ]);
             }
 

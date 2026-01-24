@@ -541,10 +541,48 @@
                         <i class="fas fa-chart-line"></i>
                         <span class="nav-link-text ms-1">Reports</span>
                     </a>
-
                     <div class="collapse {{ Request::is('dashboard/reports*') ? 'show' : '' }}"
                          id="reports">
                         <ul class="nav ms-4">
+
+                            <!-- Employee Profile -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/employee-profile*') ? 'active' : '' }}"
+                                   href="{{ route('company.dashboard.reports.employee-profile', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Employee Profile"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-id-card sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Employee Profile </span>
+                                </a>
+                            </li>
+
+                            <!-- Timesheet -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/timesheet*') ? 'active' : '' }}"
+                                   href="{{ route('company.dashboard.reports.timesheet', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Timesheet"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-clock sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Timesheet </span>
+                                </a>
+                            </li>
+
+                            <!-- Leaves -->
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/leaves*') ? 'active' : '' }}"
+                                   href="{{ route('company.dashboard.reports.leaves', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Leaves"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-calendar-check sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Leaves </span>
+                                </a>
+                            </li>
 
                             <!-- Expenses -->
                             <li class="nav-item">
@@ -559,7 +597,7 @@
                                 </a>
                             </li>
 
-
+                            <!-- Payslips -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/reports/pay-slips') ? 'active' : '' }}"
                                    href="{{ route('company.dashboard.reports.payslips', ['company' => app('authUser')->company->sub_domain]) }}"
@@ -572,11 +610,9 @@
                                 </a>
                             </li>
 
-
-
-
                         </ul>
                     </div>
+
                 </li>
             @endif
 

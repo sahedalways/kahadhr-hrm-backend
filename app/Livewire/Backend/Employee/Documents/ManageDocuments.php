@@ -159,6 +159,7 @@ class ManageDocuments extends BaseComponent
 
     public function openUploadModal($typeId)
     {
+
         $this->file_path = null;
         $this->expires_at = null;
         $this->statusFilter = null;
@@ -190,6 +191,7 @@ class ManageDocuments extends BaseComponent
 
     public function openDocModal($docId, $index)
     {
+
         $this->doc_type_id = null;
         $this->emp_id      = null;
         $this->expires_at = null;

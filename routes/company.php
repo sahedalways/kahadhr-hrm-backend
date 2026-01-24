@@ -16,6 +16,9 @@ use App\Livewire\Backend\Company\Leaves\LeavesIndex;
 use App\Livewire\Backend\Company\ManageTeamsDepartment\ManageTeamsDepartment;
 use App\Livewire\Backend\Company\Onboarding\OnboardingIndex;
 use App\Livewire\Backend\Company\Reports\CompanyExpenses;
+use App\Livewire\Backend\Company\Reports\CompanyEmployeeProfile;
+use App\Livewire\Backend\Company\Reports\CompanyTimesheet;
+use App\Livewire\Backend\Company\Reports\CompanyLeaves;
 use App\Livewire\Backend\Company\Reports\CompanyPayslip;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
@@ -132,6 +135,15 @@ Route::domain('company.' . config('app.base_domain'))
     Route::prefix('reports')->name('reports.')->group(function () {
       Route::get('/expenses', CompanyExpenses::class)->name('expenses');
       Route::get('/pay-slips', CompanyPayslip::class)->name('payslips');
+      Route::get('/employee-profile', CompanyEmployeeProfile::class)
+        ->name('employee-profile');
+
+      Route::get('/timesheet', CompanyTimesheet::class)
+        ->name('timesheet');
+
+
+      Route::get('/leaves', CompanyLeaves::class)
+        ->name('leaves');
     });
 
 
@@ -165,7 +177,7 @@ Route::get('/employees/csv-template', function () {
   $callback = function () {
     $file = fopen('php://output', 'w');
 
-    fputcsv($file, ['f_name', 'l_name', 'email', 'job_title', 'nationality', 'date_of_birth','salary_type', 'contract_hours']);
+    fputcsv($file, ['f_name', 'l_name', 'email', 'job_title', 'nationality', 'date_of_birth', 'salary_type', 'contract_hours']);
 
 
     fputcsv($file, ['John', 'Doe', 'john@example.com', 'Officer', 'British', '1990-01-01', 'hourly / monthly', '40']);

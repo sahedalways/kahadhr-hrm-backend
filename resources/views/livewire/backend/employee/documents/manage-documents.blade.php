@@ -214,8 +214,9 @@
                 "
                                                     onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
                                                     onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
-                                                <i class="bi bi-plus-lg"
+                                                <i class="fas fa-plus"
                                                    style="font-size: 1.2rem;"></i>
+
                                             </button>
                                         </div>
                                     @endif
@@ -330,8 +331,9 @@
                 "
                                             onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
                                             onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
-                                        <i class="bi bi-plus-lg"
+                                        <i class="fas fa-plus"
                                            style="font-size: 1.2rem;"></i>
+
                                     </button>
                                 @endif
                             </div>
@@ -521,6 +523,8 @@
                         @endif
                     </h5>
 
+
+
                     <button type="button"
                             class="btn btn-light rounded-pill"
                             data-bs-dismiss="modal"
@@ -576,11 +580,7 @@
                         </div>
 
                         <div class="modal-footer justify-content-center">
-                            <button type="button"
-                                    class="btn btn-secondary"
-                                    wire:click="$dispatch('closemodal')">
-                                Close
-                            </button>
+
 
                             <button type="submit"
                                     class="btn btn-primary"
@@ -682,12 +682,7 @@
                         </div>
 
                         <div class="modal-footer justify-content-center">
-                            <button type="button"
-                                    class="btn btn-secondary"
-                                    wire:click="$dispatch('closemodal')"
-                                    wire:click="resetSelectedType">
-                                Close
-                            </button>
+
 
                             <button type="submit"
                                     class="btn btn-success"

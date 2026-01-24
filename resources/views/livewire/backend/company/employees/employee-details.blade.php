@@ -540,6 +540,7 @@
                      id="documentsSection"
                      role="tabpanel"
                      aria-labelledby="documents-tab">
+
                     <div class="card border-0 shadow-lg"
                          style="border-radius: 1rem;">
                         <div class="card-header bg-white py-4 border-bottom-0"
@@ -562,20 +563,46 @@
                                         <div class="alert alert-info border-0 text-center shadow-sm d-flex flex-column justify-content-center align-items-center"
                                              style="background-color: #eaf6ff; border-radius: 0.75rem; height: 200px;">
                                             <i class="bi bi-file-earmark-lock fs-3 me-2 text-info"></i>
-                                            <h5 class="mt-2 mb-0 fw-semibold text-white">No documents found for
-                                                this
+                                            <h5 class="mt-2 mb-0 fw-semibold text-white">No documents found for this
                                                 employee.</h5>
                                         </div>
                                     </div>
                                 @else
-                                    @foreach ($types as $type)
-                                        @php
-                                            $docsForType = $employee->documents->where('doc_type_id', $type->id);
-                                        @endphp
+                                    @php
+                                        $grouped = $employee->documents
+                                            ->sortByDesc('created_at')
+                                            ->groupBy(function ($doc) {
+                                                return $doc->documentType->name ?? 'Unknown Type';
+                                            });
+                                    @endphp
 
-                                        @if ($docsForType->isEmpty())
-                                            @continue
-                                        @endif
+                                    @foreach ($grouped as $type => $docs)
+                                        @php
+                                            $latestDocs = $docs->sortByDesc('created_at')->take(3)->values();
+
+                                            $latestDoc = $docs->sortByDesc('created_at')->first();
+
+                                            $latestExpiresAt =
+                                                $latestDoc && $latestDoc->expires_at
+                                                    ? \Carbon\Carbon::parse($latestDoc->expires_at)
+                                                    : null;
+
+                                            $showTypeNotify = false;
+                                            $notificationType = null;
+
+                                            if ($latestExpiresAt) {
+                                                if ($latestExpiresAt->isPast()) {
+                                                    $showTypeNotify = true;
+                                                    $notificationType = 'expired';
+                                                } elseif (
+                                                    now()->diffInDays($latestExpiresAt, false) > 0 &&
+                                                    now()->diffInDays($latestExpiresAt, false) <= 60
+                                                ) {
+                                                    $showTypeNotify = true;
+                                                    $notificationType = 'soon';
+                                                }
+                                            }
+                                        @endphp
 
                                         <div class="col-md-6 col-sm-12">
                                             <div class="card border-0 shadow-sm rounded-4 h-100 employee-doc-card"
@@ -583,85 +610,146 @@
 
                                                 <div class="card-header bg-info text-white fw-bold d-flex align-items-center py-3"
                                                      style="border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
-                                                    <i class="bi bi-folder me-2 fs-5"></i> {{ $type->name }}
+                                                    <i class="bi bi-folder me-2 fs-5"></i> {{ $type }}
                                                 </div>
 
                                                 <div class="card-body d-flex flex-column p-3">
 
                                                     <div class="mb-3 flex-grow-1">
 
-                                                        @foreach ($docsForType as $doc)
-                                                            <div class="rounded p-3 mb-2 border border-light position-relative doc-item"
-                                                                 data-doc-id="{{ $doc->id }}"
-                                                                 data-bs-toggle="modal"
-                                                                 data-bs-target="#openDocumentModal"
-                                                                 wire:click.prevent="$dispatch('openDocumentModal', {{ json_encode(['docId' => $doc->id]) }})"
-                                                                 style="cursor:pointer; background-color:white; transition: all .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                                        <div class="border rounded p-2 mb-2"
+                                                             style="max-width:240px; position:relative;">
 
-                                                                <div class="d-flex align-items-start gap-3">
-                                                                    <i
-                                                                       class="fa-solid fa-file-pdf text-danger fs-4"></i>
+                                                            @if ($showTypeNotify)
+                                                                <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
+                                                                      wire:loading.attr="disabled"
+                                                                      title="Notify employee"
+                                                                      style="position:absolute; top:6px; right:6px; background:#dc3545; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; transition:all 0.25s ease; box-shadow:0 3px 8px rgba(0,0,0,0.25);"
+                                                                      onmouseover="this.style.transform='scale(1.2)'; this.style.background='#b02a37';"
+                                                                      onmouseout="this.style.transform='scale(1)'; this.style.background='#dc3545';">
+
+                                                                    <i class="bi bi-bell-fill"
+                                                                       wire:loading.remove
+                                                                       wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')">
+                                                                    </i>
+
+                                                                    <i class="bi bi-arrow-repeat"
+                                                                       wire:loading
+                                                                       wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
+                                                                       style="animation:spin 1s linear infinite;">
+                                                                    </i>
+
+                                                                </span>
+                                                            @endif
 
 
-                                                                    <div class="flex-grow-1 lh-1">
-                                                                        <div class="fw-semibold text-truncate"
-                                                                             style="max-width: 100%;">
-                                                                            {{ $doc->name ?? 'Document File' }}
-                                                                        </div>
 
-                                                                        <div class="small text-muted mt-1">
-                                                                            Expiry:
-                                                                            @php
-                                                                                $expiryDate = $doc->expires_at
-                                                                                    ? \Carbon\Carbon::parse(
-                                                                                        $doc->expires_at,
-                                                                                    )
-                                                                                    : null;
-                                                                                $isExpired =
-                                                                                    $expiryDate &&
-                                                                                    $expiryDate->isPast();
-                                                                                $isSoon =
-                                                                                    $expiryDate &&
-                                                                                    $expiryDate->diffInDays(now()) <
-                                                                                        30 &&
-                                                                                    !$isExpired;
-                                                                            @endphp
-                                                                            <span
-                                                                                  class="fw-medium
-                                                                @if ($isExpired) text-danger @elseif($isSoon) text-warning @else text-dark @endif">
-                                                                                {{ $expiryDate ? $expiryDate->format('d M, Y') : 'No Expiry' }}
-                                                                            </span>
+                                                            <div class="d-flex align-items-center"
+                                                                 style="overflow-x:auto; overflow-y:hidden; padding:16px 8px; min-height:105px; max-width:230px; scrollbar-width:none;">
+
+                                                                @foreach ($latestDocs as $index => $doc)
+                                                                    @php
+                                                                        $colors = [
+                                                                            '#4e73df',
+                                                                            '#1cc88a',
+                                                                            '#36b9cc',
+                                                                            '#f6c23e',
+                                                                            '#e74a3b',
+                                                                        ];
+                                                                        $currentColor =
+                                                                            $colors[$index % count($colors)];
+                                                                        $extension = pathinfo(
+                                                                            $doc->file_path,
+                                                                            PATHINFO_EXTENSION,
+                                                                        );
+                                                                        $expiresAt = $doc->expires_at
+                                                                            ? \Carbon\Carbon::parse($doc->expires_at)
+                                                                            : null;
+
+                                                                        $isExpired = $expiresAt && $expiresAt->isPast();
+
+                                                                        $isExpiringSoon =
+                                                                            $expiresAt &&
+                                                                            !$isExpired &&
+                                                                            $expiresAt->isFuture() &&
+                                                                            $expiresAt->lte(now()->addDays(60));
+
+                                                                        $zIndex = count($latestDocs) - $index;
+                                                                    @endphp
+
+                                                                    <div class="doc-card-wrapper"
+                                                                         style="position:relative; min-width:90px; margin-right:-70px; z-index:{{ $zIndex }}; transition:all 0.4s cubic-bezier(0.165,0.84,0.44,1); cursor:pointer;"
+                                                                         onmouseover="this.style.zIndex='999';this.style.transform='translateY(-12px) scale(1.08)';this.style.marginRight='10px';"
+                                                                         onmouseout="this.style.zIndex='{{ $zIndex }}';this.style.transform='translateY(0) scale(1)';this.style.marginRight='-70px';"
+                                                                         data-bs-toggle="modal"
+                                                                         data-bs-target="#documentModal"
+                                                                         wire:click="openDocModal({{ $doc->id }}, {{ $index + 1 }})">
+
+                                                                        <div
+                                                                             style="background:white; border-radius:10px; padding:10px; box-shadow:-5px 0 12px rgba(0,0,0,0.08); border-top:3px solid {{ $currentColor }}; text-align:center; border:1px solid #eee;">
+                                                                            <div
+                                                                                 style="width:36px; height:36px; background:{{ $currentColor }}15; color:{{ $currentColor }}; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; font-size:1.1rem;">
+                                                                                @if (in_array($extension, ['jpg', 'png', 'jpeg']))
+                                                                                    <i class="bi bi-image"></i>
+                                                                                @elseif($extension === 'pdf')
+                                                                                    <i
+                                                                                       class="bi bi-file-earmark-pdf"></i>
+                                                                                @else
+                                                                                    <i
+                                                                                       class="bi bi-file-earmark-text"></i>
+                                                                                @endif
+                                                                            </div>
+
+                                                                            <div
+                                                                                 style="font-weight:700;font-size:0.65rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                                                File-{{ $index + 1 }}.{{ $extension }}
+                                                                            </div>
+
+                                                                            <div
+                                                                                 style="font-size:0.6rem;margin-top:4px;">
+                                                                                <div
+                                                                                     style="color:{{ $isExpired ? '#dc3545' : ($isExpiringSoon ? '#fd7e14' : '#999') }};">
+                                                                                    {{ $doc->expires_at ? date('d M, Y', strtotime($doc->expires_at)) : 'No Expiry' }}
+                                                                                </div>
+
+                                                                                @if ($isExpired)
+                                                                                    <span class="badge bg-danger mt-1"
+                                                                                          style="font-size:0.55rem;">Expired</span>
+                                                                                @elseif($isExpiringSoon)
+                                                                                    <span class="badge bg-warning text-dark mt-1"
+                                                                                          style="font-size:0.55rem;">Expires
+                                                                                        Soon</span>
+                                                                                @endif
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                    @if ($isExpired)
-                                                                        <span
-                                                                              class="badge bg-danger zoom zoom-effect">EXPIRED</span>
-                                                                    @elseif ($isSoon)
-                                                                        <span
-                                                                              class="badge bg-warning text-dark zoom-effect">Expires
-                                                                            Soon</span>
-                                                                    @endif
-                                                                </div>
-
-
+                                                                @endforeach
                                                             </div>
-                                                        @endforeach
+
+                                                        </div>
 
                                                     </div>
-
 
                                                 </div>
                                             </div>
                                         </div>
                                     @endforeach
+                                    <style>
+                                        .d-flex::-webkit-scrollbar {
+                                            display: none;
+                                        }
+                                    </style>
+
+                                    <link rel="stylesheet"
+                                          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
                                 @endif
 
                             </div>
                         </div>
 
-
                     </div>
                 </div>
+
 
 
                 <!-- Personal Info -->
@@ -1884,6 +1972,239 @@
             </div>
         </div>
     </div>
+
+
+
+    <div wire:ignore.self
+         class="modal fade"
+         id="documentModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <div class="d-flex align-items-start flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h5 class="modal-title"
+                                style="font-weight: 800; color: #2d3748; letter-spacing: -0.5px; margin: 0;">
+                                File-{{ $modalFileIndex ?? '' }}
+                            </h5>
+
+                            <span
+                                  style="background: #edf2f7; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: #4a5568; text-transform: uppercase;">
+                                DOC
+                            </span>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            @if ($modalDocument && $modalDocument->expires_at)
+                                @php
+                                    $expiry = \Carbon\Carbon::parse($modalDocument->expires_at);
+                                    $daysLeft = now()->startOfDay()->diffInDays($expiry->startOfDay(), false);
+                                @endphp
+
+                                <div
+                                     style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                @if ($daysLeft < 0) background: #fff5f5; color: #c53030; border: 1px solid #feb2b2;
+                @elseif($daysLeft === 0) background: #fffaf0; color: #975a16; border: 1px solid #fbd38d;
+                @else background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; @endif
+            ">
+                                    <span
+                                          style="
+                    height: 8px; width: 8px; border-radius: 50%;
+                    @if ($daysLeft < 0) background: #c53030;
+                    @elseif($daysLeft === 0) background: #975a16;
+                    @else background: #276749; @endif
+                "></span>
+
+                                    @if ($daysLeft < 0)
+                                        Expired ({{ abs($daysLeft) }} days ago)
+                                    @elseif ($daysLeft === 0)
+                                        Expires Today
+                                    @else
+                                        Expires in {{ $daysLeft }} days
+                                    @endif
+                                </div>
+                            @else
+                                <div
+                                     style="display: flex; align-items: center; gap: 5px; color: #718096; font-size: 0.75rem; font-weight: 500;">
+                                    <i class="bi bi-calendar-x"
+                                       style="font-size: 0.85rem;"></i>
+                                    No Expiry Set
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body p-0">
+
+                    <div class="container-fluid">
+                        <div class="row g-0"
+                             style="min-height: 70vh;">
+
+                            {{-- LEFT SIDE : Fields --}}
+                            <div class="col-md-4 p-3 border-end"
+                                 style="background:#f8fafc;">
+
+                                <h6 class="fw-bold mb-3 text-uppercase text-muted"
+                                    style="font-size:12px;">
+                                    Document Details
+                                </h6>
+
+                                {{-- Document Type --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Document Type <span
+                                              class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm"
+                                            wire:model.live="doc_type_id">
+                                        <option value="">-- Select --</option>
+                                        @foreach ($docTypes as $type)
+                                            <option value="{{ $type->id }}">
+                                                {{ $type->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+
+                                {{-- Expiry --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Expires At <span
+                                              class="text-danger">*</span></label>
+                                    <input type="date"
+                                           class="form-control form-control-sm"
+                                           wire:model.live="expires_at">
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Change File (PDF)</label>
+
+                                    <input type="file"
+                                           class="form-control form-control-sm"
+                                           wire:model="new_file"
+                                           accept="application/pdf">
+
+                                    @error('new_file')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+
+                                    @if ($new_file)
+                                        <div class="small text-success mt-1">
+                                            New file selected: {{ $new_file->getClientOriginalName() }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                            </div>
+
+                            {{-- RIGHT SIDE : Document Preview --}}
+                            <div class="col-md-8 p-0">
+
+                                @if ($modalDocument && $modalDocument->file_path)
+                                    <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
+                                            style="width:100%; height:100%; min-height:70vh; border:0;">
+                                    </iframe>
+                                @else
+                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                                        No file found
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer d-flex justify-content-between align-items-center">
+
+
+                    <div class="d-flex gap-2 position-relative">
+
+                        @if ($modalDocument)
+                            <button wire:click="updateDocument({{ $modalDocument->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="updateDocument"
+                                    class="btn btn-sm btn-primary">
+
+
+                                <span wire:loading
+                                      wire:target="updateDocument">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Updating...
+                                </span>
+
+                                <span wire:loading.remove
+                                      wire:target="updateDocument">
+                                    <i class="fa fa-edit me-1"></i> Update
+                                </span>
+                            </button>
+                        @endif
+
+
+
+                        @if ($modalDocument && $confirmDeleteId === $modalDocument->id)
+                            <div style="position:absolute; bottom:45px; left:0; z-index:999;">
+                                <div
+                                     style="background:#fff; border:1px solid #ddd; padding:8px 10px;
+                            border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,0.15);">
+                                    <div style="font-size:12px; margin-bottom:6px;">
+                                        Are you sure?
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button wire:click="deleteDocument({{ $modalDocument->id }})"
+                                                wire:loading.attr="disabled"
+                                                class="btn btn-sm btn-danger">
+                                            Yes
+                                        </button>
+                                        <button wire:click="$set('confirmDeleteId', null)"
+                                                class="btn btn-sm btn-secondary">
+                                            No
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif ($modalDocument)
+                            <button wire:click="confirmDelete({{ $modalDocument->id }})"
+                                    class="btn btn-sm btn-danger">
+                                <i class="fa fa-trash me-1"></i> Delete
+                            </button>
+                        @endif
+
+                    </div>
+
+                    {{-- Right side: Close --}}
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="{{ asset('js/company/changePassword.js') }}"></script>
@@ -1961,14 +2282,10 @@
 
 
 <script>
-    function togglePassword(inputId, icon) {
-        const input = document.getElementById(inputId);
-        if (input.type === "password") {
-            input.type = "text";
-            icon.innerHTML = '<i class="fas fa-eye-slash"></i>';
-        } else {
-            input.type = "password";
-            icon.innerHTML = '<i class="fas fa-eye"></i>';
-        }
-    }
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('documentModalOpened', () => {
+            var modal = new bootstrap.Modal(document.getElementById('documentModal'));
+            modal.show();
+        });
+    });
 </script>

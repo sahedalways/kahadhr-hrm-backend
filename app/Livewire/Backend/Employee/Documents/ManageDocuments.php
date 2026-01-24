@@ -18,7 +18,7 @@ class ManageDocuments extends BaseComponent
     public $search = '';
     public $sortOrder = 'desc';
     public $loaded;
-    public $documentTypes;
+    public $documentTypes = [];
 
     public $selectedType = null;
     public $filterType = null;

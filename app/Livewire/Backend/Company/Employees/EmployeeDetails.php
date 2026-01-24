@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Company\Employees;
 
+use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CustomEmployeeProfileField;
 use App\Models\CustomEmployeeProfileFieldValue;
@@ -12,6 +13,7 @@ use App\Models\Team;
 use App\Traits\Exportable;
 use App\Jobs\SendEmployeeInvitation;
 use App\Models\Company;
+use App\Models\Notification;
 use App\Models\User;
 use App\Services\API\VerificationService;
 use App\Traits\VerifyPassword;
@@ -19,6 +21,8 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class EmployeeDetails extends BaseComponent
@@ -30,6 +34,7 @@ class EmployeeDetails extends BaseComponent
 
     public $departments, $teams;
     public $showAllTeams = false;
+    public $editDocId = null;
     public $employee;
     public $types;
 
@@ -43,7 +48,7 @@ class EmployeeDetails extends BaseComponent
 
 
     public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
-       $home_phone, $mobile_phone, $personal_email,
+        $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status, $brp_number, $brp_expiry_date,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
@@ -81,6 +86,18 @@ class EmployeeDetails extends BaseComponent
         "Other",
     ];
 
+    public  $expires_at, $status, $file_path, $new_file, $emp_id, $doc_type_id, $existingDocument;
+
+    public $confirmDeleteId = null;
+    public $docTypes = [];
+    public $send_email = false;
+
+    public $modalDocument;
+
+    public $selectedType;
+    public $modalFileIndex;
+
+
     public $countries = [];
     public $cities = [];
     public $locations = [];
@@ -94,7 +111,7 @@ class EmployeeDetails extends BaseComponent
     public $countrySearch = '';
     public bool $showAllDepartments = false;
 
-    protected $listeners = ['handleDelation', 'openDocumentModal'];
+    protected $listeners = ['handleDelation'];
 
     public $selectedDocTypeId;
     public $selectedFileUrl;
@@ -160,6 +177,12 @@ class EmployeeDetails extends BaseComponent
             'user.teams'
         )->find($employee);
 
+        $this->docTypes = DocumentType::where('company_id', auth()->user()->company->id)
+            ->orderBy('name')
+            ->get()
+            ->unique('name')
+            ->values();
+
 
 
         if (!$this->employee) {
@@ -217,199 +240,198 @@ class EmployeeDetails extends BaseComponent
             ->toArray();
 
 
-    $this->nationalities = [
-  "British",
-    "Afghan",
-    "Albanian",
-    "Algerian",
-    "American",
-    "Andorran",
-    "Angolan",
-    "Antiguans",
-    "Argentinean",
-    "Armenian",
-    "Australian",
-    "Austrian",
-    "Azerbaijani",
-    "Bahamian",
-    "Bahraini",
-    "Bangladeshi",
-    "Barbadian",
-    "Belarusian",
-    "Belgian",
-    "Belizean",
-    "Beninese",
-    "Bhutanese",
-    "Bolivian",
-    "Bosnian",
-    "Botswanan",
-    "Brazilian",
-    "Bruneian",
-    "Bulgarian",
-    "Burkinabe",
-    "Burmese",
-    "Burundian",
-    "Cambodian",
-    "Cameroonian",
-    "Canadian",
-    "Cape Verdean",
-    "Central African",
-    "Chadian",
-    "Chilean",
-    "Chinese",
-    "Colombian",
-    "Comoran",
-    "Congolese",
-    "Costa Rican",
-    "Croatian",
-    "Cuban",
-    "Cypriot",
-    "Czech",
-    "Danish",
-    "Djiboutian",
-    "Dominican",
-    "Dutch",
-    "East Timorese",
-    "Ecuadorean",
-    "Egyptian",
-    "Emirati",
-    "Equatorial Guinean",
-    "Eritrean",
-    "Estonian",
-    "Ethiopian",
-    "Fijian",
-    "Finnish",
-    "French",
-    "Gabonese",
-    "Gambian",
-    "Georgian",
-    "German",
-    "Ghanaian",
-    "Greek",
-    "Grenadian",
-    "Guatemalan",
-    "Guinean",
-    "Guinea-Bissauan",
-    "Guyanese",
-    "Haitian",
-    "Honduran",
-    "Hungarian",
-    "Icelander",
-    "Indian",
-    "Indonesian",
-    "Iranian",
-    "Iraqi",
-    "Irish",
-    "Israeli",
-    "Italian",
-    "Ivorian",
-    "Jamaican",
-    "Japanese",
-    "Jordanian",
-    "Kazakhstani",
-    "Kenyan",
-    "Kittian and Nevisian",
-    "Kuwaiti",
-    "Kyrgyz",
-    "Laotian",
-    "Latvian",
-    "Lebanese",
-    "Liberian",
-    "Libyan",
-    "Liechtensteiner",
-    "Lithuanian",
-    "Luxembourger",
-    "Macedonian",
-    "Malagasy",
-    "Malawian",
-    "Malaysian",
-    "Maldivian",
-    "Malian",
-    "Maltese",
-    "Marshallese",
-    "Mauritanian",
-    "Mauritian",
-    "Mexican",
-    "Micronesian",
-    "Moldovan",
-    "Monacan",
-    "Mongolian",
-    "Moroccan",
-    "Mozambican",
-    "Namibian",
-    "Nauruan",
-    "Nepalese",
-    "New Zealander",
-    "Nicaraguan",
-    "Nigerian",
-    "Nigerien",
-    "North Korean",
-    "Northern Irish",
-    "Norwegian",
-    "Omani",
-    "Pakistani",
-    "Palauan",
-    "Panamanian",
-    "Papua New Guinean",
-    "Paraguayan",
-    "Peruvian",
-    "Polish",
-    "Portuguese",
-    "Qatari",
-    "Romanian",
-    "Russian",
-    "Rwandan",
-    "Saint Lucian",
-    "Salvadoran",
-    "Samoan",
-    "San Marinese",
-    "Sao Tomean",
-    "Saudi",
-    "Scottish",
-    "Senegalese",
-    "Serbian",
-    "Seychellois",
-    "Sierra Leonean",
-    "Singaporean",
-    "Slovakian",
-    "Slovenian",
-    "Solomon Islander",
-    "Somali",
-    "South African",
-    "South Korean",
-    "South Sudanese",
-    "Spanish",
-    "Sri Lankan",
-    "Sudanese",
-    "Surinamer",
-    "Swazi",
-    "Swedish",
-    "Swiss",
-    "Syrian",
-    "Taiwanese",
-    "Tajik",
-    "Tanzanian",
-    "Thai",
-    "Togolese",
-    "Tongan",
-    "Trinidadian or Tobagonian",
-    "Tunisian",
-    "Turkish",
-    "Turkmen",
-    "Tuvaluan",
-    "Ugandan",
-    "Ukrainian",
-    "Uruguayan",
-    "Uzbekistani",
-    "Vanuatuan",
-    "Venezuelan",
-    "Vietnamese",
-    "Welsh",
-    "Yemenite",
-    "Zambian",
-    "Zimbabwean",
-];
-
+        $this->nationalities = [
+            "British",
+            "Afghan",
+            "Albanian",
+            "Algerian",
+            "American",
+            "Andorran",
+            "Angolan",
+            "Antiguans",
+            "Argentinean",
+            "Armenian",
+            "Australian",
+            "Austrian",
+            "Azerbaijani",
+            "Bahamian",
+            "Bahraini",
+            "Bangladeshi",
+            "Barbadian",
+            "Belarusian",
+            "Belgian",
+            "Belizean",
+            "Beninese",
+            "Bhutanese",
+            "Bolivian",
+            "Bosnian",
+            "Botswanan",
+            "Brazilian",
+            "Bruneian",
+            "Bulgarian",
+            "Burkinabe",
+            "Burmese",
+            "Burundian",
+            "Cambodian",
+            "Cameroonian",
+            "Canadian",
+            "Cape Verdean",
+            "Central African",
+            "Chadian",
+            "Chilean",
+            "Chinese",
+            "Colombian",
+            "Comoran",
+            "Congolese",
+            "Costa Rican",
+            "Croatian",
+            "Cuban",
+            "Cypriot",
+            "Czech",
+            "Danish",
+            "Djiboutian",
+            "Dominican",
+            "Dutch",
+            "East Timorese",
+            "Ecuadorean",
+            "Egyptian",
+            "Emirati",
+            "Equatorial Guinean",
+            "Eritrean",
+            "Estonian",
+            "Ethiopian",
+            "Fijian",
+            "Finnish",
+            "French",
+            "Gabonese",
+            "Gambian",
+            "Georgian",
+            "German",
+            "Ghanaian",
+            "Greek",
+            "Grenadian",
+            "Guatemalan",
+            "Guinean",
+            "Guinea-Bissauan",
+            "Guyanese",
+            "Haitian",
+            "Honduran",
+            "Hungarian",
+            "Icelander",
+            "Indian",
+            "Indonesian",
+            "Iranian",
+            "Iraqi",
+            "Irish",
+            "Israeli",
+            "Italian",
+            "Ivorian",
+            "Jamaican",
+            "Japanese",
+            "Jordanian",
+            "Kazakhstani",
+            "Kenyan",
+            "Kittian and Nevisian",
+            "Kuwaiti",
+            "Kyrgyz",
+            "Laotian",
+            "Latvian",
+            "Lebanese",
+            "Liberian",
+            "Libyan",
+            "Liechtensteiner",
+            "Lithuanian",
+            "Luxembourger",
+            "Macedonian",
+            "Malagasy",
+            "Malawian",
+            "Malaysian",
+            "Maldivian",
+            "Malian",
+            "Maltese",
+            "Marshallese",
+            "Mauritanian",
+            "Mauritian",
+            "Mexican",
+            "Micronesian",
+            "Moldovan",
+            "Monacan",
+            "Mongolian",
+            "Moroccan",
+            "Mozambican",
+            "Namibian",
+            "Nauruan",
+            "Nepalese",
+            "New Zealander",
+            "Nicaraguan",
+            "Nigerian",
+            "Nigerien",
+            "North Korean",
+            "Northern Irish",
+            "Norwegian",
+            "Omani",
+            "Pakistani",
+            "Palauan",
+            "Panamanian",
+            "Papua New Guinean",
+            "Paraguayan",
+            "Peruvian",
+            "Polish",
+            "Portuguese",
+            "Qatari",
+            "Romanian",
+            "Russian",
+            "Rwandan",
+            "Saint Lucian",
+            "Salvadoran",
+            "Samoan",
+            "San Marinese",
+            "Sao Tomean",
+            "Saudi",
+            "Scottish",
+            "Senegalese",
+            "Serbian",
+            "Seychellois",
+            "Sierra Leonean",
+            "Singaporean",
+            "Slovakian",
+            "Slovenian",
+            "Solomon Islander",
+            "Somali",
+            "South African",
+            "South Korean",
+            "South Sudanese",
+            "Spanish",
+            "Sri Lankan",
+            "Sudanese",
+            "Surinamer",
+            "Swazi",
+            "Swedish",
+            "Swiss",
+            "Syrian",
+            "Taiwanese",
+            "Tajik",
+            "Tanzanian",
+            "Thai",
+            "Togolese",
+            "Tongan",
+            "Trinidadian or Tobagonian",
+            "Tunisian",
+            "Turkish",
+            "Turkmen",
+            "Tuvaluan",
+            "Ugandan",
+            "Ukrainian",
+            "Uruguayan",
+            "Uzbekistani",
+            "Vanuatuan",
+            "Venezuelan",
+            "Vietnamese",
+            "Welsh",
+            "Yemenite",
+            "Zambian",
+            "Zimbabwean",
+        ];
     }
 
 
@@ -425,30 +447,32 @@ class EmployeeDetails extends BaseComponent
         $this->share_code = strtoupper($value);
     }
 
+    public function confirmDelete($id)
+    {
+        $this->confirmDeleteId = $id;
+    }
+
 
     /* 🔹 Delete document */
-    public function deleteDocument()
+    public function deleteDocument($id)
     {
-        if (!$this->selectedDocId) return;
+        $document = EmpDocument::find($id);
 
-        $doc = EmpDocument::findOrFail($this->selectedDocId);
+        if ($document) {
+            if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
 
-        if ($doc->file_path && file_exists(storage_path('app/public/' . $doc->file_path))) {
-            unlink(storage_path('app/public/' . $doc->file_path));
+            $document->delete();
         }
 
-        $doc->delete();
 
-        $this->employee->refresh();
+        $this->confirmDeleteId = null;
 
-        $this->selectedDocId = null;
-        $this->selectedFileUrl = '';
-        $this->selectedExpiresAt = '';
-        $this->selectedComment = '';
-
+        $this->toast('Document deleted successfully!', 'info');
         $this->dispatch('closemodal');
-
-        $this->toast('Document deleted successfully', 'success');
+        $this->dispatch('reload-page');
+        $this->resetInputFields();
     }
 
 
@@ -657,7 +681,7 @@ class EmployeeDetails extends BaseComponent
             return;
         }
 
-         if($this->nationality == ''){
+        if ($this->nationality == '') {
             $this->nationality = 'British';
         }
 
@@ -711,9 +735,9 @@ class EmployeeDetails extends BaseComponent
             $this->contract_hours = null;
         }
 
-         if ($this->nationality !== 'British') {
+        if ($this->nationality !== 'British') {
             $rules['share_code'] = 'nullable|string|max:20';
-        }else{
+        } else {
             $this->share_code = null;
         }
 
@@ -1012,6 +1036,98 @@ class EmployeeDetails extends BaseComponent
     {
         $this->showAllTeams = !$this->showAllTeams;
     }
+
+    public function notifyEmployee($typeId, $employeeId, $type)
+    {
+        $docType = DocumentType::findOrFail($typeId);
+
+        $companyId = auth()->user()->company->id;
+        $emp    = Employee::with('user')->find($employeeId);
+
+
+        if ($type === 'expired') {
+            $message = "{$docType->name} expired. Please upload a new one.";
+        }
+
+        if ($type === 'soon') {
+            $message = "{$docType->name} expiring soon. Please update it.";
+        }
+
+
+        $notification = Notification::create([
+            'company_id'     => $companyId,
+            'user_id'        => $emp->user->id,
+            'type'           => 'document_expired',
+            'notifiable_id'  => $docType->id,
+            'data'           => [
+                'message'          => $message,
+            ],
+        ]);
+
+        event(new NotificationEvent($notification));
+
+
+        $this->toast('Employee notified successfully', 'success');
+    }
+
+
+    public function openDocModal($docId, $index)
+    {
+        $this->resetInputFields();
+        $this->modalDocument = EmpDocument::with('documentType', 'employee')
+            ->find($docId);
+
+        $this->modalFileIndex = $index;
+        $this->editDocId = $docId;
+
+        $this->doc_type_id = $this->modalDocument->doc_type_id;
+        $this->emp_id      = $this->modalDocument->emp_id;
+        $this->expires_at = $this->modalDocument->expires_at;
+
+
+        $this->dispatch('documentModalOpened');
+    }
+
+    public function updateDocument()
+    {
+        $this->validate([
+            'doc_type_id' => 'required',
+            'expires_at'  => 'required|date',
+            'emp_id'      => 'required|integer|exists:employees,id',
+            'new_file'   => 'nullable|file|mimes:pdf|max:20240',
+        ]);
+
+        $document = EmpDocument::findOrFail($this->editDocId);
+
+
+
+        if ($this->new_file instanceof TemporaryUploadedFile) {
+
+
+            if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
+
+
+            $filePath = $this->new_file->store('pdf/employee/documents', 'public');
+            $document->file_path = $filePath;
+        }
+
+        // ✅ Update fields
+        $document->update([
+            'doc_type_id' => $this->doc_type_id,
+            'expires_at'  => $this->expires_at,
+            'emp_id'      => $this->emp_id,
+        ]);
+
+
+
+        $this->toast('Document updated successfully!', 'success');
+        $this->dispatch('closemodal');
+
+        $this->resetInputFields();
+    }
+
 
 
     public function render()

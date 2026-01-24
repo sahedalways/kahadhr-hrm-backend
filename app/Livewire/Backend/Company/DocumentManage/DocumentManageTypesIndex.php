@@ -31,7 +31,7 @@ class DocumentManageTypesIndex extends BaseComponent
     public $editDocId = null;
     public $employees;
     public $statusFilter = null;
-    public $docTypes;
+    public $docTypes = [];
     public $send_email = false;
 
     public $modalDocument;

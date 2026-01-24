@@ -137,7 +137,7 @@ class DocumentManageIndex extends BaseComponent
                 'type' => 'assigned_document',
                 'notifiable_id' => $doc->id,
                 'data' => [
-                    'message' => "A new document '{$this->name}' has been assigned to you."
+                    'message' => "A new document has been assigned to you."
                 ],
             ]);
 

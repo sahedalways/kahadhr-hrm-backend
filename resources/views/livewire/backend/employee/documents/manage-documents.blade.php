@@ -25,14 +25,7 @@
                         @endforeach
                     </select>
 
-                    <!-- Status Filter -->
-                    <select class="form-select form-select-lg"
-                            style="min-width: 180px;"
-                            wire:change="handleFilter($event.target.value)">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="expired">Expired</option>
-                    </select>
+
                 </div>
 
 
@@ -184,38 +177,54 @@
                                     </div>
 
 
-                                    <div
-                                         style="
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 60px;
-    margin-left: 80px;
-    flex-shrink: 0;
-    padding-left: 10px;
-">
-                                        <button type="button"
-                                                wire:click="openUploadModal({{ $type->id }})"
-                                                style="
-                width: 42px;
-                height: 42px;
-                border-radius: 12px;
-                border: 2px dashed #4e73df;
-                background: #f8f9fc;
-                color: #4e73df;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                cursor: pointer;
-            "
-                                                onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
-                                                onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
-                                            <i class="bi bi-plus-lg"
-                                               style="font-size: 1.2rem;"></i>
-                                        </button>
-                                    </div>
+
+
+
+                                    @php
+                                        $docsCount = $docsForType->count();
+                                        $isShareCode = strtolower($type->name) === 'share code';
+                                    @endphp
+
+                                    @if ($isShareCode || $docsCount < 3)
+                                        <div
+                                             style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            margin-left: 80px;
+            flex-shrink: 0;
+            padding-left: 10px;
+        ">
+                                            <button type="button"
+                                                    wire:click="openUploadModal({{ $type->id }})"
+                                                    style="
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 12px;
+                    border: 2px dashed #4e73df;
+                    background: #f8f9fc;
+                    color: #4e73df;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                    cursor: pointer;
+                "
+                                                    onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
+                                                    onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
+                                                <i class="bi bi-plus-lg"
+                                                   style="font-size: 1.2rem;"></i>
+                                            </button>
+                                        </div>
+                                    @endif
+
+
+
+
+
+
                                 </div>
 
                                 <style>
@@ -347,40 +356,131 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title">
-                            File-{{ $modalFileIndex ?? '' }}
-                        </h5>
+                    <div class="d-flex align-items-start flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h5 class="modal-title"
+                                style="font-weight: 800; color: #2d3748; letter-spacing: -0.5px; margin: 0;">
+                                File-{{ $modalFileIndex ?? '' }}
+                            </h5>
 
+                            <span
+                                  style="background: #edf2f7; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: #4a5568; text-transform: uppercase;">
+                                DOC
+                            </span>
+                        </div>
 
-                        @if ($modalDocument && $modalDocument->expires_at)
-                            <div style="font-size: 12px; color: #6c757d;">
-                                Expires on:
-                                <span
-                                      style="color: {{ \Carbon\Carbon::parse($modalDocument->expires_at)->isPast() ? '#dc3545' : '#333' }};">
-                                    {{ \Carbon\Carbon::parse($modalDocument->expires_at)->format('d M, Y') }}
-                                </span>
-                            </div>
-                        @else
-                            <div style="font-size: 12px; color: #6c757d;">
-                                No Expiry
-                            </div>
-                        @endif
+                        <div class="d-flex align-items-center">
+                            @if ($modalDocument && $modalDocument->expires_at)
+                                @php
+                                    $expiry = \Carbon\Carbon::parse($modalDocument->expires_at);
+                                    $daysLeft = now()->startOfDay()->diffInDays($expiry->startOfDay(), false);
+                                @endphp
+
+                                <div
+                                     style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                @if ($daysLeft < 0) background: #fff5f5; color: #c53030; border: 1px solid #feb2b2;
+                @elseif($daysLeft === 0) background: #fffaf0; color: #975a16; border: 1px solid #fbd38d;
+                @else background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; @endif
+            ">
+                                    <span
+                                          style="
+                    height: 8px; width: 8px; border-radius: 50%;
+                    @if ($daysLeft < 0) background: #c53030;
+                    @elseif($daysLeft === 0) background: #975a16;
+                    @else background: #276749; @endif
+                "></span>
+
+                                    @if ($daysLeft < 0)
+                                        Expired ({{ abs($daysLeft) }} days ago)
+                                    @elseif ($daysLeft === 0)
+                                        Expires Today
+                                    @else
+                                        Expires in {{ $daysLeft }} days
+                                    @endif
+                                </div>
+                            @else
+                                <div
+                                     style="display: flex; align-items: center; gap: 5px; color: #718096; font-size: 0.75rem; font-weight: 500;">
+                                    <i class="bi bi-calendar-x"
+                                       style="font-size: 0.85rem;"></i>
+                                    No Expiry Set
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
+
                     <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"></button>
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
-                <div class="modal-body">
-                    @if ($modalDocument && $modalDocument->file_path)
-                        <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
-                                style="width:100%; height:500px;"></iframe>
-                    @else
-                        <p>No file found</p>
-                    @endif
+                <div class="modal-body p-0">
+
+                    <div class="container-fluid">
+                        <div class="row g-0"
+                             style="min-height: 70vh;">
+
+                            {{-- LEFT SIDE : Fields --}}
+                            <div class="col-md-4 p-3 border-end"
+                                 style="background:#f8fafc;">
+
+
+                                {{-- Document Type --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Document Type </label>
+                                    <div class="form-control form-control-sm">
+                                        {{ $documentTypes->firstWhere('id', $doc_type_id)->name ?? 'N/A' }}
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                            </div>
+
+                            {{-- RIGHT SIDE : Document Preview --}}
+                            <div class="col-md-8 p-0">
+
+                                @if ($modalDocument && $modalDocument->file_path)
+                                    <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
+                                            style="width:100%; height:100%; min-height:70vh; border:0;">
+                                    </iframe>
+                                @else
+                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                                        No file found
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+
+
+                <div class="modal-footer d-flex justify-content-center align-items-center">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+
+
 
             </div>
         </div>
@@ -424,7 +524,8 @@
                     <button type="button"
                             class="btn btn-light rounded-pill"
                             data-bs-dismiss="modal"
-                            aria-label="Close">
+                            aria-label="Close"
+                            wire:click="resetSelectedType">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -583,7 +684,8 @@
                         <div class="modal-footer justify-content-center">
                             <button type="button"
                                     class="btn btn-secondary"
-                                    wire:click="$dispatch('closemodal')">
+                                    wire:click="$dispatch('closemodal')"
+                                    wire:click="resetSelectedType">
                                 Close
                             </button>
 

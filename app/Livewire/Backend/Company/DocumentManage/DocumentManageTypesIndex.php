@@ -12,6 +12,8 @@ use App\Models\Employee;
 use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
@@ -20,10 +22,13 @@ class DocumentManageTypesIndex extends BaseComponent
     use Exportable, WithPagination;
     use WithFileUploads;
 
-    public $name, $expires_at, $status, $file_path, $emp_id, $doc_type_id, $existingDocument;
+    public $name, $expires_at, $status, $file_path, $new_file, $emp_id, $doc_type_id, $existingDocument;
     public $document_id, $company_id;
     public $search, $sortOrder = 'desc', $perPage = 10;
     public $loaded, $lastId = null, $hasMore = true;
+
+    public $confirmDeleteId = null;
+    public $editDocId = null;
     public $employees;
     public $statusFilter = null;
     public $docTypes;
@@ -36,9 +41,13 @@ class DocumentManageTypesIndex extends BaseComponent
     public $shareCodeFile;
     public $shareCodeEmpId;
     public $selectedType;
+    public $modalFileIndex;
+
+    public $filterUsers = [];
+
+    public bool $selectAllUsers = false;
 
     protected $listeners = [
-        'deleteDocument' => 'deleteDocument',
         'sortUpdated' => 'handleSort'
     ];
 
@@ -69,7 +78,44 @@ class DocumentManageTypesIndex extends BaseComponent
     }
 
 
-    public function notifyEmployee($typeId, $employeeId)
+    public function filterByType($typeId)
+    {
+        if ($this->selectedType === $typeId) {
+            $this->selectedType = null;
+        } else {
+            $this->selectedType = $typeId;
+        }
+
+        $this->statusFilter = null;
+        $this->resetLoaded();
+    }
+
+
+
+    public function updatedFilterUsers()
+    {
+        $this->selectAllUsers =
+            count($this->filterUsers) === $this->employees->count();
+        $this->resetLoaded();
+    }
+
+
+
+    public function updatedSelectAllUsers($value)
+    {
+        if ($value) {
+            $this->filterUsers = $this->employees
+                ->pluck('user_id')
+                ->toArray();
+        } else {
+            $this->filterUsers = [];
+        }
+
+        $this->resetLoaded();
+    }
+
+
+    public function notifyEmployee($typeId, $employeeId, $type)
     {
         $docType = DocumentType::findOrFail($typeId);
 
@@ -77,7 +123,13 @@ class DocumentManageTypesIndex extends BaseComponent
         $emp    = Employee::with('user')->find($employeeId);
 
 
-        $message = "Your {$docType->name} document has expired. Please upload an updated document.";
+        if ($type === 'expired') {
+            $message = "{$docType->name} expired. Please upload a new one.";
+        }
+
+        if ($type === 'soon') {
+            $message = "{$docType->name} expiring soon. Please update it.";
+        }
 
 
         $notification = Notification::create([
@@ -96,13 +148,61 @@ class DocumentManageTypesIndex extends BaseComponent
         $this->toast('Employee notified successfully', 'success');
     }
 
+    public function updateDocument()
+    {
+        $this->validate([
+            'doc_type_id' => 'required',
+            'expires_at'  => 'required|date',
+            'emp_id'      => 'required|integer|exists:employees,id',
+            'new_file'   => 'nullable|file|mimes:pdf|max:20240',
+        ]);
+
+        $document = EmpDocument::findOrFail($this->editDocId);
 
 
-    public function openDocModal($docId)
+
+        if ($this->new_file instanceof TemporaryUploadedFile) {
+
+            // delete old file
+            if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
+
+
+            $filePath = $this->new_file->store('pdf/employee/documents', 'public');
+            $document->file_path = $filePath;
+        }
+
+        // ✅ Update fields
+        $document->update([
+            'doc_type_id' => $this->doc_type_id,
+            'expires_at'  => $this->expires_at,
+            'emp_id'      => $this->emp_id,
+        ]);
+
+
+
+        $this->toast('Document updated successfully!', 'success');
+        $this->dispatch('closemodal');
+
+        $this->resetInputFields();
+        $this->resetLoaded();
+    }
+
+
+
+    public function openDocModal($docId, $index)
     {
         $this->resetInputFields();
         $this->modalDocument = EmpDocument::with('documentType', 'employee')
             ->find($docId);
+
+        $this->modalFileIndex = $index;
+        $this->editDocId = $docId;
+
+        $this->doc_type_id = $this->modalDocument->doc_type_id;
+        $this->emp_id      = $this->modalDocument->emp_id;
+        $this->expires_at = $this->modalDocument->expires_at;
 
 
         $this->dispatch('documentModalOpened');
@@ -149,6 +249,8 @@ class DocumentManageTypesIndex extends BaseComponent
         $this->emp_id = null;
         $this->selectedType = null;
         $this->shareCodeEmpId = null;
+        $this->new_file = null;
+        $this->editDocId = null;
         $this->emailGatewayMissing = false;
 
         $this->resetErrorBag();
@@ -201,23 +303,6 @@ class DocumentManageTypesIndex extends BaseComponent
 
 
 
-
-    public function deleteDocument($id)
-    {
-        $doc = CompanyDocument::where('company_id', $this->company_id)->find($id);
-
-        if ($doc) $doc->delete();
-
-        $this->toast('Document deleted successfully!', 'success');
-        $this->resetLoaded();
-    }
-
-    public function updatedSearch()
-    {
-        $this->resetLoaded();
-    }
-
-
     public function handleFilter($value)
     {
         $this->statusFilter = $value;
@@ -232,17 +317,22 @@ class DocumentManageTypesIndex extends BaseComponent
         $query = Employee::where('company_id', $this->company_id)
             ->with(['documents.documentType']);
 
-        if ($this->search) {
-            $query->where('name', 'like', "%{$this->search}%");
+
+
+        if ($this->selectedType) {
+            $query->whereHas('documents', function ($q) {
+                $q->where('doc_type_id', $this->selectedType);
+            });
         }
+
+
+        if (!empty($this->filterUsers)) {
+            $query->whereIn('user_id', $this->filterUsers);
+        }
+
 
         if ($this->lastId) {
             $query->where('id', $this->sortOrder === 'desc' ? '<' : '>', $this->lastId);
-        }
-
-
-        if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
         }
 
         $items = $query->orderBy('id', $this->sortOrder)
@@ -265,6 +355,7 @@ class DocumentManageTypesIndex extends BaseComponent
         }
     }
 
+
     private function resetLoaded()
     {
         $this->loaded = collect();
@@ -279,22 +370,79 @@ class DocumentManageTypesIndex extends BaseComponent
         $this->resetLoaded();
     }
 
+
+
+
+    public function confirmDelete($id)
+    {
+        $this->confirmDeleteId = $id;
+    }
+
+    public function deleteDocument($id)
+    {
+        $document = EmpDocument::find($id);
+
+        if ($document) {
+            if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
+
+            $document->delete();
+        }
+
+
+        $this->confirmDeleteId = null;
+
+        $this->toast('Document deleted successfully!', 'info');
+        $this->dispatch('closemodal');
+        $this->dispatch('reload-page');
+        $this->resetInputFields();
+        $this->resetLoaded();
+    }
+
+
+
     public function exportDocuments($type)
     {
-        $data = $this->loaded->map(function ($d) {
-            return [
-                'id' => $d->id,
-                'name' => $d->name,
-                'status' => ucfirst($d->status),
-                'expires_at' => $d->expires_at ? Carbon::parse($d->expires_at)->format('d F, Y') : 'N/A',
-                'created_at' => $d->created_at ? Carbon::parse($d->created_at)->format('d F, Y') : 'N/A',
-            ];
-        });
+        $data = collect();
 
-        return $this->export($data, $type, 'manage-documents', 'exports.generic-table-pdf', [
-            'title' => siteSetting()->site_title . ' - Manage Documents',
-            'columns' => ['ID', 'Name', 'Status', 'Expires At', 'Created At'],
-            'keys' => ['id', 'name', 'status', 'expires_at', 'created_at'],
+        foreach ($this->loaded as $employee) {
+
+            if (!$employee->documents || $employee->documents->count() == 0) {
+                continue;
+            }
+
+
+            $grouped = $employee->documents
+                ->sortByDesc('created_at')
+                ->groupBy(function ($doc) {
+                    return $doc->documentType->name ?? 'Unknown Type';
+                });
+
+            foreach ($grouped as $typeName => $docs) {
+
+
+                $latestDocs = $docs->sortByDesc('created_at')->take(3)->values();
+
+                foreach ($latestDocs as $index => $doc) {
+
+                    $data->push([
+
+                        'employee_name' => trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? '')) ?: $employee->email ?? 'N/A',
+                        'doc_type'      => $typeName,
+                        'file_name'     => 'File-' . ($index + 1),
+
+                        'expires_at'    => $doc->expires_at ? Carbon::parse($doc->expires_at)->format('d F, Y') : 'N/A',
+
+                    ]);
+                }
+            }
+        }
+
+        return $this->export($data, $type, 'documents-by-type', 'exports.generic-table-pdf', [
+            'title'   => siteSetting()->site_title . ' - Documents By Type',
+            'columns' => ['Employee Name', 'Document Type', 'File Name',  'Expires At'],
+            'keys'    => ['employee_name', 'doc_type', 'file_name', 'expires_at',],
         ]);
     }
 }

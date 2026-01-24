@@ -24,3 +24,4 @@ Schedule::command('chat:clean-temp')->daily();
 Schedule::command('leave:reset-carry-over')->daily();
 
 Schedule::command('attendance:auto-clock-out')->dailyAt('00:01');
+Schedule::command('notify:document-expiry')->dailyAt('00:00');

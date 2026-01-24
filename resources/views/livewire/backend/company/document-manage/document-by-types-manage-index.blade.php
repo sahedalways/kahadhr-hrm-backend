@@ -49,21 +49,55 @@
                     <div class="card-body p-4">
                         <div class="row g-3 align-items-center mb-3">
 
-                            <!-- Search Input -->
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i
-                                           class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text"
-                                           class="form-control border-start-0"
-                                           placeholder="Search by document name"
-                                           wire:model="search"
-                                           wire:keyup="set('search', $event.target.value)" />
+                            {{-- Filter by Employees --}}
+                            <div class="col-lg-4 col-md-6 col-12">
+                                <div class="dropdown w-100"
+                                     wire:ignore>
+                                    <button class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        Filter by Employees
+                                    </button>
+
+                                    <div class="dropdown-menu p-3 w-100 shadow"
+                                         style="max-height: 250px; overflow-y: auto;"
+                                         data-bs-auto-close="outside">
+
+                                        <div class="form-check mb-2 border-bottom pb-2">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   wire:model.live="selectAllUsers"
+                                                   id="emp-all">
+                                            <label class="form-check-label fw-semibold"
+                                                   for="emp-all">
+                                                All Employees
+                                            </label>
+                                        </div>
+
+                                        <div class="fw-semibold text-muted small mb-2">
+                                            Select Employees
+                                        </div>
+
+                                        @foreach ($employees as $emp)
+                                            <div class="form-check mb-1">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value="{{ $emp->user_id }}"
+                                                       wire:model.live="filterUsers"
+                                                       id="emp-{{ $emp->user_id }}">
+                                                <label class="form-check-label"
+                                                       for="emp-{{ $emp->user_id }}">
+                                                    {{ $emp->full_name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Sort -->
-                            <div class="col-md-3 d-flex gap-2">
+                            {{-- Sort --}}
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <select class="form-select form-select-lg"
                                         wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
@@ -71,29 +105,18 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3">
+                            {{-- Filter by Type --}}
+                            <div class="col-lg-4 col-md-6 col-12">
                                 <select class="form-select"
-                                        wire:change="handleFilter($event.target.value)">
-                                    <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="signed">Signed</option>
-                                    <option value="expired">Expired</option>
+                                        wire:change="filterByType($event.target.value)">
+                                    <option value="">All Types</option>
+                                    @foreach ($docTypes as $type)
+                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
-                        </div>
 
-                        <!-- Search Summary -->
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <p class="text-muted small mb-0">
-                                Showing results for: <strong>{{ $search ?: 'All Documents' }}</strong>
-                            </p>
-                            <div wire:loading
-                                 wire:target="search">
-                                <span class="spinner-border spinner-border-sm text-primary"></span>
-                                <span class="text-primary small">Searching...</span>
-                            </div>
                         </div>
-
 
 
                     </div>
@@ -217,63 +240,60 @@
                                                             ->values();
 
                                                         $latestDoc = $docs->sortByDesc('created_at')->first();
+
                                                         $latestExpiresAt =
                                                             $latestDoc && $latestDoc->expires_at
                                                                 ? \Carbon\Carbon::parse($latestDoc->expires_at)
                                                                 : null;
-                                                        $showTypeNotify =
-                                                            $latestExpiresAt && $latestExpiresAt->isPast();
+
+                                                        $showTypeNotify = false;
+                                                        $notificationType = null;
+
+                                                        if ($latestExpiresAt) {
+                                                            // Expired
+                                                            if ($latestExpiresAt->isPast()) {
+                                                                $showTypeNotify = true;
+                                                                $notificationType = 'expired';
+                                                            }
+                                                            // Expiring within 60 days (future only)
+                                                            elseif (
+                                                                now()->diffInDays($latestExpiresAt, false) > 0 &&
+                                                                now()->diffInDays($latestExpiresAt, false) <= 60
+                                                            ) {
+                                                                $showTypeNotify = true;
+                                                                $notificationType = 'soon';
+                                                            }
+                                                        }
 
                                                     @endphp
 
                                                     <div class="border rounded p-2 mb-2"
                                                          style="max-width:240px; position:relative;">
 
+
+
                                                         @if ($showTypeNotify)
-                                                            <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})"
+                                                            <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
                                                                   wire:loading.attr="disabled"
                                                                   title="Notify employee"
-                                                                  style="
-            position:absolute;
-            top:6px;
-            right:6px;
-            background:#dc3545;
-            color:#fff;
-            width:22px;
-            height:22px;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:12px;
-            cursor:pointer;
-            transition:all 0.25s ease;
-            box-shadow:0 3px 8px rgba(0,0,0,0.25);
-        "
-                                                                  onmouseover="
-            this.style.transform='scale(1.2)';
-            this.style.background='#b02a37';
-        "
-                                                                  onmouseout="
-            this.style.transform='scale(1)';
-            this.style.background='#dc3545';
-        ">
+                                                                  style="position:absolute; top:6px; right:6px; background:#dc3545; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; transition:all 0.25s ease; box-shadow:0 3px 8px rgba(0,0,0,0.25);"
+                                                                  onmouseover="this.style.transform='scale(1.2)'; this.style.background='#b02a37';"
+                                                                  onmouseout="this.style.transform='scale(1)'; this.style.background='#dc3545';">
 
-                                                                <!-- 🔔 Normal Icon -->
                                                                 <i class="bi bi-bell-fill"
                                                                    wire:loading.remove
-                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})">
+                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')">
                                                                 </i>
 
-                                                                <!-- ⏳ Loading Icon -->
                                                                 <i class="bi bi-arrow-repeat"
                                                                    wire:loading
-                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }})"
+                                                                   wire:target="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
                                                                    style="animation:spin 1s linear infinite;">
                                                                 </i>
 
                                                             </span>
                                                         @endif
+
 
 
 
@@ -326,6 +346,8 @@
 
 
 
+
+
                                                                 <div class="doc-card-wrapper"
                                                                      style="
             position:relative;
@@ -339,7 +361,9 @@
                                                                      onmouseout="this.style.zIndex='{{ $zIndex }}';this.style.transform='translateY(0) scale(1)';this.style.marginRight='-70px';"
                                                                      data-bs-toggle="modal"
                                                                      data-bs-target="#documentModal"
-                                                                     wire:click="openDocModal({{ $doc->id }})">
+                                                                     wire:click="openDocModal({{ $doc->id }}, {{ $index + 1 }})">
+
+
 
                                                                     <div
                                                                          style="
@@ -426,9 +450,7 @@
 
 
 
-                                        <td>
 
-                                        </td>
                                     </tr>
 
                                 @empty
@@ -609,22 +631,237 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        {{ $modalDocument->name ?? 'Document' }}
-                    </h5>
+                    <div class="d-flex align-items-start flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h5 class="modal-title"
+                                style="font-weight: 800; color: #2d3748; letter-spacing: -0.5px; margin: 0;">
+                                File-{{ $modalFileIndex ?? '' }}
+                            </h5>
+
+                            <span
+                                  style="background: #edf2f7; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; color: #4a5568; text-transform: uppercase;">
+                                DOC
+                            </span>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            @if ($modalDocument && $modalDocument->expires_at)
+                                @php
+                                    $expiry = \Carbon\Carbon::parse($modalDocument->expires_at);
+                                    $daysLeft = now()->startOfDay()->diffInDays($expiry->startOfDay(), false);
+                                @endphp
+
+                                <div
+                                     style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                @if ($daysLeft < 0) background: #fff5f5; color: #c53030; border: 1px solid #feb2b2;
+                @elseif($daysLeft === 0) background: #fffaf0; color: #975a16; border: 1px solid #fbd38d;
+                @else background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; @endif
+            ">
+                                    <span
+                                          style="
+                    height: 8px; width: 8px; border-radius: 50%;
+                    @if ($daysLeft < 0) background: #c53030;
+                    @elseif($daysLeft === 0) background: #975a16;
+                    @else background: #276749; @endif
+                "></span>
+
+                                    @if ($daysLeft < 0)
+                                        Expired ({{ abs($daysLeft) }} days ago)
+                                    @elseif ($daysLeft === 0)
+                                        Expires Today
+                                    @else
+                                        Expires in {{ $daysLeft }} days
+                                    @endif
+                                </div>
+                            @else
+                                <div
+                                     style="display: flex; align-items: center; gap: 5px; color: #718096; font-size: 0.75rem; font-weight: 500;">
+                                    <i class="bi bi-calendar-x"
+                                       style="font-size: 0.85rem;"></i>
+                                    No Expiry Set
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+
                     <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"></button>
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
-                <div class="modal-body">
-                    @if ($modalDocument && $modalDocument->file_path)
-                        <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
-                                style="width:100%; height:500px;"></iframe>
-                    @else
-                        <p>No file found</p>
-                    @endif
+                <div class="modal-body p-0">
+
+                    <div class="container-fluid">
+                        <div class="row g-0"
+                             style="min-height: 70vh;">
+
+                            {{-- LEFT SIDE : Fields --}}
+                            <div class="col-md-4 p-3 border-end"
+                                 style="background:#f8fafc;">
+
+                                <h6 class="fw-bold mb-3 text-uppercase text-muted"
+                                    style="font-size:12px;">
+                                    Document Details
+                                </h6>
+
+                                {{-- Document Type --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Document Type <span
+                                              class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm"
+                                            wire:model.live="doc_type_id">
+                                        <option value="">-- Select --</option>
+                                        @foreach ($docTypes as $type)
+                                            <option value="{{ $type->id }}">
+                                                {{ $type->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Employee --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Employee <span
+                                              class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm"
+                                            wire:model.live="emp_id">
+                                        <option value="">-- Select --</option>
+                                        @foreach ($employees as $emp)
+                                            <option value="{{ $emp->id }}">
+                                                {{ trim(($emp->f_name ?? '') . ' ' . ($emp->l_name ?? '')) ?: $emp->email }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Expiry --}}
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Expires At <span
+                                              class="text-danger">*</span></label>
+                                    <input type="date"
+                                           class="form-control form-control-sm"
+                                           wire:model.live="expires_at">
+                                </div>
+
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Change File (PDF)</label>
+
+                                    <input type="file"
+                                           class="form-control form-control-sm"
+                                           wire:model="new_file"
+                                           accept="application/pdf">
+
+                                    @error('new_file')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+
+                                    @if ($new_file)
+                                        <div class="small text-success mt-1">
+                                            New file selected: {{ $new_file->getClientOriginalName() }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                            </div>
+
+                            {{-- RIGHT SIDE : Document Preview --}}
+                            <div class="col-md-8 p-0">
+
+                                @if ($modalDocument && $modalDocument->file_path)
+                                    <iframe src="{{ asset('storage/' . $modalDocument->file_path) }}"
+                                            style="width:100%; height:100%; min-height:70vh; border:0;">
+                                    </iframe>
+                                @else
+                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                                        No file found
+                                    </div>
+                                @endif
+
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+
+
+                <div class="modal-footer d-flex justify-content-between align-items-center">
+
+
+                    <div class="d-flex gap-2 position-relative">
+
+                        @if ($modalDocument)
+                            <button wire:click="updateDocument({{ $modalDocument->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="updateDocument"
+                                    class="btn btn-sm btn-primary">
+
+
+                                <span wire:loading
+                                      wire:target="updateDocument">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Updating...
+                                </span>
+
+                                <span wire:loading.remove
+                                      wire:target="updateDocument">
+                                    <i class="fa fa-edit me-1"></i> Update
+                                </span>
+                            </button>
+                        @endif
+
+
+
+                        @if ($modalDocument && $confirmDeleteId === $modalDocument->id)
+                            <div style="position:absolute; bottom:45px; left:0; z-index:999;">
+                                <div
+                                     style="background:#fff; border:1px solid #ddd; padding:8px 10px;
+                            border-radius:8px; box-shadow:0 3px 10px rgba(0,0,0,0.15);">
+                                    <div style="font-size:12px; margin-bottom:6px;">
+                                        Are you sure?
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button wire:click="deleteDocument({{ $modalDocument->id }})"
+                                                wire:loading.attr="disabled"
+                                                class="btn btn-sm btn-danger">
+                                            Yes
+                                        </button>
+                                        <button wire:click="$set('confirmDeleteId', null)"
+                                                class="btn btn-sm btn-secondary">
+                                            No
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif ($modalDocument)
+                            <button wire:click="confirmDelete({{ $modalDocument->id }})"
+                                    class="btn btn-sm btn-danger">
+                                <i class="fa fa-trash me-1"></i> Delete
+                            </button>
+                        @endif
+
+                    </div>
+
+                    {{-- Right side: Close --}}
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                </div>
+
 
             </div>
         </div>
@@ -690,6 +927,17 @@
         Livewire.on('documentModalOpened', () => {
             var modal = new bootstrap.Modal(document.getElementById('documentModal'));
             modal.show();
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('reload-page', () => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         });
     });
 </script>

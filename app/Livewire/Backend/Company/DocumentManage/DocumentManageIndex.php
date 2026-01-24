@@ -312,8 +312,8 @@ class DocumentManageIndex extends BaseComponent
             ];
         });
 
-        return $this->export($data, $type, 'manage-documents', 'exports.generic-table-pdf', [
-            'title' => siteSetting()->site_title . ' - Manage Documents',
+        return $this->export($data, $type, 'documents-by-assigned', 'exports.generic-table-pdf', [
+            'title' => siteSetting()->site_title . ' - Documents By Assigned',
             'columns' => ['ID', 'Name', 'Status', 'Expires At', 'Created At'],
             'keys' => ['id', 'name', 'status', 'expires_at', 'created_at'],
         ]);

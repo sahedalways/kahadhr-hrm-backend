@@ -30,6 +30,8 @@ class ManageDocuments extends BaseComponent
     public $hasMore = true;
     public $statusFilter = null;
     public $selectedDocName = null;
+    public $emp_id = null;
+    public $doc_type_id = null;
     public $share_code;
     public $date_of_birth;
 
@@ -149,6 +151,12 @@ class ManageDocuments extends BaseComponent
         $this->loadMore();
     }
 
+    public function resetSelectedType()
+    {
+        $this->selectedType = null;
+    }
+
+
     public function openUploadModal($typeId)
     {
         $this->file_path = null;
@@ -182,10 +190,22 @@ class ManageDocuments extends BaseComponent
 
     public function openDocModal($docId, $index)
     {
+        $this->doc_type_id = null;
+        $this->emp_id      = null;
+        $this->expires_at = null;
+
+
         $this->modalDocument = EmpDocument::with('documentType', 'employee')
             ->find($docId);
 
         $this->modalFileIndex = $index;
+
+
+        $this->doc_type_id = $this->modalDocument->doc_type_id;
+        $this->emp_id      = $this->modalDocument->emp_id;
+        $this->expires_at = $this->modalDocument->expires_at;
+
+
         $this->dispatch('documentModalOpened');
     }
 
@@ -208,14 +228,12 @@ class ManageDocuments extends BaseComponent
             $this->reset([
                 'share_code',
                 'date_of_birth',
+                'selectedType',
                 'selectedDocName',
             ]);
 
             $this->dispatch('closemodal');
             $this->toast('Share Code saved successfully!', 'success');
-
-            // Keep the filter intact
-            $this->resetLoaded();
             $this->dispatch('clear-notification-route');
             return;
         }
@@ -229,7 +247,7 @@ class ManageDocuments extends BaseComponent
 
         EmpDocument::create([
             'doc_type_id' => $this->selectedType,
-            'expires_at'  => $this->expires_at,
+            'expires_at' => $this->expires_at,
             'emp_id'      => auth()->user()->employee->id,
             'company_id'  => auth()->user()->employee->company_id,
             'file_path'   => $filePath ?: null,
@@ -238,6 +256,7 @@ class ManageDocuments extends BaseComponent
         $this->reset([
             'file_path',
             'expires_at',
+            'selectedType',
             'selectedDocName',
             'date_of_birth',
             'share_code',
@@ -246,11 +265,9 @@ class ManageDocuments extends BaseComponent
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
 
-        // Keep the filter intact
         $this->resetLoaded();
         $this->dispatch('clear-notification-route');
     }
-
 
     public function getFilteredDocumentTypesProperty()
     {

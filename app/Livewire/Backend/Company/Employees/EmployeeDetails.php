@@ -1130,6 +1130,34 @@ class EmployeeDetails extends BaseComponent
 
 
 
+
+    public function sendPasswordResetLink(Employee $employee)
+    {
+        // Generate a new token
+        $employee->invite_token = Str::random(64);
+        $employee->invite_token_expires_at = Carbon::now()->addHours(48);
+        $employee->save();
+
+        // Generate invite URL
+        $inviteUrl = route(
+            'employee.auth.set-password',
+            [
+                'company' => app('authUser')->company->sub_domain,
+                'token' => $employee->invite_token,
+            ]
+        );
+
+        // Dispatch job
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl)
+            ->onConnection('sync')
+            ->onQueue('urgent');
+
+        $this->toast('Password reset link sent successfully!', 'success');
+    }
+
+
+
+
     public function render()
     {
         return view('livewire.backend.company.employees.employee-details');

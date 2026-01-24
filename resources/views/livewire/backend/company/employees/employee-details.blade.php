@@ -990,55 +990,41 @@
                         </div>
 
                         <div class="card-body">
-                            <h5 class="fw-semibold mb-3">Change Password</h5>
-                            <form id="changePasswordForm">
-                                <input type="hidden"
-                                       id="employeeId"
-                                       value="{{ $employee->id }}">
-                                <input type="hidden"
-                                       id="companySubdomain"
-                                       value="{{ app('authUser')->company->sub_domain }}">
-                                <div class="mb-3 position-relative">
-                                    <label class="form-label fw-semibold">New Password <span
-                                              class="text-danger">*</span></label>
-                                    <input type="password"
-                                           id="new_password"
-                                           class="form-control"
-                                           placeholder="Enter new password"
-                                           required>
-                                    <span class="toggle-password"
-                                          toggle="#new_password"
-                                          style="position:absolute; right:10px; top:40px; cursor:pointer;">
-                                        <i class="fa fa-eye"></i>
-                                    </span>
-                                </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    {{-- Employee Email --}}
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">Employee Email</h6>
+                                        <p class="mb-0 text-muted">
+                                            {{ $employee->email ?? 'N/A' }}
+                                        </p>
+                                    </div>
 
-                                <div class="mb-3 position-relative">
-                                    <label class="form-label fw-semibold">Confirm Password <span
-                                              class="text-danger">*</span></label>
-                                    <input type="password"
-                                           id="confirm_password"
-                                           class="form-control"
-                                           placeholder="Confirm new password"
-                                           required>
-                                    <span class="toggle-password"
-                                          toggle="#confirm_password"
-                                          style="position:absolute; right:10px; top:40px; cursor:pointer;">
-                                        <i class="fa fa-eye"></i>
-                                    </span>
-                                </div>
+                                    {{-- Reset Password Button --}}
+                                    <button wire:click="sendPasswordResetLink({{ $employee->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="sendPasswordResetLink"
+                                            class="btn btn-sm btn-warning d-flex align-items-center gap-2">
 
-                                <button type="submit"
-                                        class="btn btn-primary px-4 py-2 fw-semibold"
-                                        id="changePasswordBtn">
-                                    <span id="btnText">Save Password</span>
-                                    <span id="btnLoader"
-                                          class="spinner-border spinner-border-sm ms-2 d-none"
-                                          role="status"></span>
-                                </button>
-                                <div id="passwordMessage"
-                                     class="mt-2 text-danger fw-semibold"></div>
-                            </form>
+                                        {{-- Loading Spinner --}}
+                                        <span wire:loading
+                                              wire:target="sendPasswordResetLink">
+                                            <span class="spinner-border spinner-border-sm"
+                                                  role="status"
+                                                  aria-hidden="true"></span>
+                                        </span>
+
+                                        {{-- Button Text --}}
+                                        <span wire:loading.remove
+                                              wire:target="sendPasswordResetLink">
+                                            <i class="bi bi-key-fill"></i>
+                                            Reset Password
+                                        </span>
+                                    </button>
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

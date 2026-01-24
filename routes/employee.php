@@ -26,8 +26,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::domain('company.' . config('app.base_domain'))
-  ->middleware(['guest'])
+Route::middleware(['guest'])
   ->name('employee.auth.')
   ->group(function () {
     Route::get('/employee-login', EmployeeLogin::class)->name('empLogin');

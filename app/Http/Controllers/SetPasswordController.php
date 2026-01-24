@@ -9,67 +9,87 @@ use Illuminate\Support\Str;
 
 class SetPasswordController extends Controller
 {
-    public function showForm($company, $token)
+    public function showForm($token)
 
     {
-        $employee = Employee::where('invite_token', $token)
+        $employee = Employee::withoutGlobalScope('filterByUserType')
+            ->where('invite_token', $token)
             ->where('invite_token_expires_at', '>=', now())
-            ->firstOrFail();
+            ->first();
 
+        if (!$employee) {
+            abort(404, 'Employee not found or token expired.');
+        }
 
 
         return view('auth.set-password', [
             'employee' => $employee,
             'token' => $token,
+            'company' => 'company',
 
         ]);
     }
 
 
-
-    public function setPassword(Request $request, $company, $token)
+    public function setPassword(Request $request, $token)
     {
-        $employee = Employee::where('invite_token', $token)
+        $employee = Employee::withoutGlobalScope('filterByUserType')
+            ->where('invite_token', $token)
             ->where('invite_token_expires_at', '>=', now())
-            ->firstOrFail();
+            ->first();
+
 
         $request->validate([
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Create user in users table
-        $user =  User::create([
-            'f_name'            => $employee->f_name,
-            'l_name'            => $employee->l_name,
-            'email'             => $employee->email,
-            'phone_no'          => $employee->phone_no,
-            'email_verified_at' => now(),
-            'phone_verified_at' => null,
-            'password'          => bcrypt($request->password),
-            'user_type'         => $employee->role,
-            'is_active'         => $employee->is_active ?? 1,
-            'profile_completed' => 0,
-            'permissions'       => null,
-            'remember_token'    => Str::random(60),
-        ]);
+
+        $user = User::where('email', $employee->email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'f_name'            => $employee->f_name,
+                'l_name'            => $employee->l_name,
+                'email'             => $employee->email,
+                'phone_no'          => $employee->phone_no,
+                'email_verified_at' => now(),
+                'phone_verified_at' => null,
+                'password'          => bcrypt($request->password),
+                'user_type'         => $employee->role,
+                'is_active'         => $employee->is_active ?? 1,
+                'profile_completed' => 0,
+                'permissions'       => null,
+                'remember_token'    => Str::random(60),
+            ]);
 
 
-        $employee->invite_token = null;
-        $employee->invite_token_expires_at = null;
-        $employee->user_id  = $user->id;
-        $employee->verified  = true;
-        $employee->start_date  = now();
-        $employee->save();
+            $employee->invite_token = null;
+            $employee->invite_token_expires_at = null;
+            $employee->user_id  = $user->id;
+            $employee->verified  = true;
+            $employee->start_date  = now();
+            $employee->save();
+
+            return view('auth.password-set-success', [
+                'title' => 'Password Updated & Account Verified',
+                'message' => 'Your password has been updated and your account is now verified. You can now log in using your credentials.',
+                'user_type' => 'company',
+            ]);
+        } else {
+            $user->password = bcrypt($request->password);
+            $user->save();
 
 
-        $newSubdomain = $employee->company->sub_domain;
-        $baseDomain = config('app.base_domain');
+            $employee->invite_token = null;
+            $employee->invite_token_expires_at = null;
 
-        $loginUrl = "http://{$newSubdomain}.{$baseDomain}/employee-login?message="
-            . urlencode('Password set successfully! You can now login.')
-            . "&type=info";
+            $employee->save();
 
-
-        return redirect()->to($loginUrl);
+            return view('auth.password-set-success', [
+                'title' => 'Password Updated!',
+                'message' => 'You can now login using your new password.',
+                'user_type' => 'company',
+            ]);
+        }
     }
 }

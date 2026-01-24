@@ -3,23 +3,34 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>@yield('title', siteSetting()->site_title)</title>
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ siteSetting()->favicon_url ?? asset('favicon.ico') }}">
+    <link rel="icon"
+          type="image/png"
+          href="{{ siteSetting()->favicon_url ?? asset('favicon.ico') }}">
 
     {{-- Styles --}}
-    <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.min28b5.css?v=2.0.0') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/js/plugins/toastr.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link id="pagestyle"
+          href="{{ asset('assets/css/argon-dashboard.min28b5.css?v=2.0.0') }}"
+          rel="stylesheet">
+    <link href="{{ asset('assets/css/style.css') }}"
+          rel="stylesheet">
+    <link href="{{ asset('assets/js/plugins/toastr.min.css') }}"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
 
 </head>
 
 <body class="g-sidenav-show">
-    <div id="preloader" class="preloader">
+    <div id="preloader"
+         class="preloader">
         <div class="hr-line-loader">
             <div class="line"></div>
             <div class="line"></div>
@@ -55,7 +66,7 @@
             });
         });
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -70,6 +81,17 @@
         window.addEventListener("beforeunload", function() {
             document.getElementById("preloader").classList.remove("hidden");
         });
+    </script>
+
+
+    <script>
+        "use strict"
+        Livewire.on('closemodal', () => {
+            $('.modal').modal('hide');
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').removeAttr('style');
+        })
     </script>
 </body>
 

@@ -983,51 +983,64 @@
                 <div class="tab-pane fade"
                      id="settingsEmp">
                     <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white py-3 border-0"
-                             style="display:flex; align-items:center; gap:10px;">
+
+                        {{-- Header --}}
+                        <div class="card-header bg-white py-3 border-0 d-flex align-items-center gap-2">
                             <i class="fas fa-gear text-info"></i>
                             <h4 class="mb-0 fw-bold">Settings</h4>
                         </div>
 
                         <div class="card-body">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    {{-- Employee Email --}}
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">Employee Email</h6>
-                                        <p class="mb-0 text-muted">
-                                            {{ $employee->email ?? 'N/A' }}
-                                        </p>
-                                    </div>
 
-                                    {{-- Reset Password Button --}}
-                                    <button wire:click="sendPasswordResetLink({{ $employee->id }})"
-                                            wire:loading.attr="disabled"
-                                            wire:target="sendPasswordResetLink"
-                                            class="btn btn-sm btn-warning d-flex align-items-center gap-2">
+                            {{-- Change Password Title --}}
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-uppercase text-secondary mb-1">
+                                    Change Password
+                                </h6>
+                                <p class="text-muted mb-0"
+                                   style="font-size: 0.9rem;">
+                                    Send a password reset link to the employee’s email address
+                                </p>
+                            </div>
 
-                                        {{-- Loading Spinner --}}
-                                        <span wire:loading
-                                              wire:target="sendPasswordResetLink">
-                                            <span class="spinner-border spinner-border-sm"
-                                                  role="status"
-                                                  aria-hidden="true"></span>
-                                        </span>
+                            <div class="d-flex align-items-center justify-content-between">
 
-                                        {{-- Button Text --}}
-                                        <span wire:loading.remove
-                                              wire:target="sendPasswordResetLink">
-                                            <i class="bi bi-key-fill"></i>
-                                            Reset Password
-                                        </span>
-                                    </button>
-
+                                {{-- Employee Email --}}
+                                <div>
+                                    <h6 class="mb-1 fw-bold">Employee Email</h6>
+                                    <p class="mb-0 text-muted">
+                                        {{ $employee->email ?? 'N/A' }}
+                                    </p>
                                 </div>
+
+                                {{-- Reset Password Button --}}
+                                <button wire:click="sendPasswordResetLink({{ $employee->id }})"
+                                        wire:loading.attr="disabled"
+                                        wire:target="sendPasswordResetLink"
+                                        class="btn btn-sm btn-success d-flex align-items-center gap-2 px-3">
+
+                                    {{-- Loading Spinner --}}
+                                    <span wire:loading
+                                          wire:target="sendPasswordResetLink">
+                                        <span class="spinner-border spinner-border-sm"
+                                              role="status"
+                                              aria-hidden="true"></span>
+                                    </span>
+
+                                    {{-- Button Text --}}
+                                    <span wire:loading.remove
+                                          wire:target="sendPasswordResetLink">
+                                        <i class="bi bi-key-fill"></i>
+                                        Reset Password
+                                    </span>
+                                </button>
+
                             </div>
 
                         </div>
                     </div>
                 </div>
+
 
             </div>
         </div>
@@ -1930,9 +1943,6 @@
 
 
                     </div>
-
-
-
 
 
 

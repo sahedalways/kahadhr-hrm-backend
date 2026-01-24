@@ -3,21 +3,185 @@
 namespace App\Livewire\Backend\Company\Auth;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\User;
 use App\Repositories\AuthRepository;
 use App\Services\API\VerificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
 
 class CompanyLogin extends BaseComponent
 {
     public $email = 'abc@company.com', $phone_no, $userId, $password = "12345678", $success = false;
-    public $otp = [], $generatedOtp, $showOtpModal = false;
+    public $otp = [],  $showOtpModal = false;
     public $company;
     public $updating_field;
     public $code_sent = false;
     public $otpCooldown = 0;
     public $rememberMe = false;
+
+    public $resetMethod;
+    public $resetEmail;
+    public $resetPhone;
+
+    public $resetOtpCooldown = 0;
+
+    public $currentStep = 1;
+    public $changePasswordOtp = [];
+    public $newPassword;
+    public $confirmPassword;
+
+
+
+    public function sendResetOtp(VerificationService $verificationService)
+    {
+        try {
+            $this->validate(['resetMethod' => 'required',]);
+            if ($this->resetMethod === 'email') {
+                $this->validate([
+                    'resetEmail' => 'required|email'
+                ]);
+
+                // Check if user exists
+                $userExists = User::where('email', $this->resetEmail)
+                    ->where('user_type', 'company')
+                    ->exists();
+
+                if (!$userExists) {
+                    $this->toast('No company user found with this email.', 'error');
+                    return;
+                }
+
+
+
+                $sent = $verificationService->sendEmailOtp($this->resetEmail, null);
+            } else {
+                $this->validate([
+                    'resetPhone' => 'required|numeric'
+                ]);
+
+                // Check if user exists
+                $userExists = User::where('phone_no', $this->resetPhone)
+                    ->where('user_type', 'company')
+                    ->exists();
+
+                if (!$userExists) {
+                    $this->toast('No company user found with this phone number.', 'error');
+                    return;
+                }
+
+
+                $sent = $verificationService->sendPhoneOtp($this->resetPhone, null);
+            }
+
+            if ($sent) {
+                $this->resetOtpCooldown = 120;
+                $this->currentStep = 2;
+                $this->toast('OTP sent successfully', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->toast(collect($e->errors())->flatten()->first(), 'error');
+        }
+    }
+
+
+    public function verifyResetOtp(VerificationService $verificationService)
+    {
+        try {
+            $this->validate([
+                'changePasswordOtp' => 'required|array|size:6',
+                'changePasswordOtp.*' => 'required|numeric|digits:1',
+            ], [
+                'changePasswordOtp.required' => 'OTP is required.',
+                'changePasswordOtp.size' => 'OTP must be 6 digits.',
+                'changePasswordOtp.*.required' => 'OTP must be 6 digits.',
+                'changePasswordOtp.*.numeric' => 'OTP must be numeric.',
+                'changePasswordOtp.*.digits' => 'OTP must be 1 digit each.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->toast(collect($e->errors())->flatten()->first(), 'error');
+            return;
+        }
+
+        try {
+
+            $destination = $this->resetMethod === 'email'
+                ? $this->resetEmail
+                : $this->resetPhone;
+
+
+            $otp = implode('', $this->changePasswordOtp);
+
+
+            $verificationService->verifyOtp($destination, $otp);
+
+            $this->toast('OTP verified successfully!', 'success');
+            $this->currentStep = 3;
+        } catch (\Exception $e) {
+            $this->toast("OTP does not match.", 'error');
+        }
+    }
+
+
+
+    public function updatePassword()
+    {
+        try {
+            $this->validate([
+                'newPassword' => 'required|min:8',
+                'confirmPassword' => 'required|same:newPassword',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            $message = implode('<br>', $errors);
+            $this->toast($message, 'error');
+            return;
+        }
+
+
+        $user = null;
+
+        if ($this->resetMethod === 'email') {
+            $user = User::where('email', $this->resetEmail)
+                ->where('user_type', 'company')
+                ->first();
+        } else {
+            $user = User::where('phone_no', $this->resetPhone)
+                ->where('user_type', 'company')
+                ->first();
+        }
+
+
+        if (!$user) {
+            $this->toast('User not found!', 'error');
+            return;
+        }
+
+        $user->password = Hash::make($this->newPassword);
+        $user->save();
+
+
+        $this->reset();
+
+        return redirect()->route('password.set.success', [
+            'user_type' => 'Company'
+        ]);
+    }
+
+
+    public function cleaResetPasswordFields()
+    {
+        $this->reset();
+    }
+    public function tickResetOtp()
+    {
+        if ($this->resetOtpCooldown > 0) {
+            $this->resetOtpCooldown--;
+        }
+    }
+
 
 
     protected $rules = [
@@ -99,7 +263,7 @@ class CompanyLogin extends BaseComponent
             ], [
                 'otp.required' => 'OTP is required.',
                 'otp.size'     => 'OTP must be 6 digits.',
-                'otp.*.required' => 'Each OTP field is required.',
+                'otp.*.required' => 'OTP must be 6 digits.',
                 'otp.*.numeric'  => 'OTP must be numeric.',
                 'otp.*.digits'   => 'OTP must be 1 digit each.',
             ]);

@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\CustomEmployeeProfileField;
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\DocumentType;
 use App\Models\Team;
 use App\Models\User;
 use App\Traits\Exportable;
@@ -35,7 +36,7 @@ class UsersIndex extends BaseComponent
     public $countrySearch = '';
 
     public $employees, $employee, $employee_id, $title;
-    public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
+    public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $employment_status = 'full-time', $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
 
     public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
@@ -69,6 +70,7 @@ class UsersIndex extends BaseComponent
     public $customValues = [];
 
     public $addMethod = 'manual';
+    public $documentTypes;
 
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
 
@@ -143,7 +145,6 @@ class UsersIndex extends BaseComponent
         return view('livewire.backend.company.employees.users-index', [
             'infos' => $this->loaded
         ]);
-
     }
 
 
@@ -182,203 +183,207 @@ class UsersIndex extends BaseComponent
 
 
 
-    $this->nationalities = [
-  "British",
-    "Afghan",
-    "Albanian",
-    "Algerian",
-    "American",
-    "Andorran",
-    "Angolan",
-    "Antiguans",
-    "Argentinean",
-    "Armenian",
-    "Australian",
-    "Austrian",
-    "Azerbaijani",
-    "Bahamian",
-    "Bahraini",
-    "Bangladeshi",
-    "Barbadian",
-    "Belarusian",
-    "Belgian",
-    "Belizean",
-    "Beninese",
-    "Bhutanese",
-    "Bolivian",
-    "Bosnian",
-    "Botswanan",
-    "Brazilian",
-    "Bruneian",
-    "Bulgarian",
-    "Burkinabe",
-    "Burmese",
-    "Burundian",
-    "Cambodian",
-    "Cameroonian",
-    "Canadian",
-    "Cape Verdean",
-    "Central African",
-    "Chadian",
-    "Chilean",
-    "Chinese",
-    "Colombian",
-    "Comoran",
-    "Congolese",
-    "Costa Rican",
-    "Croatian",
-    "Cuban",
-    "Cypriot",
-    "Czech",
-    "Danish",
-    "Djiboutian",
-    "Dominican",
-    "Dutch",
-    "East Timorese",
-    "Ecuadorean",
-    "Egyptian",
-    "Emirati",
-    "Equatorial Guinean",
-    "Eritrean",
-    "Estonian",
-    "Ethiopian",
-    "Fijian",
-    "Finnish",
-    "French",
-    "Gabonese",
-    "Gambian",
-    "Georgian",
-    "German",
-    "Ghanaian",
-    "Greek",
-    "Grenadian",
-    "Guatemalan",
-    "Guinean",
-    "Guinea-Bissauan",
-    "Guyanese",
-    "Haitian",
-    "Honduran",
-    "Hungarian",
-    "Icelander",
-    "Indian",
-    "Indonesian",
-    "Iranian",
-    "Iraqi",
-    "Irish",
-    "Israeli",
-    "Italian",
-    "Ivorian",
-    "Jamaican",
-    "Japanese",
-    "Jordanian",
-    "Kazakhstani",
-    "Kenyan",
-    "Kittian and Nevisian",
-    "Kuwaiti",
-    "Kyrgyz",
-    "Laotian",
-    "Latvian",
-    "Lebanese",
-    "Liberian",
-    "Libyan",
-    "Liechtensteiner",
-    "Lithuanian",
-    "Luxembourger",
-    "Macedonian",
-    "Malagasy",
-    "Malawian",
-    "Malaysian",
-    "Maldivian",
-    "Malian",
-    "Maltese",
-    "Marshallese",
-    "Mauritanian",
-    "Mauritian",
-    "Mexican",
-    "Micronesian",
-    "Moldovan",
-    "Monacan",
-    "Mongolian",
-    "Moroccan",
-    "Mozambican",
-    "Namibian",
-    "Nauruan",
-    "Nepalese",
-    "New Zealander",
-    "Nicaraguan",
-    "Nigerian",
-    "Nigerien",
-    "North Korean",
-    "Northern Irish",
-    "Norwegian",
-    "Omani",
-    "Pakistani",
-    "Palauan",
-    "Panamanian",
-    "Papua New Guinean",
-    "Paraguayan",
-    "Peruvian",
-    "Polish",
-    "Portuguese",
-    "Qatari",
-    "Romanian",
-    "Russian",
-    "Rwandan",
-    "Saint Lucian",
-    "Salvadoran",
-    "Samoan",
-    "San Marinese",
-    "Sao Tomean",
-    "Saudi",
-    "Scottish",
-    "Senegalese",
-    "Serbian",
-    "Seychellois",
-    "Sierra Leonean",
-    "Singaporean",
-    "Slovakian",
-    "Slovenian",
-    "Solomon Islander",
-    "Somali",
-    "South African",
-    "South Korean",
-    "South Sudanese",
-    "Spanish",
-    "Sri Lankan",
-    "Sudanese",
-    "Surinamer",
-    "Swazi",
-    "Swedish",
-    "Swiss",
-    "Syrian",
-    "Taiwanese",
-    "Tajik",
-    "Tanzanian",
-    "Thai",
-    "Togolese",
-    "Tongan",
-    "Trinidadian or Tobagonian",
-    "Tunisian",
-    "Turkish",
-    "Turkmen",
-    "Tuvaluan",
-    "Ugandan",
-    "Ukrainian",
-    "Uruguayan",
-    "Uzbekistani",
-    "Vanuatuan",
-    "Venezuelan",
-    "Vietnamese",
-    "Welsh",
-    "Yemenite",
-    "Zambian",
-    "Zimbabwean",
-];
+        $this->nationalities = [
+            "British",
+            "Afghan",
+            "Albanian",
+            "Algerian",
+            "American",
+            "Andorran",
+            "Angolan",
+            "Antiguans",
+            "Argentinean",
+            "Armenian",
+            "Australian",
+            "Austrian",
+            "Azerbaijani",
+            "Bahamian",
+            "Bahraini",
+            "Bangladeshi",
+            "Barbadian",
+            "Belarusian",
+            "Belgian",
+            "Belizean",
+            "Beninese",
+            "Bhutanese",
+            "Bolivian",
+            "Bosnian",
+            "Botswanan",
+            "Brazilian",
+            "Bruneian",
+            "Bulgarian",
+            "Burkinabe",
+            "Burmese",
+            "Burundian",
+            "Cambodian",
+            "Cameroonian",
+            "Canadian",
+            "Cape Verdean",
+            "Central African",
+            "Chadian",
+            "Chilean",
+            "Chinese",
+            "Colombian",
+            "Comoran",
+            "Congolese",
+            "Costa Rican",
+            "Croatian",
+            "Cuban",
+            "Cypriot",
+            "Czech",
+            "Danish",
+            "Djiboutian",
+            "Dominican",
+            "Dutch",
+            "East Timorese",
+            "Ecuadorean",
+            "Egyptian",
+            "Emirati",
+            "Equatorial Guinean",
+            "Eritrean",
+            "Estonian",
+            "Ethiopian",
+            "Fijian",
+            "Finnish",
+            "French",
+            "Gabonese",
+            "Gambian",
+            "Georgian",
+            "German",
+            "Ghanaian",
+            "Greek",
+            "Grenadian",
+            "Guatemalan",
+            "Guinean",
+            "Guinea-Bissauan",
+            "Guyanese",
+            "Haitian",
+            "Honduran",
+            "Hungarian",
+            "Icelander",
+            "Indian",
+            "Indonesian",
+            "Iranian",
+            "Iraqi",
+            "Irish",
+            "Israeli",
+            "Italian",
+            "Ivorian",
+            "Jamaican",
+            "Japanese",
+            "Jordanian",
+            "Kazakhstani",
+            "Kenyan",
+            "Kittian and Nevisian",
+            "Kuwaiti",
+            "Kyrgyz",
+            "Laotian",
+            "Latvian",
+            "Lebanese",
+            "Liberian",
+            "Libyan",
+            "Liechtensteiner",
+            "Lithuanian",
+            "Luxembourger",
+            "Macedonian",
+            "Malagasy",
+            "Malawian",
+            "Malaysian",
+            "Maldivian",
+            "Malian",
+            "Maltese",
+            "Marshallese",
+            "Mauritanian",
+            "Mauritian",
+            "Mexican",
+            "Micronesian",
+            "Moldovan",
+            "Monacan",
+            "Mongolian",
+            "Moroccan",
+            "Mozambican",
+            "Namibian",
+            "Nauruan",
+            "Nepalese",
+            "New Zealander",
+            "Nicaraguan",
+            "Nigerian",
+            "Nigerien",
+            "North Korean",
+            "Northern Irish",
+            "Norwegian",
+            "Omani",
+            "Pakistani",
+            "Palauan",
+            "Panamanian",
+            "Papua New Guinean",
+            "Paraguayan",
+            "Peruvian",
+            "Polish",
+            "Portuguese",
+            "Qatari",
+            "Romanian",
+            "Russian",
+            "Rwandan",
+            "Saint Lucian",
+            "Salvadoran",
+            "Samoan",
+            "San Marinese",
+            "Sao Tomean",
+            "Saudi",
+            "Scottish",
+            "Senegalese",
+            "Serbian",
+            "Seychellois",
+            "Sierra Leonean",
+            "Singaporean",
+            "Slovakian",
+            "Slovenian",
+            "Solomon Islander",
+            "Somali",
+            "South African",
+            "South Korean",
+            "South Sudanese",
+            "Spanish",
+            "Sri Lankan",
+            "Sudanese",
+            "Surinamer",
+            "Swazi",
+            "Swedish",
+            "Swiss",
+            "Syrian",
+            "Taiwanese",
+            "Tajik",
+            "Tanzanian",
+            "Thai",
+            "Togolese",
+            "Tongan",
+            "Trinidadian or Tobagonian",
+            "Tunisian",
+            "Turkish",
+            "Turkmen",
+            "Tuvaluan",
+            "Ugandan",
+            "Ukrainian",
+            "Uruguayan",
+            "Uzbekistani",
+            "Vanuatuan",
+            "Venezuelan",
+            "Vietnamese",
+            "Welsh",
+            "Yemenite",
+            "Zambian",
+            "Zimbabwean",
+        ];
 
-
-
-
+        $this->documentTypes = DocumentType::query()
+            ->where('company_id', auth()->user()->company->id)
+            ->orderBy('name')
+            ->get();
     }
+
+
+
 
     /* Reset input fields */
     public function resetInputFields()
@@ -474,7 +479,7 @@ class UsersIndex extends BaseComponent
     public function submitEmployee()
     {
 
-        if($this->nationality == ''){
+        if ($this->nationality == '') {
             $this->nationality = 'British';
         }
 
@@ -490,19 +495,32 @@ class UsersIndex extends BaseComponent
                 }
             }],
 
+            'phone_no' => [
+                'required',
+                'max:15',
+                function ($attribute, $value, $fail) {
+                    if (Employee::where('phone_no', $value)->exists()) {
+                        $fail('This phone number is already used.');
+                    }
+                    if (User::where('phone_no', $value)->exists()) {
+                        $fail('This phone number is already used.');
+                    }
+                }
+            ],
+
+
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
             'job_title' => ['nullable', 'string', 'max:255'],
-            'salary_type' => ['required', 'in:hourly,monthly'],
-
+            'employment_status' => 'required|in:part-time,full-time',
         ];
 
 
         if ($this->nationality !== 'British') {
             $rules['share_code'] = 'nullable|string|max:20';
-        }else{
+        } else {
             $this->share_code = null;
         }
 
@@ -511,7 +529,18 @@ class UsersIndex extends BaseComponent
             $rules['contract_hours'] = ['required', 'numeric', 'min:0'];
         }
 
-        $validatedData = $this->validate($rules);
+        $attributes = [
+            'email'             => 'Email Address',
+            'phone_no'          => 'Phone Number',
+            'f_name'            => 'First Name',
+            'l_name'            => 'Last Name',
+            'nationality'       => 'Nationality',
+            'date_of_birth'     => 'Date of Birth',
+            'job_title'         => 'Job Title',
+            'employment_status' => 'Employment Status',
+        ];
+
+        $this->validate($rules, [], $attributes);
 
 
 
@@ -525,9 +554,10 @@ class UsersIndex extends BaseComponent
             'nationality' => $this->nationality,
             'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
             'share_code' => $this->share_code ?? null,
+            'phone_no' => $this->phone_no ?? null,
             'role' => 'employee',
-            'salary_type' => $this->salary_type,
-            'contract_hours' => $this->salary_type === 'hourly' ? $this->contract_hours : null,
+            'contract_hours' => $this->contract_hours !== '' ? $this->contract_hours : null,
+            'employment_status' =>  $this->employment_status ?? null,
             'invite_token' => Str::random(64),
             'invite_token_expires_at' => Carbon::now()->addHours(48),
             'billable_from' => now()->addDays(3),
@@ -549,7 +579,9 @@ class UsersIndex extends BaseComponent
         SendEmployeeInvitation::dispatch($employee, $inviteUrl)->onConnection('sync')->onQueue('urgent');
 
         // Reset form
-        $this->reset(['email', 'job_title', 'department_id', 'team_id', 'role', 'salary_type', 'contract_hours']);
+        $this->reset(['email', 'f_name', 'l_name', 'department_id', 'team_id', 'role', 'employment_status', 'contract_hours', 'phone_no', 'job_title', 'start_date', 'end_date', 'is_active', 'title', 'nationality', 'date_of_birth', 'share_code']);
+
+
         $this->dispatch('closemodal');
         $this->resetInputFields();
         $this->resetLoaded();
@@ -559,7 +591,7 @@ class UsersIndex extends BaseComponent
 
     public function updatedShareCode($value)
     {
-     $this->share_code = strtoupper($value);
+        $this->share_code = strtoupper($value);
     }
 
 
@@ -686,8 +718,6 @@ class UsersIndex extends BaseComponent
             'Job Title',
             'Department',
             'Team',
-            'Role',
-            'Salary Type',
             'Contract Hours',
             'Status',
             'Start Date',
@@ -705,8 +735,6 @@ class UsersIndex extends BaseComponent
             'job_title',
             'department',
             'team',
-            'role',
-            'salary_type',
             'contract_hours',
             'status',
             'start_date',
@@ -725,8 +753,6 @@ class UsersIndex extends BaseComponent
                 'job_title'      => $emp->job_title,
                 'department'     => $emp->department?->name ?? '',
                 'team'           => $emp->team?->name ?? '',
-                'role'           => ucfirst($emp->role),
-                'salary_type'    => ucfirst($emp->salary_type),
                 'contract_hours' => $emp->contract_hours ?? '',
                 'status'         => $emp->is_active ? 'Active' : 'Former',
                 'start_date'     => optional($emp->start_date)->format('Y-m-d'),

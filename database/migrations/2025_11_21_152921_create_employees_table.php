@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('l_name')->nullable();
             $table->enum('title', ['Mr', 'Mrs'])->nullable();
             $table->string('email')->unique();
+            $table->string('phone_no')->unique()->nullable();
 
             $table->string('avatar')->nullable();
 
@@ -37,7 +38,8 @@ return new class extends Migration
             $table->foreignId('department_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('contract_hours', 5, 2)->nullable();
-            $table->enum('salary_type', ['hourly', 'monthly'])->nullable();
+            $table->enum('salary_type', ['hourly', 'monthly'])->default('hourly');
+            $table->enum('employment_status', ['part-time', 'full-time'])->default('full-time');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('invite_token')->nullable()->unique();

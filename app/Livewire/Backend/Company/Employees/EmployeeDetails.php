@@ -13,6 +13,7 @@ use App\Models\Team;
 use App\Traits\Exportable;
 use App\Jobs\SendEmployeeInvitation;
 use App\Models\Company;
+use App\Models\EmergencyContact;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\API\VerificationService;
@@ -36,6 +37,12 @@ class EmployeeDetails extends BaseComponent
     public $showAllTeams = false;
     public $editDocId = null;
     public $employee;
+    public $contactId;
+    public $mode;
+
+    public $documentTypes;
+
+    public $employment_status = 'full-time';
     public $types;
 
     public $employees, $employee_id, $title;
@@ -119,10 +126,119 @@ class EmployeeDetails extends BaseComponent
     public $selectedComment;
     public $selectedDocId;
 
+    public $activeTab = 'overview';
+
+    public $name;
+    public $mobile;
+    public $address;
+    public $relationship;
+
+    public function deleteEmergencyContact($contactId)
+    {
+        $contact = EmergencyContact::findOrFail($contactId);
+
+        $contact->delete();
+
+        // Refresh employee contacts
+        $this->employee->refresh();
+
+        $this->toast('Emergency contact deleted successfully.', 'success');
+    }
+
+
+    public function openEmergencyContactModal()
+    {
+        $this->activeTab = 'emeregeny';
+        $this->resetFields();
+        $this->dispatch('show-emergency-modal');
+    }
+
+    public function resetFields()
+    {
+        $this->contactId = null;
+        $this->mode = 'create';
+
+        $this->name = '';
+        $this->mobile = '';
+        $this->email = '';
+        $this->address = '';
+        $this->relationship = '';
+
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
+
+
+
+    public function openEditEmergencyContactModal($id)
+    {
+        $this->activeTab = 'emeregeny';
+        $contact = EmergencyContact::findOrFail($id);
+
+        $this->contactId = $contact->id;
+        $this->name = $contact->name;
+        $this->mobile = $contact->mobile;
+        $this->email = $contact->email;
+        $this->address = $contact->address;
+        $this->relationship = $contact->relationship;
+
+        $this->mode = 'edit';
+        $this->dispatch('show-emergency-modal');
+    }
+
+
+    public function saveContact()
+    {
+        $rules = [
+            'name'         => 'required|string|max:255',
+            'mobile'       => 'required|string|max:20',
+            'email'        => 'nullable|email|max:255',
+            'address'      => 'required|string|max:500',
+            'relationship' => 'required|string|max:255',
+        ];
+
+        $this->validate($rules);
+
+        if ($this->contactId) {
+
+            EmergencyContact::findOrFail($this->contactId)->update([
+                'name'         => $this->name,
+                'mobile'       => $this->mobile,
+                'email'        => $this->email,
+                'address'      => $this->address,
+                'relationship' => $this->relationship,
+            ]);
+
+            $this->toast('Emergency contact updated successfully.', 'success');
+        } else {
+            // If adding, check limit (max 2)
+            if ($this->employee->emergencyContacts()->count() >= 2) {
+                $this->toast('You can add only 2 emergency contacts.', 'error');
+                return;
+            }
+
+            EmergencyContact::create([
+                'employee_id'  => $this->employee->id,
+                'name'         => $this->name,
+                'mobile'       => $this->mobile,
+                'email'        => $this->email,
+                'address'      => $this->address,
+                'relationship' => $this->relationship,
+            ]);
+
+            $this->toast('Emergency contact added successfully.', 'success');
+        }
+
+        $this->dispatch('closemodal');
+        $this->resetFields();
+    }
+
 
 
     public function openDocumentModal($docId)
     {
+        $this->activeTab = 'documentsSection';
         $this->selectedFileUrl = '';
         $this->selectedExpiresAt = '';
         $this->selectedComment = '';
@@ -167,6 +283,12 @@ class EmployeeDetails extends BaseComponent
 
     public function mount($employee)
     {
+        $this->documentTypes = DocumentType::query()
+            ->where('company_id', auth()->user()->company->id)
+            ->orderBy('name')
+            ->get();
+
+
         $this->employee = Employee::with(
             'documents',
             'documents.documentType',
@@ -174,7 +296,8 @@ class EmployeeDetails extends BaseComponent
             'user',
             'company',
             'department',
-            'user.teams'
+            'user.teams',
+            'emergencyContacts'
         )->find($employee);
 
         $this->docTypes = DocumentType::where('company_id', auth()->user()->company->id)
@@ -552,6 +675,7 @@ class EmployeeDetails extends BaseComponent
         $this->email = $this->employee->email;
         $this->job_title = $this->employee->job_title;
         $this->department_id = $this->employee->department_id;
+        $this->employment_status = $this->employee->employment_status;
         $this->team_id = $this->employee->team_id;
         $this->role = $this->employee->role;
         $this->salary_type = $this->employee->salary_type;
@@ -635,6 +759,8 @@ class EmployeeDetails extends BaseComponent
     }
 
 
+
+
     /* Toggle status active/former */
     public function toggleStatus($id)
     {
@@ -647,7 +773,6 @@ class EmployeeDetails extends BaseComponent
 
         $employee->is_active = !$employee->is_active;
         $employee->save();
-
         $this->employee->refresh();
 
         $this->toast('Status updated successfully!', 'success');
@@ -697,11 +822,6 @@ class EmployeeDetails extends BaseComponent
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'avatar' => 'nullable|image|max:2048',
 
-
-            'street_1' => 'nullable|string|max:255',
-            'street_2' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
             'postcode' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
             'nationality' => 'required|string',
@@ -719,13 +839,13 @@ class EmployeeDetails extends BaseComponent
 
             'immigration_status' => 'nullable|string|max:255',
 
-            'brp_number' => 'nullable|string|max:100',
             'brp_expiry_date' => 'nullable|date',
 
             'right_to_work_expiry_date' => 'nullable|date',
 
             'passport_number' => 'nullable|string|max:100',
             'passport_expiry_date' => 'nullable|date',
+            'employment_status' => 'required|in:part-time,full-time',
         ];
 
         // Contract hours only required if salary_type is hourly
@@ -741,7 +861,52 @@ class EmployeeDetails extends BaseComponent
             $this->share_code = null;
         }
 
-        $validatedData = $this->validate($rules);
+
+        $attributes = [
+            'email'                    => 'Email Address',
+            'phone_no'                 => 'Phone Number',
+            'f_name'                   => 'First Name',
+            'l_name'                   => 'Last Name',
+            'title'                    => 'Title',
+            'job_title'                => 'Job Title',
+            'team_id'                  => 'Team',
+            'salary_type'              => 'Salary Type',
+            'contract_hours'           => 'Contract Hours (Weekly)',
+            'start_date'               => 'Employment Start Date',
+            'end_date'                 => 'Employment End Date',
+            'avatar'                   => 'Avatar',
+
+            'street_1'                 => 'Street 1',
+            'street_2'                 => 'Street 2',
+            'city'                     => 'City',
+            'state'                    => 'State',
+            'postcode'                 => 'Postcode',
+            'country'                  => 'Country',
+            'nationality'              => 'Nationality',
+            'date_of_birth'            => 'Date of Birth',
+
+            'home_phone'               => 'Home Phone',
+            'personal_email'           => 'Personal Email',
+
+            'gender'                   => 'Gender',
+            'marital_status'           => 'Marital Status',
+
+            'tax_reference_number'     => 'Tax Reference Number',
+
+            'immigration_status'       => 'Immigration Status / Visa Type',
+            'brp_number'               => 'BRP Number',
+            'brp_expiry_date'          => 'BRP Expiry Date',
+
+            'right_to_work_expiry_date' => 'Right to Work Expiry Date',
+
+            'passport_number'          => 'Passport Number',
+            'passport_expiry_date'     => 'Passport Expiry Date',
+
+            'employment_status'        => 'Employment Status',
+            'share_code'               => 'Share Code',
+        ];
+
+        $this->validate($rules, [], $attributes);
 
 
         if ($this->avatar instanceof UploadedFile) {
@@ -762,10 +927,10 @@ class EmployeeDetails extends BaseComponent
             'nationality' => $this->nationality,
             'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
             'share_code' => $this->share_code ?? null,
-
+            'contract_hours' => $this->contract_hours !== '' ? $this->contract_hours : null,
+            'employment_status' =>  $this->employment_status ?? null,
             'role' => 'employee',
             'salary_type' => $this->salary_type,
-            'contract_hours' => $this->contract_hours,
             'is_active' => $this->is_active,
             'end_date' => $this->end_date == '' ? null : $this->end_date,
             'start_date' => $this->start_date == '' ? null : $this->start_date,

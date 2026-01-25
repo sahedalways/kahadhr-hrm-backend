@@ -28,6 +28,8 @@ class Employee extends Model
         'start_date',
         'salary_type',
         'contract_hours',
+        'employment_status',
+        'phone_no',
         'team_id',
         'department_id',
         'job_title',
@@ -103,6 +105,13 @@ class Employee extends Model
     }
 
 
+    public function emergencyContacts()
+    {
+        return $this->hasMany(EmergencyContact::class);
+    }
+
+
+
     // Accessor for logo URL
     public function getAvatarUrlAttribute()
     {
@@ -162,6 +171,52 @@ class Employee extends Model
                 }
             }
         });
+
+
+        static::updated(function ($employee) {
+            if (
+                $employee->isDirty('contract_hours') ||
+                $employee->isDirty('employment_status')
+            ) {
+
+
+                if ($employee->employment_status === 'part-time') {
+
+                    $user = $employee->user;
+
+                    if (! $user) {
+                        return;
+                    }
+
+                    $contractHours = (float) ($employee->contract_hours ?? 0);
+
+                    if ($contractHours <= 0) {
+                        return;
+                    }
+
+                    $partTimePercent = (float) config('leave.part_time_percentage', 100);
+
+                    $totalHours = ($contractHours * 52) * ($partTimePercent / 100);
+
+                    $annualLeaveHours = ceil($totalHours);
+
+                    if ($annualLeaveHours > 0) {
+                        LeaveBalance::updateOrCreate(
+                            [
+                                'company_id' => $employee->company_id,
+                                'user_id'    => $user->id,
+                            ],
+                            [
+                                'total_annual_hours' => $annualLeaveHours,
+                                'used_annual_hours'  => 0,
+                                'carry_over_hours'   => $annualLeaveHours,
+                            ]
+                        );
+                    }
+                }
+            }
+        });
+
 
 
 

@@ -97,59 +97,161 @@
                                         <th>Name</th>
 
                                         <th>Email</th>
+                                        <th>Mobile</th>
                                         <th>Job Title</th>
+                                        <th>Right to Work Expires</th>
 
-                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
+                                @php
+                                    $activeCount = $infos->where('is_active', 1)->count();
+                                    $formerCount = $infos->where('is_active', 0)->count();
+                                @endphp
                                 <tbody>
                                     @php $i = 1; @endphp
                                     @forelse($infos as $employee)
                                         <tr>
                                             <td>{{ $i++ }}</td>
-                                            <td>{{ $employee->full_name ?? 'N/A' }}</td>
+                                            <td>
+                                                <a href="{{ route('company.dashboard.employees.details', [
+                                                    'company' => app('authUser')->company->sub_domain,
+                                                    'employee' => $employee->id,
+                                                ]) }}"
+                                                   class="badge badge-xs text-primary"
+                                                   style="
+        background: transparent;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+   "
+                                                   onmouseover="this.style.textDecoration='underline'"
+                                                   onmouseout="this.style.textDecoration='none'">
+                                                    {{ $employee->full_name ?? 'N/A' }}
+                                                </a>
+
+
+                                            </td>
 
                                             <td>
                                                 <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
                                                       style="cursor:pointer; padding:2px 4px; border-radius:4px;"
                                                       onmouseover="this.style.backgroundColor='#f0f0f0';"
                                                       onmouseout="this.style.backgroundColor='transparent';"
-                                                      style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
                                                       data-bs-toggle="tooltip"
                                                       data-bs-placement="top"
-                                                      class="tooltip-btn"
-                                                      data-tooltip="Click to copy"
+                                                      title="Click to copy"
                                                       aria-label="copy email">
                                                     {{ $employee->email ?? 'N/A' }}
                                                 </span>
                                             </td>
+
+                                            <td>
+                                                <span onclick="copyToClipboard('{{ $employee->phone_no ?? '' }}')"
+                                                      style="cursor:pointer; padding:2px 4px; border-radius:4px;"
+                                                      onmouseover="this.style.backgroundColor='#f0f0f0';"
+                                                      onmouseout="this.style.backgroundColor='transparent';"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      title="Click to copy"
+                                                      aria-label="copy phone number">
+                                                    {{ $employee->phone_no ?? 'N/A' }}
+                                                </span>
+                                            </td>
+
                                             <td>{{ $employee->job_title ?? 'N/A' }}</td>
 
 
-                                            <td>
 
-                                                <a href="{{ route('company.dashboard.employees.details', [
-                                                    'company' => app('authUser')->company->sub_domain,
-                                                    'employee' => $employee->id,
-                                                ]) }}"
-                                                   class="badge badge-xs text-white"
-                                                   style="background-color:#5acaa3;">
-                                                    View Details
-                                                </a>
+                                            @php
+                                                $shareCodeType = $documentTypes->firstWhere('name', 'Share Code');
+
+                                                $latestShareDoc = null;
+                                                $statusLabel = null;
+                                                $statusColor = null;
+
+                                                if ($shareCodeType) {
+                                                    $latestShareDoc = $employee
+                                                        ->documents()
+                                                        ->where('doc_type_id', $shareCodeType->id)
+                                                        ->latest('created_at')
+                                                        ->first();
+
+                                                    if ($latestShareDoc && $latestShareDoc->expires_at) {
+                                                        $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+                                                        $daysLeft = now()->diffInDays($expiresAt, false);
+
+                                                        if ($daysLeft < 0) {
+                                                            $statusLabel = 'Expired';
+                                                            $statusColor = '#dc3545';
+                                                        } elseif ($daysLeft <= 60) {
+                                                            $statusLabel = 'Expires Soon';
+                                                            $statusColor = '#fd7e14';
+                                                        } else {
+                                                            $statusLabel = 'Valid';
+                                                            $statusColor = '#198754';
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
 
 
 
 
-                                            </td>
+                                            @if ($employee->nationality === 'British')
+                                                <td>
+                                                    <span class="badge"
+                                                          style="background:#e9ecef; color:#6c757d; font-weight:600;">
+                                                        Not Required (British)
+                                                    </span>
+                                                </td>
+                                            @else
+                                                @if ($latestShareDoc && $latestShareDoc->expires_at)
+                                                    <td>
+                                                        <div style="display:flex; flex-direction:column; gap:4px;">
+                                                            <span style="font-size:12px; color:#6c757d;">
+
+                                                                <strong>{{ \Carbon\Carbon::parse($latestShareDoc->expires_at)->format('d M, Y') }}</strong>
+                                                            </span>
+
+                                                            <div
+                                                                 style="display:flex; align-items:center; justify-content:center;">
+                                                                <span class="badge text-center"
+                                                                      style="
+              background: {{ $statusColor }};
+              color:#fff;
+              font-weight:600;
+              min-width:110px;
+          ">
+                                                                    {{ $statusLabel }}
+                                                                </span>
+                                                            </div>
+
+                                                        </div>
+                                                    </td>
+                                                @else
+                                                    <td>
+                                                        <span class="badge bg-secondary">
+                                                            Not Verified
+                                                        </span>
+                                                    </td>
+                                                @endif
+                                            @endif
+
                                         </tr>
                                     @empty
                                         <tr>
                                             <td colspan="9"
                                                 class="text-center">No employees found</td>
                                         </tr>
+
                                     @endforelse
                                 </tbody>
+
+
                             </table>
+
+
 
                             @if ($hasMore)
                                 <div class="text-center my-3">
@@ -159,15 +261,21 @@
                             @endif
                         </div>
 
-
-
-                        @if ($hasMore)
-                            <div class="text-center my-3">
-                                <button wire:click="loadMore"
-                                        class="btn btn-outline-primary">Load More</button>
+                        <div class="row mt-3">
+                            <div class="col-12 d-flex gap-3 justify-content-center">
+                                @if ($statusFilter == 'active')
+                                    <div class="px-4 py-2 rounded-pill shadow-sm"
+                                         style="background-color: #e9f5ee; color: #1b5e20; font-weight: 600; border: 1px solid #d1e7dd;">
+                                        Total Active Employees: {{ $activeCount }}
+                                    </div>
+                                @else
+                                    <div class="px-4 py-2 rounded-pill shadow-sm"
+                                         style="background-color: #fce8e8; color: #c62828; font-weight: 600; border: 1px solid #f8d7da;">
+                                        Total Former Employees: {{ $formerCount }}
+                                    </div>
+                                @endif
                             </div>
-                        @endif
-
+                        </div>
                         <script>
                             function copyToClipboard(text) {
                                 navigator.clipboard.writeText(text).then(function() {
@@ -219,8 +327,9 @@
                         <select class="form-select"
                                 wire:model.live="addMethod"
                                 wire:key="addMethod">
-                            <option value="manual">Manual Entry</option>
-                            <option value="csv">Import CSV</option>
+                            <option value="manual">Add an employee</option>
+                            <option value="csv">Add
+                                multiple employees</option>
                         </select>
                     </div>
 
@@ -259,8 +368,8 @@
                                     </small>
 
                                     <code class="d-block text-dark">
-                                        f_name, l_name, email, job_title, nationality, date_of_birth,
-                                        salary_type, contract_hours
+                                        f_name, l_name, email, phone_no, nationality, date_of_birth,
+                                        employment_status,contract_hours
                                     </code>
                                 </div>
 
@@ -323,21 +432,6 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
-
-                                <div class="col-md-6 mt-2">
-                                    <label class="form-label">
-                                        Date of Birth <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           wire:model="date_of_birth">
-
-                                    @error('date_of_birth')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-
                                 <!-- Email -->
                                 <div class="col-md-6">
                                     <label class="form-label">Email <span class="text-danger">*</span></label>
@@ -352,18 +446,37 @@
 
 
 
-
-                                <!-- Job Title -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Job Title </label>
+                                    <label class="form-label">Mobile <span class="text-danger">*</span></label>
                                     <input type="text"
-                                           class="form-control"
-                                           wire:model="job_title"
-                                           placeholder="Enter job title">
-                                    @error('job_title')
+                                           class="form-control "
+                                           wire:model="phone_no"
+                                           placeholder="Enter mobile no."
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                    @error('phone_no')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+
+
+                                <div class="col-md-6 mt-2">
+                                    <label class="form-label">
+                                        Date of Birth <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="date"
+                                           class="form-control"
+                                           wire:model="date_of_birth"
+                                           max="{{ date('Y-m-d') }}">
+
+                                    @error('date_of_birth')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+
+
 
 
                                 <div class="col-md-6">
@@ -384,7 +497,6 @@
                                 </div>
 
 
-
                                 @if ($nationality && $nationality !== 'British')
                                     <div class="col-md-6 mt-2">
                                         <label class="form-label">
@@ -402,40 +514,37 @@
                                 @endif
 
 
-
-
-                                <!-- Salary Type -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Salary Type <span class="text-danger">*</span></label>
+                                    <label class="form-label">
+                                        Employment Status <span class="text-danger">*</span>
+                                    </label>
+
                                     <select class="form-select"
-                                            wire:model.live="salary_type"
-                                            wire:key="salary_type">
-                                        <option value=""
-                                                selected
-                                                disabled>Select Salary Type</option>
-                                        <option value="hourly">Hourly</option>
-                                        <option value="monthly">Monthly</option>
+                                            wire:model.live="employment_status">
+                                        <option value="full-time">Full-time</option>
+                                        <option value="part-time">Part-time</option>
                                     </select>
-                                    @error('salary_type')
+
+                                    @error('employment_status')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
 
-                                @if ($salary_type === 'hourly')
-                                    <div class="col-md-6"
-                                         wire:key="contract-hours-field">
-                                        <label class="form-label">Contract Hours (Weekly)<span
-                                                  class="text-danger">*</span></label>
-                                        <input type="number"
-                                               step="0.01"
-                                               class="form-control"
-                                               wire:model="contract_hours"
-                                               placeholder="Enter contract hours">
-                                        @error('contract_hours')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                @endif
+
+
+                                <div class="col-md-6"
+                                     wire:key="contract-hours-field">
+                                    <label class="form-label">Contract Hours (Weekly)</label>
+                                    <input type="number"
+                                           step="0.01"
+                                           class="form-control"
+                                           wire:model="contract_hours"
+                                           placeholder="Enter contract hours">
+                                    @error('contract_hours')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                             </div>
 
                             <div class="modal-footer">

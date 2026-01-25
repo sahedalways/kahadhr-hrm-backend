@@ -196,6 +196,11 @@
                     Security Update
                 </div>
 
+                <input type="text"
+                       id="user-type"
+                       value="{{ $user_type }}"
+                       hidden>
+
                 <h3>{{ $title ?? 'Password set successfully!' }}</h1>
 
                     <p class="description">
@@ -263,6 +268,7 @@
     <script>
         let seconds = 5;
         const el = document.getElementById('redirect-count');
+        const userType = document.getElementById('user-type');
 
         const timer = setInterval(() => {
             seconds--;
@@ -271,15 +277,15 @@
             if (seconds <= 0) {
                 clearInterval(timer);
 
-                @if ($user_type == 'Employee')
+                if (userType.innerText.trim() === 'Employee') {
                     window.location.href = "{{ url('/employee-login') }}";
-                @else
+                } else {
                     window.location.href = "{{ route('company.auth.login', ['company' => 'company']) }}";
-                @endif
-
+                }
             }
         }, 1000);
     </script>
+
 
 </body>
 

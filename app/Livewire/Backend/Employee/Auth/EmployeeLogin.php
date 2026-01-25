@@ -188,13 +188,6 @@ class EmployeeLogin extends BaseComponent
 
 
 
-
-
-
-
-
-
-
     public function mount(Request $request)
     {
         $this->company = $request->route('company') ?? null;

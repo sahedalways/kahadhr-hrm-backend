@@ -911,8 +911,21 @@ class EmployeeDetails extends BaseComponent
             'share_code'               => 'Share Code',
         ];
 
-        $this->validate($rules, [], $attributes);
+        $customRules = [];
+        $customAttributes = [];
 
+        foreach ($this->customFields as $field) {
+            if ($field->required) {
+                $customRules["customValues.{$field->id}"] = 'required';
+                $customAttributes["customValues.{$field->id}"] = $field->name;
+            }
+        }
+
+        $this->validate(
+            array_merge($rules, $customRules),
+            [],
+            array_merge($attributes, $customAttributes)
+        );
 
 
 

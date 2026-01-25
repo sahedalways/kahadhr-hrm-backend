@@ -926,7 +926,7 @@
                                             @endphp
 
                                             @if ($departments->isEmpty())
-                                                <span class="text-muted fst-italic">N/A</span>
+                                                <span class="text-muted ">N/A</span>
                                             @else
                                                 <div class="d-flex flex-wrap align-items-center gap-2">
                                                     @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
@@ -1176,6 +1176,33 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if ($customFields->isNotEmpty())
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm"
+                                     style="border-radius: 20px; background: linear-gradient(to right, #f8f9fa, #ffffff);">
+                                    <div class="card-body p-4">
+                                        <h6 class="fw-bold text-primary text-uppercase mb-3">
+                                            <i class="fas fa-clipboard-list me-2"></i>More Information
+                                        </h6>
+
+                                        <div class="row g-3">
+                                            @foreach ($customFields as $field)
+                                                <div class="col-md-6">
+                                                    <label
+                                                           class="text-muted small d-block">{{ $field->name }}</label>
+                                                    <span class="fw-bold text-dark">
+                                                        {{ $customValues[$field->id] ?? 'N/A' }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
 
                     </div>
                 </div>
@@ -2012,6 +2039,10 @@
                                             @endforeach
                                         </select>
                                     @endif
+
+                                    @error('customValues.' . $field->id)
+                                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             @endforeach
                         @endif

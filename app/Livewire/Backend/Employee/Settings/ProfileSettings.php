@@ -8,6 +8,7 @@ use App\Models\CustomEmployeeProfileFieldValue;
 use Livewire\WithFileUploads;
 use Illuminate\Http\UploadedFile;
 use App\Models\Department;
+use App\Models\DocumentType;
 use App\Models\Team;
 
 class ProfileSettings extends BaseComponent
@@ -15,6 +16,7 @@ class ProfileSettings extends BaseComponent
     use WithFileUploads;
     public $countries = [];
     public $cities = [];
+    public $documentTypes;
     public $locations = [];
 
     public $filteredCountries = [];
@@ -31,12 +33,12 @@ class ProfileSettings extends BaseComponent
     public $job_title, $department_id, $team_id;
     public $contract_hours, $salary_type, $start_date, $end_date;
 
-    public $date_of_birth, $house_no, $street, $city, $state, $postcode, $country,
+    public $date_of_birth, $house_no, $address, $street, $city, $state, $postcode, $country,
         $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
-    public $address;
+
     public $employee;
     public $departments = [];
     public $teams = [];
@@ -81,6 +83,13 @@ class ProfileSettings extends BaseComponent
     /* Load employee info */
     public function mount()
     {
+        $this->documentTypes = DocumentType::query()
+            ->where('company_id', auth()->user()->employee->company_id)
+            ->orderBy('name')
+            ->get();
+
+
+
         $this->employee = auth()->user()->employee;
 
         if (!$this->employee) {
@@ -341,6 +350,33 @@ class ProfileSettings extends BaseComponent
         ];
     }
 
+    public function getRightToWorkStatusProperty()
+    {
+        $shareCodeType = $this->documentTypes->firstWhere('name', 'Share Code');
+
+        $latestShareDoc = null;
+        $daysLeft = null;
+
+        if ($shareCodeType) {
+            $latestShareDoc = $this->employee
+                ->documents()
+                ->where('doc_type_id', $shareCodeType->id)
+                ->latest('created_at')
+                ->first();
+
+            if ($latestShareDoc && $latestShareDoc->expires_at) {
+                $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+                $daysLeft = now()->diffInDays($expiresAt, false);
+            }
+        }
+
+        return [
+            'doc' => $latestShareDoc,
+            'daysLeft' => $daysLeft,
+        ];
+    }
+
+
     public function updatedState($value)
     {
         $this->cities = collect($this->locations)
@@ -393,9 +429,53 @@ class ProfileSettings extends BaseComponent
             $this->share_code = null;
         }
 
-        $validatedData = $this->validate($rules);
+
+        $attributes = [
+            'email'                    => 'Email Address',
+            'phone_no'                 => 'Phone Number',
+            'f_name'                   => 'First Name',
+            'l_name'                   => 'Last Name',
+            'title'                    => 'Title',
+            'job_title'                => 'Job Title',
+            'contract_hours'           => 'Contract Hours (Weekly)',
+            'start_date'               => 'Employment Start Date',
+            'house_no'                 => 'House Number',
+            'street'                 => 'Street',
+            'city'                     => 'City',
+            'state'                    => 'State',
+            'address'                    => 'Current Address',
+            'postcode'                 => 'Postcode',
+            'country'                  => 'Country',
+            'nationality'              => 'Nationality',
+            'date_of_birth'            => 'Date of Birth',
+            'home_phone'               => 'Home Phone',
+            'personal_email'           => 'Personal Email',
+            'gender'                   => 'Gender',
+            'marital_status'           => 'Marital Status',
+            'tax_reference_number'     => 'Tax Reference Number',
+            'immigration_status'       => 'Immigration Status / Visa Type',
+            'passport_number'          => 'Passport Number',
+            'passport_expiry_date'     => 'Passport Expiry Date',
+            'employment_status'        => 'Employment Status',
+            'share_code'               => 'Share Code',
+        ];
 
 
+        $customRules = [];
+        $customAttributes = [];
+
+        foreach ($this->customFields as $field) {
+            if ($field->required) {
+                $customRules["customValues.{$field->id}"] = 'required';
+                $customAttributes["customValues.{$field->id}"] = $field->name;
+            }
+        }
+
+        $validatedData = $this->validate(
+            array_merge($rules, $customRules),
+            [],
+            array_merge($attributes, $customAttributes)
+        );
 
 
         $this->employee->update([

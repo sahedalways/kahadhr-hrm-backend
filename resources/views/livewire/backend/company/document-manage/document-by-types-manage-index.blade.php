@@ -154,63 +154,169 @@
 
 
 
-                                        <td style="text-align: center; vertical-align: middle;">
+                                        <td
+                                            style="text-align: center; vertical-align: middle; background-color: #fcfcfd;">
                                             <div
-                                                 style="display: inline-flex; flex-direction: column; align-items: center; gap: 8px; text-align: left;">
+                                                 style="display: inline-flex; flex-direction: column; align-items: center; gap: 12px; width: 240px; padding: 15px 0;">
 
-                                                <div class="mt-2"
-                                                     style="font-weight: 700; color: #1a1c1e; font-size: 15px; letter-spacing: -0.01em; text-align: center; width: 100%;">
-                                                    {{ trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? '')) ?: $employee->email ?? 'N/A' }}
+                                                <div style="text-align: center;">
+                                                    <div
+                                                         style="font-weight: 800; color: #111827; font-size: 16px; letter-spacing: -0.02em; margin-bottom: 2px;">
+                                                        {{ trim(($employee->f_name ?? '') . ' ' . ($employee->l_name ?? '')) ?: $employee->email ?? 'N/A' }}
+                                                    </div>
+                                                    <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;"
+                                                         class="mt-2">
+                                                        Employee Identity
+                                                    </div>
                                                 </div>
 
-
                                                 @if ($employee->nationality !== 'British')
-                                                    <div class="mt-2"
-                                                         style="display: flex; flex-direction: column; gap: 6px;">
+                                                    @php
 
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <small
-                                                                   style="width: 75px; color: #6c757d; font-size: 10px; text-transform: uppercase; font-weight: 700; line-height: 1;">
-                                                                Share Code
-                                                            </small>
-                                                            @if ($employee->share_code)
-                                                                <span onclick="copyToClipboard('{{ $employee->share_code }}')"
-                                                                      data-bs-toggle="tooltip"
-                                                                      title="Click to copy Share Code"
-                                                                      style="cursor: pointer; background-color: #f0f4ff; color: #0056b3; border: 1px solid #cfe2ff; padding: 3px 10px; border-radius: 6px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; font-weight: 600; min-width: 100px; text-align: center;">
-                                                                    {{ $employee->share_code }}
-                                                                </span>
-                                                            @else
-                                                                <span
-                                                                      style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #e9ecef; padding: 3px 10px; border-radius: 6px; font-size: 12px; min-width: 100px; text-align: center;">
-                                                                    N/A
-                                                                </span>
-                                                            @endif
+                                                        $shareStatus = 'unavailable';
+                                                        if ($employee->share_code) {
+                                                            $shareStatus = 'pending';
+                                                            $shareDocType = \App\Models\DocumentType::where(
+                                                                'name',
+                                                                'Share Code',
+                                                            )->first();
+                                                            $latestDoc = $shareDocType
+                                                                ? $employee
+                                                                    ->documents()
+                                                                    ->where('doc_type_id', $shareDocType->id)
+                                                                    ->latest()
+                                                                    ->first()
+                                                                : null;
+                                                            if ($latestDoc) {
+                                                                $expiresAt = $latestDoc->expires_at
+                                                                    ? \Carbon\Carbon::parse($latestDoc->expires_at)
+                                                                    : null;
+                                                                $shareStatus =
+                                                                    $expiresAt && $expiresAt->isPast()
+                                                                        ? 'expired'
+                                                                        : 'verified';
+                                                            }
+                                                        }
 
-                                                        </div>
+                                                        // Status configuration for dynamic styling
+                                                        $statusConfig = [
+                                                            'unavailable' => [
+                                                                'bg' => '#f3f4f6',
+                                                                'text' => '#374151',
+                                                                'label' => 'Unavailable',
+                                                            ],
+                                                            'pending' => [
+                                                                'bg' => '#fef3c7',
+                                                                'text' => '#92400e',
+                                                                'label' => 'Waiting for Verification',
+                                                            ],
+                                                            'verified' => [
+                                                                'bg' => '#d1fae5',
+                                                                'text' => '#065f46',
+                                                                'label' => 'Verified',
+                                                            ],
+                                                            'expired' => [
+                                                                'bg' => '#fee2e2',
+                                                                'text' => '#991b1b',
+                                                                'label' => 'Expired',
+                                                            ],
+                                                        ];
+                                                        $currentStyle = $statusConfig[$shareStatus];
+                                                    @endphp
 
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <small
-                                                                   style="width: 75px; color: #6c757d; font-size: 10px; text-transform: uppercase; font-weight: 700; line-height: 1;">
-                                                                DOB
-                                                            </small>
-                                                            <span onclick="copyToClipboard('{{ $employee->date_of_birth ? date('d M, Y', strtotime($employee->date_of_birth)) : '' }}')"
-                                                                  data-bs-toggle="tooltip"
-                                                                  title="Click to copy Date of Birth"
-                                                                  style="cursor: pointer; background-color: #f8f9fa; color: #333; border: 1px solid #e9ecef; padding: 3px 10px; border-radius: 6px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 100px;">
-                                                                <i class="bi bi-calendar3"
-                                                                   style="font-size: 11px; color: #6c757d;"></i>
-                                                                {{ $employee->date_of_birth ? date('d M, Y', strtotime($employee->date_of_birth)) : 'N/A' }}
+                                                    <div
+                                                         style="width: 100%; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+
+                                                        <div
+                                                             style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">
+                                                            <span
+                                                                  style="font-weight: 700; font-size: 11px; color: #4b5563; text-transform: uppercase;">Share
+                                                                Code</span>
+                                                            <span
+                                                                  style="background: {{ $currentStyle['bg'] }}; color: {{ $currentStyle['text'] }}; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                                                                {{ $currentStyle['label'] }}
                                                             </span>
                                                         </div>
 
+                                                        <div
+                                                             style="padding: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left;">
+
+                                                            <div
+                                                                 style="display: flex; justify-content: space-between; align-items: center;">
+                                                                <span
+                                                                      style="font-size: 12px; color: #9ca3af; font-weight: 500;">Code</span>
+                                                                @if ($employee->share_code)
+                                                                    <span onclick="copyToClipboard('{{ $employee->share_code }}')"
+                                                                          class="copy-badge"
+                                                                          data-bs-toggle="tooltip"
+                                                                          title="Click to copy code">
+                                                                        {{ $employee->share_code }}
+                                                                        <i class="bi bi-clipboard ms-1"
+                                                                           style="font-size: 10px; opacity: 0.6;"></i>
+                                                                    </span>
+                                                                @else
+                                                                    <span
+                                                                          style="font-size: 12px; color: #d1d5db; font-style: italic;">Not
+                                                                        Set</span>
+                                                                @endif
+                                                            </div>
+
+                                                            <div
+                                                                 style="display: flex; justify-content: space-between; align-items: center;">
+                                                                <span
+                                                                      style="font-size: 12px; color: #9ca3af; font-weight: 500;">Birth
+                                                                    Date</span>
+                                                                <span onclick="copyToClipboard('{{ $employee->date_of_birth ? date('d M, Y', strtotime($employee->date_of_birth)) : '' }}')"
+                                                                      class="dob-badge"
+                                                                      data-bs-toggle="tooltip"
+                                                                      title="Click to copy DOB">
+                                                                    {{ $employee->date_of_birth ? date('d M, Y', strtotime($employee->date_of_birth)) : 'N/A' }}
+                                                                </span>
+                                                            </div>
+
+                                                        </div>
                                                     </div>
                                                 @endif
-
-
                                             </div>
                                         </td>
 
+                                        <style>
+                                            /* Premium Hover States & Badges */
+                                            .copy-badge {
+                                                cursor: pointer;
+                                                background: #eff6ff;
+                                                color: #1d4ed8;
+                                                padding: 4px 10px;
+                                                border-radius: 6px;
+                                                font-family: 'SFMono-Regular', Menlo, monospace;
+                                                font-size: 12px;
+                                                font-weight: 700;
+                                                transition: all 0.2s;
+                                                border: 1px solid #dbeafe;
+                                            }
+
+                                            .copy-badge:hover {
+                                                background: #dbeafe;
+                                                transform: translateY(-1px);
+                                            }
+
+                                            .dob-badge {
+                                                cursor: pointer;
+                                                background: #f9fafb;
+                                                color: #374151;
+                                                padding: 4px 10px;
+                                                border-radius: 6px;
+                                                font-size: 12px;
+                                                font-weight: 600;
+                                                border: 1px solid #f3f4f6;
+                                                transition: all 0.2s;
+                                            }
+
+                                            .dob-badge:hover {
+                                                background: #f3f4f6;
+                                                border-color: #e5e7eb;
+                                            }
+                                        </style>
 
                                         <td class="text-start"
                                             style="width:260px; max-width:260px; white-space:nowrap;">
@@ -406,7 +512,7 @@
                                                                         </div>
 
                                                                         <!-- Expiry -->
-                                                                        <div style="font-size:0.6rem;margin-top:4px;">
+                                                                        <div style="font-size:0.7rem;margin-top:4px;">
                                                                             <div
                                                                                  style="color:{{ $isExpired ? '#dc3545' : ($isExpiringSoon ? '#fd7e14' : '#999') }};">
                                                                                 {{ $doc->expires_at ? date('d M, Y', strtotime($doc->expires_at)) : 'No Expiry' }}

@@ -181,6 +181,25 @@ class DocumentManageTypesIndex extends BaseComponent
         ]);
 
 
+        $docType = DocumentType::find($this->doc_type_id);
+
+        if ($docType && strtolower($docType->name) === 'share code') {
+
+            $expiresAt = Carbon::parse($this->expires_at);
+            $daysLeft  = $expiresAt->diffInDays(now());
+
+            if ($expiresAt->isPast()) {
+                $status = 'expired';
+            } else {
+                $status = 'verified';
+            }
+
+            $employee = Employee::find($this->emp_id);
+
+            $employee->share_code_status = $status;
+            $employee->saveQuietly();
+        }
+
 
         $this->toast('Document updated successfully!', 'success');
         $this->dispatch('closemodal');
@@ -295,6 +314,26 @@ class DocumentManageTypesIndex extends BaseComponent
 
 
 
+        $docType = DocumentType::find($this->doc_type_id);
+
+        if ($docType && strtolower($docType->name) === 'share code') {
+
+            $expiresAt = Carbon::parse($this->expires_at);
+
+
+            if ($expiresAt->isPast()) {
+                $status = 'expired';
+            } else {
+                $status = 'verified';
+            }
+            $employee = Employee::find($this->emp_id);
+
+            $employee->share_code_status = $status;
+            $employee->saveQuietly();
+        }
+
+
+
         $this->toast('Document uploaded successfully!', 'success');
         $this->dispatch('closemodal');
         $this->resetInputFields();
@@ -388,6 +427,27 @@ class DocumentManageTypesIndex extends BaseComponent
             }
 
             $document->delete();
+
+
+
+
+            $docType = DocumentType::find($document->doc_type_id);
+
+            if ($docType && strtolower($docType->name) === 'share code') {
+
+                $empId = $document->emp_id;
+
+                $hasShareCodeDoc = EmpDocument::where('emp_id', $empId)
+                    ->where('doc_type_id', $document->doc_type_id)
+                    ->exists();
+
+                if (!$hasShareCodeDoc) {
+                    $employee = Employee::find($this->emp_id);
+
+                    $employee->share_code_status = 'pending';
+                    $employee->saveQuietly();
+                }
+            }
         }
 
 

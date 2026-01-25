@@ -17,6 +17,7 @@ class Employee extends Model
         'l_name',
         'nationality',
         'share_code',
+        'share_code_status',
         'date_of_birth',
         'title',
         'is_active',
@@ -143,6 +144,8 @@ class Employee extends Model
         });
 
 
+
+
         static::updated(function ($employee) {
 
 
@@ -157,6 +160,24 @@ class Employee extends Model
                         'email' => $employee->email,
                     ]);
                 }
+            }
+        });
+
+
+
+        static::saving(function ($employee) {
+
+            if ($employee->nationality == 'British') {
+                $employee->share_code_status = 'verified';
+                $employee->share_code = null;
+                return;
+            }
+
+            if (!$employee->share_code) {
+                $employee->share_code_status = 'unavailable';
+                $employee->share_code = null;
+            } else {
+                $employee->share_code_status = 'pending';
             }
         });
     }

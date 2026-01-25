@@ -57,10 +57,36 @@
         {{ $id == $type->id ? 'background:#fff5f5; box-shadow:0 0 0 2px rgba(220,53,69,.25);' : '' }}
      "
                      wire:ignore.self>
-                    <!-- Card header / type name -->
-                    <div class="card-header bg-light text-primary fw-semibold d-flex align-items-center">
-                        <i class="fas fa-folder me-2"></i> {{ $type->name }}
+
+                    @php
+                        $shareStatus = auth()->user()->employee->share_code_status ?? 'unavailable';
+                    @endphp
+
+
+
+
+
+                    <div
+                         class="card-header bg-light text-primary fw-semibold d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="fas fa-folder me-2"></i> {{ $type->name }}
+                        </div>
+
+                        @if (strtolower($type->name) === 'share code')
+                            <div>
+                                @if ($shareStatus === 'unavailable')
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                @elseif ($shareStatus === 'pending')
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif ($shareStatus === 'verified')
+                                    <span class="badge bg-success">Verified</span>
+                                @elseif ($shareStatus === 'expired')
+                                    <span class="badge bg-danger">Expired</span>
+                                @endif
+                            </div>
+                        @endif
                     </div>
+
                     <div class="card-body">
 
                         @php
@@ -164,12 +190,7 @@
                                                         </span>
                                                     </div>
 
-                                                    @if ($isExpired)
-                                                        <span class="badge bg-danger mt-1"
-                                                              style="font-size:.55rem;">
-                                                            Expired
-                                                        </span>
-                                                    @endif
+
 
                                                 </div>
                                             </div>
@@ -242,80 +263,94 @@
                             @php
                                 $employee = auth()->user()->employee;
                                 $hasShareCode = !empty($employee->share_code);
+                                $shareStatus = $employee->share_code_status ?? 'unavailable';
                             @endphp
 
                             <div class="d-flex justify-content-center align-items-center"
                                  style="height:90px; cursor:pointer;"
                                  wire:click="openUploadModal({{ $type->id }})">
 
-                                @if ($type->name === 'Share Code' && $hasShareCode)
-                                    <div class="text-center"
-                                         data-bs-toggle="tooltip"
-                                         data-bs-placement="top"
-                                         title="Change Share Code">
-                                        <div class="text-center">
-                                            <div
-                                                 style="
-                        font-weight: 800;
-                        font-size: 1.1rem;
-                        color: #4e73df;
-                        letter-spacing: 1px;
-                        text-transform: uppercase;
-                        margin-bottom: 4px;
-                    ">
-                                                {{ $employee->share_code }}
-                                            </div>
+                                @if ($type->name === 'Share Code')
+                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                        <div class="flex-grow-1">
+                                            @if ($shareStatus === 'unavailable')
+                                                {{-- only plus --}}
+                                                <button type="button"
+                                                        wire:click="openUploadModal({{ $type->id }})"
+                                                        style="
+                            width: 42px;
+                            height: 42px;
+                            border-radius: 12px;
+                            border: 2px dashed #4e73df;
+                            background: #f8f9fc;
+                            color: #4e73df;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                            cursor: pointer;
+                        "
+                                                        onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
+                                                        onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
+                                                    <i class="fas fa-plus"
+                                                       style="font-size: 1.2rem;"></i>
+                                                </button>
+                                            @elseif ($shareStatus === 'pending')
+                                                {{-- show code + pending --}}
+                                                <div class="text-center"
+                                                     style="cursor:pointer;"
+                                                     wire:click="openUploadModal({{ $type->id }})">
+                                                    <div
+                                                         style="font-weight: 800; font-size: 1.1rem; color: #4e73df; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+                                                        {{ $employee->share_code }}
+                                                    </div>
 
-                                            <div
-                                                 style="
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 5px;
-                        background: #fff3cd;
-                        color: #856404;
-                        padding: 4px 10px;
-                        border-radius: 50px;
-                        font-size: 0.65rem;
-                        font-weight: 600;
-                        border: 1px solid #ffeeba;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    ">
-                                                <span
-                                                      style="
-                            height: 6px;
-                            width: 6px;
-                            background-color: #856404;
-                            border-radius: 50%;
-                            display: inline-block;
-                            animation: pulse 1.5s infinite;
-                        "></span>
-                                                Pending Verification
-                                            </div>
+                                                    <div
+                                                         style="display:inline-flex; align-items:center; gap:5px; background:#fff3cd; color:#856404; padding:4px 10px; border-radius:50px; font-size:.65rem; font-weight:600; border:1px solid #ffeeba;">
+                                                        <span
+                                                              style="height:6px; width:6px; background:#856404; border-radius:50%; display:inline-block; animation:pulse 1.5s infinite;"></span>
+                                                        Pending Verification
+                                                    </div>
+                                                </div>
+                                            @elseif ($shareStatus === 'verified')
+                                                {{-- show code + change --}}
+                                                <div class="text-center"
+                                                     style="cursor:pointer;"
+                                                     wire:click="openUploadModal({{ $type->id }})">
+                                                    <div
+                                                         style="font-weight: 800; font-size: 1.1rem; color: #4e73df; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+                                                        {{ $employee->share_code }}
+                                                    </div>
+
+                                                    <div
+                                                         style="display:inline-flex; align-items:center; gap:5px; background:#d1e7dd; color:#0f5132; padding:4px 10px; border-radius:50px; font-size:.65rem; font-weight:600; border:1px solid #badbcc;">
+                                                        <i class="fas fa-edit"></i>
+                                                        Change Share Code
+                                                    </div>
+                                                </div>
+                                            @elseif ($shareStatus === 'expired')
+                                                {{-- show code + re-upload --}}
+                                                <div class="text-center"
+                                                     style="cursor:pointer;"
+                                                     wire:click="openUploadModal({{ $type->id }})">
+                                                    <div
+                                                         style="font-weight: 800; font-size: 1.1rem; color: #dc3545; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+                                                        {{ $employee->share_code }}
+                                                    </div>
+
+                                                    <div
+                                                         style="display:inline-flex; align-items:center; gap:5px; background:#f8d7da; color:#842029; padding:4px 10px; border-radius:50px; font-size:.65rem; font-weight:600; border:1px solid #f5c2c7;">
+                                                        <i class="fas fa-redo"></i>
+                                                        Update New Share Code
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
-
-                                        <style>
-                                            @keyframes pulse {
-                                                0% {
-                                                    transform: scale(0.95);
-                                                    opacity: 0.7;
-                                                }
-
-                                                70% {
-                                                    transform: scale(1.2);
-                                                    opacity: 1;
-                                                }
-
-                                                100% {
-                                                    transform: scale(0.95);
-                                                    opacity: 0.7;
-                                                }
-                                            }
-                                        </style>
-                                    </div>
-                                @else
-                                    <button type="button"
-                                            wire:click="openUploadModal({{ $type->id }})"
-                                            style="
+                                    @else
+                                        <button type="button"
+                                                wire:click="openUploadModal({{ $type->id }})"
+                                                style="
                     width: 42px;
                     height: 42px;
                     border-radius: 12px;
@@ -329,12 +364,12 @@
                     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
                     cursor: pointer;
                 "
-                                            onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
-                                            onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
-                                        <i class="fas fa-plus"
-                                           style="font-size: 1.2rem;"></i>
+                                                onmouseover="this.style.background='#4e73df'; this.style.color='#fff'; this.style.borderStyle='solid'; this.style.transform='scale(1.1)';"
+                                                onmouseout="this.style.background='#f8f9fc'; this.style.color='#4e73df'; this.style.borderStyle='dashed'; this.style.transform='scale(1)';">
+                                            <i class="fas fa-plus"
+                                               style="font-size: 1.2rem;"></i>
 
-                                    </button>
+                                        </button>
                                 @endif
                             </div>
                         @endif

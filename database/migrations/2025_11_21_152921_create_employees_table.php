@@ -29,6 +29,8 @@ return new class extends Migration
 
             $table->string('nationality');
             $table->string('share_code')->nullable();
+            $table->enum('share_code_status', ['unavailable', 'pending', 'verified', 'expired'])
+                ->default('unavailable');
             $table->date('date_of_birth');
 
             $table->string('job_title')->nullable();

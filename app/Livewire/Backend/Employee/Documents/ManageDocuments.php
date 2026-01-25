@@ -18,7 +18,7 @@ class ManageDocuments extends BaseComponent
     public $search = '';
     public $sortOrder = 'desc';
     public $loaded;
-    public $documentTypes = [];
+    public $documentTypes;
 
     public $selectedType = null;
     public $filterType = null;
@@ -264,10 +264,13 @@ class ManageDocuments extends BaseComponent
             'share_code',
         ]);
 
+        $this->selectedType = null;
+
         $this->dispatch('closemodal');
         $this->toast('Document uploaded successfully!', 'success');
 
         $this->resetLoaded();
+
         $this->dispatch('clear-notification-route');
     }
 

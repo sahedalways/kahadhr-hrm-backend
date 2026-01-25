@@ -1544,9 +1544,12 @@
                                 <label class="form-label small fw-semibold text-secondary">Personal Mobile</label>
                                 <input type="text"
                                        class="form-control border-light-subtle shadow-none"
-                                       wire:model="mobile_phone"
-                                       placeholder="+44 ...">
-                                @error('mobile_phone')
+                                       wire:model="home_phone"
+                                       placeholder="+44 ..."
+                                       pattern="[0-9]+"
+                                       inputmode="numeric"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                @error('home_phone')
                                     <span class="text-danger x-small">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -1644,7 +1647,7 @@
 
                                         <div class="col-12 mb-2"
                                              x-data="addressAutocomplete()">
-                                            <label class="form-label small fw-semibold text-secondary">Search Full
+                                            <label class="form-label small fw-semibold text-secondary">
                                                 Address
                                                 <span class="text-danger">*</span></label>
                                             <div class="position-relative">
@@ -1800,7 +1803,7 @@
                                     </div>
 
 
-                                    <div class="row g-3">
+                                    <div class="row g-3 mt-1">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-secondary">House Number
                                                 <span class="text-danger">*</span></label>
@@ -1968,6 +1971,50 @@
                             </div>
 
                         </div>
+
+
+                        <hr>
+                        @if (!empty($customFields) && $customFields->count())
+                            @foreach ($customFields as $field)
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">
+                                        {{ $field->name }}
+                                        @if ($field->required)
+                                            <span class="text-danger">*</span>
+                                        @endif
+                                    </label>
+
+                                    @if ($field->type === 'text')
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="Enter {{ $field->name }}"
+                                               wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'number')
+                                        <input type="number"
+                                               class="form-control"
+                                               placeholder="Enter {{ $field->name }}"
+                                               wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'date')
+                                        <input type="date"
+                                               class="form-control"
+                                               placeholder="{{ $field->name }}"
+                                               wire:model.defer="customValues.{{ $field->id }}">
+                                    @elseif($field->type === 'textarea')
+                                        <textarea class="form-control"
+                                                  placeholder="Enter {{ $field->name }}"
+                                                  wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                    @elseif($field->type === 'select')
+                                        <select class="form-select"
+                                                wire:model.defer="customValues.{{ $field->id }}">
+                                            <option value="">{{ $field->name }}</option>
+                                            @foreach ($field->options ?? [] as $opt)
+                                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
 
                     <div class="modal-footer bg-light bg-opacity-50 border-0 py-3 px-4">

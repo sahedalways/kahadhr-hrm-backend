@@ -914,13 +914,6 @@ class EmployeeDetails extends BaseComponent
         $this->validate($rules, [], $attributes);
 
 
-        if ($this->avatar instanceof UploadedFile) {
-            $this->employee->avatar = uploadImage($this->avatar, 'image/employee/avatar', $this->employee->avatar);
-        }
-
-        if ($this->team_id) {
-            $team = Team::find($this->team_id);
-        }
 
 
         // Update employee

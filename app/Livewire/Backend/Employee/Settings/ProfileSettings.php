@@ -27,16 +27,16 @@ class ProfileSettings extends BaseComponent
     public $customValues = [];
     public $countrySearch = '';
 
-    public $f_name, $l_name, $employment_status, $avatar, $old_avatar;
+    public $f_name, $l_name, $employment_status, $avatar, $old_avatar, $title;
     public $job_title, $department_id, $team_id;
     public $contract_hours, $salary_type, $start_date, $end_date;
 
-    public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
+    public $date_of_birth, $house_no, $street, $city, $state, $postcode, $country,
         $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
-        $immigration_status, $brp_number, $brp_expiry_date,
+        $immigration_status,
         $right_to_work_expiry_date, $passport_number, $passport_expiry_date;
-
+    public $address;
     public $employee;
     public $departments = [];
     public $teams = [];
@@ -104,27 +104,24 @@ class ProfileSettings extends BaseComponent
 
 
 
-        $this->street_1                  = $this->employee->profile?->street_1;
-        $this->street_2                  = $this->employee->profile?->street_2;
+        $this->house_no                  = $this->employee->profile?->house_no;
+        $this->street                  = $this->employee->profile?->street;
         $this->city                       = $this->employee->profile?->city ?: null;
         $this->state                      = $this->employee->profile?->state ?: null;
         $this->postcode                   = $this->employee->profile?->postcode;
         $this->country                    = $this->employee->profile?->country ?: null;
         $this->home_phone                 = $this->employee->profile?->home_phone;
-        $this->mobile_phone               = $this->employee->profile?->mobile_phone;
+        $this->title                 = $this->employee->title;
         $this->personal_email             = $this->employee->profile?->personal_email;
         $this->gender                     = $this->employee->profile?->gender;
         $this->marital_status             = $this->employee->profile?->marital_status;
         $this->tax_reference_number       = $this->employee->profile?->tax_reference_number;
-        $this->immigration_status         = $this->employee->profile?->immigration_status ?: null;
-        $this->brp_number                 = $this->employee->profile?->brp_number;
-        $this->brp_expiry_date            = optional($this->employee->profile?->brp_expiry_date)->format('Y-m-d');
-        $this->right_to_work_expiry_date  = optional($this->employee->profile?->right_to_work_expiry_date)->format('Y-m-d');
+        $this->tax_reference_number       = $this->employee->profile?->tax_reference_number;
+        $this->address         = $this->employee->profile?->address ?: null;
+
         $this->passport_number            = $this->employee->profile?->passport_number;
         $this->passport_expiry_date       = optional($this->employee->profile?->passport_expiry_date)->format('Y-m-d');
 
-        $this->departments = Department::where('company_id', $this->employee->company_id)->pluck('name', 'id');
-        $this->teams       = Team::where('company_id', $this->employee->company_id)->pluck('name', 'id');
 
         $this->country = 'United Kingdom';
 
@@ -362,34 +359,31 @@ class ProfileSettings extends BaseComponent
     /* Save employee profile */
     public function save()
     {
+
         if ($this->nationality == '') {
             $this->nationality = 'British';
         }
         $rules = [
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
-            'avatar' => 'nullable|image|max:2048',
-
-            'street_1' => 'nullable|string|max:255',
-            'street_2' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
-            'postcode' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:255',
+            'title' => 'required|in:Mr,Mrs',
+            'address' => 'required|string|max:255',
+            'house_no' => 'required|string|max:255',
+            'street' => 'required|string|max:255',
+            'postcode' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'city' => 'required|string|max:100',
+            'nationality' => 'required|string',
+            'date_of_birth' => 'required|date',
             'home_phone' => 'nullable|string|max:20',
-            'mobile_phone' => 'nullable|string|max:20',
             'personal_email' => 'nullable|email|max:255',
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:single,married',
-            'tax_reference_number' => 'nullable|string|max:50',
+            'tax_reference_number' => 'required|string|max:100',
             'immigration_status' => 'nullable|string|max:255',
-            'brp_number' => 'nullable|string|max:50',
-            'brp_expiry_date' => 'nullable|date',
-            'right_to_work_expiry_date' => 'nullable|date',
-            'passport_number' => 'nullable|string|max:50',
-            'passport_expiry_date' => 'nullable|date',
-            'nationality' => 'required|string',
-            'date_of_birth' => 'required|date',
+            'passport_number' => 'required|string|max:100',
+            'passport_expiry_date' => 'required|date',
         ];
 
 
@@ -402,15 +396,6 @@ class ProfileSettings extends BaseComponent
         $validatedData = $this->validate($rules);
 
 
-        // Handle avatar upload
-        if ($this->avatar instanceof UploadedFile) {
-            $validatedData['avatar'] = uploadImage(
-                $this->avatar,
-                'image/employee/avatar',
-                $this->employee->avatar
-            );
-        }
-
 
 
         $this->employee->update([
@@ -419,7 +404,6 @@ class ProfileSettings extends BaseComponent
             'nationality'    => $validatedData['nationality'],
             'share_code'     => $validatedData['share_code'] ?? null,
             'date_of_birth'  => $validatedData['date_of_birth'] ?? null,
-            'avatar'         => $validatedData['avatar'] ?? $this->employee->avatar,
         ]);
 
 
@@ -427,8 +411,9 @@ class ProfileSettings extends BaseComponent
         $this->employee->profile()->updateOrCreate(
             ['emp_id' => $this->employee->id],
             [
-                'street_1' => $validatedData['street_1'],
-                'street_2' => $validatedData['street_2'],
+                'house_no' => $validatedData['house_no'],
+                'address' => $validatedData['address'],
+                'street' => $validatedData['street'],
                 'city' => $validatedData['city'],
                 'state' => $validatedData['state'],
                 'postcode' => $validatedData['postcode'],
@@ -440,11 +425,8 @@ class ProfileSettings extends BaseComponent
                 'marital_status' => $validatedData['marital_status'],
                 'tax_reference_number' => $validatedData['tax_reference_number'],
                 'immigration_status' => $validatedData['immigration_status'],
-                'brp_number' => $validatedData['brp_number'],
                 'passport_number' => $validatedData['passport_number'],
 
-                'brp_expiry_date' => $validatedData['brp_expiry_date'] ?: null,
-                'right_to_work_expiry_date' => $validatedData['right_to_work_expiry_date'] ?: null,
                 'passport_expiry_date' => $validatedData['passport_expiry_date'] ?: null,
             ]
         );

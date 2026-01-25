@@ -54,7 +54,7 @@ class EmployeeDetails extends BaseComponent
     public $f_name, $l_name, $start_date, $end_date, $email, $phone_no, $job_title, $avatar, $avatar_preview, $department_id, $team_id, $role, $contract_hours, $is_active, $salary_type = '';
 
 
-    public $date_of_birth, $street_1, $street_2, $city, $state, $postcode, $country,
+    public $date_of_birth, $house_no, $street, $city, $state, $postcode, $country,
         $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status, $brp_number, $brp_expiry_date,
@@ -627,8 +627,8 @@ class EmployeeDetails extends BaseComponent
 
         // Profile info fields (ADD YOURS HERE)
         $this->date_of_birth = '';
-        $this->street_1 = '';
-        $this->street_2 = '';
+        $this->house_no = '';
+        $this->street = '';
         $this->city = '';
         $this->state = '';
         $this->postcode = '';
@@ -641,9 +641,6 @@ class EmployeeDetails extends BaseComponent
         $this->marital_status = '';
         $this->tax_reference_number = '';
         $this->immigration_status = '';
-        $this->brp_number = '';
-        $this->brp_expiry_date = '';
-        $this->right_to_work_expiry_date = '';
         $this->passport_number = '';
         $this->passport_expiry_date = '';
 
@@ -678,7 +675,6 @@ class EmployeeDetails extends BaseComponent
         $this->employment_status = $this->employee->employment_status;
         $this->team_id = $this->employee->team_id;
         $this->role = $this->employee->role;
-        $this->salary_type = $this->employee->salary_type;
         $this->contract_hours = $this->employee->contract_hours;
         $this->is_active = $this->employee->is_active;
         $this->start_date = $this->employee->start_date;
@@ -690,8 +686,8 @@ class EmployeeDetails extends BaseComponent
         $profile = $this->employee->profile;
 
         if ($profile) {
-            $this->street_1 = $profile->street_1;
-            $this->street_2 = $profile->street_2;
+            $this->house_no = $profile->house_no;
+            $this->street = $profile->street;
             $this->city = $profile->city ?: null;
             $this->state = $profile->state ?: null;
             $this->postcode = $profile->postcode;
@@ -703,9 +699,6 @@ class EmployeeDetails extends BaseComponent
             $this->marital_status = $profile->marital_status;
             $this->tax_reference_number = $profile->tax_reference_number;
             $this->immigration_status = $profile->immigration_status ?: null;
-            $this->brp_number = $profile->brp_number;
-            $this->brp_expiry_date = $profile->brp_expiry_date;
-            $this->right_to_work_expiry_date = $profile->right_to_work_expiry_date;
             $this->passport_number = $profile->passport_number;
             $this->passport_expiry_date = $profile->passport_expiry_date;
         }
@@ -814,46 +807,30 @@ class EmployeeDetails extends BaseComponent
         $rules = [
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
-            'title' => 'nullable|in:Mr,Mrs',
-            'job_title' => 'nullable|string|max:255',
-            'team_id' => 'nullable|exists:teams,id',
-            'salary_type' => 'required|in:hourly,monthly',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'avatar' => 'nullable|image|max:2048',
-
-            'postcode' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'title' => 'required|in:Mr,Mrs',
+            'job_title' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'house_no' => 'required|string|max:255',
+            'street' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'postcode' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
-
-
             'home_phone' => 'nullable|string|max:20',
-
             'personal_email' => 'nullable|email|max:255',
-
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:single,married',
-
-            'tax_reference_number' => 'nullable|string|max:100',
-
+            'tax_reference_number' => 'required|string|max:100',
             'immigration_status' => 'nullable|string|max:255',
-
-            'brp_expiry_date' => 'nullable|date',
-
-            'right_to_work_expiry_date' => 'nullable|date',
-
-            'passport_number' => 'nullable|string|max:100',
-            'passport_expiry_date' => 'nullable|date',
+            'passport_number' => 'required|string|max:100',
+            'passport_expiry_date' => 'required|date',
             'employment_status' => 'required|in:part-time,full-time',
+            'contract_hours' => 'required|numeric|min:0',
         ];
 
-        // Contract hours only required if salary_type is hourly
-        if ($this->salary_type === 'hourly') {
-            $rules['contract_hours'] = 'required|numeric|min:0';
-        } else {
-            $this->contract_hours = null;
-        }
+
 
         if ($this->nationality !== 'British') {
             $rules['share_code'] = 'nullable|string|max:20';
@@ -869,39 +846,25 @@ class EmployeeDetails extends BaseComponent
             'l_name'                   => 'Last Name',
             'title'                    => 'Title',
             'job_title'                => 'Job Title',
-            'team_id'                  => 'Team',
-            'salary_type'              => 'Salary Type',
             'contract_hours'           => 'Contract Hours (Weekly)',
             'start_date'               => 'Employment Start Date',
-            'end_date'                 => 'Employment End Date',
-            'avatar'                   => 'Avatar',
-
-            'street_1'                 => 'Street 1',
-            'street_2'                 => 'Street 2',
+            'house_no'                 => 'Street 1',
+            'street'                 => 'Street 2',
             'city'                     => 'City',
             'state'                    => 'State',
+            'address'                    => 'Current Address',
             'postcode'                 => 'Postcode',
             'country'                  => 'Country',
             'nationality'              => 'Nationality',
             'date_of_birth'            => 'Date of Birth',
-
             'home_phone'               => 'Home Phone',
             'personal_email'           => 'Personal Email',
-
             'gender'                   => 'Gender',
             'marital_status'           => 'Marital Status',
-
             'tax_reference_number'     => 'Tax Reference Number',
-
             'immigration_status'       => 'Immigration Status / Visa Type',
-            'brp_number'               => 'BRP Number',
-            'brp_expiry_date'          => 'BRP Expiry Date',
-
-            'right_to_work_expiry_date' => 'Right to Work Expiry Date',
-
             'passport_number'          => 'Passport Number',
             'passport_expiry_date'     => 'Passport Expiry Date',
-
             'employment_status'        => 'Employment Status',
             'share_code'               => 'Share Code',
         ];
@@ -924,17 +887,15 @@ class EmployeeDetails extends BaseComponent
             'l_name' => $this->l_name,
             'job_title' => $this->job_title,
             'title' => $this->title,
+            'street' => $this->street,
+            'house_no' => $this->house_no,
             'nationality' => $this->nationality,
             'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
             'share_code' => $this->share_code ?? null,
             'contract_hours' => $this->contract_hours !== '' ? $this->contract_hours : null,
             'employment_status' =>  $this->employment_status ?? null,
-            'role' => 'employee',
-            'salary_type' => $this->salary_type,
             'is_active' => $this->is_active,
-            'end_date' => $this->end_date == '' ? null : $this->end_date,
             'start_date' => $this->start_date == '' ? null : $this->start_date,
-            'avatar' => $this->employee->avatar,
         ]);
 
 
@@ -944,8 +905,8 @@ class EmployeeDetails extends BaseComponent
             ['emp_id' => $this->employee->id],
             [
                 'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
-                'street_1' => $this->street_1,
-                'street_2' => $this->street_2,
+                'street' => $this->street,
+                'house_no' => $this->house_no,
                 'city' => $this->city,
                 'state' => $this->state,
                 'postcode' => $this->postcode,
@@ -958,9 +919,6 @@ class EmployeeDetails extends BaseComponent
                 'marital_status' => $this->marital_status,
                 'tax_reference_number' => $this->tax_reference_number,
                 'immigration_status' => $this->immigration_status,
-                'brp_number' => $this->brp_number,
-                'brp_expiry_date' => $this->brp_expiry_date == '' ? null : $this->brp_expiry_date,
-                'right_to_work_expiry_date' => $this->right_to_work_expiry_date == '' ? null : $this->right_to_work_expiry_date,
                 'passport_expiry_date' => $this->passport_expiry_date == '' ? null : $this->passport_expiry_date,
                 'passport_number' => $this->passport_number,
             ]

@@ -919,9 +919,9 @@
                                     <dl style="margin:0;">
                                         <dt style="color:#6c757d; margin-bottom:0.25rem;">Street</dt>
                                         <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->street_1) ? $profile->street_1 : 'N/A' }}<br>
+                                            {{ !empty($profile->house_no) ? $profile->house_no : 'N/A' }}<br>
                                             <span style="font-size:0.85rem; color:#868e96;">
-                                                {{ !empty($profile->street_2) ? $profile->street_2 : '' }}
+                                                {{ !empty($profile->street) ? $profile->street : '' }}
                                             </span>
                                         </dd>
 
@@ -1289,344 +1289,447 @@
          id="editProfile"
          tabindex="-1"
          data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title">Edit Employee</h6>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg"
+                 style="border-radius: 1.25rem; overflow: hidden;">
+
+                <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                    <div class="d-flex align-items-center">
+
+                        <div>
+                            <h5 class="modal-title fw-bold text-dark mb-0">Edit Employee Profile</h5>
+                            <small class="text-muted">Update personal and employment details</small>
+                        </div>
+                    </div>
                     <button type="button"
-                            class="btn btn-light rounded-pill"
+                            class="btn-close shadow-none"
                             data-bs-dismiss="modal"
-                            aria-label="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
+                            aria-label="Close"></button>
                 </div>
 
                 <form wire:submit.prevent="updateProfile">
-                    <div class="modal-body row g-2">
+                    <div class="modal-body px-4 pt-2 pb-4">
+                        <div class="row g-3">
 
-                        <h6 class="fw-bold">Profile Information</h6>
+                            <div class="col-12 mt-4 mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-uppercase small text-primary letter-spacing-1">Basic
+                                        Information</span>
+                                    <div class="flex-grow-1 ms-3 border-bottom border-light"></div>
+                                </div>
+                            </div>
 
-                        <!-- 1. Title -->
-                        <div class="col-md-6">
-                            <label class="form-label">Title <span class="text-danger">*</span></label>
-                            <select class="form-select"
-                                    wire:model="title">
-                                <option value=""
-                                        selected>Select Title</option>
-                                <option value="Mr">Mr</option>
-                                <option value="Mrs">Mrs</option>
-                            </select>
-                            @error('title')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 2. First Name -->
-                        <div class="col-md-6">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="f_name"
-                                   placeholder="Enter first name">
-                            @error('f_name')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 3. Last Name -->
-                        <div class="col-md-6">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="l_name"
-                                   placeholder="Enter last name">
-                            @error('l_name')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 4. Email -->
-                        <div class="col-md-6 d-flex align-items-end">
-                            <div class="flex-grow-1">
-                                <label class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email"
-                                       class="form-control"
-                                       wire:model="email"
-                                       readonly>
-                                @error('email')
-                                    <span class="text-danger">{{ $message }}</span>
+                            <!-- 1. Title -->
+                            <div class="col-md-2">
+                                <label class="form-label small fw-semibold text-secondary">Title <span
+                                          class="text-danger">*</span></label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="title">
+                                    <option value="">Select</option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Ms">Ms</option>
+                                </select>
+                                @error('title')
+                                    <span class="text-danger x-small">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="button"
-                                    class="btn btn-primary ms-2 mb-0"
-                                    wire:click="openModal('email')"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#verifyModal">
-                                Change
-                            </button>
-                        </div>
-
-                        <!-- 5. Personal Email -->
-                        <div class="col-md-6">
-                            <label class="form-label">Personal Email</label>
-                            <input type="email"
-                                   class="form-control"
-                                   wire:model="personal_email"
-                                   placeholder="Enter personal email">
-                            @error('personal_email')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 6. Mobile -->
-                        <div class="col-md-6 d-flex align-items-end">
-                            <div class="flex-grow-1">
-                                <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                            <!-- 2. First Name -->
+                            <div class="col-md-5">
+                                <label class="form-label small fw-semibold text-secondary">First Name <span
+                                          class="text-danger">*</span></label>
                                 <input type="text"
-                                       class="form-control"
-                                       wire:model="phone_no"
-                                       readonly>
-                                @error('phone_no')
-                                    <span class="text-danger">{{ $message }}</span>
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="f_name"
+                                       placeholder="Enter First Name">
+                                @error('f_name')
+                                    <span class="text-danger x-small">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="button"
-                                    class="btn btn-primary ms-2 mb-0"
-                                    wire:click="openModal('mobile')"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#verifyModal">
-                                Change
-                            </button>
+                            <!-- 3. Last Name -->
+                            <div class="col-md-5">
+                                <label class="form-label small fw-semibold text-secondary">Last Name <span
+                                          class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="l_name"
+                                       placeholder="Enter Last Name">
+                                @error('l_name')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mt-4 mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-uppercase small text-primary letter-spacing-1">Contact
+                                        Details</span>
+                                    <div class="flex-grow-1 ms-3 border-bottom border-light"></div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Email -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Email <span
+                                          class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-light-subtle"><i
+                                           class="fas fa-envelope text-muted"></i></span>
+                                    <input type="email"
+                                           class="form-control border-light-subtle bg-light shadow-none"
+                                           wire:model="email"
+                                           readonly>
+                                    <button class="btn btn-outline-primary"
+                                            type="button"
+                                            wire:click="openModal('email')"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#verifyModal">Change</button>
+                                </div>
+                            </div>
+
+                            <!-- 5. Personal Email -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Personal Email</label>
+                                <input type="email"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="personal_email"
+                                       placeholder="personal@example.com">
+                            </div>
+
+                            <!-- 6. Mobile -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Mobile <span
+                                          class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-light-subtle"><i
+                                           class="fas fa-phone-alt text-muted"></i></span>
+                                    <input type="text"
+                                           class="form-control border-light-subtle bg-light shadow-none"
+                                           wire:model="phone_no"
+                                           readonly>
+                                    <button class="btn btn-outline-primary"
+                                            type="button"
+                                            wire:click="openModal('mobile')"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#verifyModal">Change</button>
+                                </div>
+                            </div>
+
+                            <!-- 7. Personal Mobile -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Personal Mobile</label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="mobile_phone"
+                                       placeholder="+44 ...">
+                                @error('mobile_phone')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mt-4 mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-uppercase small text-primary letter-spacing-1">Employment
+                                        Details</span>
+                                    <div class="flex-grow-1 ms-3 border-bottom border-light"></div>
+                                </div>
+
+
+                            </div>
+
+                            <!-- 8. Job Title -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Job Title <span
+                                          class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="job_title"
+                                       placeholder="Enter Job Title">
+
+                                @error('job_title')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+
+
+                            <!-- 11. Contract Hours -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Contract Hours (Weekly)
+                                    <span class="text-danger">*</span></label>
+                                <input type="number"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="contract_hours"
+                                       placeholder="e.g. 40">
+
+                                @error('contract_hours')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 12. Employment Start Date -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Employment Start Date <span
+                                          class="text-danger">*</span></label>
+                                <input type="date"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="start_date">
+
+                                @error('start_date')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 13. Employment Status -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Employment Status <span
+                                          class="text-danger">*</span></label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="employment_status">
+                                    <option value="">Select</option>
+                                    <option value="full-time">Full time</option>
+                                    <option value="part-time">Part time</option>
+                                </select>
+                                @error('employment_status')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 mt-4 mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="fw-bold text-uppercase small text-primary letter-spacing-1">Residency
+                                        &
+                                        Demographics</span>
+                                    <div class="flex-grow-1 ms-3 border-bottom border-light"></div>
+                                </div>
+                            </div>
+
+                            <!-- 14. Current Address -->
+                            <div class="col-md-6"
+                                 x-data="addressAutocomplete()">
+                                <label class="form-label small fw-semibold text-secondary">
+                                    Current Address <span class="text-danger">*</span>
+                                </label>
+
+                                <div class="position-relative">
+                                    <input type="text"
+                                           class="form-control border-light-subtle shadow-none"
+                                           wire:model.lazy="address"
+                                           {{-- Livewire model --}}
+                                           x-model="query"
+                                           {{-- Alpine model --}}
+                                           @input.debounce.500ms="fetchSuggestions"
+                                           @click.away="showSuggestions = false"
+                                           placeholder="Enter Current Address"
+                                           autocomplete="off">
+
+                                    <div x-show="showSuggestions && suggestions.length > 0"
+                                         class="list-group position-absolute w-100 shadow-lg"
+                                         style="z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 2px;">
+
+                                        <template x-for="(item, index) in suggestions"
+                                                  :key="index">
+                                            <button type="button"
+                                                    class="list-group-item list-group-item-action border-1 small"
+                                                    @click="selectSuggestion(item)">
+                                                <i class="fas fa-map-marker-alt text-secondary me-2"></i>
+                                                <span x-text="item.display_name"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+
+                                    <div x-show="loading"
+                                         class="position-absolute end-0 top-50 translate-middle-y me-3">
+                                        <div class="spinner-border spinner-border-sm text-primary"
+                                             role="status"></div>
+                                    </div>
+                                </div>
+
+                                @error('address')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">House Number <span
+                                          class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="house_no"
+                                       placeholder="Enter House Number">
+
+                                @error('house_no')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Street <span
+                                          class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="street"
+                                       placeholder="Enter House Number">
+
+                                @error('street')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+
+                            <!-- 16. Date of Birth -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Date of Birth <span
+                                          class="text-danger">*</span></label>
+                                <input type="date"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="date_of_birth">
+
+
+                                @error('date_of_birth')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 17. Nationality -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Nationality <span
+                                          class="text-danger">*</span></label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="nationality">
+                                    <option value="">Select</option>
+                                    @foreach ($nationalities as $nation)
+                                        <option value="{{ $nation }}">{{ $nation }}</option>
+                                    @endforeach
+                                </select>
+
+                                @error('nationality')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+
+
+                            @if ($nationality && $nationality !== 'British')
+                                <div class="col-md-6 ">
+                                    <label class="form-label">
+                                        Share Code
+                                    </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           wire:model.live="share_code"
+                                           placeholder="Example: WLE JFZ 6FT">
+
+                                    @error('share_code')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endif
+
+
+                            <!-- 18. Immigration Status / Visa Type -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Immigration Status / Visa
+                                    Type</label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="immigration_status">
+                                    <option value="">Select</option>
+                                    @foreach ($immigrationOptions as $opt)
+                                        <option value="{{ $opt }}">{{ $opt }}</option>
+                                    @endforeach
+                                </select>
+
+
+                                @error('immigration_status')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 20. National Insurance / Tax Reference -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">National Insurance / Tax
+                                    Reference <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="tax_reference_number"
+                                       placeholder="Enter NI / Tax Reference">
+
+                                @error('tax_reference_number')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 21. Passport Number -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Passport Number <span
+                                          class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="passport_number"
+                                       placeholder="Enter Passport Number">
+
+                                @error('passport_number')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 22. Passport Expiry -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Passport Expiry <span
+                                          class="text-danger">*</span></label>
+                                <input type="date"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="passport_expiry_date">
+
+                                @error('passport_expiry_date')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 23. Gender -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Gender</label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="gender">
+                                    <option value="">Select</option>
+                                    @foreach ($genderOptions as $g)
+                                        <option value="{{ $g }}">{{ ucfirst($g) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- 24. Marital Status -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Marital Status</label>
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model="marital_status">
+                                    <option value="">Select</option>
+                                    @foreach ($maritalOptions as $m)
+                                        <option value="{{ $m }}">{{ ucfirst($m) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                         </div>
-
-                        <!-- 7. Personal Mobile -->
-                        <div class="col-md-6">
-                            <label class="form-label">Personal Mobile</label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="mobile_phone"
-                                   placeholder="Enter personal mobile">
-                            @error('mobile_phone')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 8. Job Title -->
-                        <div class="col-md-6">
-                            <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="job_title"
-                                   placeholder="Enter job title">
-                            @error('job_title')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-
-
-
-
-                        <!-- 11. Contract Hours -->
-                        <div class="col-md-6">
-                            <label class="form-label">Contract Hours (Weekly) <span
-                                      class="text-danger">*</span></label>
-                            <input type="number"
-                                   class="form-control"
-                                   wire:model="contract_hours"
-                                   placeholder="Enter contract hours">
-                            @error('contract_hours')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 12. Employment Start Date -->
-                        <div class="col-md-6">
-                            <label class="form-label">Employment Start Date <span class="text-danger">*</span></label>
-                            <input type="date"
-                                   class="form-control"
-                                   wire:model="start_date">
-                            @error('start_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 13. Employment Status -->
-                        <div class="col-md-6">
-                            <label class="form-label">
-                                Employment Status <span class="text-danger">*</span>
-                            </label>
-
-                            <select class="form-select"
-                                    wire:model.live="employment_status">
-                                <option value="full-time">Full-time</option>
-                                <option value="part-time">Part-time</option>
-                            </select>
-
-                            @error('employment_status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 14. Current Address -->
-                        <div class="col-md-6">
-                            <label class="form-label">Current Address <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="street_1"
-                                   placeholder="Enter current address">
-                            @error('street_1')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 15. Previous Address -->
-                        <div class="col-md-6">
-                            <label class="form-label">Previous Address</label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="street_2"
-                                   placeholder="Enter previous address">
-                            @error('street_2')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 16. Date of Birth -->
-                        <div class="col-md-6">
-                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                            <input type="date"
-                                   class="form-control"
-                                   wire:model="date_of_birth">
-                            @error('date_of_birth')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 17. Nationality -->
-                        <div class="col-md-6">
-                            <label class="form-label">Nationality <span class="text-danger">*</span></label>
-                            <select class="form-select"
-                                    wire:model="nationality">
-                                @foreach ($nationalities as $nation)
-                                    <option value="{{ $nation }}">{{ $nation }}</option>
-                                @endforeach
-                            </select>
-                            @error('nationality')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 18. Immigration Status / Visa -->
-                        <div class="col-md-6">
-                            <label class="form-label">Immigration Status / Visa Type</label>
-                            <select class="form-select"
-                                    wire:model="immigration_status">
-                                <option value="">Select</option>
-                                @foreach ($immigrationOptions as $opt)
-                                    <option value="{{ $opt }}">{{ $opt }}</option>
-                                @endforeach
-                            </select>
-                            @error('immigration_status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 19. Right to Work Expiry -->
-                        <div class="col-md-6">
-                            <label class="form-label">Right to Work Expiry <span class="text-danger">*</span></label>
-                            <input type="date"
-                                   class="form-control"
-                                   wire:model="right_to_work_expiry_date">
-                            @error('right_to_work_expiry_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 20. Tax Reference -->
-                        <div class="col-md-6">
-                            <label class="form-label">National Insurance / Tax Reference <span
-                                      class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="tax_reference_number"
-                                   placeholder="Enter tax reference no.">
-                            @error('tax_reference_number')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 21. Passport Number -->
-                        <div class="col-md-6">
-                            <label class="form-label">Passport Number <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   wire:model="passport_number"
-                                   placeholder="Enter passport no.">
-                            @error('passport_number')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 22. Passport Expiry -->
-                        <div class="col-md-6">
-                            <label class="form-label">Passport Expiry <span class="text-danger">*</span></label>
-                            <input type="date"
-                                   class="form-control"
-                                   wire:model="passport_expiry_date">
-                            @error('passport_expiry_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 23. Gender -->
-                        <div class="col-md-6">
-                            <label class="form-label">Gender</label>
-                            <select class="form-select"
-                                    wire:model="gender">
-                                <option value="">Select Gender</option>
-                                @foreach ($genderOptions as $g)
-                                    <option value="{{ $g }}">{{ ucfirst($g) }}</option>
-                                @endforeach
-                            </select>
-                            @error('gender')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- 24. Marital Status -->
-                        <div class="col-md-6">
-                            <label class="form-label">Marital Status</label>
-                            <select class="form-select"
-                                    wire:model="marital_status">
-                                <option value="">Select Status</option>
-                                @foreach ($maritalOptions as $m)
-                                    <option value="{{ $m }}">{{ ucfirst($m) }}</option>
-                                @endforeach
-                            </select>
-                            @error('marital_status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                     </div>
 
-                    <div class="modal-footer">
+                    <div class="modal-footer bg-light bg-opacity-50 border-0 py-3 px-4">
                         <button type="button"
-                                class="btn btn-secondary"
+                                class="btn btn-link text-secondary text-decoration-none fw-semibold"
                                 data-bs-dismiss="modal">Cancel</button>
                         <button type="submit"
-                                class="btn btn-success"
-                                wire:loading.attr="disabled"
-                                wire:target="updateProfile">
+                                class="btn btn-primary px-4 fw-bold text-white shadow-sm"
+                                style="border-radius: 8px;"
+                                wire:loading.attr="disabled">
                             <span wire:loading
                                   wire:target="updateProfile">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Saving...
                             </span>
                             <span wire:loading.remove
-                                  wire:target="updateProfile">Save</span>
+                                  wire:target="updateProfile">
+                                Update Profile
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -2071,4 +2174,48 @@
     window.addEventListener('hide-emergency-modal', () => {
         bootstrap.Modal.getInstance(document.getElementById('addEmergencyContact')).hide();
     });
+
+
+
+
+    function addressAutocomplete() {
+        return {
+            query: '',
+            suggestions: [],
+            showSuggestions: false,
+            loading: false,
+
+            async fetchSuggestions() {
+                if (this.query.length < 3) {
+                    this.suggestions = [];
+                    this.showSuggestions = false;
+                    return;
+                }
+
+                this.loading = true;
+                try {
+                    // Nominatim API call for search
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.query)}&addressdetails=1&limit=5`
+                    );
+                    const data = await response.json();
+
+                    this.suggestions = data;
+                    this.showSuggestions = true;
+                } catch (error) {
+                    console.error("Error fetching addresses:", error);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            selectSuggestion(item) {
+                this.query = item.display_name;
+                this.showSuggestions = false;
+
+                // Livewire-কে ভ্যালু আপডেট করার জন্য জানানো
+                @this.set('address', item.display_name);
+            }
+        }
+    }
 </script>

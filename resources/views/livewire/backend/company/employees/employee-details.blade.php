@@ -100,136 +100,138 @@
                              style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
 
                             <!-- Title -->
-                            <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
                                 <i class="fas fa-user-circle me-3 text-info"></i>
                                 Employee Overview
-                            </h4>
+                                </h4>
 
-                            <!-- Menu Button -->
-                            <div class="dropdown"
-                                 wire:ignore.self>
-                                <button class="btn btn-sm btn-light border-0 px-md-3 px-2"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                        wire:loading.attr="disabled"
-                                        wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                <!-- Menu Button -->
+                                <div class="dropdown"
+                                     wire:ignore.self>
+                                    <button class="btn btn-sm btn-light border-0 px-md-3 px-2"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            wire:loading.attr="disabled"
+                                            wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
 
-                                    <!-- Normal Icon -->
-                                    <span wire:loading.remove
-                                          wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
-                                        <i class="fas fa-ellipsis-v text-muted"></i>
-                                    </span>
+                                        <!-- Normal Icon -->
+                                        <span wire:loading.remove
+                                              wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                            <i class="fas fa-ellipsis-v text-muted"></i>
+                                        </span>
 
-                                    <!-- Loading Icon -->
-                                    <span wire:loading
-                                          wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
-                                        <span class="spinner-border spinner-border-sm text-muted"></span>
-                                    </span>
+                                        <!-- Loading Icon -->
+                                        <span wire:loading
+                                              wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                            <span class="spinner-border spinner-border-sm text-muted"></span>
+                                        </span>
 
-                                </button>
+                                    </button>
 
 
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li>
-                                        <a class="dropdown-item"
-                                           href="#"
-                                           data-bs-toggle="modal"
-                                           data-bs-target="#editProfile"
-                                           wire:click="editProfile({{ $employee->id }})">
-                                            <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
-                                        </a>
-                                    </li>
-                                    @if (!$employee->verified && !$employee->user)
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                         <li>
                                             <a class="dropdown-item"
                                                href="#"
-                                               wire:click.prevent="sendVerificationLink({{ $employee->id }})"
-                                               wire:loading.attr="disabled"
-                                               wire:target="sendVerificationLink({{ $employee->id }})">
-
-                                                <i class="fas fa-envelope me-2 text-muted"></i>
-
-                                                <span wire:loading.remove
-                                                      wire:target="sendVerificationLink({{ $employee->id }})">
-                                                    Send Verification Link
-                                                </span>
-
-
-
-                                                <span wire:loading
-                                                      wire:target="sendVerificationLink({{ $employee->id }})">
-                                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                                    Sending...
-                                                </span>
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editProfile"
+                                               wire:click="editProfile({{ $employee->id }})">
+                                                <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
                                             </a>
                                         </li>
-                                    @endif
+                                        @if (!$employee->verified && !$employee->user)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="#"
+                                                   wire:click.prevent="sendVerificationLink({{ $employee->id }})"
+                                                   wire:loading.attr="disabled"
+                                                   wire:target="sendVerificationLink({{ $employee->id }})">
+
+                                                    <i class="fas fa-envelope me-2 text-muted"></i>
+
+                                                    <span wire:loading.remove
+                                                          wire:target="sendVerificationLink({{ $employee->id }})">
+                                                        Send Verification Link
+                                                    </span>
 
 
-                                    @if ($employee->user)
+
+                                                    <span wire:loading
+                                                          wire:target="sendVerificationLink({{ $employee->id }})">
+                                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                                        Sending...
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        @endif
+
+
+                                        @if ($employee->user)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   href="#"
+                                                   wire:click.prevent="sendPasswordResetLink({{ $employee->id }})"
+                                                   wire:loading.attr="disabled"
+                                                   wire:target="sendPasswordResetLink({{ $employee->id }})">
+
+                                                    <i class="fas fa-user-lock me-2 text-muted"></i>
+
+                                                    <span wire:loading.remove
+                                                          wire:target="sendPasswordResetLink({{ $employee->id }})">
+                                                        Password Reset Link
+                                                    </span>
+
+                                                    <span wire:loading
+                                                          wire:target="sendPasswordResetLink({{ $employee->id }})">
+                                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                                        Sending...
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        @endif
+
                                         <li>
                                             <a class="dropdown-item"
                                                href="#"
-                                               wire:click.prevent="sendPasswordResetLink({{ $employee->id }})"
+                                               wire:click.prevent="toggleStatus({{ $employee->id }})"
                                                wire:loading.attr="disabled"
-                                               wire:target="sendPasswordResetLink({{ $employee->id }})">
-
-                                                <i class="fas fa-user-lock me-2 text-muted"></i>
+                                               wire:target="toggleStatus">
 
                                                 <span wire:loading.remove
-                                                      wire:target="sendPasswordResetLink({{ $employee->id }})">
-                                                    Password Reset Link
+                                                      wire:target="toggleStatus">
+                                                    @if ($employee->is_active == 1)
+                                                        <i class="fas fa-user-minus me-2 text-muted"></i> Change to
+                                                        Former
+                                                    @else
+                                                        <i class="fas fa-user-check me-2 text-muted"></i> Change to
+                                                        Active
+                                                    @endif
                                                 </span>
 
                                                 <span wire:loading
-                                                      wire:target="sendPasswordResetLink({{ $employee->id }})">
+                                                      wire:target="toggleStatus">
                                                     <span class="spinner-border spinner-border-sm me-2"></span>
-                                                    Sending...
+                                                    Updating...
                                                 </span>
                                             </a>
                                         </li>
-                                    @endif
-
-                                    <li>
-                                        <a class="dropdown-item"
-                                           href="#"
-                                           wire:click.prevent="toggleStatus({{ $employee->id }})"
-                                           wire:loading.attr="disabled"
-                                           wire:target="toggleStatus">
-
-                                            <span wire:loading.remove
-                                                  wire:target="toggleStatus">
-                                                @if ($employee->is_active == 1)
-                                                    <i class="fas fa-user-minus me-2 text-muted"></i> Change to Former
-                                                @else
-                                                    <i class="fas fa-user-check me-2 text-muted"></i> Change to Active
-                                                @endif
-                                            </span>
-
-                                            <span wire:loading
-                                                  wire:target="toggleStatus">
-                                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                                Updating...
-                                            </span>
-                                        </a>
-                                    </li>
 
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
 
-                                    <li>
-                                        <a class="dropdown-item text-danger"
-                                           href="#"
-                                           wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
-                                            <i class="fas fa-trash me-2"></i> Remove Employee
-                                        </a>
-                                    </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger"
+                                               href="#"
+                                               wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
+                                                <i class="fas fa-trash me-2"></i> Remove Employee
+                                            </a>
+                                        </li>
 
-                                </ul>
-                            </div>
+                                    </ul>
+                                </div>
 
                         </div>
 
@@ -270,118 +272,118 @@
                                             </span>
                                         </div>
 
-                                        <h5 class="mb-1 fw-bold">{{ $employee->full_name }}</h5>
+                                        <h6 class="mb-1 fw-bold">{{ $employee->full_name }}</h5>
 
-                                        <!-- Verified / Unverified Badge -->
-                                        @if ($employee->user)
-                                            @if ($employee->user->email_verified_at)
-                                                <span class="badge bg-success mb-2">Verified</span>
-                                            @else
-                                                <span class="badge bg-warning text-dark mb-2">Unverified</span>
+                                            <!-- Verified / Unverified Badge -->
+                                            @if ($employee->user)
+                                                @if ($employee->user->email_verified_at && $this->isProfileComplete())
+                                                    <span class="badge bg-success mb-2">Verified</span>
+                                                @else
+                                                    <span class="badge bg-light text-dark mb-2">Not Verified</span>
+                                                @endif
+
                                             @endif
-                                        @else
-                                            <span class="badge bg-secondary mb-2">Link Sent</span>
-                                        @endif
 
 
 
 
-                                        @php
-                                            $shareCodeType = $documentTypes->firstWhere('name', 'Share Code');
 
-                                            $latestShareDoc = null;
-                                            $statusLabel = null;
-                                            $statusColor = null;
+                                            @php
+                                                $shareCodeType = $documentTypes->firstWhere('name', 'Share Code');
 
-                                            if ($shareCodeType) {
-                                                $latestShareDoc = $employee
-                                                    ->documents()
-                                                    ->where('doc_type_id', $shareCodeType->id)
-                                                    ->latest('created_at')
-                                                    ->first();
+                                                $latestShareDoc = null;
+                                                $statusLabel = null;
+                                                $statusColor = null;
 
-                                                if ($latestShareDoc && $latestShareDoc->expires_at) {
-                                                    $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
-                                                    $daysLeft = now()->diffInDays($expiresAt, false);
+                                                if ($shareCodeType) {
+                                                    $latestShareDoc = $employee
+                                                        ->documents()
+                                                        ->where('doc_type_id', $shareCodeType->id)
+                                                        ->latest('created_at')
+                                                        ->first();
 
-                                                    if ($daysLeft < 0) {
-                                                        $statusLabel = 'Expired';
-                                                        $statusColor = '#dc3545';
-                                                    } elseif ($daysLeft <= 60) {
-                                                        $statusLabel = 'Expires Soon';
-                                                        $statusColor = '#fd7e14';
-                                                    } else {
-                                                        $statusLabel = 'Valid';
-                                                        $statusColor = '#198754';
+                                                    if ($latestShareDoc && $latestShareDoc->expires_at) {
+                                                        $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+                                                        $daysLeft = now()->diffInDays($expiresAt, false);
+
+                                                        if ($daysLeft < 0) {
+                                                            $statusLabel = 'Expired';
+                                                            $statusColor = '#dc3545';
+                                                        } elseif ($daysLeft <= 60) {
+                                                            $statusLabel = 'Expires Soon';
+                                                            $statusColor = '#fd7e14';
+                                                        } else {
+                                                            $statusLabel = 'Valid';
+                                                            $statusColor = '#198754';
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        @endphp
+                                            @endphp
 
-                                        <style>
-                                            @keyframes blinkRed {
-                                                0% {
-                                                    color: #dc3545;
+                                            <style>
+                                                @keyframes blinkRed {
+                                                    0% {
+                                                        color: #dc3545;
+                                                    }
+
+                                                    50% {
+                                                        color: transparent;
+                                                    }
+
+                                                    100% {
+                                                        color: #dc3545;
+                                                    }
                                                 }
 
-                                                50% {
-                                                    color: transparent;
+                                                .blink-red {
+                                                    animation: blinkRed 1s infinite;
                                                 }
-
-                                                100% {
-                                                    color: #dc3545;
-                                                }
-                                            }
-
-                                            .blink-red {
-                                                animation: blinkRed 1s infinite;
-                                            }
-                                        </style>
+                                            </style>
 
 
 
-                                        @if ($employee->nationality === 'British')
-                                            <td>
-                                                <div class="text-center mt-3">
-                                                    <span
-                                                          style="color: #6c757d; font-size: 13px; display: block;">Right
-                                                        to Work Expiry</span>
-                                                    <span class="badge mt-1"
-                                                          style="background:#f8f9fa; color:#6c757d; font-weight:600; border: 1px solid #dee2e6;">
-                                                        Not Required (British)
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        @else
-                                            @if ($latestShareDoc && $latestShareDoc->expires_at)
-                                                <td>
-                                                    <div class="text-center mt-3">
-                                                        <span
-                                                              style="color: #6c757d; font-size: 14px; display: block; margin-bottom: 2px;">
-                                                            Right to Work Expiry
-                                                        </span>
-
-                                                        <strong class="{{ $daysLeft !== null && $daysLeft <= 60 ? 'blink-red' : '' }}"
-                                                                style="color: {{ $daysLeft !== null && $daysLeft <= 60 ? '#dc3545' : '#198754' }};
-                       font-size: 17px; display: block;">
-                                                            {{ \Carbon\Carbon::parse($latestShareDoc->expires_at)->format('d F Y') }}
-                                                        </strong>
-                                                    </div>
-                                                </td>
-                                            @else
+                                            @if ($employee->nationality === 'British')
                                                 <td>
                                                     <div class="text-center mt-3">
                                                         <span
                                                               style="color: #6c757d; font-size: 13px; display: block;">Right
                                                             to Work Expiry</span>
-                                                        <span class="badge bg-light text-muted mt-1"
-                                                              style="border: 1px dashed #ced4da;">
-                                                            Not Verified
+                                                        <span class="badge mt-1"
+                                                              style="background:#f8f9fa; color:#6c757d; font-weight:600; border: 1px solid #dee2e6;">
+                                                            Not Required (British)
                                                         </span>
                                                     </div>
                                                 </td>
+                                            @else
+                                                @if ($latestShareDoc && $latestShareDoc->expires_at)
+                                                    <td>
+                                                        <div class="text-center mt-3">
+                                                            <span
+                                                                  style="color: #6c757d; font-size: 14px; display: block; margin-bottom: 2px;">
+                                                                Right to Work Expiry
+                                                            </span>
+
+                                                            <strong class="{{ $daysLeft !== null && $daysLeft <= 60 ? 'blink-red' : '' }}"
+                                                                    style="color: {{ $daysLeft !== null && $daysLeft <= 60 ? '#dc3545' : '#198754' }};
+                       font-size: 17px; display: block;">
+                                                                {{ \Carbon\Carbon::parse($latestShareDoc->expires_at)->format('d F Y') }}
+                                                            </strong>
+                                                        </div>
+                                                    </td>
+                                                @else
+                                                    <td>
+                                                        <div class="text-center mt-3">
+                                                            <span
+                                                                  style="color: #6c757d; font-size: 13px; display: block;">Right
+                                                                to Work Expiry</span>
+                                                            <span class="badge bg-light text-muted mt-1"
+                                                                  style="border: 1px dashed #ced4da;">
+                                                                Not Verified
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                @endif
                                             @endif
-                                        @endif
 
 
                                     </div>
@@ -531,86 +533,86 @@
                     <div class="card border-0 shadow-sm"
                          style="border-radius:1rem; background-color: #f8f9fa;">
                         <div class="card-body p-4">
-                            <h4 class="mb-4 fw-bold text-dark">Emergency contacts</h4>
+                            <h5 class="mb-4 fw-bold text-dark">Emergency contacts</h4>
 
-                            @if ($employee->emergencyContacts->count() < 2)
-                                <button class="btn mb-4 d-flex align-items-center px-3 py-2"
-                                        style="background-color: #2f6dca; color: white; border-radius: 8px; font-weight: 500;"
-                                        wire:click="openEmergencyContactModal">
+                                @if ($employee->emergencyContacts->count() < 2)
+                                    <button class="btn mb-4 d-flex align-items-center px-3 py-2"
+                                            style="background-color: #2f6dca; color: white; border-radius: 8px; font-weight: 500;"
+                                            wire:click="openEmergencyContactModal">
 
-                                    <i class="fas fa-user-plus me-2"></i> Add emergency contact
-                                </button>
-                            @else
-                                <div class="alert alert-warning mb-4">
-                                    <strong>Limit Reached:</strong> You can only add <strong>2 emergency
-                                        contacts</strong>.
+                                        <i class="fas fa-user-plus me-2"></i> Add emergency contact
+                                    </button>
+                                @else
+                                    <div class="alert alert-warning mb-4">
+                                        <strong>Limit Reached:</strong> You can only add <strong>2 emergency
+                                            contacts</strong>.
+                                    </div>
+                                @endif
+
+
+                                <div class="table-responsive bg-white shadow-sm border"
+                                     style="border-radius: 12px;">
+                                    <table class="table mb-0 align-middle">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="border-0 ps-4 py-3 text-muted fw-bold"
+                                                    style="font-size: 14px;">Name</th>
+                                                <th class="border-0 py-3 text-muted fw-bold"
+                                                    style="font-size: 14px;">Relationship</th>
+                                                <th class="border-0 py-3 text-muted fw-bold"
+                                                    style="font-size: 14px;">Mobile</th>
+                                                <th class="border-0 py-3 text-muted fw-bold"
+                                                    style="font-size: 14px;">E-mail</th>
+                                                <th class="border-0 py-3 text-muted fw-bold"
+                                                    style="font-size: 14px;">Address</th>
+                                                <th class="border-0 py-3 text-muted fw-bold text-center"
+                                                    style="font-size: 14px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($employee->emergencyContacts as $contact)
+                                                <tr>
+                                                    <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
+                                                    <td class="text-muted">{{ $contact->relationship }}</td>
+                                                    <td class="text-muted">
+                                                        {{ $contact->mobile }}<br>
+
+                                                    </td>
+                                                    <td class="text-muted">{{ $contact->email ?? '' }}</td>
+                                                    <td class="text-muted"
+                                                        style="max-width: 200px;">
+                                                        {!! nl2br(e($contact->address)) !!}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex justify-content-center gap-3">
+                                                            <a href="#"
+                                                               class="text-dark"
+                                                               wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                            </a>
+
+                                                            <a href="#"
+                                                               class="text-danger"
+                                                               onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                               wire:click="deleteEmergencyContact({{ $contact->id }})">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+
+                                            @if ($employee->emergencyContacts->isEmpty())
+                                                <tr>
+                                                    <td colspan="6"
+                                                        class="text-center py-5 text-muted">
+                                                        No emergency contacts found.
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
                                 </div>
-                            @endif
-
-
-                            <div class="table-responsive bg-white shadow-sm border"
-                                 style="border-radius: 12px;">
-                                <table class="table mb-0 align-middle">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th class="border-0 ps-4 py-3 text-muted fw-bold"
-                                                style="font-size: 14px;">Name</th>
-                                            <th class="border-0 py-3 text-muted fw-bold"
-                                                style="font-size: 14px;">Relationship</th>
-                                            <th class="border-0 py-3 text-muted fw-bold"
-                                                style="font-size: 14px;">Mobile</th>
-                                            <th class="border-0 py-3 text-muted fw-bold"
-                                                style="font-size: 14px;">E-mail</th>
-                                            <th class="border-0 py-3 text-muted fw-bold"
-                                                style="font-size: 14px;">Address</th>
-                                            <th class="border-0 py-3 text-muted fw-bold text-center"
-                                                style="font-size: 14px;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($employee->emergencyContacts as $contact)
-                                            <tr>
-                                                <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
-                                                <td class="text-muted">{{ $contact->relationship }}</td>
-                                                <td class="text-muted">
-                                                    {{ $contact->mobile }}<br>
-
-                                                </td>
-                                                <td class="text-muted">{{ $contact->email ?? '' }}</td>
-                                                <td class="text-muted"
-                                                    style="max-width: 200px;">
-                                                    {!! nl2br(e($contact->address)) !!}
-                                                </td>
-                                                <td class="text-center">
-                                                    <div class="d-flex justify-content-center gap-3">
-                                                        <a href="#"
-                                                           class="text-dark"
-                                                           wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </a>
-
-                                                        <a href="#"
-                                                           class="text-danger"
-                                                           onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
-                                                           wire:click="deleteEmergencyContact({{ $contact->id }})">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-                                        @if ($employee->emergencyContacts->isEmpty())
-                                            <tr>
-                                                <td colspan="6"
-                                                    class="text-center py-5 text-muted">
-                                                    No emergency contacts found.
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -626,10 +628,10 @@
                          style="border-radius: 1rem;">
                         <div class="card-header bg-white py-4 border-bottom-0"
                              style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                            <h4 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
                                 <i class="fas fa-folder me-3 text-info"></i>
                                 Employee Documents
-                            </h4>
+                                </h4>
                         </div>
 
                         <div class="card-body p-4">
@@ -833,227 +835,348 @@
 
 
 
-                <!-- Personal Info -->
                 <div class="tab-pane fade {{ $activeTab === 'personalInfo' ? 'show active' : '' }}"
                      id="personalInfo"
-                     role="tabpanel"
-                     aria-labelledby="personalInfo-tab">
+                     role="tabpanel">
 
-                    <h4 class="mb-0 fw-bold text-dark d-flex align-items-center mb-3">
-                        <i class="fas fa-id-badge"
-                           style="margin-right:0.75rem; color:#0dcaf0;"></i>
-                        Personal Information
-                    </h4>
+                    @php
+                        $profile = $employee->profile;
+                        $emp = $employee;
+                    @endphp
 
-                    <div style="display:flex; flex-wrap:wrap; gap:1rem;">
 
-                        {{-- ================= CORE DETAILS ================= --}}
-                        <div style="flex:1 1 48%;">
-                            <div
-                                 style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0; height:100%;">
-                                <div
-                                     style="background:#0dcaf0; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
-                                    <i class="bi bi-person"
-                                       style="margin-right:0.5rem;"></i> Core Details & Contact
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold text-dark mb-0">
+                            <i class="fas fa-id-card-alt text-dark me-2"></i>Employee Profile Summary
+                            </h4>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                Last Updated:
+                                {{ $profile && $profile->updated_at ? $profile->updated_at->format('d M, Y') : 'N/A' }}
+                            </span>
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100"
+                                 style="border-radius: 20px;">
+                                <div class="card-header bg-info bg-opacity-10 border-0 pt-4 px-4">
+                                    <h6 class="fw-bold text-dark text-uppercase mb-0"><i
+                                           class="fas fa-user-circle me-2"></i>Identity & Contact</h6>
                                 </div>
-                                <div style="padding:1rem;">
-                                    <dl style="margin:0;">
-                                        @php $profile = $employee->profile ?? new \stdClass(); @endphp
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Date of Birth</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->date_of_birth) ? \Carbon\Carbon::parse($profile->date_of_birth)->format('d F, Y') : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Gender</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->gender) ? $profile->gender : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Marital Status</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->marital_status) ? $profile->marital_status : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Nationality</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->employee->nationality) ? $profile->employee->nationality : 'N/A' }}
-                                        </dd>
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Share Code</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->employee->share_code) ? $profile->employee->share_code : 'N/A' }}
-                                        </dd>
-
-                                        <hr style="margin:0.75rem 0; border-color:#dee2e6;">
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Personal Email</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem; word-break:break-word;">
-                                            {{ !empty($profile->personal_email) ? $profile->personal_email : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Mobile Phone</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->mobile_phone) ? $profile->mobile_phone : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Home Phone</dt>
-                                        <dd style="font-weight:600;">
-                                            {{ !empty($profile->home_phone) ? $profile->home_phone : 'N/A' }}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- ================= ADDRESS + ID ================= --}}
-                        <div style="flex:1 1 48%; display:flex; flex-direction:column; gap:1rem;">
-
-                            {{-- ADDRESS --}}
-                            <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
-                                <div
-                                     style="background:#6c757d; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
-                                    <i class="bi bi-geo-alt"
-                                       style="margin-right:0.5rem;"></i> Permanent Address
-                                </div>
-                                <div style="padding:1rem;">
-                                    <dl style="margin:0;">
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Street</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->house_no) ? $profile->house_no : 'N/A' }}<br>
-                                            <span style="font-size:0.85rem; color:#868e96;">
-                                                {{ !empty($profile->street) ? $profile->street : '' }}
-                                            </span>
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">City / State</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->city) ? $profile->city : 'N/A' }},
-                                            {{ !empty($profile->state) ? $profile->state : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Postcode</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->postcode) ? $profile->postcode : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Country</dt>
-                                        <dd style="font-weight:600;">
-                                            {{ !empty($profile->country) ? $profile->country : 'N/A' }}
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-
-                            {{-- ID & COMPLIANCE --}}
-                            <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
-                                <div
-                                     style="background:#ffc107; color:#212529; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
-                                    <i class="bi bi-passport"
-                                       style="margin-right:0.5rem;"></i> ID & Compliance
-                                </div>
-                                <div style="padding:1rem;">
-                                    <dl style="margin:0;">
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Tax Ref No</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->tax_reference_number) ? $profile->tax_reference_number : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Visa / Status</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->immigration_status) ? $profile->immigration_status : 'N/A' }}
-                                        </dd>
-
-                                        @php
-                                            $rtw = $profile->right_to_work_expiry ?? null;
-                                            $rtwExpired = $rtw ? \Carbon\Carbon::parse($rtw)->isPast() : false;
-                                        @endphp
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">RTW Expiry</dt>
-                                        <dd
-                                            style="font-weight:600; margin-bottom:0.75rem; color: {{ $rtwExpired ? '#dc3545' : '#212529' }};">
-                                            {{ $rtw ? \Carbon\Carbon::parse($rtw)->format('d F, Y') : 'N/A' }}
-                                        </dd>
-
-                                        <hr style="margin:0.75rem 0; border-color:#dee2e6;">
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport No</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->passport_number) ? $profile->passport_number : 'N/A' }}
-                                        </dd>
-
-                                        @php
-                                            $passport = $profile->passport_expiry ?? null;
-                                            $passportExpired = $passport
-                                                ? \Carbon\Carbon::parse($passport)->isPast()
-                                                : false;
-                                        @endphp
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">Passport Expiry</dt>
-                                        <dd
-                                            style="font-weight:600; margin-bottom:0.75rem; color: {{ $passportExpired ? '#dc3545' : '#212529' }};">
-                                            {{ $passport ? \Carbon\Carbon::parse($passport)->format('d F, Y') : 'N/A' }}
-                                        </dd>
-
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Number</dt>
-                                        <dd style="font-weight:600; margin-bottom:0.75rem;">
-                                            {{ !empty($profile->brp_number) ? $profile->brp_number : 'N/A' }}
-                                        </dd>
-
-                                        @php
-                                            $brp = $profile->brp_expiry_date ?? null;
-                                            $brpExpired = $brp ? \Carbon\Carbon::parse($brp)->isPast() : false;
-                                        @endphp
-                                        <dt style="color:#6c757d; margin-bottom:0.25rem;">BRP Expiry</dt>
-                                        <dd
-                                            style="font-weight:600; color: {{ $brpExpired ? '#dc3545' : '#212529' }};">
-                                            {{ $brp ? \Carbon\Carbon::parse($brp)->format('d F, Y') : 'N/A' }}
-                                        </dd>
-
-                                    </dl>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        @if ($customFields->isNotEmpty())
-                            <div style="flex:1 1 100%; margin-top:1rem;">
-                                <div style="border-radius:16px; box-shadow:0 0.25rem 1rem rgba(0,0,0,0.1); border:0;">
-                                    <div
-                                         style="background:#198754; color:#fff; font-weight:700; padding:0.75rem 1rem; border-radius:16px 16px 0 0;">
-                                        <i class="bi bi-sliders"
-                                           style="margin-right:0.5rem;"></i> More Information
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-12 d-flex align-items-center mb-2">
+                                            <div class="avatar-sm bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                 style="width: 45px; height: 45px;">
+                                                <span
+                                                      class="fw-bold">{{ substr($emp->f_name, 0, 1) }}{{ substr($emp->l_name, 0, 1) }}</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-muted small mb-0">Full Name</p>
+                                                <h6 class="fw-bold mb-0">{{ $profile->title ?? '' }}
+                                                    {{ $emp->f_name ?? '' }} {{ $emp->l_name ?? '' }}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Work Email</label>
+                                            <span class="fw-semibold text-dark">{{ $emp->email ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Personal Email</label>
+                                            <span
+                                                  class="fw-semibold text-dark">{{ $profile->personal_email ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Work Mobile</label>
+                                            <span class="fw-semibold text-dark">{{ $emp->phone_no ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Personal Mobile</label>
+                                            <span
+                                                  class="fw-semibold text-dark">{{ $profile->mobile_phone ?? 'N/A' }}</span>
+                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <div style="padding:1rem;">
-                                        <div class="row">
-                                            @foreach ($customFields as $field)
-                                                @php
-                                                    $value = $customValues[$field->id] ?? null;
-                                                @endphp
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100"
+                                 style="border-radius: 20px;">
+                                <div class="card-header bg-info bg-opacity-10 border-0 pt-4 px-4">
+                                    <h6 class="fw-bold text-dark text-uppercase mb-0"><i
+                                           class="fas fa-briefcase me-2"></i>Employment Details</h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Job Title</label>
+                                            <span class="fw-bold text-dark">{{ $emp->job_title ?? 'N/A' }}</span>
+                                        </div>
 
-                                                <div class="col-md-6 mb-3">
-                                                    <dt style="color:#6c757d; margin-bottom:0.25rem;">
-                                                        {{ $field->name }}
-                                                    </dt>
 
-                                                    <dd style="font-weight:600;">
-                                                        @if ($value === null || $value === '')
-                                                            <span class="text-muted">N/A</span>
-                                                        @else
-                                                            {{-- Format by type --}}
-                                                            @if ($field->type === 'date')
-                                                                {{ \Carbon\Carbon::parse($value)->format('d F, Y') }}
-                                                            @else
-                                                                {{ $value }}
-                                                            @endif
-                                                        @endif
-                                                    </dd>
+
+                                        <div class="col-sm-6">
+                                            <div class="text-muted fw-bold small mb-1">Departments</div>
+
+                                            @php
+
+                                                $max = 5;
+                                            @endphp
+
+                                            @if ($departments->isEmpty())
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @else
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
+                                                        <span
+                                                              class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                                            {{ $department->name }}
+                                                        </span>
+                                                    @endforeach
+
+                                                    @if ($departments->count() > $max)
+                                                        <button wire:click="toggleDepartments"
+                                                                class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                            {{ $showAllDepartments ? 'See less' : 'View more' }}
+                                                        </button>
+                                                    @endif
                                                 </div>
-                                            @endforeach
+                                            @endif
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="text-muted small d-block mb-1">Team</div>
+
+                                            @php
+                                                $assignedTeams = $employee->user ? $employee->user->teams : collect();
+                                                $max = 5;
+                                            @endphp
+
+                                            @if ($assignedTeams->isEmpty())
+                                                <span class="text-muted ">N/A</span>
+                                            @else
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
+                                                        @php
+                                                            $isLead = $team->team_lead_id === $employee->user_id;
+                                                        @endphp
+
+                                                        <span
+                                                              class="badge rounded-pill px-3 py-2 {{ $isLead ? 'bg-primary text-white' : 'bg-light text-dark border' }}">
+                                                            {{ $team->name }}
+                                                            @if ($isLead)
+                                                                <span class="ms-1 fw-semibold">⭐ Leader</span>
+                                                            @endif
+                                                        </span>
+                                                    @endforeach
+
+                                                    @if ($assignedTeams->count() > $max)
+                                                        <button wire:click="toggleTeams"
+                                                                class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                            {{ $showAllTeams ? 'See less' : 'View more' }}
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Contract Hours (Weekly)</label>
+                                            <span
+                                                  class="badge bg-success bg-opacity-10 text-white fw-bold">{{ $employee->contract_hours ?? '0' }}
+                                                Hours</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Start Date</label>
+                                            <span
+                                                  class="fw-semibold">{{ !empty($emp->start_date) ? \Carbon\Carbon::parse($emp->start_date)->format('d M, Y') : 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Employment Status</label>
+                                            <span
+                                                  class="badge bg-soft-primary text-primary border border-primary border-opacity-25">{{ ucfirst($emp->employment_status ?? 'N/A') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        @if ($profile)
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm"
+                                     style="border-radius: 20px; background: linear-gradient(to right, #f8f9fa, #ffffff);">
+                                    <div class="card-body p-4">
+                                        <div class="row">
+                                            <div class="col-md-6 border-end-md">
+                                                <h6 class="fw-bold text-primary text-uppercase mb-3">
+                                                    <i class="fas fa-home me-2"></i>Current Address
+                                                </h6>
+
+                                                <p class="fw-semibold text-dark mb-1">
+                                                    {{ $profile->address ?? 'N/A' }}
+                                                </p>
+
+                                                <span class="text-muted small">
+                                                    {{ $profile->city ?? 'N/A' }},
+                                                    {{ $profile->state ?? 'N/A' }},
+                                                    {{ $profile->postcode ?? 'N/A' }},
+                                                    {{ $profile->country ?? 'N/A' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm"
+                                     style="border-radius: 20px; background: linear-gradient(to right, #f8f9fa, #ffffff);">
+                                    <div class="card-body p-4">
+                                        <div class="row">
+                                            <div class="col-md-6 border-end-md">
+                                                <h6 class="fw-bold text-primary text-uppercase mb-3">
+                                                    <i class="fas fa-home me-2"></i>Current Address
+                                                </h6>
+
+                                                <p class="fw-semibold text-dark mb-1">
+                                                    N/A
+                                                </p>
+
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         @endif
+
+
+                        <div class="col-md-5">
+                            <div class="card border-0 shadow-sm h-100"
+                                 style="border-radius: 20px;">
+                                <div class="card-header bg-info bg-opacity-10 border-0 pt-4 px-4">
+                                    <h6 class="fw-bold text-dark text-uppercase mb-0">
+                                        <i class="fas fa-user-tag me-2"></i>Demographics
+                                    </h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <dl class="row mb-0">
+
+                                        <dt class="col-12 text-muted fw-normal small">Date of Birth</dt>
+                                        <dd class="col-12 fw-bold mb-3">
+                                            {{ !empty($profile->date_of_birth) ? \Carbon\Carbon::parse($profile->date_of_birth)->format('d F, Y') : 'N/A' }}
+                                        </dd>
+
+                                        <dt class="col-12 text-muted fw-normal small">Nationality</dt>
+                                        <dd class="col-12 fw-bold mb-3">
+                                            {{ $emp->nationality ?? 'N/A' }}
+                                        </dd>
+
+                                        <dt class="col-12 text-muted fw-normal small">Gender</dt>
+                                        <dd class="col-12 fw-bold text-capitalize mb-3">
+                                            {{ $profile->gender ?? 'N/A' }}
+                                        </dd>
+
+                                        <dt class="col-12 text-muted fw-normal small">Marital Status</dt>
+                                        <dd class="col-12 fw-bold text-capitalize mb-0">
+                                            {{ $profile->marital_status ?? 'N/A' }}
+                                        </dd>
+
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-7">
+                            <div class="card border-0 shadow-sm h-100"
+                                 style="border-radius: 20px;">
+                                <div class="card-header bg-info bg-opacity-10 border-0 pt-4 px-4">
+                                    <h6 class="fw-bold text-dark text-uppercase mb-0"><i
+                                           class="fas fa-shield-alt me-2"></i>Compliance & ID</h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Immigration Status</label>
+                                            <span
+                                                  class="fw-bold text-dark">{{ $profile->immigration_status ?? 'N/A' }}</span>
+                                        </div>
+
+
+                                        <div class="col-sm-6">
+                                            @php
+                                                $shareCodeType = $documentTypes->firstWhere('name', 'Share Code');
+
+                                                $latestShareDoc = null;
+                                                $daysLeft = null;
+                                                $rtwExp = null;
+
+                                                if ($shareCodeType) {
+                                                    $latestShareDoc = $employee
+                                                        ->documents()
+                                                        ->where('doc_type_id', $shareCodeType->id)
+                                                        ->latest('created_at')
+                                                        ->first();
+
+                                                    if ($latestShareDoc && $latestShareDoc->expires_at) {
+                                                        $rtwExp = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+                                                        $daysLeft = now()->diffInDays($rtwExp, false);
+                                                    }
+                                                }
+                                            @endphp
+
+                                            <label class="text-muted small d-block">Right to Work Expiry</label>
+
+                                            @if ($employee->nationality === 'British')
+                                                <span class="badge bg-light text-muted mt-1"
+                                                      style="border: 1px solid #dee2e6;">
+                                                    Not Required (British)
+                                                </span>
+                                            @elseif ($rtwExp)
+                                                <span class="fw-bold {{ $daysLeft !== null && $daysLeft <= 60 ? 'text-danger blink-red' : 'text-dark' }}"
+                                                      style="font-size: 15px;">
+                                                    {{ $rtwExp->format('d F Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge bg-light text-muted mt-1"
+                                                      style="border: 1px dashed #ced4da;">
+                                                    Not Verified
+                                                </span>
+                                            @endif
+                                        </div>
+
+
+
+
+                                        <div class="col-sm-12">
+                                            <label class="text-muted small d-block">National Insurance / Tax
+                                                Ref</label>
+                                            <span
+                                                  class="fw-mono fw-bold text-dark">{{ $profile->tax_reference_number ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="text-muted small d-block">Passport Number</label>
+                                            <span
+                                                  class="fw-bold text-dark">{{ $profile->passport_number ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            @php $passExp = !empty($profile->passport_expiry_date) ? \Carbon\Carbon::parse($profile->passport_expiry_date) : null; @endphp
+                                            <label class="text-muted small d-block">Passport Expiry</label>
+                                            <span
+                                                  class="fw-bold {{ $passExp && $passExp->isPast() ? 'text-danger' : 'text-dark' }}">
+                                                {{ $passExp ? $passExp->format('d M, Y') : 'N/A' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -1505,52 +1628,175 @@
                                 </div>
                             </div>
 
-                            <!-- 14. Current Address -->
-                            <div class="col-md-6"
-                                 x-data="addressAutocomplete()">
-                                <label class="form-label small fw-semibold text-secondary">
-                                    Current Address <span class="text-danger">*</span>
-                                </label>
 
-                                <div class="position-relative">
-                                    <input type="text"
-                                           class="form-control border-light-subtle shadow-none"
-                                           wire:model.lazy="address"
-                                           {{-- Livewire model --}}
-                                           x-model="query"
-                                           {{-- Alpine model --}}
-                                           @input.debounce.500ms="fetchSuggestions"
-                                           @click.away="showSuggestions = false"
-                                           placeholder="Enter Current Address"
-                                           autocomplete="off">
+                            <div class="col-12 mt-4">
+                                <div class="p-4 rounded-4  border border-light-subtle shadow-sm">
 
-                                    <div x-show="showSuggestions && suggestions.length > 0"
-                                         class="list-group position-absolute w-100 shadow-lg"
-                                         style="z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 2px;">
+                                    <div class="d-flex align-items-center mb-4">
 
-                                        <template x-for="(item, index) in suggestions"
-                                                  :key="index">
-                                            <button type="button"
-                                                    class="list-group-item list-group-item-action border-1 small"
-                                                    @click="selectSuggestion(item)">
-                                                <i class="fas fa-map-marker-alt text-secondary me-2"></i>
-                                                <span x-text="item.display_name"></span>
-                                            </button>
-                                        </template>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0">Current Address Details</h5>
+
+                                        </div>
                                     </div>
 
-                                    <div x-show="loading"
-                                         class="position-absolute end-0 top-50 translate-middle-y me-3">
-                                        <div class="spinner-border spinner-border-sm text-primary"
-                                             role="status"></div>
+                                    <div class="row g-3">
+
+                                        <div class="col-12 mb-2"
+                                             x-data="addressAutocomplete()">
+                                            <label class="form-label small fw-bold text-secondary">Search Full Address
+                                                <span class="text-danger">*</span></label>
+                                            <div class="position-relative">
+                                                <input type="text"
+                                                       class="form-control border-light-subtle py-2 shadow-none"
+                                                       wire:model.lazy="address"
+                                                       x-model="query"
+                                                       @input.debounce.500ms="fetchSuggestions"
+                                                       @click.away="showSuggestions = false"
+                                                       placeholder="Type to search your address..."
+                                                       autocomplete="off">
+
+                                                <div x-show="showSuggestions && suggestions.length > 0"
+                                                     class="list-group position-absolute w-100 shadow-lg mt-1"
+                                                     style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                                                    <template x-for="(item, index) in suggestions"
+                                                              :key="index">
+                                                        <button type="button"
+                                                                class="list-group-item list-group-item-action small py-2 border-0"
+                                                                @click="selectSuggestion(item)">
+                                                            <i class="fas fa-map-pin text-muted me-2"></i>
+                                                            <span x-text="item.display_name"></span>
+                                                        </button>
+                                                    </template>
+                                                </div>
+
+                                                <div x-show="loading"
+                                                     class="position-absolute end-0 top-50 translate-middle-y me-3">
+                                                    <div class="spinner-border spinner-border-sm text-primary"
+                                                         role="status"></div>
+                                                </div>
+                                            </div>
+                                            @error('address')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <hr class="my-3 opacity-25">
+
+                                        <div class="col-md-6"
+                                             id="countryDropdownContainer">
+                                            <label class="form-label small fw-bold text-secondary">Country <span
+                                                      class="text-danger">*</span></label>
+                                            <div class="position-relative">
+                                                <button class="form-select text-start d-flex align-items-center bg-white shadow-none border-light-subtle"
+                                                        type="button"
+                                                        id="countryDropdownButton"
+                                                        onclick="toggleDropdown('countryDropdownMenu')">
+                                                    {{ !empty($country) ? $country : 'Select Country' }}
+                                                </button>
+
+                                                <div id="countryDropdownMenu"
+                                                     wire:ignore.self
+                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle px-2 pt-2"
+                                                     style="display:none; position:absolute; z-index:1000; max-height:250px; overflow-y:auto;">
+                                                    <input type="text"
+                                                           class="form-control form-control-sm mb-2"
+                                                           placeholder="Search country..."
+                                                           wire:model.live="countrySearch">
+                                                    @foreach ($filteredCountries as $c)
+                                                        <a href="#"
+                                                           class="dropdown-item d-flex align-items-center rounded-2 py-2"
+                                                           wire:click.prevent="$set('country', '{{ $c['name'] }}'); closeDropdown()">
+                                                            <img src="{{ $c['image'] }}"
+                                                                 class="me-2 rounded-1"
+                                                                 style="width:20px; height:14px; object-fit: cover;">
+                                                            <span class="small">{{ $c['name'] }}</span>
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @error('country')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6"
+                                             id="stateDropdownContainer">
+                                            <label class="form-label small fw-bold text-secondary">State / Province
+                                                <span class="text-danger">*</span></label>
+                                            <div class="position-relative">
+                                                <button class="form-select text-start bg-white shadow-none border-light-subtle"
+                                                        type="button"
+                                                        id="stateDropdownButton"
+                                                        onclick="toggleDropdown('stateDropdownMenu')">
+                                                    {{ !empty($state) ? $state : 'Select State' }}
+                                                </button>
+
+                                                <div id="stateDropdownMenu"
+                                                     wire:ignore.self
+                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle"
+                                                     style="display:none; position:absolute; z-index:1000; max-height:200px; overflow-y:auto;">
+                                                    @foreach ($locations as $loc)
+                                                        <a href="#"
+                                                           class="dropdown-item small py-2"
+                                                           wire:click.prevent="$set('state', '{{ $loc['state'] }}'); selectState('{{ $loc['state'] }}'); closeDropdown('state')">
+                                                            {{ $loc['state'] }}
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @error('state')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6"
+                                             id="cityDropdownContainer">
+                                            <label class="form-label small fw-bold text-secondary">City <span
+                                                      class="text-danger">*</span></label>
+                                            <div class="position-relative">
+                                                <button class="form-select text-start bg-white shadow-none border-light-subtle"
+                                                        type="button"
+                                                        id="cityDropdownButton"
+                                                        @if (!$cities) disabled @endif
+                                                        onclick="toggleDropdown('cityDropdownMenu')">
+                                                    {{ !empty($city) ? $city : 'Select City' }}
+                                                </button>
+
+                                                <div id="cityDropdownMenu"
+                                                     wire:ignore.self
+                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle"
+                                                     style="display:none; position:absolute; z-index:1000; max-height:200px; overflow-y:auto;">
+                                                    @foreach ($cities as $c)
+                                                        <a href="#"
+                                                           class="dropdown-item small py-2"
+                                                           wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown('city')">
+                                                            {{ $c }}
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @error('city')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Zip / Postal Code
+                                                <span class="text-danger">*</span></label>
+                                            <input type="text"
+                                                   class="form-control border-light-subtle shadow-none"
+                                                   wire:model="postcode"
+                                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                                   placeholder="e.g. 1234">
+                                            @error('postcode')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
                                     </div>
                                 </div>
-
-                                @error('address')
-                                    <span class="text-danger x-small">{{ $message }}</span>
-                                @enderror
                             </div>
-
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold text-secondary">House Number <span
                                           class="text-danger">*</span></label>
@@ -1597,7 +1843,7 @@
                                 <label class="form-label small fw-semibold text-secondary">Nationality <span
                                           class="text-danger">*</span></label>
                                 <select class="form-select border-light-subtle shadow-none"
-                                        wire:model="nationality">
+                                        wire:model.live="nationality">
                                     <option value="">Select</option>
                                     @foreach ($nationalities as $nation)
                                         <option value="{{ $nation }}">{{ $nation }}</option>

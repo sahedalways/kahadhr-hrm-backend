@@ -51,6 +51,9 @@ class Employee extends Model
     ];
 
 
+
+
+
     /**
      * Relation: Employee belongs to a Company
      */
@@ -149,6 +152,38 @@ class Employee extends Model
                 return;
             } elseif ($user->user_type === 'company') {
                 $builder->where('company_id', $user->company->id ?? 0);
+            }
+        });
+
+        static::updating(function ($employee) {
+
+            if ($employee->user && $employee->user->user_type === 'employee') {
+                $data = [];
+
+                if ($employee->isDirty('f_name')) {
+                    $data['f_name'] = $employee->f_name;
+                }
+
+
+                if ($employee->isDirty('l_name')) {
+                    $data['l_name'] = $employee->l_name;
+                }
+
+                if ($employee->isDirty('email')) {
+                    $data['email'] = $employee->email;
+                }
+
+                if ($employee->isDirty('phone_no')) {
+                    $data['phone_no'] = $employee->phone_no;
+                }
+
+                if ($employee->isDirty('is_active')) {
+                    $data['is_active'] = $employee->is_active;
+                }
+
+                if (!empty($data)) {
+                    $employee->user->update($data);
+                }
             }
         });
 

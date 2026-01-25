@@ -261,21 +261,22 @@
                             @endif
                         </div>
 
-                        <div class="row mt-3">
+                        <div class="row mt-4">
                             <div class="col-12 d-flex gap-3 justify-content-center">
                                 @if ($statusFilter == 'active')
-                                    <div class="px-4 py-2 rounded-pill shadow-sm"
+                                    <div class="px-4 py-2 rounded-pill shadow-sm small"
                                          style="background-color: #e9f5ee; color: #1b5e20; font-weight: 600; border: 1px solid #d1e7dd;">
                                         Total Active Employees: {{ $activeCount }}
                                     </div>
                                 @else
-                                    <div class="px-4 py-2 rounded-pill shadow-sm"
+                                    <div class="px-4 py-2 rounded-pill shadow-sm small"
                                          style="background-color: #fce8e8; color: #c62828; font-weight: 600; border: 1px solid #f8d7da;">
                                         Total Former Employees: {{ $formerCount }}
                                     </div>
                                 @endif
                             </div>
                         </div>
+
                         <script>
                             function copyToClipboard(text) {
                                 navigator.clipboard.writeText(text).then(function() {

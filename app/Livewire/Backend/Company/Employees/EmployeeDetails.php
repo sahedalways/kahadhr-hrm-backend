@@ -635,6 +635,7 @@ class EmployeeDetails extends BaseComponent
         $this->country = '';
         $this->nationality = '';
         $this->home_phone = '';
+        $this->address = '';
         $this->mobile_phone = '';
         $this->personal_email = '';
         $this->gender = '';
@@ -677,7 +678,10 @@ class EmployeeDetails extends BaseComponent
         $this->role = $this->employee->role;
         $this->contract_hours = $this->employee->contract_hours;
         $this->is_active = $this->employee->is_active;
-        $this->start_date = $this->employee->start_date;
+        $this->start_date = $this->employee->start_date
+            ? Carbon::parse($this->employee->start_date)->format('Y-m-d')
+            : null;
+
         $this->end_date = $this->employee->end_date;
         $this->phone_no = $this->employee->user->phone_no ?? null;
         $this->avatar_preview = $this->employee->avatar_url;
@@ -690,6 +694,7 @@ class EmployeeDetails extends BaseComponent
             $this->street = $profile->street;
             $this->city = $profile->city ?: null;
             $this->state = $profile->state ?: null;
+            $this->address = $profile->address ?: null;
             $this->postcode = $profile->postcode;
             $this->country = $profile->country ?: 'United Kingdom';
             $this->home_phone = $profile->home_phone;
@@ -700,7 +705,9 @@ class EmployeeDetails extends BaseComponent
             $this->tax_reference_number = $profile->tax_reference_number;
             $this->immigration_status = $profile->immigration_status ?: null;
             $this->passport_number = $profile->passport_number;
-            $this->passport_expiry_date = $profile->passport_expiry_date;
+            $this->passport_expiry_date = $profile->passport_expiry_date
+                ? Carbon::parse($profile->passport_expiry_date)->format('Y-m-d')
+                : null;
         }
 
         $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
@@ -790,6 +797,40 @@ class EmployeeDetails extends BaseComponent
     }
 
 
+    public function isProfileComplete()
+    {
+        $requiredFields = [
+            'f_name',
+            'l_name',
+            'title',
+            'job_title',
+            'address',
+            'house_no',
+            'street',
+            'start_date',
+            'postcode',
+            'country',
+            'state',
+            'city',
+            'nationality',
+            'date_of_birth',
+            'tax_reference_number',
+            'passport_number',
+            'passport_expiry_date',
+            'employment_status',
+            'contract_hours'
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (empty($this->{$field})) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
 
 
     public function updateProfile()
@@ -816,6 +857,7 @@ class EmployeeDetails extends BaseComponent
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
             'state' => 'required|string|max:100',
+            'city' => 'required|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
             'home_phone' => 'nullable|string|max:20',
@@ -848,8 +890,8 @@ class EmployeeDetails extends BaseComponent
             'job_title'                => 'Job Title',
             'contract_hours'           => 'Contract Hours (Weekly)',
             'start_date'               => 'Employment Start Date',
-            'house_no'                 => 'Street 1',
-            'street'                 => 'Street 2',
+            'house_no'                 => 'House Number',
+            'street'                 => 'Street',
             'city'                     => 'City',
             'state'                    => 'State',
             'address'                    => 'Current Address',
@@ -889,6 +931,7 @@ class EmployeeDetails extends BaseComponent
             'title' => $this->title,
             'street' => $this->street,
             'house_no' => $this->house_no,
+
             'nationality' => $this->nationality,
             'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
             'share_code' => $this->share_code ?? null,
@@ -908,6 +951,7 @@ class EmployeeDetails extends BaseComponent
                 'street' => $this->street,
                 'house_no' => $this->house_no,
                 'city' => $this->city,
+                'address' => $this->address,
                 'state' => $this->state,
                 'postcode' => $this->postcode,
                 'country' => $this->country,
@@ -1083,8 +1127,9 @@ class EmployeeDetails extends BaseComponent
                 $this->email = $this->new_email;
                 $this->employee->update(['email' => $this->new_email]);
             } else {
-                $this->phone_no = $this->new_mobile;
-                $this->employee->user->update(['phone_no' => $this->new_mobile]);
+                $this->employee->update([
+                    'phone_no' => $this->new_mobile,
+                ]);
             }
 
 

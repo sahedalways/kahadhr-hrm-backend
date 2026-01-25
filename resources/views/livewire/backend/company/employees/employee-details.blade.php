@@ -11,35 +11,27 @@
         </div>
 
 
+
+
         <!-- Sidebar -->
         <div class="col-lg-3">
             <div class="card shadow-sm"
-                 style="border-radius:14px; border:none; overflow:hidden; background:#fff;">
+                 style="border-radius:14px;border:none;overflow:hidden;background:#fff;">
 
-                <div
-                     style="background:linear-gradient(135deg,#0dcaf0,#0b9ed0);
-                   color:#fff;
-                   padding:14px 20px;
-                   font-weight:600;
-                   font-size:0.85rem;
-                   text-transform:uppercase;
-                   letter-spacing:.5px;">
-                    <i class="bi bi-person-circle me-2"></i>
-                    Employee Profile
-                </div>
-
+                <!-- Header -->
                 <div class="list-group list-group-flush"
-                     role="tablist">
+                     role="tablist"
+                     wire:ignore.self>
 
                     <a class="list-group-item list-group-item-action {{ $activeTab === 'overview' ? 'active' : '' }}"
                        href="#overview"
                        role="tab"
                        data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'overview')"
+                       wire:click="$set('activeTab', 'overview')"
                        style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'overview' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
+              {{ $activeTab === 'overview' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
                         <i class="bi bi-person-lines-fill"
-                           style="font-size:1.1rem; {{ $activeTab === 'overview' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
+                           style="font-size:1.1rem; {{ $activeTab === 'overview' ? '' : 'color:#6c757d;' }}"></i>
                         Employee Overview
                     </a>
 
@@ -47,9 +39,9 @@
                        href="#personalInfo"
                        role="tab"
                        data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'personalInfo')"
+                       wire:click="$set('activeTab', 'personalInfo')"
                        style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'personalInfo' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
+              {{ $activeTab === 'personalInfo' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
                         <i class="bi bi-person-badge"
                            style="font-size:1.1rem; {{ $activeTab === 'personalInfo' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
                         Personal Information
@@ -59,9 +51,9 @@
                        href="#emeregeny"
                        role="tab"
                        data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'emeregeny')"
+                       wire:click="$set('activeTab', 'emeregeny')"
                        style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'emeregeny' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
+              {{ $activeTab === 'emeregeny' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
                         <i class="bi bi-briefcase"
                            style="font-size:1.1rem; {{ $activeTab === 'emeregeny' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
                         Emergency Contacts
@@ -71,9 +63,9 @@
                        href="#documentsSection"
                        role="tab"
                        data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'documentsSection')"
+                       wire:click="$set('activeTab', 'documentsSection')"
                        style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'documentsSection' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
+              {{ $activeTab === 'documentsSection' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
                         <i class="bi bi-folder"
                            style="font-size:1.1rem; {{ $activeTab === 'documentsSection' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
                         Documents
@@ -524,7 +516,7 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade {{ $activeTab === 'emeregeny' ? 'show active' : '' }}"
+                <div class="tab-pane fade { $activeTab === 'emeregeny' ? 'show active' : '' }}"
                      id="emeregeny"
                      role="tabpanel"
                      aria-labelledby="emeregeny-tab">
@@ -616,8 +608,11 @@
                 </div>
 
 
+
+
+
                 <!-- Documents -->
-                <div class="tab-pane fade {{ $activeTab === 'documentsSection' ? 'show active' : '' }}"
+                <div class="tab-pane fade {{ }}"
                      id="documentsSection"
                      role="tabpanel"
                      aria-labelledby="documents-tab">
@@ -834,7 +829,7 @@
 
 
                 <!-- Personal Info -->
-                <div class="tab-pane fade {{ $activeTab === 'personalInfo' ? 'show active' : '' }}"
+                <div class="tab-pane fade"
                      id="personalInfo"
                      role="tabpanel"
                      aria-labelledby="personalInfo-tab">
@@ -1056,6 +1051,10 @@
                         @endif
                     </div>
                 </div>
+
+
+
+
 
 
 

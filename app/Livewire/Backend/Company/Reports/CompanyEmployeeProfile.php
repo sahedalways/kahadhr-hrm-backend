@@ -18,13 +18,14 @@ class CompanyEmployeeProfile extends BaseComponent
 
     public $selectAllUsers = false;
     public $company_id = null;
+    public $selectedYear = null;
     public $selectAllFields = false;
 
     public $employees;
 
     public function updatedStatus($value)
     {
-        logger('STATUS CHANGED TO: ' . $value);
+
         $this->loadEmployees();
     }
 
@@ -70,6 +71,7 @@ class CompanyEmployeeProfile extends BaseComponent
         ];
 
 
+        $this->selectedYear = now()->year;
 
         $this->loadEmployees();
     }

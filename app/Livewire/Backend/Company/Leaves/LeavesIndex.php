@@ -52,11 +52,11 @@ class LeavesIndex extends BaseComponent
         }
 
         if (request()->has('leave')) {
-                $this->openLeaveId = request('leave');
+            $this->openLeaveId = request('leave');
 
 
-         $this->viewRequestInfo($this->openLeaveId);
-    }
+            $this->viewRequestInfo($this->openLeaveId);
+        }
 
 
         // Get all employees of the company
@@ -151,7 +151,7 @@ class LeavesIndex extends BaseComponent
 
     public function viewRequestInfo($id)
     {
-     $this->requestDetails = null;
+        $this->requestDetails = null;
         $this->paidStatus = null;
         $this->paidHours = null;
 
@@ -258,7 +258,6 @@ class LeavesIndex extends BaseComponent
         $this->dispatch('reload-page');
 
         $this->toast('Request approved successfully!', 'success');
-
     }
 
 

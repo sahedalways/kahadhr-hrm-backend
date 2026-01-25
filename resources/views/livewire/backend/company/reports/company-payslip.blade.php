@@ -3,7 +3,7 @@
 
         {{-- LEFT: Title --}}
         <div class="col-auto">
-            <h5 class="fw-500 text-primary m-0">Payslip Management</h5>
+            <h5 class="fw-500 text-primary m-0">Payslip Report</h5>
         </div>
 
         {{-- RIGHT: Upload Payslip --}}

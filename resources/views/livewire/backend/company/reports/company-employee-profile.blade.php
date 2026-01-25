@@ -3,6 +3,11 @@
     <div class="card border-0 shadow-sm p-4">
         <div class="row g-4">
 
+            <div class="col-auto">
+                <h5 class="fw-500 text-primary m-0">Employees Profile Report</h5>
+            </div>
+
+
             <div class="col-md-12 mb-4">
                 <label class="form-label small fw-bolder text-uppercase text-muted tracking-wider mb-2 d-block">
                     Employee Status

@@ -3,6 +3,11 @@
         <div class="card border-0 shadow-sm p-4">
             <div class="row g-4">
 
+                <div class="col-auto">
+                    <h5 class="fw-500 text-primary m-0">Timesheet Report</h5>
+                </div>
+
+
                 <div class="col-md-12 mb-4">
                     <label class="form-label small fw-bolder text-uppercase text-muted tracking-wider mb-2 d-block">
                         Employee Status
@@ -155,6 +160,8 @@
 
                         <label for="auto"
                                class="w-100 px-3 py-2 rounded-3 d-flex align-items-center justify-content-center gap-2"
+                               onmouseover="this.style.border='2px dashed #0d6efd'; this.style.background='#f0f7ff'; this.style.color='#0d6efd';"
+                               onmouseout="this.style.border='2px dashed {{ in_array('auto', $attendanceNature ?? []) ? '#0d6efd' : '#ced4da' }}'; this.style.background='{{ in_array('auto', $attendanceNature ?? []) ? '#f0f7ff' : '#fff' }}'; this.style.color='{{ in_array('auto', $attendanceNature ?? []) ? '#0d6efd' : '#6c757d' }}';"
                                style="
                     cursor:pointer;
                     border:2px dashed {{ in_array('auto', $attendanceNature ?? []) ? '#0d6efd' : '#ced4da' }};
@@ -175,6 +182,8 @@
 
                         <label for="manual"
                                class="w-100 px-3 py-2 rounded-3 d-flex align-items-center justify-content-center gap-2"
+                               onmouseover="this.style.border='2px dashed #198754'; this.style.background='#f0fff7'; this.style.color='#198754';"
+                               onmouseout="this.style.border='2px dashed {{ in_array('manual', $attendanceNature ?? []) ? '#198754' : '#ced4da' }}'; this.style.background='{{ in_array('manual', $attendanceNature ?? []) ? '#f0fff7' : '#fff' }}'; this.style.color='{{ in_array('manual', $attendanceNature ?? []) ? '#198754' : '#6c757d' }}';"
                                style="
                     cursor:pointer;
                     border:2px dashed {{ in_array('manual', $attendanceNature ?? []) ? '#198754' : '#ced4da' }};
@@ -193,63 +202,116 @@
 
                 {{-- Date Range --}}
                 <div class="col-md-12">
-                    <label class="form-label fw-bold text-secondary">Time Period</label>
-                    <div class="bg-light p-3 rounded border border-dashed">
+                    <label class="form-label small fw-bolder text-uppercase text-muted tracking-wider mb-2 d-block">
+                        <i class="fas fa-calendar-alt me-1"></i> Time Period
+                    </label>
 
-                        <div class="mb-3 d-flex gap-2">
+                    <div class="bg-light p-3 rounded-3 border border-dashed">
+                        {{-- Modern Segmented Control --}}
+                        <div class="d-inline-flex p-1 bg-white border rounded-pill mb-3 shadow-sm">
                             @foreach (['custom', 'week', 'month', 'year'] as $type)
-                                <button class="btn btn-sm {{ $dateRangeType == $type ? 'btn-primary' : 'btn-white border' }}"
+                                <button type="button"
+                                        class="btn btn-sm px-4 py-1 rounded-pill border-0 transition-all ms-2 {{ $dateRangeType == $type ? 'btn-primary shadow-sm fw-bold' : 'btn-white text-muted hover-bg-light' }}"
                                         wire:click="$set('dateRangeType','{{ $type }}')">
                                     {{ ucfirst($type) }}
                                 </button>
                             @endforeach
                         </div>
 
-                        <div class="row g-2">
+                        {{-- Smoothly Swap Inputs based on selection --}}
+                        <div class="row g-2 align-items-center">
                             @if ($dateRangeType == 'custom')
-                                <div class="col-md-6">
-                                    <input type="date"
-                                           class="form-control"
-                                           wire:model.live="startDate">
+                                <div class="col-md-5">
+                                    <div class="input-group shadow-sm">
+                                        <span
+                                              class="input-group-text bg-white border-end-0 text-muted small">From</span>
+                                        <input type="date"
+                                               class="form-control border-start-0 ps-0 fw-medium"
+                                               wire:model.live="startDate">
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="date"
-                                           class="form-control"
-                                           wire:model.live="endDate">
+                                <div class="col-md-1 text-center text-muted">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0 text-muted small">To</span>
+                                        <input type="date"
+                                               class="form-control border-start-0 ps-0 fw-medium"
+                                               wire:model.live="endDate">
+                                    </div>
                                 </div>
                             @elseif($dateRangeType == 'month')
-                                <div class="col-md-8">
-                                    <select class="form-select"
-                                            wire:model.live="selectedMonth">
-                                        @foreach (range(1, 12) as $m)
-                                            <option value="{{ $m }}">
-                                                {{ date('F', mktime(0, 0, 0, $m, 1)) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <div class="col-md-7">
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0 text-muted">
+                                            <i class="far fa-calendar"></i>
+                                        </span>
+                                        <select class="form-select border-start-0 ps-0 fw-medium"
+                                                wire:model.live="selectedMonth">
+                                            @foreach (range(1, 12) as $m)
+                                                <option value="{{ $m }}">
+                                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <select class="form-select"
+                                <div class="col-md-5">
+                                    <select class="form-select shadow-sm fw-medium"
                                             wire:model.live="selectedYear">
-                                        @foreach (range(now()->year, now()->year + 4) as $y)
+                                        @foreach (range(now()->year - 2, now()->year + 4) as $y)
                                             <option value="{{ $y }}">{{ $y }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             @elseif($dateRangeType == 'year')
-                                <div class="col-md-12">
-                                    <select class="form-select"
+                                <div class="col-md-6">
+                                    <select class="form-select shadow-sm fw-medium"
                                             wire:model.live="selectedYear">
-                                        @foreach (range(now()->year, now()->year + 4) as $y)
+                                        @foreach (range(now()->year - 2, now()->year + 4) as $y)
                                             <option value="{{ $y }}">{{ $y }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-
                             @endif
                         </div>
                     </div>
                 </div>
+
+                <style>
+                    /* Styling to match your previous professional elements */
+                    .hover-bg-light:hover {
+                        background-color: #f8f9fa !important;
+                        color: #333 !important;
+                    }
+
+                    .border-dashed {
+                        border-style: dashed !important;
+                        border-width: 2px !important;
+                        border-color: #dee2e6 !important;
+                    }
+
+                    .form-control,
+                    .form-select {
+                        border-color: #dee2e6;
+                        padding: 0.6rem 0.75rem;
+                    }
+
+                    .form-control:focus,
+                    .form-select:focus {
+                        border-color: #0d6efd;
+                        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.05);
+                    }
+
+                    .input-group-text {
+                        border-color: #dee2e6;
+                        font-weight: 500;
+                    }
+
+                    .transition-all {
+                        transition: all 0.2s ease-in-out;
+                    }
+                </style>
 
 
 

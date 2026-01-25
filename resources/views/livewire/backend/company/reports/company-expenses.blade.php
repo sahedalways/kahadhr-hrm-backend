@@ -3,21 +3,24 @@
 
         {{-- LEFT: Title --}}
         <div class="col-auto">
-            <h5 class="fw-500 text-primary m-0">Expense Management</h5>
+            <h5 class="fw-500 text-primary m-0">Expenses Report</h5>
         </div>
 
         {{-- RIGHT: Export --}}
         <div class="col-auto d-flex gap-2">
 
-            <button wire:click="exportExpenses('pdf')" class="btn btn-sm btn-white text-primary">
+            <button wire:click="exportExpenses('pdf')"
+                    class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
 
-            <button wire:click="exportExpenses('excel')" class="btn btn-sm btn-white text-success">
+            <button wire:click="exportExpenses('excel')"
+                    class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
 
-            <button wire:click="exportExpenses('csv')" class="btn btn-sm btn-white text-info">
+            <button wire:click="exportExpenses('csv')"
+                    class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
 
@@ -25,8 +28,10 @@
 
 
         <div class="col-auto">
-            <a data-bs-toggle="modal" data-bs-target="#add" wire:click="resetInputFields"
-                class="btn btn-icon btn-3 btn-white text-primary mb-0">
+            <a data-bs-toggle="modal"
+               data-bs-target="#add"
+               wire:click="resetInputFields"
+               class="btn btn-icon btn-3 btn-white text-primary mb-0">
                 <i class="fa fa-plus me-2"></i> Add New Expense
             </a>
         </div>
@@ -44,25 +49,31 @@
 
                             {{-- Employee Filter (Admin Only) --}}
                             <div class="col-lg-3 col-md-6 col-12">
-                                <div class="dropdown w-100" wire:ignore>
+                                <div class="dropdown w-100"
+                                     wire:ignore>
                                     <!-- Dropdown button -->
-                                    <button
-                                        class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
-                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn border shadow-none dropdown-toggle w-100 d-flex justify-content-between align-items-center"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
                                         Filter by Employees
                                     </button>
 
                                     <!-- Dropdown menu -->
                                     <div class="dropdown-menu p-3 w-100 shadow"
-                                        style="max-height: 250px; overflow-y: auto;" data-bs-auto-close="outside">
+                                         style="max-height: 250px; overflow-y: auto;"
+                                         data-bs-auto-close="outside">
 
 
 
 
                                         <div class="form-check mb-2 border-bottom pb-2">
-                                            <input class="form-check-input" type="checkbox"
-                                                wire:model.live="selectAllUsers" id="emp-all">
-                                            <label class="form-check-label fw-semibold" for="emp-all">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   wire:model.live="selectAllUsers"
+                                                   id="emp-all">
+                                            <label class="form-check-label fw-semibold"
+                                                   for="emp-all">
                                                 All Employees
                                             </label>
                                         </div>
@@ -75,10 +86,13 @@
 
                                         @foreach ($employees as $emp)
                                             <div class="form-check mb-1">
-                                                <input class="form-check-input" type="checkbox"
-                                                    value="{{ $emp->user_id }}" wire:model.live="filterUsers"
-                                                    id="emp-{{ $emp->user_id }}">
-                                                <label class="form-check-label" for="emp-{{ $emp->user_id }}">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       value="{{ $emp->user_id }}"
+                                                       wire:model.live="filterUsers"
+                                                       id="emp-{{ $emp->user_id }}">
+                                                <label class="form-check-label"
+                                                       for="emp-{{ $emp->user_id }}">
                                                     {{ $emp->full_name }}
                                                 </label>
                                             </div>
@@ -95,7 +109,7 @@
                             {{-- Sort --}}
                             <div class="col-lg-3 col-md-6 col-12">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleSort($event.target.value)">
+                                        wire:change="handleSort($event.target.value)">
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
                                 </select>
@@ -103,7 +117,8 @@
 
                             {{-- Category Filter --}}
                             <div class="col-lg-3 col-md-6 col-12">
-                                <select class="form-select" wire:change="handleCategoryFilter($event.target.value)">
+                                <select class="form-select"
+                                        wire:change="handleCategoryFilter($event.target.value)">
                                     <option value="">All Categories</option>
                                     <option value="Travel">Travel</option>
                                     <option value="Meals & Entertainment">Meals & Entertainment</option>
@@ -122,7 +137,7 @@
 
                             <div class="col-lg-3 col-md-6 col-12">
                                 <select class="form-select form-select-lg"
-                                    wire:change="handleDateFilter($event.target.value)">
+                                        wire:change="handleDateFilter($event.target.value)">
                                     <option value="">All Dates</option>
                                     <option value="day">Today</option>
                                     <option value="week">This Week</option>
@@ -136,14 +151,18 @@
 
                             @if ($filterDate === 'custom')
                                 <div class="col-md-2">
-                                    <input type="date" class="form-control"
-                                        wire:change="handleDateFrom($event.target.value)" wire:model="date_from">
+                                    <input type="date"
+                                           class="form-control"
+                                           wire:change="handleDateFrom($event.target.value)"
+                                           wire:model="date_from">
                                 </div>
 
                                 {{-- Date To --}}
                                 <div class="col-md-2">
-                                    <input type="date" class="form-control"
-                                        wire:change="handleDateTo($event.target.value)" wire:model="date_to">
+                                    <input type="date"
+                                           class="form-control"
+                                           wire:change="handleDateTo($event.target.value)"
+                                           wire:model="date_to">
                                 </div>
                             @endif
                         </div>
@@ -156,7 +175,8 @@
                                 <strong>{{ $search ?: 'All Expenses' }}</strong>
                             </p>
 
-                            <div wire:loading wire:target="search">
+                            <div wire:loading
+                                 wire:target="search">
                                 <span class="spinner-border spinner-border-sm text-primary"></span>
                                 <span class="text-primary small">Searching...</span>
                             </div>
@@ -209,9 +229,11 @@
                                         {{-- Attachments --}}
                                         <td>
                                             @if ($row->attachments && count($row->attachments) > 0)
-                                                <button type="button" class="btn btn-sm btn-primary"
-                                                    wire:click="openAttachments({{ $row->id }})"
-                                                    data-bs-toggle="modal" data-bs-target="#attachmentsModal">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-primary"
+                                                        wire:click="openAttachments({{ $row->id }})"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#attachmentsModal">
                                                     View
                                                 </button>
                                             @else
@@ -225,16 +247,19 @@
 
                                         {{-- Only Delete for Company Admin --}}
                                         <td>
-                                            <a href="#" class="badge bg-info text-white"
-                                                wire:click="editExpense({{ $row->id }})" data-bs-toggle="modal"
-                                                data-bs-target="#editExpenseModal">
+                                            <a href="#"
+                                               class="badge bg-info text-white"
+                                               wire:click="editExpense({{ $row->id }})"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editExpenseModal">
                                                 Edit
                                             </a>
 
 
 
-                                            <a href="#" class="badge bg-danger text-white"
-                                                wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
+                                            <a href="#"
+                                               class="badge bg-danger text-white"
+                                               wire:click.prevent="$dispatch('confirmDelete', {{ $row->id }})">
                                                 Delete
                                             </a>
                                         </td>
@@ -242,7 +267,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center">No expenses found</td>
+                                        <td colspan="8"
+                                            class="text-center">No expenses found</td>
                                     </tr>
                                 @endforelse
 
@@ -252,7 +278,7 @@
 
                         <div class="mt-4 d-flex justify-content-end">
                             <div class="card shadow-sm border-0 rounded-4 p-3"
-                                style="max-width: 300px; background-color: #f8f9fa;">
+                                 style="max-width: 300px; background-color: #f8f9fa;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold text-muted">Total Expenses:</span>
                                     <span class="fw-bold text-dark">
@@ -266,7 +292,8 @@
                         {{-- Load More --}}
                         @if ($hasMore)
                             <div class="text-center mt-4">
-                                <button wire:click="loadMore" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                                <button wire:click="loadMore"
+                                        class="btn btn-outline-primary rounded-pill px-4 py-2">
                                     Load More
                                 </button>
                             </div>
@@ -278,21 +305,26 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="add" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="add"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Add Expense</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i
-                            class="fas fa-times"></i></button>
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
                 </div>
 
                 <form wire:submit.prevent="save">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Category<span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="category">
+                            <select class="form-select"
+                                    wire:model="category">
                                 <option value="">Select</option>
 
                                 <option value="Travel">Travel</option>
@@ -317,7 +349,9 @@
 
                         <div class="mb-3">
                             <label class="form-label mt-2">Amount (£) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" wire:model="amount">
+                            <input type="number"
+                                   class="form-control"
+                                   wire:model="amount">
                             @error('amount')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -327,7 +361,8 @@
                         <div class="mb-3">
 
                             <label class="form-label mt-2">Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control" wire:model="description"></textarea>
+                            <textarea class="form-control"
+                                      wire:model="description"></textarea>
 
                             @error('description')
                                 <span class="text-danger">{{ $message }}</span>
@@ -337,14 +372,18 @@
 
                         {{-- Hidden File Input --}}
                         <div class="mb-3">
-                            <input type="file" class="d-none" id="fileInput" wire:model="newAttachment"
-                                accept="application/pdf,image/*">
+                            <input type="file"
+                                   class="d-none"
+                                   id="fileInput"
+                                   wire:model="newAttachment"
+                                   accept="application/pdf,image/*">
 
                             {{-- Add Attachment Button --}}
                             <div>
-                                <button type="button" class="btn btn-sm btn-primary mt-1"
-                                    @if (count($attachments) >= 3) disabled @endif
-                                    onclick="document.getElementById('fileInput').click();">
+                                <button type="button"
+                                        class="btn btn-sm btn-primary mt-1"
+                                        @if (count($attachments) >= 3) disabled @endif
+                                        onclick="document.getElementById('fileInput').click();">
                                     Add Attachment (Max: 3)
                                 </button>
                             </div>
@@ -374,22 +413,24 @@
                                         @endphp
 
                                         <div class="border rounded p-2 position-relative"
-                                            style="width: 120px; text-align:center;">
+                                             style="width: 120px; text-align:center;">
                                             @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                                <img src="{{ $fileUrl }}" class="img-fluid rounded"
-                                                    style="height:80px; object-fit:cover;">
+                                                <img src="{{ $fileUrl }}"
+                                                     class="img-fluid rounded"
+                                                     style="height:80px; object-fit:cover;">
                                             @else
-                                                <a href="{{ $fileUrl }}" target="_blank"
-                                                    class="d-block mt-2 text-decoration-none">
+                                                <a href="{{ $fileUrl }}"
+                                                   target="_blank"
+                                                   class="d-block mt-2 text-decoration-none">
                                                     <i class="fas fa-file-pdf fa-2x text-danger"></i>
                                                     <p class="small mb-0">{{ $shortName }}</p>
                                                 </a>
                                             @endif
 
                                             <button type="button"
-                                                class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                wire:click="removeAttachment({{ $index }})"
-                                                style="padding: 0 6px; font-size: 12px;">×
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    wire:click="removeAttachment({{ $index }})"
+                                                    style="padding: 0 6px; font-size: 12px;">×
                                             </button>
                                         </div>
                                     @endforeach
@@ -404,13 +445,18 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
 
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="save">
-                            <span wire:loading wire:target="save"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
-                            <span wire:loading.remove wire:target="save">Save</span>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="save">
+                            <span wire:loading
+                                  wire:target="save"><i class="fas fa-spinner fa-spin me-2"></i>Saving...</span>
+                            <span wire:loading.remove
+                                  wire:target="save">Save</span>
                         </button>
                     </div>
 
@@ -422,13 +468,18 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="editExpenseModal" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="editExpenseModal"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Edit Expense</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -439,7 +490,8 @@
                         {{-- Category --}}
                         <div class="mb-3">
                             <label class="form-label">Category<span class="text-danger">*</span></label>
-                            <select class="form-select" wire:model="category">
+                            <select class="form-select"
+                                    wire:model="category">
                                 <option value="">Select</option>
                                 <option value="Travel">Travel</option>
                                 <option value="Meals & Entertainment">Meals & Entertainment</option>
@@ -462,7 +514,9 @@
                         {{-- Amount --}}
                         <div class="mb-3">
                             <label class="form-label mt-2">Amount (£) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" wire:model="amount">
+                            <input type="number"
+                                   class="form-control"
+                                   wire:model="amount">
                             @error('amount')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -471,7 +525,8 @@
                         {{-- Description --}}
                         <div class="mb-3">
                             <label class="form-label mt-2">Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control" wire:model="description"></textarea>
+                            <textarea class="form-control"
+                                      wire:model="description"></textarea>
                             @error('description')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -480,14 +535,18 @@
                         {{-- Attachments --}}
                         <div class="mb-3">
                             {{-- Hidden File Input --}}
-                            <input type="file" class="d-none" id="editFileInput" wire:model="newAttachment"
-                                accept="application/pdf,image/*">
+                            <input type="file"
+                                   class="d-none"
+                                   id="editFileInput"
+                                   wire:model="newAttachment"
+                                   accept="application/pdf,image/*">
 
                             {{-- Add Attachment Button --}}
                             <div>
-                                <button type="button" class="btn btn-sm btn-primary mt-1"
-                                    @if (count($attachments) >= 3) disabled @endif
-                                    onclick="document.getElementById('editFileInput').click();">
+                                <button type="button"
+                                        class="btn btn-sm btn-primary mt-1"
+                                        @if (count($attachments) >= 3) disabled @endif
+                                        onclick="document.getElementById('editFileInput').click();">
                                     Add Attachment (Max: 3)
                                 </button>
                             </div>
@@ -516,22 +575,24 @@
                                         @endphp
 
                                         <div class="border rounded p-2 position-relative"
-                                            style="width: 120px; text-align:center;">
+                                             style="width: 120px; text-align:center;">
                                             @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                                <img src="{{ $fileUrl }}" class="img-fluid rounded"
-                                                    style="height:80px; object-fit:cover;">
+                                                <img src="{{ $fileUrl }}"
+                                                     class="img-fluid rounded"
+                                                     style="height:80px; object-fit:cover;">
                                             @else
-                                                <a href="{{ $fileUrl }}" target="_blank"
-                                                    class="d-block mt-2 text-decoration-none">
+                                                <a href="{{ $fileUrl }}"
+                                                   target="_blank"
+                                                   class="d-block mt-2 text-decoration-none">
                                                     <i class="fas fa-file-pdf fa-2x text-danger"></i>
                                                     <p class="small mb-0">{{ $shortName }}</p>
                                                 </a>
                                             @endif
 
                                             <button type="button"
-                                                class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                wire:click="removeAttachment({{ $index }})"
-                                                style="padding: 0 6px; font-size: 12px;">×
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    wire:click="removeAttachment({{ $index }})"
+                                                    style="padding: 0 6px; font-size: 12px;">×
                                             </button>
                                         </div>
                                     @endforeach
@@ -545,12 +606,17 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                            wire:target="update">
-                            <span wire:loading wire:target="update"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Updating...</span>
-                            <span wire:loading.remove wire:target="update">Update</span>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="update">
+                            <span wire:loading
+                                  wire:target="update"><i class="fas fa-spinner fa-spin me-2"></i>Updating...</span>
+                            <span wire:loading.remove
+                                  wire:target="update">Update</span>
                         </button>
                     </div>
 
@@ -563,13 +629,19 @@
 
 
     {{-- Attachments Modal --}}
-    <div wire:ignore.self class="modal fade" id="attachmentsModal" tabindex="-1" aria-hidden="true">
+    <div wire:ignore.self
+         class="modal fade"
+         id="attachmentsModal"
+         tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h5 class="modal-title">Attachments</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -582,12 +654,14 @@
                                     @php $ext = pathinfo($file, PATHINFO_EXTENSION); @endphp
 
                                     @if (in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
-                                        <img src="{{ asset('storage/' . $file) }}" class="img-fluid rounded"
-                                            style="max-height:150px; cursor:pointer;"
-                                            onclick="window.open('{{ asset('storage/' . $file) }}','_blank')">
+                                        <img src="{{ asset('storage/' . $file) }}"
+                                             class="img-fluid rounded"
+                                             style="max-height:150px; cursor:pointer;"
+                                             onclick="window.open('{{ asset('storage/' . $file) }}','_blank')">
                                     @elseif ($ext === 'pdf')
-                                        <a href="{{ asset('storage/' . $file) }}" target="_blank"
-                                            class="btn btn-outline-primary btn-sm mt-2 w-100">
+                                        <a href="{{ asset('storage/' . $file) }}"
+                                           target="_blank"
+                                           class="btn btn-outline-primary btn-sm mt-2 w-100">
                                             View PDF
                                         </a>
                                     @endif
@@ -602,7 +676,9 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
                 </div>
 
             </div>

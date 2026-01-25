@@ -16,9 +16,12 @@ return new class extends Migration
             $table->foreignId('emp_id')->nullable()->constrained('employees')->cascadeOnDelete();
 
             $table->date('date_of_birth')->nullable();
-            $table->string('house_no')->nullable();
-            $table->string('street')->nullable();
-            $table->string('address')->nullable();
+            $table->string('street_1')->nullable();
+            $table->string('street_2')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postcode')->nullable();
+            $table->string('country')->nullable();
             $table->string('nationality')->nullable();
 
             $table->string('home_phone')->nullable();
@@ -31,6 +34,8 @@ return new class extends Migration
 
             // Visa / Immigration / BRP
             $table->string('immigration_status')->nullable();
+            $table->string('brp_number')->nullable();
+            $table->date('brp_expiry_date')->nullable();
             $table->date('right_to_work_expiry_date')->nullable();
 
             // Passport

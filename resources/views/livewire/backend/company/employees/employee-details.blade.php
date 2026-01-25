@@ -1644,7 +1644,8 @@
 
                                         <div class="col-12 mb-2"
                                              x-data="addressAutocomplete()">
-                                            <label class="form-label small fw-bold text-secondary">Search Full Address
+                                            <label class="form-label small fw-semibold text-secondary">Search Full
+                                                Address
                                                 <span class="text-danger">*</span></label>
                                             <div class="position-relative">
                                                 <input type="text"
@@ -1685,7 +1686,7 @@
 
                                         <div class="col-md-6"
                                              id="countryDropdownContainer">
-                                            <label class="form-label small fw-bold text-secondary">Country <span
+                                            <label class="form-label small fw-semibold text-secondary">Country <span
                                                       class="text-danger">*</span></label>
                                             <div class="position-relative">
                                                 <button class="form-select text-start d-flex align-items-center bg-white shadow-none border-light-subtle"
@@ -1722,7 +1723,7 @@
 
                                         <div class="col-md-6"
                                              id="stateDropdownContainer">
-                                            <label class="form-label small fw-bold text-secondary">State / Province
+                                            <label class="form-label small fw-semibold text-secondary">State / Province
                                                 <span class="text-danger">*</span></label>
                                             <div class="position-relative">
                                                 <button class="form-select text-start bg-white shadow-none border-light-subtle"
@@ -1752,7 +1753,7 @@
 
                                         <div class="col-md-6"
                                              id="cityDropdownContainer">
-                                            <label class="form-label small fw-bold text-secondary">City <span
+                                            <label class="form-label small fw-semibold text-secondary">City <span
                                                       class="text-danger">*</span></label>
                                             <div class="position-relative">
                                                 <button class="form-select text-start bg-white shadow-none border-light-subtle"
@@ -1782,8 +1783,10 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-secondary">Zip / Postal Code
+                                            <label class="form-label small fw-semibold text-secondary">Zip / Postal
+                                                Code
                                                 <span class="text-danger">*</span></label>
+
                                             <input type="text"
                                                    class="form-control border-light-subtle shadow-none"
                                                    wire:model="postcode"
@@ -1795,32 +1798,39 @@
                                         </div>
 
                                     </div>
+
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold text-secondary">House Number
+                                                <span class="text-danger">*</span></label>
+
+
+                                            <input type="text"
+                                                   class="form-control border-light-subtle shadow-none"
+                                                   wire:model="house_no"
+                                                   placeholder="Enter House Number">
+
+                                            @error('house_no')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold text-secondary">Street <span
+                                                      class="text-danger">*</span></label>
+                                            <input type="text"
+                                                   class="form-control border-light-subtle shadow-none"
+                                                   wire:model="street"
+                                                   placeholder="Enter House Number">
+
+                                            @error('street')
+                                                <span class="text-danger x-small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-secondary">House Number <span
-                                          class="text-danger">*</span></label>
-                                <input type="text"
-                                       class="form-control border-light-subtle shadow-none"
-                                       wire:model="house_no"
-                                       placeholder="Enter House Number">
-
-                                @error('house_no')
-                                    <span class="text-danger x-small">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-secondary">Street <span
-                                          class="text-danger">*</span></label>
-                                <input type="text"
-                                       class="form-control border-light-subtle shadow-none"
-                                       wire:model="street"
-                                       placeholder="Enter House Number">
-
-                                @error('street')
-                                    <span class="text-danger x-small">{{ $message }}</span>
-                                @enderror
                             </div>
 
 

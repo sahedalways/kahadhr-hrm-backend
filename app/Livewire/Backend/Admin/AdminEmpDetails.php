@@ -17,6 +17,7 @@ class AdminEmpDetails extends BaseComponent
 
     public $customFields = [];
     public $customValues = [];
+    public $documentTypes;
 
     public $departments;
     public $showAllTeams = false;
@@ -46,6 +47,46 @@ class AdminEmpDetails extends BaseComponent
     public $selectedExpiresAt;
     public $selectedComment;
     public $selectedDocId;
+
+    public $activeTab = 'overview';
+
+
+
+
+    public function isProfileComplete()
+    {
+        $requiredFields = [
+            'f_name',
+            'l_name',
+            'title',
+            'job_title',
+            'address',
+            'house_no',
+            'street',
+            'start_date',
+            'postcode',
+            'country',
+            'state',
+            'city',
+            'nationality',
+            'date_of_birth',
+            'tax_reference_number',
+            'passport_number',
+            'passport_expiry_date',
+            'employment_status',
+            'contract_hours'
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (empty($this->{$field})) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
 
     public function openDocumentModal($docId)
     {
@@ -85,8 +126,14 @@ class AdminEmpDetails extends BaseComponent
         )->find($employee);
 
 
+        $this->documentTypes = DocumentType::query()
+            ->where('company_id', $this->employee->company_id)
+            ->orderBy('name')
+            ->get();
 
-        $this->types = DocumentType::all();
+
+
+
 
 
         $this->departments = $this->employee->user

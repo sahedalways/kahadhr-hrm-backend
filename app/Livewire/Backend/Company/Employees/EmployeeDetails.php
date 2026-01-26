@@ -22,6 +22,8 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -106,8 +108,13 @@ class EmployeeDetails extends BaseComponent
 
 
     public $countries = [];
+    public $citySearch = '';
     public $cities = [];
-    public $locations = [];
+    public $allCities = [];
+
+    public $stateSearch = '';
+    public $states = [];
+    public $allStates = [];
 
     public $filteredCountries = [];
 
@@ -132,6 +139,137 @@ class EmployeeDetails extends BaseComponent
     public $mobile;
     public $address;
     public $relationship;
+
+
+
+    public function updatedCountrySearch($value)
+    {
+        $this->filteredCountries = collect($this->countries)
+            ->filter(function ($c) use ($value) {
+                return str_contains(strtolower($c['name']), strtolower($value));
+            })
+            ->values()
+            ->toArray();
+    }
+
+    public function updatedCitySearch($value)
+    {
+        if ($value === '') {
+            $this->cities = $this->allCities;
+            return;
+        }
+
+        $this->cities = collect($this->allCities)
+            ->filter(
+                fn($city) =>
+                str_contains(strtolower($city), strtolower($value))
+            )
+            ->values()
+            ->toArray();
+    }
+
+
+    public function updatedStateSearch($value)
+    {
+        if ($value === '') {
+            $this->states = $this->allStates;
+            return;
+        }
+
+        $this->states = collect($this->allStates)
+            ->filter(
+                fn($s) =>
+                str_contains(strtolower($s['name']), strtolower($value))
+            )
+            ->values()
+            ->toArray();
+    }
+
+
+
+
+    public function updatedCountry($value)
+    {
+        $this->state = null;
+        $this->city = null;
+
+        $this->stateSearch = '';
+        $this->citySearch  = '';
+
+        $this->states = [];
+        $this->allStates = [];
+        $this->cities = [];
+        $this->allCities = [];
+
+        $this->loadStates($value);
+    }
+
+
+
+
+    public function loadStates($country)
+    {
+        if (!$country) {
+            return;
+        }
+
+        $cacheKey = 'states.' . md5($country);
+
+        $this->allStates = Cache::remember(
+            $cacheKey,
+            now()->addDays(7),
+            function () use ($country) {
+
+                $response = Http::post(
+                    'https://countriesnow.space/api/v0.1/countries/states',
+                    ['country' => $country]
+                );
+
+                if ($response->successful()) {
+                    return $response->json()['data']['states'] ?? [];
+                }
+
+                return [];
+            }
+        );
+
+
+        $this->states = $this->allStates;
+    }
+
+
+
+    public function updatedState($state)
+    {
+        $this->city = null;
+        $this->citySearch = '';
+
+        $cacheKey = 'cities.' . md5($this->country . '_' . $state);
+
+        $this->allCities = Cache::remember(
+            $cacheKey,
+            now()->addDays(7),
+            function () use ($state) {
+                $response = Http::post(
+                    'https://countriesnow.space/api/v0.1/countries/state/cities',
+                    [
+                        'country' => $this->country,
+                        'state'   => $state,
+                    ]
+                );
+
+                return $response->successful()
+                    ? $response->json()['data']
+                    : [];
+            }
+        );
+
+
+        $this->cities = $this->allCities;
+    }
+
+
+
 
     public function deleteEmergencyContact($contactId)
     {
@@ -260,15 +398,7 @@ class EmployeeDetails extends BaseComponent
         }
     }
 
-    public function updatedCountrySearch($value)
-    {
-        $this->filteredCountries = collect($this->countries)
-            ->filter(function ($c) use ($value) {
-                return str_contains(strtolower($c['name']), strtolower($value));
-            })
-            ->values()
-            ->toArray();
-    }
+
 
     public function openModal($field)
     {
@@ -331,16 +461,23 @@ class EmployeeDetails extends BaseComponent
 
         $this->country = 'United Kingdom';
 
+        $this->countries = Cache::remember(
+            'countries.list',
+            now()->addDays(7),
+            function () {
+                $response = Http::get(
+                    'https://countriesnow.space/api/v0.1/countries/flag/images'
+                );
 
-        $jsonPath = resource_path('data/countries.json');
-        if (file_exists($jsonPath)) {
-            $this->countries = json_decode(file_get_contents($jsonPath), true);
-        }
+                return $response->successful()
+                    ? $response->json()['data']
+                    : [];
+            }
+        );
 
-        $json = resource_path('data/uk_locations.json');
-        if (file_exists($json)) {
-            $this->locations = json_decode(file_get_contents($json), true);
-        }
+        $this->loadStates($this->country);
+
+
 
         $this->filteredCountries = $this->countries;
 
@@ -558,12 +695,6 @@ class EmployeeDetails extends BaseComponent
     }
 
 
-    public function updatedState($value)
-    {
-        $this->cities = collect($this->locations)
-            ->firstWhere('state', $value)['cities'] ?? [];
-        $this->city = null;
-    }
 
     public function updatedShareCode($value)
     {
@@ -811,7 +942,6 @@ class EmployeeDetails extends BaseComponent
             'postcode',
             'country',
             'state',
-            'city',
             'nationality',
             'date_of_birth',
             'tax_reference_number',
@@ -857,7 +987,7 @@ class EmployeeDetails extends BaseComponent
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
             'state' => 'required|string|max:100',
-            'city' => 'required|string|max:100',
+            'city' => 'nullable|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
             'home_phone' => 'nullable|string|max:20',
@@ -956,7 +1086,7 @@ class EmployeeDetails extends BaseComponent
                 'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
                 'street' => $this->street,
                 'house_no' => $this->house_no,
-                'city' => $this->city,
+                'city' => $this->city ?? null,
                 'address' => $this->address,
                 'state' => $this->state,
                 'postcode' => $this->postcode,

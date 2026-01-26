@@ -338,6 +338,15 @@
                                                 .blink-red {
                                                     animation: blinkRed 1s infinite;
                                                 }
+
+                                                #countryDropdownButton,
+                                                #stateDropdownButton,
+                                                #cityDropdownButton,
+                                                #countryDropdownMenu,
+                                                #stateDropdownMenu,
+                                                #cityDropdownMenu {
+                                                    box-shadow: none !important;
+                                                }
                                             </style>
 
 
@@ -1714,103 +1723,125 @@
 
                                         <hr class="my-3 opacity-25">
 
+
+
                                         <div class="col-md-6"
                                              id="countryDropdownContainer">
-                                            <label class="form-label small fw-semibold text-secondary">Country <span
+                                            <label class="form-label">Country <span
                                                       class="text-danger">*</span></label>
-                                            <div class="position-relative">
-                                                <button class="form-select text-start d-flex align-items-center bg-white shadow-none border-light-subtle"
+                                            <div style="position:relative;">
+                                                <button class="btn btn-sm w-100 text-start"
                                                         type="button"
                                                         id="countryDropdownButton"
-                                                        onclick="toggleDropdown('countryDropdownMenu')">
-                                                    {{ !empty($country) ? $country : 'Select Country' }}
+                                                        style="border:1px solid #ccc; background:#fff;">
+                                                    {{ $country ?? 'Select Country' }}
                                                 </button>
 
                                                 <div id="countryDropdownMenu"
                                                      wire:ignore.self
-                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle px-2 pt-2"
-                                                     style="display:none; position:absolute; z-index:1000; max-height:250px; overflow-y:auto;">
+                                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding: 8px;">
                                                     <input type="text"
-                                                           class="form-control form-control-sm mb-2"
+                                                           class="form-control mb-2"
                                                            placeholder="Search country..."
                                                            wire:model.live="countrySearch">
+
                                                     @foreach ($filteredCountries as $c)
                                                         <a href="#"
-                                                           class="dropdown-item d-flex align-items-center rounded-2 py-2"
+                                                           class="dropdown-item d-flex align-items-center"
                                                            wire:click.prevent="$set('country', '{{ $c['name'] }}'); closeDropdown()">
-                                                            <img src="{{ $c['image'] }}"
-                                                                 class="me-2 rounded-1"
-                                                                 style="width:20px; height:14px; object-fit: cover;">
-                                                            <span class="small">{{ $c['name'] }}</span>
+                                                            <img src="{{ $c['flag'] }}"
+                                                                 alt="{{ $c['name'] }}"
+                                                                 style="width:20px; height:15px; margin-right:8px;">
+                                                            {{ $c['name'] }}
                                                         </a>
                                                     @endforeach
                                                 </div>
                                             </div>
                                             @error('country')
-                                                <span class="text-danger x-small">{{ $message }}</span>
+                                                <span class="text-danger small">{{ $message }}</span>
                                             @enderror
                                         </div>
 
                                         <div class="col-md-6"
                                              id="stateDropdownContainer">
-                                            <label class="form-label small fw-semibold text-secondary">State / Province
-                                                <span class="text-danger">*</span></label>
-                                            <div class="position-relative">
-                                                <button class="form-select text-start bg-white shadow-none border-light-subtle"
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <div style="position:relative;">
+                                                <button class="btn btn-sm w-100 text-start"
                                                         type="button"
                                                         id="stateDropdownButton"
-                                                        onclick="toggleDropdown('stateDropdownMenu')">
-                                                    {{ !empty($state) ? $state : 'Select State' }}
+                                                        style="border:1px solid #ccc; background:#fff;"
+                                                        @if (empty($states)) disabled @endif>
+                                                    {{ $state ?? 'Select State' }}
                                                 </button>
 
                                                 <div id="stateDropdownMenu"
                                                      wire:ignore.self
-                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle"
-                                                     style="display:none; position:absolute; z-index:1000; max-height:200px; overflow-y:auto;">
-                                                    @foreach ($locations as $loc)
+                                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding: 8px;">
+                                                    <input type="text"
+                                                           class="form-control mb-2"
+                                                           placeholder="Search state..."
+                                                           wire:model.live="stateSearch">
+
+                                                    @forelse ($states as $s)
                                                         <a href="#"
-                                                           class="dropdown-item small py-2"
-                                                           wire:click.prevent="$set('state', '{{ $loc['state'] }}'); selectState('{{ $loc['state'] }}'); closeDropdown('state')">
-                                                            {{ $loc['state'] }}
+                                                           class="dropdown-item"
+                                                           wire:click.prevent="$set('state', '{{ $s['name'] }}'); $set('city', null); closeDropdown()">
+                                                            {{ $s['name'] }}
                                                         </a>
-                                                    @endforeach
+                                                    @empty
+                                                        <span class="dropdown-item text-muted small">Select country
+                                                            first</span>
+                                                    @endforelse
                                                 </div>
                                             </div>
                                             @error('state')
-                                                <span class="text-danger x-small">{{ $message }}</span>
+                                                <span class="text-danger small">{{ $message }}</span>
                                             @enderror
                                         </div>
 
                                         <div class="col-md-6"
                                              id="cityDropdownContainer">
-                                            <label class="form-label small fw-semibold text-secondary">City <span
-                                                      class="text-danger">*</span></label>
-                                            <div class="position-relative">
-                                                <button class="form-select text-start bg-white shadow-none border-light-subtle"
+                                            <label class="form-label">City </label>
+                                            <div style="position:relative;">
+                                                <button class="btn btn-sm w-100 text-start"
                                                         type="button"
                                                         id="cityDropdownButton"
-                                                        @if (!$cities) disabled @endif
-                                                        onclick="toggleDropdown('cityDropdownMenu')">
-                                                    {{ !empty($city) ? $city : 'Select City' }}
+                                                        style="border:1px solid #ccc; background:#fff;"
+                                                        @if (empty($cities)) disabled @endif>
+                                                    {{ $city ?? 'Select City' }}
                                                 </button>
 
                                                 <div id="cityDropdownMenu"
                                                      wire:ignore.self
-                                                     class="dropdown-menu shadow-lg w-100 border-light-subtle"
-                                                     style="display:none; position:absolute; z-index:1000; max-height:200px; overflow-y:auto;">
-                                                    @foreach ($cities as $c)
+                                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding: 8px;">
+                                                    <input type="text"
+                                                           class="form-control mb-2"
+                                                           placeholder="Search city..."
+                                                           wire:model.live="citySearch">
+
+                                                    @forelse ($cities as $c)
                                                         <a href="#"
-                                                           class="dropdown-item small py-2"
-                                                           wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown('city')">
+                                                           class="dropdown-item"
+                                                           wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown()">
                                                             {{ $c }}
                                                         </a>
-                                                    @endforeach
+                                                    @empty
+                                                        <span class="dropdown-item text-muted small">Select state
+                                                            first</span>
+                                                    @endforelse
                                                 </div>
                                             </div>
                                             @error('city')
-                                                <span class="text-danger x-small">{{ $message }}</span>
+                                                <span class="text-danger small">{{ $message }}</span>
                                             @enderror
                                         </div>
+
+
+
+
+
+
+
 
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-secondary">Zip / Postal
@@ -2475,7 +2506,7 @@
 
 <script>
     document.addEventListener('click', function(e) {
-        ['country', 'state', 'city', 'immigration', 'gender', 'marital'].forEach(type => {
+        ['country', 'state', 'city', 'immigration'].forEach(type => {
             const btn = document.getElementById(type + 'DropdownButton');
             const menu = document.getElementById(type + 'DropdownMenu');
             if (btn && menu) {

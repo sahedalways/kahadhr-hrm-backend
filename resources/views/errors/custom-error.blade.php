@@ -169,7 +169,7 @@
                 <div class="cta-group">
                     <a href="{{ url('/') }}"
                        class="btn-primary-custom">
-                        Back to Dashboard
+                        Back to Home
                     </a>
                     <a href="mailto:{{ getSiteEmail() ?? 'support@company.com' }}"
                        class="btn-outline-custom">

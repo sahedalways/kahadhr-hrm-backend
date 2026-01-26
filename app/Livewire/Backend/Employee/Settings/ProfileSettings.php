@@ -6,16 +6,22 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CustomEmployeeProfileField;
 use App\Models\CustomEmployeeProfileFieldValue;
 use Livewire\WithFileUploads;
-use Illuminate\Http\UploadedFile;
-use App\Models\Department;
 use App\Models\DocumentType;
-use App\Models\Team;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class ProfileSettings extends BaseComponent
 {
     use WithFileUploads;
     public $countries = [];
+    public $citySearch = '';
     public $cities = [];
+    public $allCities = [];
+
+    public $stateSearch = '';
+    public $states = [];
+    public $allStates = [];
+
     public $documentTypes;
     public $locations = [];
 
@@ -78,6 +84,123 @@ class ProfileSettings extends BaseComponent
             ->toArray();
     }
 
+    public function updatedCitySearch($value)
+    {
+        if ($value === '') {
+            $this->cities = $this->allCities;
+            return;
+        }
+
+        $this->cities = collect($this->allCities)
+            ->filter(
+                fn($city) =>
+                str_contains(strtolower($city), strtolower($value))
+            )
+            ->values()
+            ->toArray();
+    }
+
+
+    public function updatedStateSearch($value)
+    {
+        if ($value === '') {
+            $this->states = $this->allStates;
+            return;
+        }
+
+        $this->states = collect($this->allStates)
+            ->filter(
+                fn($s) =>
+                str_contains(strtolower($s['name']), strtolower($value))
+            )
+            ->values()
+            ->toArray();
+    }
+
+
+
+
+    public function updatedCountry($value)
+    {
+        $this->state = null;
+        $this->city = null;
+
+        $this->stateSearch = '';
+        $this->citySearch  = '';
+
+        $this->states = [];
+        $this->allStates = [];
+        $this->cities = [];
+        $this->allCities = [];
+
+        $this->loadStates($value);
+    }
+
+
+
+
+    public function loadStates($country)
+    {
+        if (!$country) {
+            return;
+        }
+
+        $cacheKey = 'states.' . md5($country);
+
+        $this->allStates = Cache::remember(
+            $cacheKey,
+            now()->addDays(7),
+            function () use ($country) {
+
+                $response = Http::post(
+                    'https://countriesnow.space/api/v0.1/countries/states',
+                    ['country' => $country]
+                );
+
+                if ($response->successful()) {
+                    return $response->json()['data']['states'] ?? [];
+                }
+
+                return [];
+            }
+        );
+
+
+        $this->states = $this->allStates;
+    }
+
+
+
+    public function updatedState($state)
+    {
+        $this->city = null;
+        $this->citySearch = '';
+
+        $cacheKey = 'cities.' . md5($this->country . '_' . $state);
+
+        $this->allCities = Cache::remember(
+            $cacheKey,
+            now()->addDays(7),
+            function () use ($state) {
+                $response = Http::post(
+                    'https://countriesnow.space/api/v0.1/countries/state/cities',
+                    [
+                        'country' => $this->country,
+                        'state'   => $state,
+                    ]
+                );
+
+                return $response->successful()
+                    ? $response->json()['data']
+                    : [];
+            }
+        );
+
+
+        $this->cities = $this->allCities;
+    }
+
+
 
 
     /* Load employee info */
@@ -135,17 +258,24 @@ class ProfileSettings extends BaseComponent
         $this->country = 'United Kingdom';
 
 
-        $jsonPath = resource_path('data/countries.json');
-        if (file_exists($jsonPath)) {
-            $this->countries = json_decode(file_get_contents($jsonPath), true);
-        }
+        $this->countries = Cache::remember(
+            'countries.list',
+            now()->addDays(7),
+            function () {
+                $response = Http::get(
+                    'https://countriesnow.space/api/v0.1/countries/flag/images'
+                );
 
-        $json = resource_path('data/uk_locations.json');
-        if (file_exists($json)) {
-            $this->locations = json_decode(file_get_contents($json), true);
-        }
+                return $response->successful()
+                    ? $response->json()['data']
+                    : [];
+            }
+        );
+
+        $this->loadStates($this->country);
 
         $this->filteredCountries = $this->countries;
+
 
         $this->customFields = CustomEmployeeProfileField::where('company_id', $this->employee->company_id)
             ->orderBy('id')
@@ -377,12 +507,6 @@ class ProfileSettings extends BaseComponent
     }
 
 
-    public function updatedState($value)
-    {
-        $this->cities = collect($this->locations)
-            ->firstWhere('state', $value)['cities'] ?? [];
-        $this->city = null;
-    }
 
     public function updatedShareCode($value)
     {
@@ -409,7 +533,7 @@ class ProfileSettings extends BaseComponent
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
             'state' => 'required|string|max:100',
-            'city' => 'required|string|max:100',
+            'city' => 'nullable|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
             'home_phone' => 'nullable|string|max:20',
@@ -494,7 +618,7 @@ class ProfileSettings extends BaseComponent
                 'house_no' => $validatedData['house_no'],
                 'address' => $validatedData['address'],
                 'street' => $validatedData['street'],
-                'city' => $validatedData['city'],
+                'city' => $validatedData['city'] ?? null,
                 'state' => $validatedData['state'],
                 'postcode' => $validatedData['postcode'],
                 'country' => $validatedData['country'],

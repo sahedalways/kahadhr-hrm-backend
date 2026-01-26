@@ -137,12 +137,13 @@
                                     <div class="position-relative">
                                         <input type="text"
                                                class="form-control border-light-subtle py-2 shadow-none"
-                                               wire:model.lazy="address"
                                                x-model="query"
+                                               wire:model.lazy="address"
                                                @input.debounce.500ms="fetchSuggestions"
                                                @click.away="showSuggestions = false"
                                                placeholder="Type to search your address..."
                                                autocomplete="off">
+
 
                                         <div x-show="showSuggestions && suggestions.length > 0"
                                              class="list-group position-absolute w-100 shadow-lg mt-1"
@@ -415,7 +416,7 @@
 
     <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
         <div class="card-body p-4">
-            <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2">
+            <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2 text-center">
                 Job Assignment
             </h6>
 
@@ -696,7 +697,7 @@
 <script>
     function addressAutocomplete() {
         return {
-            query: '',
+            query: @entangle('address'),
             suggestions: [],
             showSuggestions: false,
             loading: false,
@@ -710,7 +711,6 @@
 
                 this.loading = true;
                 try {
-                    // Nominatim API call for search
                     const response = await fetch(
                         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.query)}&addressdetails=1&limit=5`
                     );
@@ -729,7 +729,6 @@
                 this.query = item.display_name;
                 this.showSuggestions = false;
 
-                // Livewire-কে ভ্যালু আপডেট করার জন্য জানানো
                 @this.set('address', item.display_name);
             }
         }

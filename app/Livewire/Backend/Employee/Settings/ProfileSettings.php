@@ -33,6 +33,9 @@ class ProfileSettings extends BaseComponent
 
     public $customFields = [];
     public $customValues = [];
+    public bool $showAllDepartments = false;
+
+    public $showAllTeams = false;
     public $countrySearch = '';
 
     public $f_name, $l_name, $employment_status, $avatar, $old_avatar, $title;
@@ -72,6 +75,19 @@ class ProfileSettings extends BaseComponent
         "Other",
     ];
 
+
+    public function toggleDepartments()
+    {
+        $this->showAllDepartments = ! $this->showAllDepartments;
+    }
+
+
+
+
+    public function toggleTeams()
+    {
+        $this->showAllTeams = !$this->showAllTeams;
+    }
 
 
     public function updatedCountrySearch($value)
@@ -206,14 +222,25 @@ class ProfileSettings extends BaseComponent
     /* Load employee info */
     public function mount()
     {
+        $this->employee = auth()->user()->employee;
+
+
+
         $this->documentTypes = DocumentType::query()
             ->where('company_id', auth()->user()->employee->company_id)
             ->orderBy('name')
             ->get();
 
+        $this->departments = $this->employee->user
+            ? $this->employee->user->teams
+            ->pluck('department')
+            ->filter()
+            ->unique('id')
+            ->values()
+            : collect();
 
 
-        $this->employee = auth()->user()->employee;
+
 
         if (!$this->employee) {
             abort(403, 'Employee profile not found.');
@@ -532,7 +559,7 @@ class ProfileSettings extends BaseComponent
             'street' => 'required|string|max:255',
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
@@ -619,7 +646,7 @@ class ProfileSettings extends BaseComponent
                 'address' => $validatedData['address'],
                 'street' => $validatedData['street'],
                 'city' => $validatedData['city'] ?? null,
-                'state' => $validatedData['state'],
+                'state' => $validatedData['state'] ?? null,
                 'postcode' => $validatedData['postcode'],
                 'country' => $validatedData['country'],
                 'home_phone' => $validatedData['home_phone'],

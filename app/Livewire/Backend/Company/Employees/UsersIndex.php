@@ -13,6 +13,8 @@ use App\Models\Team;
 use App\Models\User;
 use App\Traits\Exportable;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 
@@ -162,20 +164,7 @@ class UsersIndex extends BaseComponent
 
         $this->loadMore();
 
-        $this->country = 'United Kingdom';
 
-
-        $jsonPath = resource_path('data/countries.json');
-        if (file_exists($jsonPath)) {
-            $this->countries = json_decode(file_get_contents($jsonPath), true);
-        }
-
-        $json = resource_path('data/uk_locations.json');
-        if (file_exists($json)) {
-            $this->locations = json_decode(file_get_contents($json), true);
-        }
-
-        $this->filteredCountries = $this->countries;
 
         $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
             ->orderBy('id')

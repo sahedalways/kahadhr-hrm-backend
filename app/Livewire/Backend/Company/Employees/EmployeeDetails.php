@@ -452,11 +452,6 @@ class EmployeeDetails extends BaseComponent
         $this->teams = Team::all();
 
 
-        $jsonPath = resource_path('data/countries.json');
-        if (file_exists($jsonPath)) {
-            $this->countries = json_decode(file_get_contents($jsonPath), true);
-        }
-
 
 
         $this->country = 'United Kingdom';
@@ -986,7 +981,7 @@ class EmployeeDetails extends BaseComponent
             'start_date' => 'required|date',
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'nationality' => 'required|string',
             'date_of_birth' => 'required|date',
@@ -1088,7 +1083,7 @@ class EmployeeDetails extends BaseComponent
                 'house_no' => $this->house_no,
                 'city' => $this->city ?? null,
                 'address' => $this->address,
-                'state' => $this->state,
+                'state' => $this->state ?? null,
                 'postcode' => $this->postcode,
                 'country' => $this->country,
                 'nationality' => $this->nationality,

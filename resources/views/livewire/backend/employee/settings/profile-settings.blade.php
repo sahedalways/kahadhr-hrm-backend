@@ -213,7 +213,7 @@
 
                                 <div class="col-md-6"
                                      id="stateDropdownContainer">
-                                    <label class="form-label">State <span class="text-danger">*</span></label>
+                                    <label class="form-label">State </label>
                                     <div style="position:relative;">
                                         <button class="btn btn-sm w-100 text-start"
                                                 type="button"
@@ -423,7 +423,10 @@
                 <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
                     Job Title
                 </label>
-                <span class="fw-bold">{{ $job_title ?? 'N/A' }}</span>
+                <span class="{{ $job_title ? 'fw-bold' : 'fst-italic' }}">
+                    {{ $job_title ?? 'N/A' }}
+                </span>
+
             </div>
 
             <div class="row g-3">
@@ -463,13 +466,82 @@
                     @include('livewire.backend.employee.settings.partials.right-to-work-status')
                 </div>
 
+                {{-- Departments --}}
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                            Departments
+                        </label>
+
+                        @php $max = 5; @endphp
+
+                        @if ($departments->isEmpty())
+                            <span class="text-muted fst-italic">N/A</span>
+                        @else
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
+                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                        {{ $department->name }}
+                                    </span>
+                                @endforeach
+
+                                @if ($departments->count() > $max)
+                                    <button wire:click="toggleDepartments"
+                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                        {{ $showAllDepartments ? 'See less' : 'View more' }}
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Teams --}}
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                            Teams
+                        </label>
+
+                        @php
+                            $assignedTeams = $employee->user ? $employee->user->teams : collect();
+                            $max = 5;
+                        @endphp
+
+                        @if ($assignedTeams->isEmpty())
+                            <span class="text-muted fst-italic">N/A</span>
+                        @else
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
+                                    @php
+                                        $isLead = $team->team_lead_id === $employee->user_id;
+                                    @endphp
+                                    <span
+                                          class="badge rounded-pill px-3 py-2
+    {{ $isLead ? 'bg-soft-primary text-primary' : 'bg-light text-dark border' }}">
+                                        {{ $team->name }}
+
+                                        @if ($isLead)
+                                            <span class="ms-1 fw-semibold text-dark">★ Leader</span>
+                                        @endif
+                                    </span>
+                                @endforeach
+
+                                @if ($assignedTeams->count() > $max)
+                                    <button wire:click="toggleTeams"
+                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                        {{ $showAllTeams ? 'See less' : 'View more' }}
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
             </div>
         </div>
-
-
-
-
     </div>
+
 
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">

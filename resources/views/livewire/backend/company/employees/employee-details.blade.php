@@ -347,6 +347,13 @@
                                                 #cityDropdownMenu {
                                                     box-shadow: none !important;
                                                 }
+
+                                                #countryDropdownMenu {
+                                                    overflow-y: auto;
+
+                                                    overflow-x: hidden;
+
+                                                }
                                             </style>
 
 
@@ -1461,9 +1468,11 @@
                         </div>
                     </div>
                     <button type="button"
-                            class="btn-close shadow-none"
+                            class="btn btn-light rounded-pill"
                             data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
                 <form wire:submit.prevent="updateProfile">
@@ -1764,7 +1773,7 @@
 
                                         <div class="col-md-6"
                                              id="stateDropdownContainer">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <label class="form-label">State </label>
                                             <div style="position:relative;">
                                                 <button class="btn btn-sm w-100 text-start"
                                                         type="button"

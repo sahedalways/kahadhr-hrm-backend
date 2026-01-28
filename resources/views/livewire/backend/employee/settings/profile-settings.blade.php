@@ -138,40 +138,14 @@
                                         <input type="text"
                                                class="form-control border-light-subtle py-2 shadow-none"
                                                x-model="query"
-                                               wire:model.lazy="address"
-                                               @input.debounce.500ms="fetchSuggestions"
-                                               @click.away="showSuggestions = false"
+                                               wire:model="address"
                                                placeholder="Type to search your address..."
                                                autocomplete="off">
-
-
-                                        <div x-show="showSuggestions && suggestions.length > 0"
-                                             class="list-group position-absolute w-100 shadow-lg mt-1"
-                                             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                                            <template x-for="(item, index) in suggestions"
-                                                      :key="index">
-                                                <button type="button"
-                                                        class="list-group-item list-group-item-action small py-2 border-0"
-                                                        @click="selectSuggestion(item)">
-                                                    <i class="fas fa-map-pin text-muted me-2"></i>
-                                                    <span x-text="item.display_name"></span>
-                                                </button>
-                                            </template>
-                                        </div>
-
-                                        <div x-show="loading"
-                                             class="position-absolute end-0 top-50 translate-middle-y me-3">
-                                            <div class="spinner-border spinner-border-sm text-primary"
-                                                 role="status"></div>
-                                        </div>
                                     </div>
                                     @error('address')
                                         <span class="text-danger x-small">{{ $message }}</span>
                                     @enderror
                                 </div>
-
-
-
 
 
 
@@ -694,46 +668,7 @@
 </div>
 
 
-<script>
-    function addressAutocomplete() {
-        return {
-            query: @entangle('address'),
-            suggestions: [],
-            showSuggestions: false,
-            loading: false,
 
-            async fetchSuggestions() {
-                if (this.query.length < 3) {
-                    this.suggestions = [];
-                    this.showSuggestions = false;
-                    return;
-                }
-
-                this.loading = true;
-                try {
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.query)}&addressdetails=1&limit=5`
-                    );
-                    const data = await response.json();
-
-                    this.suggestions = data;
-                    this.showSuggestions = true;
-                } catch (error) {
-                    console.error("Error fetching addresses:", error);
-                } finally {
-                    this.loading = false;
-                }
-            },
-
-            selectSuggestion(item) {
-                this.query = item.display_name;
-                this.showSuggestions = false;
-
-                @this.set('address', item.display_name);
-            }
-        }
-    }
-</script>
 
 
 <script>

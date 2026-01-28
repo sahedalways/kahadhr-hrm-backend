@@ -549,86 +549,117 @@
                     <div class="card border-0 shadow-sm"
                          style="border-radius:1rem; background-color: #f8f9fa;">
                         <div class="card-body p-4">
-                            <h5 class="mb-4 fw-bold text-dark">Emergency contacts</h4>
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                {{-- Left : Title --}}
+                                <h5 class="fw-bold text-dark mb-0">
+                                    Emergency contacts
+                                </h5>
 
-                                @if ($employee->emergencyContacts->count() < 2)
-                                    <button class="btn mb-4 d-flex align-items-center px-3 py-2"
-                                            style="background-color: #2f6dca; color: white; border-radius: 8px; font-weight: 500;"
-                                            wire:click="openEmergencyContactModal">
 
-                                        <i class="fas fa-user-plus me-2"></i> Add emergency contact
-                                    </button>
-                                @else
-                                    <div class="alert alert-warning mb-4">
-                                        <strong>Limit Reached:</strong> You can only add <strong>2 emergency
-                                            contacts</strong>.
+                                @if ($employee->profile?->addressHistory)
+                                    @php
+                                        $addr = $employee->profile->addressHistory;
+                                    @endphp
+
+                                    <div class="text-end"
+                                         style="max-width: 420px;">
+                                        <div class="fw-semibold text-muted mb-1"
+                                             style="font-size: 13px;">
+                                            Previous Address
+                                        </div>
+
+                                        <div class="small text-dark"
+                                             style="line-height: 1.4;">
+                                            {{ $addr->house_no }},
+                                            {{ $addr->street }},
+                                            {{ $addr->city }},
+                                            {{ $addr->state }},
+                                            {{ $addr->postcode }}<br>
+                                            <span class="text-muted">{{ $addr->country }}</span>
+                                        </div>
                                     </div>
                                 @endif
+                            </div>
 
 
-                                <div class="table-responsive bg-white shadow-sm border"
-                                     style="border-radius: 12px;">
-                                    <table class="table mb-0 align-middle">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th class="border-0 ps-4 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Name</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Relationship</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Mobile</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">E-mail</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Address</th>
-                                                <th class="border-0 py-3 text-muted fw-bold text-center"
-                                                    style="font-size: 14px;">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($employee->emergencyContacts as $contact)
-                                                <tr>
-                                                    <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
-                                                    <td class="text-muted">{{ $contact->relationship }}</td>
-                                                    <td class="text-muted">
-                                                        {{ $contact->mobile }}<br>
+                            @if ($employee->emergencyContacts->count() < 2)
+                                <button class="btn mb-4 d-flex align-items-center px-3 py-2"
+                                        style="background-color: #2f6dca; color: white; border-radius: 8px; font-weight: 500;"
+                                        wire:click="openEmergencyContactModal">
 
-                                                    </td>
-                                                    <td class="text-muted">{{ $contact->email ?? '' }}</td>
-                                                    <td class="text-muted"
-                                                        style="max-width: 200px;">
-                                                        {!! nl2br(e($contact->address)) !!}
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="d-flex justify-content-center gap-3">
-                                                            <a href="#"
-                                                               class="text-dark"
-                                                               wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
-                                                                <i class="fas fa-pencil-alt"></i>
-                                                            </a>
-
-                                                            <a href="#"
-                                                               class="text-danger"
-                                                               onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
-                                                               wire:click="deleteEmergencyContact({{ $contact->id }})">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-
-                                            @if ($employee->emergencyContacts->isEmpty())
-                                                <tr>
-                                                    <td colspan="6"
-                                                        class="text-center py-5 text-muted">
-                                                        No emergency contacts found.
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
+                                    <i class="fas fa-user-plus me-2"></i> Add emergency contact
+                                </button>
+                            @else
+                                <div class="alert alert-warning mb-4">
+                                    <strong>Limit Reached:</strong> You can only add <strong>2 emergency
+                                        contacts</strong>.
                                 </div>
+                            @endif
+
+
+                            <div class="table-responsive bg-white shadow-sm border"
+                                 style="border-radius: 12px;">
+                                <table class="table mb-0 align-middle">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="border-0 ps-4 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Name</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Relationship</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Mobile</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">E-mail</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Address</th>
+                                            <th class="border-0 py-3 text-muted fw-bold text-center"
+                                                style="font-size: 14px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($employee->emergencyContacts as $contact)
+                                            <tr>
+                                                <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
+                                                <td class="text-muted">{{ $contact->relationship }}</td>
+                                                <td class="text-muted">
+                                                    {{ $contact->mobile }}<br>
+
+                                                </td>
+                                                <td class="text-muted">{{ $contact->email ?? '' }}</td>
+                                                <td class="text-muted"
+                                                    style="max-width: 200px;">
+                                                    {!! nl2br(e($contact->address)) !!}
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-3">
+                                                        <a href="#"
+                                                           class="text-dark"
+                                                           wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </a>
+
+                                                        <a href="#"
+                                                           class="text-danger"
+                                                           onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                           wire:click="deleteEmergencyContact({{ $contact->id }})">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+
+                                        @if ($employee->emergencyContacts->isEmpty())
+                                            <tr>
+                                                <td colspan="6"
+                                                    class="text-center py-5 text-muted">
+                                                    No emergency contacts found.
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1698,32 +1729,9 @@
                                             <div class="position-relative">
                                                 <input type="text"
                                                        class="form-control border-light-subtle py-2 shadow-none"
-                                                       wire:model.lazy="address"
-                                                       x-model="query"
-                                                       @input.debounce.500ms="fetchSuggestions"
-                                                       @click.away="showSuggestions = false"
+                                                       wire:model="address"
                                                        placeholder="Type to search your address..."
                                                        autocomplete="off">
-
-                                                <div x-show="showSuggestions && suggestions.length > 0"
-                                                     class="list-group position-absolute w-100 shadow-lg mt-1"
-                                                     style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                                                    <template x-for="(item, index) in suggestions"
-                                                              :key="index">
-                                                        <button type="button"
-                                                                class="list-group-item list-group-item-action small py-2 border-0"
-                                                                @click="selectSuggestion(item)">
-                                                            <i class="fas fa-map-pin text-muted me-2"></i>
-                                                            <span x-text="item.display_name"></span>
-                                                        </button>
-                                                    </template>
-                                                </div>
-
-                                                <div x-show="loading"
-                                                     class="position-absolute end-0 top-50 translate-middle-y me-3">
-                                                    <div class="spinner-border spinner-border-sm text-primary"
-                                                         role="status"></div>
-                                                </div>
                                             </div>
                                             @error('address')
                                                 <span class="text-danger x-small">{{ $message }}</span>
@@ -2548,48 +2556,4 @@
     window.addEventListener('hide-emergency-modal', () => {
         bootstrap.Modal.getInstance(document.getElementById('addEmergencyContact')).hide();
     });
-
-
-
-
-    function addressAutocomplete() {
-        return {
-            query: '',
-            suggestions: [],
-            showSuggestions: false,
-            loading: false,
-
-            async fetchSuggestions() {
-                if (this.query.length < 3) {
-                    this.suggestions = [];
-                    this.showSuggestions = false;
-                    return;
-                }
-
-                this.loading = true;
-                try {
-                    // Nominatim API call for search
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.query)}&addressdetails=1&limit=5`
-                    );
-                    const data = await response.json();
-
-                    this.suggestions = data;
-                    this.showSuggestions = true;
-                } catch (error) {
-                    console.error("Error fetching addresses:", error);
-                } finally {
-                    this.loading = false;
-                }
-            },
-
-            selectSuggestion(item) {
-                this.query = item.display_name;
-                this.showSuggestions = false;
-
-                // Livewire-কে ভ্যালু আপডেট করার জন্য জানানো
-                @this.set('address', item.display_name);
-            }
-        }
-    }
 </script>

@@ -834,6 +834,10 @@ class EmployeeDetails extends BaseComponent
             $this->passport_expiry_date = $profile->passport_expiry_date
                 ? Carbon::parse($profile->passport_expiry_date)->format('Y-m-d')
                 : null;
+        } else {
+            $this->country = 'United Kingdom';
+            $this->state = null;
+            $this->city = null;
         }
 
         $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)

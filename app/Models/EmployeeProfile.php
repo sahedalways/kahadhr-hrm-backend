@@ -41,4 +41,11 @@ class EmployeeProfile extends Model
     {
         return $this->belongsTo(Employee::class, 'emp_id');
     }
+
+
+
+    public function addressHistory()
+    {
+        return $this->hasOne(EmpAddressHistory::class);
+    }
 }

@@ -259,4 +259,75 @@ class Company extends Model
             'data' => json_encode($data),
         ]);
     }
+
+
+
+    public function getTotalStorageMbAttribute()
+    {
+        $totalBytes = 0;
+
+
+        $docs = \DB::table('company_documents')->where('company_id', $this->id)->pluck('file_path');
+        foreach ($docs as $file) {
+            if (Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+        $slips = \DB::table('pay_slips')->where('company_id', $this->id)->pluck('file_path');
+        foreach ($slips as $file) {
+            if (Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+
+        $invoices = \DB::table('invoices')->where('company_id', $this->id)->pluck('pdf_path');
+        foreach ($invoices as $file) {
+            if (Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+
+        $empDocs = \DB::table('emp_documents')->where('company_id', $this->id)->pluck('file_path');
+        foreach ($empDocs as $file) {
+            if (Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+
+        $chats = \DB::table('chat_messages')->where('company_id', $this->id)->pluck('media_path');
+        foreach ($chats as $file) {
+            if ($file && Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+
+        $announcements = \DB::table('announcements')->where('company_id', $this->id)->pluck('media');
+        foreach ($announcements as $file) {
+            if ($file && Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+        $assignments = \DB::table('training_assignments')->pluck('proof_file');
+        foreach ($assignments as $file) {
+            if ($file && Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+
+        $trainings = \DB::table('trainings')->where('company_id', $this->id)->pluck('file_path');
+        foreach ($trainings as $file) {
+            if ($file && Storage::disk('public')->exists($file)) {
+                $totalBytes += Storage::disk('public')->size($file);
+            }
+        }
+
+        return round($totalBytes / 1024 / 1024, 2);
+    }
 }

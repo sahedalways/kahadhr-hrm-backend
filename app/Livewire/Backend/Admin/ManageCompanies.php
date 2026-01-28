@@ -23,7 +23,7 @@ class ManageCompanies extends BaseComponent
     public $billingPlans;
     public $perPage = 10;
     public $sortOrder = 'desc';
-    public $statusFilter = '';
+    public $statusFilter = 'Active';
 
     public $loaded;
     public $lastId = null;

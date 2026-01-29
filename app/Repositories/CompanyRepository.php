@@ -45,11 +45,12 @@ class CompanyRepository
     $company->company_mobile         = $data['company_mobile'] ?? $company->company_mobile;
     $company->company_email          = $data['company_email'] ?? $company->company_email;
     $company->business_type          = $data['business_type'] ?? $company->business_type;
-    $company->address_contact_info   = $data['address_contact_info'] ?? $company->address_contact_info;
     $company->registered_domain      = $data['registered_domain'] ?? $company->registered_domain;
-    $company->subscription_status    = $data['subscription_status'] ?? $company->subscription_status;
-    $company->subscription_start     = $data['subscription_start'] ?? $company->subscription_start;
-    $company->subscription_end       = $data['subscription_end'] ?? $company->subscription_end;
+    $company->address      = $data['address'] ?? $company->address;
+    $company->street      = $data['street'] ?? $company->street;
+    $company->city      = $data['city'] ?? $company->city;
+    $company->postcode      = $data['postcode'] ?? $company->postcode;
+    $company->country      = $data['country'] ?? $company->country;
 
     // Handle company logo like your ResortImage example
     if (isset($data['company_logo']) && $data['company_logo'] instanceof UploadedFile) {

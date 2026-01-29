@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CompanyController;
 use App\Livewire\Backend\Admin\AdminEmpDetails;
 use App\Livewire\Backend\Admin\Auth\AdminLogin;
 use App\Livewire\Backend\Admin\BillingPayments;
+use App\Livewire\Backend\Admin\CompanyDetails;
 use App\Livewire\Backend\Admin\Dashboard;
 use App\Livewire\Backend\Admin\ManageCompanies;
 use App\Livewire\Backend\Admin\ManageEmployees;
@@ -41,13 +42,11 @@ Route::domain('admin.' . config('app.base_domain'))->prefix('dashboard')->middle
   Route::prefix('companies')->group(function () {
     Route::get('/', ManageCompanies::class)->name('companies');
     Route::get('/employees', ManageEmployees::class)->name('employees');
+    Route::get('/employees', ManageEmployees::class)->name('employees');
 
 
-    Route::name('company.')->controller(CompanyController::class)->group(function () {
-
-      Route::get('/details/{id}', 'companyDetails')->name('details.show');
-
-      Route::post('/change-password/{id}', 'changeCompanyPassword')->name('changePassword');
+    Route::name('company.')->group(function () {
+      Route::get('/details/{id}', CompanyDetails::class)->name('details.show');
     });
   });
 

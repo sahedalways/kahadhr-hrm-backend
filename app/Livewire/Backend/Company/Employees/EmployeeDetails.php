@@ -21,7 +21,6 @@ use App\Traits\VerifyPassword;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;

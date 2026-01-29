@@ -29,6 +29,12 @@ class Company extends Model
         'trial_ends_at',
         'payment_status',
         'status',
+        'address',
+        'street',
+        'city',
+        'state',
+        'postcode',
+        'country',
 
     ];
 

@@ -25,7 +25,7 @@ class ManageEmployees extends BaseComponent
 
     public $perPage = 10;
     public $sortOrder = 'desc';
-    public $statusFilter = '';
+    public $statusFilter = 'active';
     public $loaded;
     public $lastId = null;
     public $hasMore = true;

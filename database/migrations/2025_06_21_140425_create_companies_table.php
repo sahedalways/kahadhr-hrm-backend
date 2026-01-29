@@ -20,7 +20,12 @@ return new class extends Migration
             $table->string('company_mobile');
             $table->string('company_email');
             $table->string('business_type')->nullable();
-            $table->text('address_contact_info')->nullable();
+            $table->string('street')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('address')->nullable();
+            $table->string('postcode')->nullable();
+            $table->string('country')->nullable();
             $table->string('company_logo')->nullable();
             $table->string('registered_domain')->nullable();
             $table->foreignId('billing_plan_id')

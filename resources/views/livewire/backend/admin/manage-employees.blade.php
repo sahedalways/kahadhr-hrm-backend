@@ -8,13 +8,16 @@
 
         <!-- RIGHT: Export Buttons -->
         <div class="col-auto d-flex gap-2">
-            <button wire:click="exportEmployees('pdf')" class="btn btn-sm btn-white text-primary">
+            <button wire:click="exportEmployees('pdf')"
+                    class="btn btn-sm btn-white text-primary">
                 <i class="fa fa-file-pdf me-1"></i> PDF
             </button>
-            <button wire:click="exportEmployees('excel')" class="btn btn-sm btn-white text-success">
+            <button wire:click="exportEmployees('excel')"
+                    class="btn btn-sm btn-white text-success">
                 <i class="fa fa-file-excel me-1"></i> Excel
             </button>
-            <button wire:click="exportEmployees('csv')" class="btn btn-sm btn-white text-info">
+            <button wire:click="exportEmployees('csv')"
+                    class="btn btn-sm btn-white text-info">
                 <i class="fa fa-file-csv me-1"></i> CSV
             </button>
 
@@ -30,19 +33,25 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-lg-8 col-md-6 col-12">
-                    <input type="text" class="form-control shadow-sm" placeholder="Search by name, email, job title"
-                        wire:model="search" wire:keyup="set('search', $event.target.value)">
+                    <input type="text"
+                           class="form-control shadow-sm"
+                           placeholder="Search by name, email, job title"
+                           wire:model="search"
+                           wire:keyup="set('search', $event.target.value)">
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-12 d-flex gap-2">
-                    <select class="form-select" wire:change="handleSort($event.target.value)">
+                    <select class="form-select"
+                            wire:change="handleSort($event.target.value)">
                         <option value="desc">Newest First</option>
                         <option value="asc">Oldest First</option>
                     </select>
-                    <select class="form-select" wire:change="handleFilter($event.target.value)">
-                        <option value="">All Status</option>
-                        <option value="active">Active Member</option>
-                        <option value="former">Former Member</option>
+                    <select class="form-select"
+                            wire:change="handleFilter($event.target.value)">
+
+                        <option value="active"
+                                selected>Active </option>
+                        <option value="former">Former </option>
                     </select>
                 </div>
             </div>
@@ -59,15 +68,15 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
+                                        <th>Employee Name</th>
                                         <th>Company Name</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
+
+
                                         <th>Email</th>
+                                        <th>Mobile</th>
                                         <th>Job Title</th>
 
-                                        <th>Status</th>
 
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -75,6 +84,26 @@
                                     @forelse($infos as $employee)
                                         <tr>
                                             <td>{{ $i++ }}</td>
+
+
+                                            <td>
+                                                <a href="{{ route('super-admin.dashboard.employees.details', $employee->id) }}"
+                                                   class="badge badge-xs text-primary"
+                                                   style="
+        background: transparent;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+   "
+                                                   onmouseover="this.style.textDecoration='underline'"
+                                                   onmouseout="this.style.textDecoration='none'">
+                                                    {{ $employee->full_name ?? 'N/A' }}
+                                                </a>
+
+
+                                            </td>
+
+
                                             <td style="cursor:pointer; transition: background-color 0.3s;"
                                                 onclick="window.location='{{ route('super-admin.company.details.show', $employee->company->id) }}'"
                                                 onmouseover="this.style.backgroundColor='#f0f8ff';"
@@ -84,49 +113,29 @@
 
 
 
-                                            <td>{{ $employee->f_name ?? 'N/A' }}</td>
-                                            <td>{{ $employee->l_name ?? 'N/A' }}</td>
+
                                             <td>
                                                 <span onclick="copyToClipboard('{{ $employee->email ?? '' }}')"
-                                                    style="cursor:pointer; padding:2px 4px; border-radius:4px;"
-                                                    onmouseover="this.style.backgroundColor='#f0f0f0';"
-                                                    onmouseout="this.style.backgroundColor='transparent';"
-                                                    style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top" class="tooltip-btn"
-                                                    data-tooltip="Click to copy" aria-label="copy email">
+                                                      style="cursor:pointer; padding:2px 4px; border-radius:4px;"
+                                                      onmouseover="this.style.backgroundColor='#f0f0f0';"
+                                                      onmouseout="this.style.backgroundColor='transparent';"
+                                                      style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      class="tooltip-btn"
+                                                      data-tooltip="Click to copy"
+                                                      aria-label="copy email">
                                                     {{ $employee->email ?? 'N/A' }}
                                                 </span>
                                             </td>
+                                            <td>{{ $employee->phone_no ?? 'N/A' }}</td>
                                             <td>{{ $employee->job_title ?? 'N/A' }}</td>
 
-
-
-                                            <td>
-                                                <a href="#" onmouseover="this.style.backgroundColor='#f0f0f0';"
-                                                    onmouseout="this.style.backgroundColor='transparent';"
-                                                    style="cursor: pointer; color: inherit; padding: 2px 4px; border-radius: 4px;">
-                                                    {!! statusBadgeTwo($employee->is_active) !!}
-                                                </a>
-                                            </td>
-
-
-                                            <td>
-                                                <a href="{{ route('super-admin.dashboard.employees.details', $employee->id) }}"
-                                                    class="badge badge-xs text-white"
-                                                    style="background-color:#5acaa3; color:#ffffff; transition: all 0.3s ease;"
-                                                    onmouseover="this.style.setProperty('background-color', '#4ebf9f', 'important'); this.style.setProperty('color', '#000000', 'important');"
-                                                    onmouseout="this.style.setProperty('background-color', '#5acaa3', 'important'); this.style.setProperty('color', '#ffffff', 'important');">
-                                                    View Details
-                                                </a>
-
-
-
-
-                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="text-center">No employees found</td>
+                                            <td colspan="9"
+                                                class="text-center">No employees found</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -134,7 +143,30 @@
 
                             @if ($hasMore)
                                 <div class="text-center my-3">
-                                    <button wire:click="loadMore" class="btn btn-outline-primary">Load More</button>
+                                    <button wire:click="loadMore"
+                                            class="btn btn-outline-primary">Load More</button>
+                                </div>
+                            @endif
+                        </div>
+
+
+                    </div>
+                    @php
+                        $activeCount = $infos->where('is_active', 1)->count();
+                        $formerCount = $infos->where('is_active', 0)->count();
+                    @endphp
+
+                    <div class="row mt-4">
+                        <div class="col-12 d-flex gap-3 justify-content-center">
+                            @if ($statusFilter == 'active')
+                                <div class="px-4 py-2 rounded-pill shadow-sm small"
+                                     style="background-color: #e9f5ee; color: #1b5e20; font-weight: 600; border: 1px solid #d1e7dd;">
+                                    Total Active Employees: {{ $activeCount }}
+                                </div>
+                            @else
+                                <div class="px-4 py-2 rounded-pill shadow-sm small"
+                                     style="background-color: #fce8e8; color: #c62828; font-weight: 600; border: 1px solid #f8d7da;">
+                                    Total Inactive Employees: {{ $formerCount }}
                                 </div>
                             @endif
                         </div>

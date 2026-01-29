@@ -143,7 +143,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"
                        data-bs-toggle="tooltip"
                        data-bs-placement="right"
@@ -153,7 +153,7 @@
                         <i class="fas fa-life-ring text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Support Tickets</span>
                     </a>
-                </li>
+                </li> --}}
 
 
 

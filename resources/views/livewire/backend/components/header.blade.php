@@ -227,10 +227,10 @@
                                 </li>
 
 
-                                <li><a class="dropdown-item"
+                                {{-- <li><a class="dropdown-item"
                                        href="#"><i class="fas fa-question-circle me-2"></i>
                                         Help
-                                        Center</a></li>
+                                        Center</a></li> --}}
                                 <li><a class="dropdown-item"
                                        href="#"><i class="fas fa-headset me-2"></i>
                                         Support</a>

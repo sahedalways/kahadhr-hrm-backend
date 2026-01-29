@@ -465,10 +465,10 @@
                                    href="{{ route('company.dashboard.document-types.index', ['company' => app('authUser')->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
-                                   title="Document Types"
+                                   title="Manage Docs Type"
                                    data-bs-trigger="manual">
                                     <i class="fas fa-th-list sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Document Types </span>
+                                    <span class="sidenav-normal"> Manage Docs Type </span>
                                 </a>
                             </li>
 
@@ -478,10 +478,10 @@
                                    href="{{ route('company.dashboard.document-manage.index', ['company' => app('authUser')->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
-                                   title="Documents By Assiged"
+                                   title="e-Sign Docs"
                                    data-bs-trigger="manual">
                                     <i class="fas fa-folder-open sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Documents By Assiged</span>
+                                    <span class="sidenav-normal"> e-Sign Docs</span>
                                 </a>
                             </li>
 
@@ -491,10 +491,10 @@
                                    href="{{ route('company.dashboard.document-manage.types.index', ['company' => app('authUser')->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
-                                   title="Documents By Type"
+                                   title="Employees Docs"
                                    data-bs-trigger="manual">
                                     <i class="fas fa-file-alt sidenav-mini-icon"></i>
-                                    <span class="sidenav-normal"> Documents By Type</span>
+                                    <span class="sidenav-normal"> Employees Docs</span>
                                 </a>
                             </li>
 

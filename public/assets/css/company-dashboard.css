@@ -1,0 +1,163 @@
+:root {
+    --sky-blue: #e0f2fe;
+    --sky-blue-text: #0369a1;
+    --light-green: #dcfce7;
+    --light-green-text: #15803d;
+    --light-pink: #fce7f3;
+    --light-pink-text: #be185d;
+    --soft-orange: #ffedd5;
+    --soft-orange-text: #c2410c;
+    --bg-gray: #f8fafc;
+    --border-color: #e2e8f0;
+}
+
+body {
+    background-color: var(--bg-gray);
+    font-family: "Inter", sans-serif;
+}
+
+.dashboard-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.dashboard-section {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+/* Stat Card Variations */
+.stat-sky {
+    background-color: var(--sky-blue);
+    color: var(--sky-blue-text);
+}
+.stat-green {
+    background-color: var(--light-green);
+    color: var(--light-green-text);
+}
+.stat-pink {
+    background-color: var(--light-pink);
+    color: var(--light-pink-text);
+}
+.stat-orange {
+    background-color: var(--soft-orange);
+    color: var(--soft-orange-text);
+}
+
+.stat-card h3,
+.stat-card h5 {
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+/* Calendar Styling */
+.calendar-table th {
+    background: #f1f5f9;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.calendar-day {
+    height: 90px;
+    width: 14.28%;
+    vertical-align: top;
+    padding: 5px !important;
+}
+
+.event-bar {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+/* Badges */
+.badge-green {
+    background-color: var(--light-green);
+    color: var(--light-green-text);
+}
+.badge-pink {
+    background-color: var(--light-pink);
+    color: var(--light-pink-text);
+}
+.badge-orange {
+    background-color: var(--soft-orange);
+    color: var(--soft-orange-text);
+}
+.badge-red {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+.badge-gray {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.progress-thin {
+    height: 6px;
+    border-radius: 10px;
+}
+
+.dashboard-card {
+    background: #ffffff;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #edf2f9;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+    margin-bottom: 1rem !important;
+}
+
+.chart-legend .legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.chart-legend .legend-item:last-child {
+    margin-bottom: 0;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    display: inline-block;
+    border-radius: 3px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+/* Specific Modern Colors */
+.bg-present {
+    background-color: #34c38f;
+}
+.bg-leave {
+    background-color: #556ee6;
+}
+.bg-absent {
+    background-color: #f46a6a;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #d0d5dd;
+    border-radius: 10px;
+}

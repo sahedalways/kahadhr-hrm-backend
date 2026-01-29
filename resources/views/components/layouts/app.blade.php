@@ -3,29 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon"
+          type="image/x-icon"
+          href="{{ asset('favicon.ico') }}">
 
     <title>@yield('title', siteSetting()->site_title)</title>
 
-    <link rel="icon" type="image/png" href="{{ siteSetting()->favicon_url }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="Permissions-Policy" content="fullscreen=(self)">
+    <link rel="icon"
+          type="image/png"
+          href="{{ siteSetting()->favicon_url }}">
+    <meta name="csrf-token"
+          content="{{ csrf_token() }}">
+    <meta http-equiv="Permissions-Policy"
+          content="fullscreen=(self)">
 
-    <link href="{{ asset('assets/css/poppinsfont.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link id="pagestyle" href="{{ asset('assets/css/argon-dashboard.min28b5.css?v=2.0.0') }}" rel="stylesheet" />
-    <link id="pagestyle" href="{{ asset('assets/css/newdashboard.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/js/plugins/toastr.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/poppinsfont.css') }}"
+          rel="stylesheet" />
+    <link href="{{ asset('assets/css/nucleo-icons.css') }}"
+          rel="stylesheet" />
+    <link href="{{ asset('assets/css/nucleo-svg.css') }}"
+          rel="stylesheet" />
+    <link href="{{ asset('assets/vendors/font-awesome/css/font-awesome.min.css') }}"
+          rel="stylesheet">
+    <link id="pagestyle"
+          href="{{ asset('assets/css/argon-dashboard.min28b5.css?v=2.0.0') }}"
+          rel="stylesheet" />
+    <link id="pagestyle"
+          href="{{ asset('assets/css/newdashboard.css') }}"
+          rel="stylesheet" />
+    <link href="{{ asset('assets/css/style.css') }}"
+          rel="stylesheet" />
+    <link href="{{ asset('assets/js/plugins/toastr.min.css') }}"
+          rel="stylesheet" />
     <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
+          rel="stylesheet" />
 
-    <link href="{{ asset('assets/css/clockInOut.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/clockInOut.css') }}"
+          rel="stylesheet" />
 
     @vite('resources/js/app.js')
 
@@ -57,7 +78,8 @@
         </div>
     @endif
 
-    <div id="preloader" class="preloader">
+    <div id="preloader"
+         class="preloader">
         <div class="hr-line-loader">
             <div class="line"></div>
             <div class="line"></div>
@@ -82,18 +104,25 @@
             @livewire('backend.components.header')
         </div>
 
-        <div style="min-width: 500px" class="container-fluid pb-3 h-100">
+        <div style="min-width: 500px"
+             class="container-fluid pb-3 h-100">
             {{ $slot }}
         </div>
     </main>
 
 
     {{-- for showing image --}}
-    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade"
+         id="imagePreviewModal"
+         tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0">
                 <div class="modal-body p-0">
-                    <img id="modalImage" src="" class="img-fluid w-100" alt="Preview">
+                    <img id="modalImage"
+                         src=""
+                         class="img-fluid w-100"
+                         alt="Preview">
                 </div>
             </div>
         </div>

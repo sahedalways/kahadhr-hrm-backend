@@ -551,30 +551,34 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
 
-
 <script>
     function renderStatusChart() {
         const canvas = document.getElementById('statusChart');
-        if (!canvas) return; // Stop if canvas not loaded
-        const ctx = canvas.getContext('2d');
+        if (!canvas) return;
 
-        new Chart(ctx, {
+        const data = [
+            {{ $liveStatus['present'] ?? 0 }},
+            {{ $liveStatus['leave'] ?? 0 }},
+            {{ $liveStatus['absent'] ?? 0 }}
+        ];
+
+
+        const allZero = data.every(v => v === 0);
+        const chartData = allZero ? [1, 1, 1] : data;
+
+        new Chart(canvas.getContext('2d'), {
             type: 'doughnut',
             data: {
                 labels: ['Present', 'On Leave', 'Absent'],
                 datasets: [{
-                    data: [
-                        {{ $liveStatus['present'] ?? 0 }},
-                        {{ $liveStatus['leave'] ?? 0 }},
-                        {{ $liveStatus['absent'] ?? 0 }}
-                    ],
+                    data: chartData,
                     backgroundColor: ['#28a745', '#007bff', '#dc3545'],
                     borderWidth: 2,
                     borderColor: '#ffffff'
                 }]
             },
             options: {
-                cutout: '65%',
+                cutout: '67%',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -589,14 +593,13 @@
         });
     }
 
-
     document.addEventListener('DOMContentLoaded', renderStatusChart);
-
 
     if (window.Livewire) {
         Livewire.hook('message.processed', renderStatusChart);
     }
 </script>
+
 
 
 

@@ -252,6 +252,7 @@
                     @else
                         <ul class="list-group list-group-flush mb-2"
                             style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+
                             @foreach ($leaveRequests as $leave)
                                 @php
                                     $duration =
@@ -265,61 +266,47 @@
                                     ]);
                                 @endphp
 
-                                <li class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm leave-item"
-                                    style="background: #ffffff; border: 1px solid #eef2f7 !important; margin-bottom: 15px !important; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm leave-item"
+                                    style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
                                     onclick="window.location='{{ $route }}'"
-                                    onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-2px)';"
+                                    onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-1px)';"
                                     onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
 
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <!-- Left Side: Name + Date -->
                                         <div>
                                             <h6 class="mb-0 fw-bold text-dark"
-                                                style="font-size: 0.95rem;">
+                                                style="font-size: 0.9rem;">
                                                 {{ $leave->user->full_name }}
                                             </h6>
                                             <small class="text-muted"
-                                                   style="font-size: 0.8rem;">
+                                                   style="font-size: 0.75rem;">
                                                 <i class="far fa-calendar-alt me-1"></i>
                                                 {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
                                                 {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
                                             </small>
                                         </div>
-                                        <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2"
-                                              style="font-size: 0.75rem; font-weight: 600;">
-                                            {{ $duration }} {{ Str::plural('Day', $duration) }}
-                                        </span>
-                                    </div>
 
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <div class="p-2 rounded-3 d-flex align-items-center"
-                                                 style="background-color: rgba(248, 249, 250, 0.8); border: 1px solid #f1f3f5;">
-                                                <span class="me-2"
-                                                      style="font-size: 1.1rem;">{!! $leave->leaveType->emoji !!}</span>
-                                                <span
-                                                      class="text-dark fw-medium small text-truncate">{{ $leave->leaveType->name ?? 'N/A' }}</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-6">
-                                            <div class="p-2 rounded-3 d-flex align-items-center h-100"
-                                                 style="background-color: rgba(231, 241, 255, 0.7); border: 1px solid #dee2e6;">
-                                                <i class="fas fa-comment-dots me-2 text-primary"
-                                                   style="font-size: 0.85rem;"></i>
-                                                <span class="text-dark small text-truncate"
-                                                      title="{{ $leave->other_reason }}">
-                                                    {{ $leave->other_reason ?? 'No reason' }}
+                                        <!-- Right Side: Type + Emoji + Days below -->
+                                        <div class="d-flex flex-column align-items-end text-end">
+                                            <div class="d-flex align-items-center gap-1">
+                                                <span style="font-size: 1rem;">{!! $leave->leaveType->emoji !!}</span>
+                                                <span class="fw-medium text-dark small">
+                                                    {{ $leave->leaveType->name ?? 'N/A' }}
                                                 </span>
                                             </div>
+                                            <small class="text-muted"
+                                                   style="font-size: 0.7rem;">
+                                                ({{ $duration }} {{ Str::plural('Day', $duration) }})
+                                            </small>
                                         </div>
                                     </div>
                                 </li>
                             @endforeach
                         </ul>
-
-
                     @endif
                 </div>
+
 
                 {{-- Attendance Requests Section --}}
                 <div class="mb-3">
@@ -334,6 +321,7 @@
                     @else
                         <ul class="list-group list-group-flush mb-2"
                             style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+
                             @foreach ($attendanceRequests as $record)
                                 @php
                                     $pendingRequests = $record->requests->where('status', 'pending');
@@ -341,74 +329,115 @@
 
                                 @foreach ($pendingRequests as $req)
                                     @php
-                                        $location =
-                                            $req->type === 'late_clock_in'
-                                                ? $record->clock_in_location
-                                                : $record->clock_out_location;
-
                                         $route = route('company.dashboard.timesheet.index', [
                                             'company' => $companySubDomain,
                                             'id' => $req->id ?? null,
                                         ]);
+
+                                        $period =
+                                            $req->type === 'late_clock_in'
+                                                ? \Carbon\Carbon::parse($record->clock_in)->format('h:i A')
+                                                : \Carbon\Carbon::parse($record->clock_out)->format('h:i A');
                                     @endphp
 
-                                    <li class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm"
-                                        style="background: #ffffff; border: 1px solid #eef2f7 !important; margin-bottom: 15px !important; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                    <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
+                                        style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
                                         onclick="window.location='{{ $route }}'"
-                                        onmouseover="this.style.backgroundColor='#fff9f0'; this.style.borderColor='#ffeeba'; this.style.transform='translateY(-2px)';"
+                                        onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#ffeeba'; this.style.transform='translateY(-1px)';"
                                         onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
 
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <!-- Left Side: Employee Name -->
                                             <div>
                                                 <h6 class="mb-0 fw-bold text-dark"
-                                                    style="font-size: 0.95rem;">
+                                                    style="font-size: 0.9rem;">
                                                     {{ $record->user->full_name }}
                                                 </h6>
                                                 <small class="text-muted"
-                                                       style="font-size: 0.8rem;">
-                                                    <i class="far fa-clock me-1"></i>
-                                                    Clock-in:
-                                                    {{ \Carbon\Carbon::parse($record->clock_in)->format('h:i A') }}
+                                                       style="font-size: 0.75rem;">
+                                                    {{ ucfirst(str_replace('_', ' ', $req->type)) }} Request
                                                 </small>
                                             </div>
-                                            <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3 py-2"
-                                                  style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                Pending
-                                            </span>
-                                        </div>
 
-                                        <div class="row g-2">
-                                            <div class="col-6">
-                                                <div class="p-2 rounded-3 d-flex align-items-center h-100"
-                                                     style="background-color: #f8f9fa; border: 1px solid #f1f3f5;">
-                                                    <div class="me-2 text-primary">
-                                                        <i class="fas fa-file-alt"
-                                                           style="font-size: 0.9rem;"></i>
-                                                    </div>
-                                                    <span class="text-dark fw-medium small text-truncate">
-                                                        {{ ucfirst(str_replace('_', ' ', $req->type)) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-6">
-                                                <div class="p-2 rounded-3 d-flex align-items-center h-100"
-                                                     style="background-color: #f0f7ff; border: 1px solid #dee2e6;">
-                                                    <i class="fas fa-map-marker-alt me-2 text-info"
-                                                       style="font-size: 0.85rem;"></i>
-                                                    <span class="text-dark small text-truncate"
-                                                          title="{{ $location ?? 'No location' }}">
-                                                        {{ $location ?? 'Remote/Unknown' }}
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <!-- Right Side: Period -->
+                                            <small class="text-muted"
+                                                   style="font-size: 0.75rem;">
+                                                <i class="fas fa-calendar-check me-1 text-success"></i>
+                                                {{ $period }}
+                                            </small>
                                         </div>
                                     </li>
                                 @endforeach
                             @endforeach
+
                         </ul>
                     @endif
                 </div>
+
+
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Payslip Requests</h6>
+
+                    @if ($payslipRequests->isEmpty())
+                        <div class="list-group list-group-flush mb-2">
+                            <li class="list-group-item text-center text-muted py-3">
+                                <i class="fas fa-check-circle me-1"></i> No payslip requests found.
+                            </li>
+                        </div>
+                    @else
+                        <ul class="list-group list-group-flush mb-2"
+                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+
+                            @foreach ($payslipRequests as $request)
+                                @php
+                                    $route = route('company.dashboard.reports.payslips', [
+                                        'company' => $companySubDomain,
+                                        'id' => $request->id,
+                                    ]);
+
+                                    $period = \Carbon\Carbon::create($request->year, $request->month)->format('F Y');
+                                @endphp
+
+                                <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
+                                    style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                    onclick="window.location='{{ $route }}'"
+                                    onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#b3d7ff'; this.style.transform='translateY(-1px)';"
+                                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <!-- Left: User Name + Requested Date -->
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-dark"
+                                                style="font-size: 0.9rem;">
+                                                {{ $request->user->full_name }}
+                                            </h6>
+                                            <small class="text-muted"
+                                                   style="font-size: 0.75rem;">
+                                                <i class="fas fa-history me-1"></i>
+                                                Requested:
+                                                {{ \Carbon\Carbon::parse($request->created_at)->format('M d, Y') }}
+                                            </small>
+                                        </div>
+
+                                        <!-- Right: Period -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="me-1 text-success">
+                                                <i class="fas fa-file-invoice-dollar"
+                                                   style="font-size: 0.9rem;"></i>
+                                            </div>
+                                            <small class="text-dark fw-bold"
+                                                   style="font-size: 0.75rem;">
+                                                {{ $period }}
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+
             </div>
 
 

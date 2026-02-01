@@ -311,4 +311,10 @@ class Employee extends Model
             'id'
         );
     }
+
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id', 'user_id');
+    }
 }

@@ -8,29 +8,45 @@
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="dashboard-card stat-card stat-sky">
-                <small class="fw-bold opacity-75">Today's Absent</small>
-                <h3>3</h3>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="fw-bold opacity-75">Today's Absent</small>
+                    <i class="fas fa-user-times text-danger"></i>
+                </div>
+                <h3>{{ $todayAbsent ?? 0 }}</h3>
             </div>
         </div>
+
         <div class="col-md-3">
             <div class="dashboard-card stat-card stat-green">
-                <small class="fw-bold opacity-75">On Leave Today</small>
-                <h3>5</h3>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="fw-bold opacity-75">On Leave Today</small>
+                    <i class="fas fa-plane-departure text-success"></i>
+                </div>
+                <h3>{{ $onLeaveToday ?? 0 }}</h3>
             </div>
         </div>
+
         <div class="col-md-3">
             <div class="dashboard-card stat-card stat-pink">
-                <small class="fw-bold opacity-75">Upcoming Holiday</small>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="fw-bold opacity-75">Upcoming Holiday</small>
+                    <i class="fas fa-calendar-day text-pink"></i>
+                </div>
                 <h5 class="mb-0">Summer Bank Holiday</h5>
             </div>
         </div>
+
         <div class="col-md-3">
             <div class="dashboard-card stat-card stat-orange">
-                <small class="fw-bold opacity-75">Pending Requests</small>
-                <h3>8</h3>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="fw-bold opacity-75">Pending Leave Requests</small>
+                    <i class="fas fa-clock text-warning"></i>
+                </div>
+                <h3>{{ $pendingRequests ?? 0 }}</h3>
             </div>
         </div>
     </div>
+
 
     <div class="row g-4">
         <div class="col-lg-8">
@@ -176,7 +192,22 @@
 
         <div class="col-lg-4">
             <div class="dashboard-section mb-3">
-                <h6 class="fw-bold mb-3 text-secondary">Live Office Status</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-secondary mb-0">Live Office Status</h6>
+                    <select wire:change="handleFilter($event.target.value)"
+                            class="form-select form-select-sm"
+                            style="width: 90px;"> <!-- adjust this value as needed -->
+                        <option value="day"
+                                @if ($statusFilter == 'day') selected @endif>Today</option>
+                        <option value="month"
+                                @if ($statusFilter == 'month') selected @endif>Month</option>
+                        <option value="year"
+                                @if ($statusFilter == 'year') selected @endif>Year</option>
+                    </select>
+                </div>
+
+
+
                 <div class="d-flex align-items-center">
                     <div style="width: 145px; height: 130px; position: relative;"
                          class="me-4">
@@ -186,15 +217,15 @@
                     <div class="chart-legend">
                         <div class="legend-item">
                             <span class="dot bg-present"></span>
-                            <span>Present: <strong>40</strong></span>
+                            <span>Present: <strong>{{ $liveStatus['present'] ?? 0 }}</strong></span>
                         </div>
                         <div class="legend-item">
                             <span class="dot bg-leave"></span>
-                            <span>On Leave: <strong>5</strong></span>
+                            <span>On Leave: <strong>{{ $liveStatus['leave'] ?? 0 }}</strong></span>
                         </div>
                         <div class="legend-item">
                             <span class="dot bg-absent"></span>
-                            <span>Absent/Late: <strong>5</strong></span>
+                            <span>Absent/Late: <strong>{{ $liveStatus['absent'] ?? 0 }}</strong></span>
                         </div>
                     </div>
                 </div>
@@ -217,38 +248,48 @@
 
             <div class="dashboard-section">
                 <h5 class="fw-bold mb-3">Documents Expiring Soon (60 Days)</h5>
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="fw-bold">A. Khan - Visa</span>
-                        <span class="text-danger fw-bold">15 days [Notify]</span>
+
+                @forelse ($expiringDocs as $doc)
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-bold">
+                                {{ $doc->employee->f_name }} - {{ $doc->documentType->name }}
+                            </span>
+                            <span class="text-danger fw-bold">
+                                {{ \Carbon\Carbon::now()->diffInDays($doc->expires_at) }} days
+                            </span>
+                        </div>
+
+                        <div class="progress"
+                             style="height: 6px;">
+                            <div class="progress-bar bg-danger"
+                                 style="width: 40%"></div>
+                        </div>
                     </div>
-                    <div class="progress"
-                         style="height: 6px;">
-                        <div class="progress-bar bg-danger"
-                             style="width: 25%"></div>
+                @empty
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-file-shield mb-2 d-block"
+                           style="font-size: 28px;"></i>
+                        <span class="fw-bold fst-italic">
+                            No documents expiring in the next 60 days
+                        </span>
                     </div>
-                </div>
-                <div>
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="fw-bold">L. Taylor - Passport</span>
-                        <span class="text-warning fw-bold">50 days [Notify]</span>
-                    </div>
-                    <div class="progress"
-                         style="height: 6px;">
-                        <div class="progress-bar bg-warning"
-                             style="width: 75%"></div>
-                    </div>
-                </div>
+                @endforelse
             </div>
+
 
             <div class="dashboard-section shadow-sm border-0 mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h5 class="fw-bold m-0 text-dark">Recent Employees</h5>
                         <small class="text-muted">Total Employees: <span
-                                  class="fw-bold text-primary">50</span></small>
+                                  class="fw-bold text-primary">{{ $totalEmployees ?? 0 }}</span></small>
                     </div>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</button>
+                    <a href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}"
+                       class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        View All
+                    </a>
+
                 </div>
 
                 <div class="table-responsive">
@@ -262,48 +303,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="ps-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold me-2"
-                                             style="width: 32px; height: 32px; font-size: 12px;">JD</div>
-                                        <span class="fw-bold">John Doe</span>
-                                    </div>
-                                </td>
-                                <td class="text-muted small">john.doe@company.com</td>
-                                <td class="text-muted small">+1 234 567 890</td>
-                                <td><span class="badge bg-success-soft text-success rounded-pill px-3">Active</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-soft-info text-info d-flex align-items-center justify-content-center fw-bold me-2"
-                                             style="width: 32px; height: 32px; font-size: 12px;">SC</div>
-                                        <span class="fw-bold">Sarah Connor</span>
-                                    </div>
-                                </td>
-                                <td class="text-muted small">sarah.c@company.com</td>
-                                <td class="text-muted small">+1 987 654 321</td>
-                                <td><span class="badge bg-success-soft text-success rounded-pill px-3">Active</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-soft-warning text-warning d-flex align-items-center justify-content-center fw-bold me-2"
-                                             style="width: 32px; height: 32px; font-size: 12px;">MK</div>
-                                        <span class="fw-bold">Mike Kelvin</span>
-                                    </div>
-                                </td>
-                                <td class="text-muted small">m.kelvin@company.com</td>
-                                <td class="text-muted small">+1 555 010 999</td>
-                                <td><span class="badge bg-warning-soft text-warning rounded-pill px-3">On Leave</span>
-                                </td>
-                            </tr>
+                            @forelse($recentEmployees as $emp)
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold me-2"
+                                                 style="width: 32px; height: 32px; font-size: 12px;">
+                                                {{ strtoupper(substr($emp->f_name, 0, 1) . substr($emp->l_name, 0, 1)) }}
+                                            </div>
+                                            <span class="fw-bold">{{ $emp->f_name }} {{ $emp->l_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small">{{ $emp->email }}</td>
+                                    <td class="text-muted small">{{ $emp->phone_no ?? 'N/A' }}</td>
+                                    <td>
+                                        <span
+                                              class="badge {{ $emp->is_active ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger' }} rounded-pill px-3">
+                                            {{ $emp->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4"
+                                        class="text-center text-muted py-3">
+                                        No employees found
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
+
                     </table>
                 </div>
             </div>

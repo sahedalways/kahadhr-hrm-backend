@@ -149,6 +149,7 @@ class ClockModal extends BaseComponent
         $grace = config('attendance.grace_minutes');
         $bdTime = now()->setTimezone('Asia/Dhaka');
         $ukTime = now()->setTimezone('Europe/London');
+        $message = '';
 
         $needsApproval = false;
         $type = null;
@@ -165,6 +166,8 @@ class ClockModal extends BaseComponent
                 return;
             } else {
                 $this->showClockOutReason = false;
+                $submitterName = auth()->user()->full_name;
+                $message = "Employee '{$submitterName}' clocked out early.";
             }
         } elseif ($ukTime->gt($shiftEnd->copy()->addMinutes($grace))) {
             $needsApproval = true;
@@ -176,6 +179,8 @@ class ClockModal extends BaseComponent
                 return;
             } else {
                 $this->showClockOutReason = false;
+                $submitterName = auth()->user()->full_name;
+                $message = "Employee '{$submitterName}' clocked out late.";
             }
         }
 
@@ -187,7 +192,7 @@ class ClockModal extends BaseComponent
         ]);
 
         if ($needsApproval) {
-           $item = AttendanceRequest::create([
+            $item = AttendanceRequest::create([
                 'user_id' => Auth::id(),
                 'attendance_id' => $attendance->id,
                 'type' => $type,
@@ -195,9 +200,6 @@ class ClockModal extends BaseComponent
                 'status' => 'pending',
             ]);
 
-
-            $submitterName = auth()->user()->full_name;
-            $message = "Employee '{$submitterName}' clocked out late.";
 
             $notification = Notification::create([
                 'company_id' => auth()->user()->employee->company_id,

@@ -215,8 +215,7 @@
 
                 <div class="d-flex align-items-center">
                     <div style="width: 145px; height: 130px; position: relative;"
-                         class="me-4"
-                         wire:ignore.self>
+                         class="me-4">
                         <canvas id="statusChart"></canvas>
                     </div>
 

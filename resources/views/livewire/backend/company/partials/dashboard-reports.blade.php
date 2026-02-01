@@ -564,7 +564,7 @@
 
 
         const allZero = data.every(v => v === 0);
-        const chartData = allZero ? [1, 1, 1] : data;
+        const chartData = allZero ? [0.01, 0.01, 0.01] : data;
 
         new Chart(canvas.getContext('2d'), {
             type: 'doughnut',

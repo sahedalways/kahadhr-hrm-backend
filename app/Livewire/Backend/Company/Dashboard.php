@@ -7,22 +7,29 @@ use App\Models\Attendance;
 use App\Models\LeaveRequest;
 use App\Models\EmpDocument;
 use App\Models\Employee;
+use App\Models\PaySlipRequest;
 use App\Models\ShiftDate;
 use Carbon\Carbon;
 
 class Dashboard extends Component
 {
     public $statusFilter = 'day';
+
     public function render()
     {
         $companyId = auth()->user()->company->id;
         $today = Carbon::today();
         $now = Carbon::now();
 
-
+        $liveStatus = [
+            'present' => 0,
+            'leave'   => 0,
+            'absent'  => 0,
+        ];
 
 
         switch ($this->statusFilter) {
+
             case 'month':
                 $startDate = $today->copy()->startOfMonth();
                 $endDate   = $today->copy()->endOfMonth();
@@ -36,6 +43,27 @@ class Dashboard extends Component
                 $startDate = $today;
                 $endDate   = $today;
         }
+
+
+
+        $leaveRequests = LeaveRequest::with('leaveType', 'user.employee')->where('company_id', $companyId)->where('status', "pending")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+
+        $payslipRequests = PaySlipRequest::where('company_id', $companyId)
+            ->where('status', 'pending')
+            ->get();
+
+
+        $attendanceRequests = Attendance::with(['requests' => function ($q) {
+            $q->where('status', 'pending');
+        }])
+            ->where('company_id', $companyId)
+            ->whereHas('requests', function ($q) {
+                $q->where('status', 'pending');
+            })
+            ->get();
 
 
 
@@ -53,6 +81,8 @@ class Dashboard extends Component
                 });
             }])
             ->get();
+
+
 
         $absentEmployees = $shiftDates->pluck('employees')->flatten();
         $todayAbsent = $absentEmployees->count();
@@ -78,13 +108,33 @@ class Dashboard extends Component
 
 
         $present = Attendance::where('company_id', $companyId)
-            ->whereBetween('clock_in', [$startDate->startOfDay(), $endDate->endOfDay()])
+            ->whereBetween('clock_in', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->whereNotNull('clock_out')
+            ->whereDoesntHave('requests', function ($req) {
+                $req->whereIn('status', ['pending', 'rejected']);
+            })
             ->count();
 
 
 
 
-        $absent = $totalEmployees - ($present + $onLeave);
+        $shiftDatesFilterWise = ShiftDate::whereBetween('date', [$startDate, $endDate])
+            ->whereTime('start_time', '<=', $now->format('H:i:s'))
+            ->with(['employees' => function ($q) use ($startDate, $endDate) {
+                $q->whereDoesntHave('attendances', function ($att) use ($startDate, $endDate) {
+                    $att->whereBetween('clock_in', [$startDate->startOfDay(), $endDate->endOfDay()])
+                        ->whereDoesntHave('requests', function ($req) {
+                            $req->whereIn('status', ['pending', 'rejected']);
+                        });
+                });
+            }])
+            ->get();
+
+
+        $absentEmployeesFilterWise = $shiftDatesFilterWise->pluck('employees')->flatten();
+        $absentFilterWise = $absentEmployeesFilterWise->count();
+
+
 
         $pendingRequests = LeaveRequest::where('company_id', $companyId)
             ->where('status', 'pending')
@@ -106,13 +156,16 @@ class Dashboard extends Component
         $liveStatus = [
             'present' => $present,
             'leave'   => $onLeave,
-            'absent'  => $absent,
+            'absent'  => $absentFilterWise,
         ];
 
 
 
         return view('livewire.backend.company.dashboard', [
             'liveStatus' => $liveStatus,
+            'leaveRequests' => $leaveRequests,
+            'payslipRequests' => $payslipRequests,
+            'attendanceRequests' => $attendanceRequests,
             'todayAbsent'     => $todayAbsent,
             'onLeaveToday'    => $onLeaveToday,
             'pendingRequests' => $pendingRequests,

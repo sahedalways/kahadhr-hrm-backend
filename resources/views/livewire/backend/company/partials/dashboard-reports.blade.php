@@ -2,6 +2,11 @@
     <link href="{{ asset('assets/css/company-dashboard.css') }}"
           rel="stylesheet" />
 @endpush
+@php
+    $authUser = app('authUser');
+    $companySubDomain =
+        $authUser->user_type === 'company' ? $authUser->company->sub_domain : $authUser->employee->company->sub_domain;
+@endphp
 
 <div class="container-fluid py-4"
      wire:poll.60s>
@@ -210,7 +215,8 @@
 
                 <div class="d-flex align-items-center">
                     <div style="width: 145px; height: 130px; position: relative;"
-                         class="me-4">
+                         class="me-4"
+                         wire:ignore.self>
                         <canvas id="statusChart"></canvas>
                     </div>
 
@@ -225,53 +231,223 @@
                         </div>
                         <div class="legend-item">
                             <span class="dot bg-absent"></span>
-                            <span>Absent/Late: <strong>{{ $liveStatus['absent'] ?? 0 }}</strong></span>
+                            <span>Absent: <strong>{{ $liveStatus['absent'] ?? 0 }}</strong></span>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="dashboard-section mb-4">
+                <h5 class="fw-bold mb-3">Action Center</h5>
+
+                {{-- Leave Requests Section --}}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Leave Requests</h6>
+
+                    @if ($leaveRequests->isEmpty())
+                        <div class="list-group list-group-flush mb-2">
+                            <li class="list-group-item text-center text-muted py-3">
+                                <i class="fas fa-check-circle me-1"></i> No leave requests found.
+                            </li>
+                        </div>
+                    @else
+                        <ul class="list-group list-group-flush mb-2"
+                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                            @foreach ($leaveRequests as $leave)
+                                @php
+                                    $duration =
+                                        \Carbon\Carbon::parse($leave->start_date)->diffInDays(
+                                            \Carbon\Carbon::parse($leave->end_date),
+                                        ) + 1;
+
+                                    $route = route('company.dashboard.leaves.index', [
+                                        'company' => $companySubDomain,
+                                        'leave' => $leave->id ?? null,
+                                    ]);
+                                @endphp
+
+                                <li class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm leave-item"
+                                    style="background: #ffffff; border: 1px solid #eef2f7 !important; margin-bottom: 15px !important; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                    onclick="window.location='{{ $route }}'"
+                                    onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-2px)';"
+                                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-dark"
+                                                style="font-size: 0.95rem;">
+                                                {{ $leave->user->full_name }}
+                                            </h6>
+                                            <small class="text-muted"
+                                                   style="font-size: 0.8rem;">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
+                                                {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
+                                            </small>
+                                        </div>
+                                        <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2"
+                                              style="font-size: 0.75rem; font-weight: 600;">
+                                            {{ $duration }} {{ Str::plural('Day', $duration) }}
+                                        </span>
+                                    </div>
+
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="p-2 rounded-3 d-flex align-items-center"
+                                                 style="background-color: rgba(248, 249, 250, 0.8); border: 1px solid #f1f3f5;">
+                                                <span class="me-2"
+                                                      style="font-size: 1.1rem;">{!! $leave->leaveType->emoji !!}</span>
+                                                <span
+                                                      class="text-dark fw-medium small text-truncate">{{ $leave->leaveType->name ?? 'N/A' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="p-2 rounded-3 d-flex align-items-center h-100"
+                                                 style="background-color: rgba(231, 241, 255, 0.7); border: 1px solid #dee2e6;">
+                                                <i class="fas fa-comment-dots me-2 text-primary"
+                                                   style="font-size: 0.85rem;"></i>
+                                                <span class="text-dark small text-truncate"
+                                                      title="{{ $leave->other_reason }}">
+                                                    {{ $leave->other_reason ?? 'No reason' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+
+
+                    @endif
+                </div>
+
+                {{-- Attendance Requests Section --}}
+                <div class="mb-3">
+                    <h6 class="fw-bold mb-2">Attendance Requests</h6>
+
+                    @if ($attendanceRequests->isEmpty())
+                        <div class="list-group list-group-flush mb-2">
+                            <li class="list-group-item text-center text-muted py-3">
+                                <i class="fas fa-check-circle me-1"></i> No attendance requests found.
+                            </li>
+                        </div>
+                    @else
+                        <ul class="list-group list-group-flush mb-2"
+                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                            @foreach ($attendanceRequests as $record)
+                                @php
+                                    $pendingRequests = $record->requests->where('status', 'pending');
+                                @endphp
+
+                                @foreach ($pendingRequests as $req)
+                                    @php
+                                        $location =
+                                            $req->type === 'late_clock_in'
+                                                ? $record->clock_in_location
+                                                : $record->clock_out_location;
+
+                                        $route = route('company.dashboard.timesheet.index', [
+                                            'company' => $companySubDomain,
+                                            'id' => $req->id ?? null,
+                                        ]);
+                                    @endphp
+
+                                    <li class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm"
+                                        style="background: #ffffff; border: 1px solid #eef2f7 !important; margin-bottom: 15px !important; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                        onclick="window.location='{{ $route }}'"
+                                        onmouseover="this.style.backgroundColor='#fff9f0'; this.style.borderColor='#ffeeba'; this.style.transform='translateY(-2px)';"
+                                        onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-dark"
+                                                    style="font-size: 0.95rem;">
+                                                    {{ $record->user->full_name }}
+                                                </h6>
+                                                <small class="text-muted"
+                                                       style="font-size: 0.8rem;">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    Clock-in:
+                                                    {{ \Carbon\Carbon::parse($record->clock_in)->format('h:i A') }}
+                                                </small>
+                                            </div>
+                                            <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3 py-2"
+                                                  style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                Pending
+                                            </span>
+                                        </div>
+
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <div class="p-2 rounded-3 d-flex align-items-center h-100"
+                                                     style="background-color: #f8f9fa; border: 1px solid #f1f3f5;">
+                                                    <div class="me-2 text-primary">
+                                                        <i class="fas fa-file-alt"
+                                                           style="font-size: 0.9rem;"></i>
+                                                    </div>
+                                                    <span class="text-dark fw-medium small text-truncate">
+                                                        {{ ucfirst(str_replace('_', ' ', $req->type)) }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="p-2 rounded-3 d-flex align-items-center h-100"
+                                                     style="background-color: #f0f7ff; border: 1px solid #dee2e6;">
+                                                    <i class="fas fa-map-marker-alt me-2 text-info"
+                                                       style="font-size: 0.85rem;"></i>
+                                                    <span class="text-dark small text-truncate"
+                                                          title="{{ $location ?? 'No location' }}">
+                                                        {{ $location ?? 'Remote/Unknown' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
             </div>
 
-            <div class="dashboard-section mb-4">
-                <h5 class="fw-bold mb-3">Action Center</h5>
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item px-0 py-2 border-0 border-bottom">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="small fw-bold">Leave Req: David Lee</span>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-success">Approve</button>
-                                <button class="btn btn-sm btn-outline-danger">Reject</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
 
             <div class="dashboard-section">
                 <h5 class="fw-bold mb-3">Documents Expiring Soon (60 Days)</h5>
 
                 @forelse ($expiringDocs as $doc)
+                    @php
+                        $totalDays = 60;
+                        $remainingDays = max(floor(\Carbon\Carbon::now()->diffInDays($doc->expires_at)), 0);
+                        $progress = (($totalDays - $remainingDays) / $totalDays) * 100;
+                    @endphp
+
                     <div class="mb-3">
                         <div class="d-flex justify-content-between small mb-1">
                             <span class="fw-bold">
                                 {{ $doc->employee->f_name }} - {{ $doc->documentType->name }}
                             </span>
+
                             <span class="text-danger fw-bold">
-                                {{ \Carbon\Carbon::now()->diffInDays($doc->expires_at) }} days
+                                {{ $remainingDays }} days
                             </span>
                         </div>
 
                         <div class="progress"
                              style="height: 6px;">
                             <div class="progress-bar bg-danger"
-                                 style="width: 40%"></div>
+                                 style="width: {{ $progress }}%"></div>
                         </div>
                     </div>
+
                 @empty
                     <div class="text-center text-muted py-4">
                         <i class="fas fa-file-shield mb-2 d-block"
                            style="font-size: 28px;"></i>
                         <span class="fw-bold fst-italic">
-                            No documents expiring in the next 60 days
+                            No documents expiring.
                         </span>
                     </div>
                 @endforelse
@@ -304,7 +480,11 @@
                         </thead>
                         <tbody>
                             @forelse($recentEmployees as $emp)
-                                <tr>
+                                <tr class="clickable-row cursor-pointer"
+                                    data-href="{{ route('company.dashboard.employees.details', [
+                                        'company' => app('authUser')->company->sub_domain,
+                                        'employee' => $emp->id,
+                                    ]) }}">
                                     <td class="ps-3">
                                         <div class="d-flex align-items-center">
                                             <div class="rounded-circle bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold me-2"
@@ -350,7 +530,11 @@
         data: {
             labels: ['Present', 'On Leave', 'Absent'],
             datasets: [{
-                data: [40, 5, 5],
+                data: [
+                    {{ $liveStatus['present'] ?? 0 }},
+                    {{ $liveStatus['leave'] ?? 0 }},
+                    {{ $liveStatus['absent'] ?? 0 }}
+                ],
                 backgroundColor: [
                     '#28a745',
                     '#007bff',
@@ -373,5 +557,16 @@
                 }
             }
         }
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('tr.clickable-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+        });
     });
 </script>

@@ -562,9 +562,9 @@
             {{ $liveStatus['absent'] ?? 0 }}
         ];
 
-
+        // if all zeros, show a tiny dummy value to force render
         const allZero = data.every(v => v === 0);
-        const chartData = allZero ? [0.01, 0.01, 0.01] : data;
+        const chartData = allZero ? [0, 0, 0] : data;
 
         new Chart(canvas.getContext('2d'), {
             type: 'doughnut',
@@ -578,7 +578,7 @@
                 }]
             },
             options: {
-                cutout: '67%',
+                cutout: '65%',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {

@@ -551,43 +551,53 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('statusChart').getContext('2d');
 
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Present', 'On Leave', 'Absent'],
-            datasets: [{
-                data: [
-                    {{ $liveStatus['present'] ?? 0 }},
-                    {{ $liveStatus['leave'] ?? 0 }},
-                    {{ $liveStatus['absent'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#28a745',
-                    '#007bff',
-                    '#dc3545'
-                ],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            cutout: '65%',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: true
+<script>
+    function renderStatusChart() {
+        const canvas = document.getElementById('statusChart');
+        if (!canvas) return; // Stop if canvas not loaded
+        const ctx = canvas.getContext('2d');
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Present', 'On Leave', 'Absent'],
+                datasets: [{
+                    data: [
+                        {{ $liveStatus['present'] ?? 0 }},
+                        {{ $liveStatus['leave'] ?? 0 }},
+                        {{ $liveStatus['absent'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#28a745', '#007bff', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                cutout: '65%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', renderStatusChart);
+
+
+    if (window.Livewire) {
+        Livewire.hook('message.processed', renderStatusChart);
+    }
 </script>
+
 
 
 <script>

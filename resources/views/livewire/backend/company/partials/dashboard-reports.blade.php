@@ -215,9 +215,23 @@
 
                 <div class="d-flex align-items-center">
                     <div style="width: 145px; height: 130px; position: relative;"
-                         class="me-4">
-                        <canvas id="statusChart"></canvas>
+                         class="me-4 d-flex align-items-center justify-content-center bg-light rounded">
+                        @php
+                            $hasData =
+                                ($liveStatus['present'] ?? 0) > 0 ||
+                                ($liveStatus['leave'] ?? 0) > 0 ||
+                                ($liveStatus['absent'] ?? 0) > 0;
+                        @endphp
+
+                        @if ($hasData)
+                            <canvas id="statusChart"></canvas>
+                        @else
+                            <span class="text-muted fw-bold small text-center">
+                                <i class="fas fa-info-circle me-1"></i> No data available
+                            </span>
+                        @endif
                     </div>
+
 
                     <div class="chart-legend">
                         <div class="legend-item">

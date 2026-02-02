@@ -185,12 +185,17 @@
                                 <td class="fw-bold text-end">{{ $row['time'] }}</td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="3"
-                                    class="text-center text-muted py-3">
-                                    No anomalies found today.
-                                </td>
-                            </tr>
+                            <div class="text-center py-5 rounded-4 shadow-sm border-0"
+                                 style="background: #ffffff;">
+
+                                <div class="mb-3">
+                                    <i class="fas fa-user-shield text-light-emphasis"
+                                       style="font-size: 3rem; opacity: 0.3;"></i>
+                                </div>
+                                <h6 class="text-muted fw-normal">No anomalies found today.</h6>
+                                <small class="text-secondary">Everything looks good! No unusual activity detected in the
+                                    last 24 hours.</small>
+                            </div>
                         @endforelse
                     </tbody>
                 </table>

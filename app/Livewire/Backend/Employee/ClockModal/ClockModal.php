@@ -418,6 +418,14 @@ class ClockModal extends BaseComponent
             $statusLabel = 'Not Started';
         }
 
+        $this->dispatch(
+            'attendance-status-updated',
+            showClockIn: $showClockInButton,
+            showClockOut: $showClockOutButton,
+            status: $statusLabel
+        )->to('backend.components.header');
+
+
         return view('livewire.backend.employee.clock-modal.clock-modal', [
             'showClockInButton' => $showClockInButton,
             'showClockOutButton' => $showClockOutButton,

@@ -192,7 +192,7 @@
                                     <i class="fas fa-user-shield text-light-emphasis"
                                        style="font-size: 3rem; opacity: 0.3;"></i>
                                 </div>
-                                <h6 class="text-muted fw-normal">No anomalies found today.</h6>
+                                <h6 class="text-muted fw-normal">No anomalies found today</h6>
                                 <small class="text-secondary">Everything looks good! No unusual activity detected in the
                                     last 24 hours.</small>
                             </div>
@@ -268,7 +268,7 @@
                                             <div class="text-end">
                                                 <span class="badge rounded-pill bg-danger text-white px-3 py-2 shadow-sm"
                                                       style="font-size: 0.85rem; font-weight: 700;">
-                                                    ৳{{ number_format($expense->amount, 2) }}
+                                                    €{{ number_format($expense->amount, 2) }}
                                                 </span>
                                             </div>
                                         </div>

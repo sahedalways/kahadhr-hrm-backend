@@ -415,9 +415,6 @@ class Dashboard extends Component
 
 
 
-
-
-
         return view('livewire.backend.company.dashboard', [
             'liveStatus' => $liveStatus,
             'expenses' => $expenses,

@@ -396,9 +396,11 @@
                                 <hr class="my-2">
 
                             @empty
-                                <li class="list-group-item border-0 px-0 text-center text-muted">
-                                    No leave requests found.
-                                </li>
+
+                                <div class="text-center py-4 border rounded-2 bg-light">
+                                    <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted mb-0">No leave requests found.</p>
+                                </div>
                             @endforelse
                         </ul>
                     </div>
@@ -457,9 +459,12 @@
                                 </li>
                                 <hr class="my-2">
                             @empty
-                                <li class="list-group-item border-0 px-0 text-center text-muted">
-                                    No payslip requests found.
-                                </li>
+
+
+                                <div class="text-center py-4 border rounded-2 bg-light">
+                                    <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted mb-0"> No payslip requests found.</p>
+                                </div>
                             @endforelse
                         </ul>
                     </div>
@@ -509,9 +514,12 @@
                                     <hr class="my-2">
                                 @endforeach
                             @empty
-                                <li class="list-group-item border-0 px-0 text-center text-muted">
-                                    No attendance requests found.
-                                </li>
+
+
+                                <div class="text-center py-4 border rounded-2 bg-light">
+                                    <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted mb-0"> No attendance requests found.</p>
+                                </div>
                             @endforelse
                         </ul>
 

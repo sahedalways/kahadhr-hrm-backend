@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ChatMessage;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\ShiftDate;
@@ -185,5 +186,40 @@ if (!function_exists('todaysShiftForUser')) {
 
       return "You are currently on <span class='text-danger fw-bold'>{$daysLeft}</span> days trial plan.";
     }
+  }
+
+
+
+  function getGlobalUnreadCount($userId)
+  {
+    $companyId = currentCompanyId();
+
+    // 1️⃣ Group unread
+    $groupUnread = ChatMessage::where('company_id', $companyId)
+      ->whereNull('receiver_id')
+      ->whereNull('team_id')
+      ->where('sender_id', '!=', $userId)
+      ->whereDoesntHave('reads', function ($q) use ($userId) {
+        $q->where('user_id', $userId)
+          ->whereNotNull('read_at');
+      })
+      ->count();
+
+    // 2️⃣ Team unread
+    $teamUnread = ChatMessage::where('company_id', $companyId)
+      ->whereNotNull('team_id')
+      ->where('sender_id', '!=', $userId)
+      ->whereDoesntHave('reads', function ($q) use ($userId) {
+        $q->where('user_id', $userId)
+          ->whereNotNull('read_at');
+      })
+      ->count();
+
+    $personalUnread = ChatMessage::where('company_id', $companyId)
+      ->where('receiver_id', $userId)
+      ->where('is_read', 0)
+      ->count();
+
+    return $groupUnread + $teamUnread + $personalUnread;
   }
 }

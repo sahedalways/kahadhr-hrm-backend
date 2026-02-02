@@ -222,24 +222,21 @@
                                 </li>
 
 
-                                <li class="dropdown-divider-item">
-                                    <hr class="dropdown-divider">
-                                </li>
+
+                                <hr class="dropdown-divider">
 
 
-                                {{-- <li><a class="dropdown-item"
-                                       href="#"><i class="fas fa-question-circle me-2"></i>
-                                        Help
-                                        Center</a></li> --}}
+
+
                                 <li><a class="dropdown-item"
                                        href="#"><i class="fas fa-headset me-2"></i>
                                         Support</a>
                                 </li>
 
                                 {{-- Logout --}}
-                                <li class="dropdown-divider-item">
-                                    <hr class="dropdown-divider">
-                                </li>
+
+                                <hr class="dropdown-divider">
+
                                 <li>
 
                                     <a class="dropdown-item"

@@ -294,6 +294,7 @@ class ChatIndex extends BaseComponent
 
         $this->messages->push($msg);
         $this->dispatch('scrollToBottom');
+        $this->dispatch('refreshUnreadCount');
     }
 
 
@@ -434,6 +435,8 @@ class ChatIndex extends BaseComponent
             ->update(['is_read' => 1]);
 
         $this->unreadCounts[$userId] = 0;
+
+        $this->dispatch("refreshUnreadCount");
     }
 
 

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var pusherKey = document.getElementById("pusher_key").value;
     var pusherCluster = document.getElementById("pusher_cluster").value;
     var companyId = parseInt(
-        document.getElementById("current_company_id").value
+        document.getElementById("current_company_id").value,
     );
 
     // Initialize Pusher
@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     allUserChatChannel.bind("allUsersMessage", function (data) {
         Livewire.dispatch("incomingMessage", { id: data.message.id });
+        Livewire.emit("refreshUnreadCount");
     });
 
     const attachmentBtn = document.getElementById("attachmentBtn");

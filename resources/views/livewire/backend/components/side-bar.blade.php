@@ -6,11 +6,7 @@
         <div class=" sidenav-toggler-inner-wrapper w-100">
             <a href="javascript:;"
                class="nav-link p-0 w-fitcontent sidenav-toggler">
-                {{-- <div class="sidenav-toggler-inner">
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                        <i class="sidenav-toggler-line bg-dark"></i>
-                    </div> --}}
+
                 <i class="fa-solid fa-angle-left sidebar-icon"></i>
             </a>
         </div>
@@ -32,6 +28,30 @@
                 default => asset(siteSetting()->logo_url),
             };
         @endphp
+
+        <style>
+            @keyframes blink-animation {
+                0% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+                50% {
+                    opacity: 0.3;
+                    transform: scale(1.2);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            .blink-me {
+                animation: blink-animation 0.5s ease-in-out 2;
+                /* Blinks twice */
+            }
+        </style>
 
 
         <a class="navbar-brand m-0 flex-column d-flex gap-2 text-center p-3"
@@ -361,6 +381,19 @@
                        data-bs-trigger="manual">
                         <i class="fas fa-comments"></i>
                         <span class="nav-link-text ms-1">Team Chat</span>
+
+                        <div x-data="{ blink: false }"
+                             x-on:unread-updated.window="blink = true; setTimeout(() => blink = false, 1000)">
+
+                            @if ($unreadCount > 0)
+                                <span class="badge bg-danger ms-1"
+                                      :class="{ 'blink-me': blink }"
+                                      wire:key="unread-badge-{{ $unreadCount }}">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </div>
+
                     </a>
                 </li>
 
@@ -631,7 +664,6 @@
                 </li>
 
 
-
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('employee/dashboard/chat*') ? 'active' : '' }}"
                        href="{{ route('employee.dashboard.chat.index', ['company' => app('authUser')->employee->company->sub_domain]) }}"
@@ -641,8 +673,21 @@
                        data-bs-trigger="manual">
                         <i class="fas fa-comments"></i>
                         <span class="nav-link-text ms-1">Team Chat</span>
+
+                        <div x-data="{ blink: false }"
+                             x-on:unread-updated.window="blink = true; setTimeout(() => blink = false, 1000)">
+
+                            @if ($unreadCount > 0)
+                                <span class="badge bg-danger ms-1"
+                                      :class="{ 'blink-me': blink }"
+                                      wire:key="unread-badge-{{ $unreadCount }}">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </div>
                     </a>
                 </li>
+
 
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('employee/dashboard/clock-in-out-history*') ? 'active' : '' }}"
@@ -822,6 +867,15 @@
             @endif
         </ul>
     </div>
+    <input type="hidden"
+           id="pusher_key"
+           value="{{ config('broadcasting.connections.pusher.key') }}">
+    <input type="hidden"
+           id="pusher_cluster"
+           value="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+    <input type="hidden"
+           id="current_company_id"
+           value="{{ currentCompanyId() }}">
     <hr class="horizontal dark mt-2">
 
     <script>
@@ -898,6 +952,26 @@
         new MutationObserver(updateTooltips).observe(body, {
             attributes: true,
             attributeFilter: ['class']
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var pusherKey = document.getElementById("pusher_key").value;
+        var pusherCluster = document.getElementById("pusher_cluster").value;
+        var companyId = parseInt(
+            document.getElementById("current_company_id").value,
+        );
+
+        // Initialize Pusher
+        var pusher = new Pusher(pusherKey, {
+            cluster: pusherCluster,
+            forceTLS: true,
+        });
+
+        var allUserChatChannel = pusher.subscribe("company." + companyId);
+
+        allUserChatChannel.bind("allUsersMessage", function(data) {
+            Livewire.dispatch("refreshUnreadCount");
         });
     });
 </script>

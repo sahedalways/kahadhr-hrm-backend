@@ -4,21 +4,33 @@ namespace App\Livewire\Backend\Components;
 
 use App\Models\Contact;
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+
 
 class SideBar extends Component
 {
     public $unreadContacts = 0;
 
+    public $unreadCount = 0;
+
+    protected $listeners = [
+        'incomingMessage' => 'updateUnreadCount',
+        'refreshUnreadCount' => 'updateUnreadCount',
+    ];
 
 
     public function mount()
     {
         // Count unread contacts
         $this->unreadContacts = Contact::where('is_read', false)->count();
+        $this->updateUnreadCount();
     }
 
+
+    public function updateUnreadCount()
+    {
+        $this->unreadCount = getGlobalUnreadCount(auth()->id());
+        $this->dispatch('unread-updated');
+    }
 
 
     public function render()

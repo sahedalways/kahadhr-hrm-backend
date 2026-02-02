@@ -225,7 +225,7 @@
                          style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
                         @foreach ($expenses as $expense)
                             @php
-                                $route = route('company.dashboard.document-manage.index', [
+                                $route = route('company.dashboard.reports.expenses', [
                                     'company' => $companySubDomain,
                                     'id' => $expense->id ?? null,
                                 ]);

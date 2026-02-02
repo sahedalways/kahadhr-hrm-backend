@@ -4,16 +4,142 @@ namespace App\Livewire\Backend\Company;
 
 use Livewire\Component;
 use App\Models\Attendance;
+use App\Models\CompanyDocument;
 use App\Models\LeaveRequest;
 use App\Models\EmpDocument;
 use App\Models\Employee;
+use App\Models\Expenses;
 use App\Models\PaySlipRequest;
 use App\Models\ShiftDate;
+use App\Models\User;
 use Carbon\Carbon;
 
 class Dashboard extends Component
 {
     public $statusFilter = 'day';
+
+    public $currentMonth;
+    public $currentYear;
+    public $calendarEvents = [];
+
+    public $ukHolidays = [];
+
+
+
+    public function mount()
+    {
+        $today = Carbon::today();
+        $this->currentMonth = $today->month;
+        $this->currentYear = $today->year;
+
+        $this->loadCalendarEvents();
+    }
+
+    public function previousMonth()
+    {
+        $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->subMonth();
+        $this->currentMonth = $date->month;
+        $this->currentYear = $date->year;
+        $this->loadCalendarEvents();
+    }
+
+    public function nextMonth()
+    {
+        $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->addMonth();
+        $this->currentMonth = $date->month;
+        $this->currentYear = $date->year;
+        $this->loadCalendarEvents();
+    }
+
+
+
+
+    public function loadCalendarEvents()
+    {
+        $companyId = auth()->user()->company->id;
+
+        $startOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
+        $endOfMonth   = $startOfMonth->copy()->endOfMonth();
+
+        $calendarEvents = [];
+
+        // 1. Leaves
+        $leaves = LeaveRequest::where('company_id', $companyId)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('start_date', [$startOfMonth, $endOfMonth])
+                    ->orWhereBetween('end_date', [$startOfMonth, $endOfMonth]);
+            })
+            ->with('user.employee.profile')
+            ->get();
+
+        foreach ($leaves as $leave) {
+            $period = Carbon::parse($leave->start_date)->toPeriod(Carbon::parse($leave->end_date));
+            foreach ($period as $date) {
+                if ($date->month == $this->currentMonth) {
+                    $calendarEvents[$date->toDateString()][] = [
+                        'type' => 'leave',
+                        'text' => $leave->user->full_name . ' - ' . $leave->leaveType->name ?? 'Leave',
+                    ];
+                }
+            }
+        }
+
+        // 2. Birthdays
+        $employees = Employee::with('profile')->where('company_id', $companyId)->get();
+        foreach ($employees as $emp) {
+            $dob = optional($emp->profile)->date_of_birth;
+            if ($dob && Carbon::parse($dob)->month == $this->currentMonth) {
+                $calendarEvents[Carbon::create($this->currentYear, $this->currentMonth, Carbon::parse($dob)->day)->toDateString()][] = [
+                    'type' => 'birthday',
+                    'text' => $emp->full_name . "'s Birthday",
+                ];
+            }
+        }
+
+        $year = Carbon::now()->year;
+
+
+        $holidays = config('uk_holidays');
+
+
+        $this->ukHolidays = $holidays[$year]['UK'] ?? [];
+
+
+        foreach ($this->ukHolidays as $date => $text) {
+            if (Carbon::parse($date)->month == $this->currentMonth) {
+                $calendarEvents[$date][] = [
+                    'type' => 'uk_holiday',
+                    'text' => $text,
+                ];
+            }
+        }
+
+
+        // 4. Document Expiry
+        $today = Carbon::today();
+        $companyDocs = CompanyDocument::where('company_id', $companyId)
+            ->whereNotNull('expires_at')
+            ->whereBetween('expires_at', [$startOfMonth, $endOfMonth])
+            ->get();
+
+        $empDocs = EmpDocument::where('company_id', $companyId)
+            ->whereNotNull('expires_at')
+            ->whereBetween('expires_at', [$startOfMonth, $endOfMonth])
+            ->get();
+
+        $allDocs = $companyDocs->merge($empDocs);
+        foreach ($allDocs as $doc) {
+            $calendarEvents[Carbon::parse($doc->expires_at)->toDateString()][] = [
+                'type' => 'doc_expiry',
+                'text' => $doc->name . ' Expiry',
+            ];
+        }
+
+        $this->calendarEvents = $calendarEvents;
+    }
+
+
 
     public function render()
     {
@@ -84,6 +210,61 @@ class Dashboard extends Component
 
 
 
+
+        $attendanceAnomalies = Attendance::where('company_id', $companyId)
+            ->whereDate('created_at', $today)
+            ->with(['user', 'requests'])
+            ->get()
+            ->map(function ($attendance) {
+
+
+                if (!$attendance->clock_in) {
+                    return [
+                        'name' => $attendance->user->full_name,
+                        'type' => 'Not Clocked In',
+                        'badge' => 'danger',
+                        'time' => '--',
+                    ];
+                }
+
+                $lateRequest = $attendance->requests
+                    ->where('type', 'late_clock_in')
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->first();
+
+                if ($lateRequest) {
+                    return [
+                        'name' => $attendance->user->full_name,
+                        'type' => 'Late In',
+                        'badge' => 'warning',
+                        'time' => \Carbon\Carbon::parse($attendance->clock_in)->format('h:i A'),
+                    ];
+                }
+
+                $earlyOutRequest = $attendance->requests
+                    ->where('type', 'early_clock_out')
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->first();
+
+                if ($earlyOutRequest) {
+                    return [
+                        'name' => $attendance->user->full_name,
+                        'type' => 'Early Out',
+                        'badge' => 'info',
+                        'time' => $attendance->clock_out
+                            ? \Carbon\Carbon::parse($attendance->clock_out)->format('h:i A')
+                            : '--',
+                    ];
+                }
+
+                return null;
+            })
+            ->filter()
+            ->take(5);
+
+
+
+
         $absentEmployees = $shiftDates->pluck('employees')->flatten();
         $todayAbsent = $absentEmployees->count();
 
@@ -142,15 +323,46 @@ class Dashboard extends Component
 
         $recentEmployees = Employee::where('company_id', $companyId)
             ->latest()
-            ->take(3)
+            ->take(5)
             ->get();
 
 
-        $expiringDocs = EmpDocument::where('company_id', $companyId)
+        $empExpiringDocs = EmpDocument::where('company_id', $companyId)
             ->whereNotNull('expires_at')
             ->whereBetween('expires_at', [$today, $today->copy()->addDays(60)])
             ->with(['employee', 'documentType'])
             ->get();
+
+        $expenses = Expenses::where('company_id', $companyId)
+            ->latest('submitted_at')
+            ->take(5)
+            ->get();
+
+        $recentDocuments = CompanyDocument::where('company_id', $companyId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $companyExpiringDocs = CompanyDocument::where('company_id', $companyId)
+            ->whereNotNull('expires_at')
+            ->whereBetween('expires_at', [$today, $today->copy()->addDays(60)])
+            ->get();
+
+
+        $expiringDocs = $empExpiringDocs
+            ->map(function ($doc) {
+                $doc->source = 'employee';
+                return $doc;
+            })
+            ->merge(
+                $companyExpiringDocs->map(function ($doc) {
+                    $doc->source = 'company';
+                    return $doc;
+                })
+            )
+            ->sortBy('expires_at')
+            ->values();
+
 
 
         $liveStatus = [
@@ -161,9 +373,18 @@ class Dashboard extends Component
 
 
 
+
+
+
+
+
         return view('livewire.backend.company.dashboard', [
             'liveStatus' => $liveStatus,
+            'expenses' => $expenses,
             'leaveRequests' => $leaveRequests,
+            'calendarEvents' => $this->calendarEvents,
+            'attendanceAnomalies' => $attendanceAnomalies,
+            'recentDocuments' => $recentDocuments,
             'payslipRequests' => $payslipRequests,
             'attendanceRequests' => $attendanceRequests,
             'todayAbsent'     => $todayAbsent,

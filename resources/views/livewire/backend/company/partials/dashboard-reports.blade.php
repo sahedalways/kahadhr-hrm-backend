@@ -58,31 +58,32 @@
             <div class="dashboard-section mb-4 border-0 shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="calendar-nav d-flex align-items-center gap-1 bg-light rounded-pill p-1 border">
-                        <button class="btn btn-link text-dark p-0 border-0 d-flex align-items-center justify-content-center nav-arrow"
-                                style="width: 28px; height: 28px;">
-                            <i class="fas fa-chevron-left"
-                               style="font-size: 12px;"></i>
+
+
+                        <button wire:click="previousMonth"
+                                class="btn btn-link ...">
+                            <i class="fas fa-chevron-left"></i>
                         </button>
 
-                        <span class="fw-bold text-center px-2 mb-0"
-                              style="min-width: 130px; font-size: 0.95rem; letter-spacing: -0.2px;">
-                            September 2024
+                        <span class="fw-bold">
+                            {{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->format('F Y') }}
                         </span>
 
-                        <button class="btn btn-link text-dark p-0 border-0 d-flex align-items-center justify-content-center nav-arrow"
-                                style="width: 28px; height: 28px;">
-                            <i class="fas fa-chevron-right"
-                               style="font-size: 12px;"></i>
+                        <button wire:click="nextMonth"
+                                class="btn btn-link ...">
+                            <i class="fas fa-chevron-right"></i>
                         </button>
+
+
                     </div>
 
                     <div class="d-flex gap-2">
-                        <span class="badge badge-green px-3 py-2">Leaves (Green)</span>
-                        <span class="badge badge-pink px-3 py-2">Birthdays</span>
-                        <span class="badge badge-danger px-3 py-2">UK Holidays</span>
-                        <span class="badge badge-orange px-3 py-2">Doc Expiry</span>
-
+                        <span class="badge badge-green px-3 py-2 clickable">Leaves </span>
+                        <span class="badge badge-pink px-3 py-2 clickable">Birthdays</span>
+                        <span class="badge badge-danger px-3 py-2 clickable">UK Holidays</span>
+                        <span class="badge badge-orange px-3 py-2 clickable">Doc Expiry</span>
                     </div>
+
                 </div>
 
                 <div class="table-responsive">
@@ -106,93 +107,255 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="calendar-day text-muted">31</td>
-                                <td class="calendar-day">1</td>
-                                <td class="calendar-day">
-                                    2 <div class="event-bar badge-green">John Doe - Annual Leave</div>
-                                </td>
-                                <td class="calendar-day">3</td>
-                                <td class="calendar-day">
-                                    4 <div class="event-bar badge-pink">Mike Brown's Birthday</div>
-                                </td>
-                                <td class="calendar-day">5</td>
-                                <td class="calendar-day">
-                                    6 <div class="event-bar badge-green">John Doe - Annual...</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="calendar-day">
-                                    7 <div class="event-bar badge-green">John Doe - Annual Leave</div>
-                                </td>
-                                <td class="calendar-day">8</td>
-                                <td class="calendar-day">9</td>
-                                <td class="calendar-day">10</td>
-                                <td class="calendar-day">11</td>
-                                <td class="calendar-day">
-                                    12 <div class="event-bar bg-danger text-white">Bank Holiday - Summer Bank Holiday
-                                    </div>
-                                </td>
-                                <td class="calendar-day">13</td>
-                            </tr>
-                            <tr>
-                                <td class="calendar-day">
-                                    14 <div class="event-bar badge-green-light text-success">Sarah Smith - Sick Leave
-                                    </div>
-                                </td>
-                                <td class="calendar-day">15</td>
-                                <td class="calendar-day">16</td>
-                                <td class="calendar-day">17</td>
-                                <td class="calendar-day">18</td>
-                                <td class="calendar-day">
-                                    19 <div class="event-bar badge-green-light text-success">Sarah Smith - Sick Leave
-                                    </div>
-                                </td>
-                                <td class="calendar-day">20</td>
-                            </tr>
-                            <tr>
-                                <td class="calendar-day">
-                                    21 <div class="event-bar badge-green">John Doe - Annual Leave</div>
-                                </td>
-                                <td class="calendar-day">22</td>
-                                <td class="calendar-day">23</td>
-                                <td class="calendar-day">
-                                    24 <div class="event-bar badge-green">John Doe - Annual Leave</div>
-                                </td>
-                                <td class="calendar-day">
-                                    25 <div class="event-bar badge-orange">Doc Expiry: Visa (A. Khan)</div>
-                                </td>
-                                <td class="calendar-day">26</td>
-                                <td class="calendar-day">27</td>
-                            </tr>
-                            <tr>
-                                <td class="calendar-day text-white bg-danger opacity-75">
-                                    28 <div class="event-bar">Bank Holiday - Summer</div>
-                                </td>
-                                <td class="calendar-day">29</td>
-                                <td class="calendar-day">30</td>
-                                <td class="calendar-day text-muted">1</td>
-                                <td class="calendar-day text-muted">2</td>
-                                <td class="calendar-day text-muted">3</td>
-                                <td class="calendar-day text-muted">4</td>
-                            </tr>
+                            @php
+                                $start = \Carbon\Carbon::create($currentYear, $currentMonth, 1)->startOfMonth();
+                                $end = $start->copy()->endOfMonth();
+                                $days = [];
+                                for ($day = $start->copy(); $day->lte($end); $day->addDay()) {
+                                    $days[] = $day->copy();
+                                }
+                            @endphp
+                            @foreach (array_chunk($days, 7) as $week)
+                                <tr>
+                                    @foreach ($week as $date)
+                                        <td class="calendar-day">
+                                            {{ $date->day }}
+                                            @if (isset($calendarEvents[$date->toDateString()]))
+                                                @foreach ($calendarEvents[$date->toDateString()] as $event)
+                                                    @php
+                                                        $badgeClass = match ($event['type']) {
+                                                            'leave' => 'badge-green',
+                                                            'birthday' => 'badge-pink',
+                                                            'uk_holiday' => 'bg-danger text-white',
+                                                            'doc_expiry' => 'badge-orange',
+                                                            default => 'badge-secondary',
+                                                        };
+                                                    @endphp
+                                                    <div class="event-bar {{ $badgeClass }}">
+                                                        {{ $event['text'] }}
+                                                    </div>
+                                                @endforeach
+                                            @endif
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
                         </tbody>
+
                     </table>
                 </div>
             </div>
+
+
 
             <div class="dashboard-section">
                 <h5 class="fw-bold mb-5">Attendance Anomalies</h5>
                 <table class="table align-middle">
                     <tbody>
-                        <tr>
-                            <td><strong>Chris Evans</strong></td>
-                            <td><span class="badge badge-red rounded-pill px-3">Late In - Red</span></td>
-                            <td class="fw-bold">9:45 AM</td>
-                        </tr>
+                        @forelse($attendanceAnomalies as $row)
+                            <tr>
+                                <td><strong>{{ $row['name'] }}</strong></td>
+                                <td>
+                                    <span
+                                          class="badge bg-{{ $row['badge'] }}-subtle text-{{ $row['badge'] }} rounded-pill px-3">
+                                        {{ $row['type'] }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-end">{{ $row['time'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3"
+                                    class="text-center text-muted py-3">
+                                    No anomalies found today.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
+
+
+            <div class="dashboard-section mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"
+                        style="font-size: 1.1rem; color: #2d3748;">
+                        Recent Expenses
+                    </h5>
+                    @if (!$expenses->isEmpty())
+                        <a href="{{ route('company.dashboard.reports.expenses', ['company' => app('authUser')->company->sub_domain]) }}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                           style="font-size: 0.8rem;">View All</a>
+                    @endif
+                </div>
+
+                @if ($expenses->isEmpty())
+                    <div class="text-center py-5 rounded-4 shadow-sm border-0"
+                         style="background: #ffffff;">
+                        <div class="mb-3">
+                            <i class="fas fa-receipt text-light-emphasis"
+                               style="font-size: 3rem; opacity: 0.3;"></i>
+                        </div>
+                        <h6 class="text-muted fw-normal">No recent expenses found</h6>
+                        <small class="text-secondary">Expenses submitted by employees will appear here.</small>
+                    </div>
+                @else
+                    <div class="list-group list-group-flush"
+                         style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                        @foreach ($expenses as $expense)
+                            @php
+                                $route = route('company.dashboard.document-manage.index', [
+                                    'company' => $companySubDomain,
+                                    'id' => $expense->id ?? null,
+                                ]);
+
+                            @endphp
+
+
+                            <div class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm"
+                                 style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                 onclick="window.location='{{ $route }}'"
+                                 onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-1px)';"
+                                 onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                                             style="width: 45px; height: 45px; background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2;">
+                                            <i class="fas fa-hand-holding-usd fs-5"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-dark text-truncate"
+                                                    style="font-size: 0.95rem;">
+                                                    {{ $expense->user->full_name ?? 'N/A' }}
+                                                </h6>
+                                                <small class="text-muted"
+                                                       style="font-size: 0.8rem;">
+                                                    <i class="fas fa-tag me-1"
+                                                       style="font-size: 0.7rem;"></i>
+                                                    {{ ucfirst($expense->category) }}
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge rounded-pill bg-danger text-white px-3 py-2 shadow-sm"
+                                                      style="font-size: 0.85rem; font-weight: 700;">
+                                                    ৳{{ number_format($expense->amount, 2) }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center"
+                                             style="border-color: #fceaea !important;">
+                                            <small class="text-muted"
+                                                   style="font-size: 0.75rem;">
+                                                <i class="far fa-clock me-1"></i>
+                                                {{ \Carbon\Carbon::parse($expense->submitted_at)->format('M d, Y | h:i A') }}
+                                            </small>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            <div class="dashboard-section mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"
+                        style="font-size: 1.1rem; color: #2d3748;">
+                        Recent e-Sign Documents
+                    </h5>
+                    @if (!$recentDocuments->isEmpty())
+                        <a href="{{ route('company.dashboard.document-manage.index', ['company' => app('authUser')->company->sub_domain]) }}"
+                           class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                           style="font-size: 0.8rem;">View All</a>
+                    @endif
+                </div>
+
+
+
+                @if ($recentDocuments->isEmpty())
+                    <div class="text-center py-5 rounded-4 shadow-sm border-0"
+                         style="background: #ffffff;">
+                        <div class="mb-3">
+                            <i class="fas fa-folder-open text-light-emphasis"
+                               style="font-size: 3rem; opacity: 0.3;"></i>
+                        </div>
+                        <h6 class="text-muted fw-normal">No recent documents found</h6>
+                        <small class="text-secondary">All clear! No new e-Sign Docs to review.</small>
+                    </div>
+                @else
+                    <div class="list-group list-group-flush"
+                         style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                        @foreach ($recentDocuments as $doc)
+                            @php
+                                $route = route('company.dashboard.document-manage.index', [
+                                    'company' => $companySubDomain,
+                                    'id' => $doc->id ?? null,
+                                ]);
+
+                            @endphp
+                            <div onclick="window.location='{{ $route }}'"
+                                 class="list-group-item mb-3 p-3 border-0 rounded-4 shadow-sm"
+                                 style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                 onclick="window.location='{{ $route }}'"
+                                 onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-1px)';"
+                                 onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center"
+                                             style="width: 45px; height: 45px; background: #f0f4f8; color: #4a5568; border: 1px solid #e2e8f0;">
+                                            <i class="fas fa-file-pdf fs-5"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h6 class="mb-1 fw-bold text-dark text-truncate"
+                                                style="font-size: 0.95rem;">
+                                                {{ $doc->name }}
+                                            </h6>
+                                            <span class="text-muted fw-medium"
+                                                  style="font-size: 0.75rem;">
+                                                {{ \Carbon\Carbon::parse($doc->created_at)->format('h:i A') }}
+                                            </span>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle"
+                                                  style="font-size: 0.65rem; padding: 4px 10px;">
+                                                <i class="fas fa-check-circle me-1"></i>{{ ucfirst($doc->status) }}
+                                            </span>
+
+                                            @if ($doc->expires_at)
+                                                <span class="text-warning fw-medium"
+                                                      style="font-size: 0.75rem;">
+                                                    <i class="fas fa-hourglass-half me-1"></i>Exp:
+                                                    {{ \Carbon\Carbon::parse($doc->expires_at)->format('M d, Y') }}
+                                                </span>
+                                            @else
+                                                <span class="text-muted"
+                                                      style="font-size: 0.75rem;">
+                                                    <i class="fas fa-infinity me-1"></i>No expiry
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+
         </div>
 
         <div class="col-lg-4">
@@ -213,24 +376,29 @@
 
 
 
-                <div class="d-flex align-items-center">
-                    <div style="width: 145px; height: 130px; position: relative;"
-                         class="me-4 d-flex align-items-center justify-content-center bg-light rounded">
-                        @php
-                            $hasData =
-                                ($liveStatus['present'] ?? 0) > 0 ||
-                                ($liveStatus['leave'] ?? 0) > 0 ||
-                                ($liveStatus['absent'] ?? 0) > 0;
-                        @endphp
+                <div class="d-flex align-items-center ">
 
-                        @if ($hasData)
+                    @php
+                        $hasData =
+                            ($liveStatus['present'] ?? 0) > 0 ||
+                            ($liveStatus['leave'] ?? 0) > 0 ||
+                            ($liveStatus['absent'] ?? 0) > 0;
+                    @endphp
+
+                    @if ($hasData)
+                        <div style="width: 145px; height: 130px; position: relative;"
+                             class="me-4">
                             <canvas id="statusChart"></canvas>
-                        @else
+                        </div>
+                    @else
+                        <div style="width: 145px; height: 130px; position: relative;"
+                             class="me-4 d-flex align-items-center justify-content-center bg-light rounded">
                             <span class="text-muted fw-bold small text-center">
                                 <i class="fas fa-info-circle me-1"></i> No data available
                             </span>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
+
 
 
                     <div class="chart-legend">
@@ -250,7 +418,7 @@
                 </div>
             </div>
             <div class="dashboard-section mb-4">
-                <h5 class="fw-bold mb-3">Action Center</h5>
+                <h5 class="fw-bold mb-3">Request Center</h5>
 
                 {{-- Leave Requests Section --}}
                 <div class="mb-3">
@@ -469,7 +637,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between small mb-1">
                             <span class="fw-bold">
-                                {{ $doc->employee->f_name }} - {{ $doc->documentType->name }}
+                                {{ $doc->employee->f_name }} - {{ $doc->documentType->name ?? 'eSigned Docs' }}
                             </span>
 
                             <span class="text-danger fw-bold">

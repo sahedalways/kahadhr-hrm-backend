@@ -113,7 +113,7 @@ class CompanyExpenses extends BaseComponent
             $query->where('category', $this->filterCategory);
         }
 
-        // Date Range Filter (Day / Week / Month / Year / Custom)
+
         switch ($this->filterDate) {
 
             case 'day':

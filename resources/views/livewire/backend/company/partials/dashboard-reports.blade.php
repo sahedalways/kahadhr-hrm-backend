@@ -37,7 +37,7 @@
                     <small class="fw-bold opacity-75">Upcoming Holiday</small>
                     <i class="fas fa-calendar-day text-pink"></i>
                 </div>
-                <h5 class="mb-0">Summer Bank Holiday</h5>
+                <h5 class="mb-0">{{ $upcomingHoliday ?? null }}</h5>
             </div>
         </div>
 
@@ -78,11 +78,31 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <span class="badge badge-green px-3 py-2 clickable">Leaves </span>
-                        <span class="badge badge-pink px-3 py-2 clickable">Birthdays</span>
-                        <span class="badge badge-danger px-3 py-2 clickable">UK Holidays</span>
-                        <span class="badge badge-orange px-3 py-2 clickable">Doc Expiry</span>
+                        <span wire:click="toggleCalendarFilter('leave')"
+                              class="badge badge-green px-3 py-2 clickable
+          {{ !$calendarFilters['leave'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                            Leaves
+                        </span>
+
+                        <span wire:click="toggleCalendarFilter('birthday')"
+                              class="badge badge-pink px-3 py-2 clickable
+          {{ !$calendarFilters['birthday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                            Birthdays
+                        </span>
+
+                        <span wire:click="toggleCalendarFilter('uk_holiday')"
+                              class="badge badge-danger px-3 py-2 clickable
+          {{ !$calendarFilters['uk_holiday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                            UK Holidays
+                        </span>
+
+                        <span wire:click="toggleCalendarFilter('doc_expiry')"
+                              class="badge badge-orange px-3 py-2 clickable
+          {{ !$calendarFilters['doc_expiry'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                            Doc Expiry
+                        </span>
                     </div>
+
 
                 </div>
 
@@ -127,6 +147,7 @@
                                                             'leave' => 'badge-green',
                                                             'birthday' => 'badge-pink',
                                                             'uk_holiday' => 'bg-danger text-white',
+                                                            'uk_weekend' => 'bg-danger text-white',
                                                             'doc_expiry' => 'badge-orange',
                                                             default => 'badge-secondary',
                                                         };
@@ -420,205 +441,272 @@
             <div class="dashboard-section mb-4">
                 <h5 class="fw-bold mb-3">Request Center</h5>
 
-                {{-- Leave Requests Section --}}
-                <div class="mb-3">
-                    <h6 class="fw-bold mb-2">Leave Requests</h6>
-
-                    @if ($leaveRequests->isEmpty())
-                        <div class="list-group list-group-flush mb-2">
-                            <li class="list-group-item text-center text-muted py-3">
-                                <i class="fas fa-check-circle me-1"></i> No leave requests found.
-                            </li>
-                        </div>
-                    @else
-                        <ul class="list-group list-group-flush mb-2"
-                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
-
-                            @foreach ($leaveRequests as $leave)
-                                @php
-                                    $duration =
-                                        \Carbon\Carbon::parse($leave->start_date)->diffInDays(
-                                            \Carbon\Carbon::parse($leave->end_date),
-                                        ) + 1;
-
-                                    $route = route('company.dashboard.leaves.index', [
-                                        'company' => $companySubDomain,
-                                        'leave' => $leave->id ?? null,
-                                    ]);
-                                @endphp
-
-                                <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm leave-item"
-                                    style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
-                                    onclick="window.location='{{ $route }}'"
-                                    onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-1px)';"
-                                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
-
-                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <!-- Left Side: Name + Date -->
-                                        <div>
-                                            <h6 class="mb-0 fw-bold text-dark"
-                                                style="font-size: 0.9rem;">
-                                                {{ $leave->user->full_name }}
-                                            </h6>
-                                            <small class="text-muted"
-                                                   style="font-size: 0.75rem;">
-                                                <i class="far fa-calendar-alt me-1"></i>
-                                                {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }} -
-                                                {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
-                                            </small>
-                                        </div>
-
-                                        <!-- Right Side: Type + Emoji + Days below -->
-                                        <div class="d-flex flex-column align-items-end text-end">
-                                            <div class="d-flex align-items-center gap-1">
-                                                <span style="font-size: 1rem;">{!! $leave->leaveType->emoji !!}</span>
-                                                <span class="fw-medium text-dark small">
-                                                    {{ $leave->leaveType->name ?? 'N/A' }}
-                                                </span>
-                                            </div>
-                                            <small class="text-muted"
-                                                   style="font-size: 0.7rem;">
-                                                ({{ $duration }} {{ Str::plural('Day', $duration) }})
-                                            </small>
-                                        </div>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
 
 
-                {{-- Attendance Requests Section --}}
-                <div class="mb-3">
-                    <h6 class="fw-bold mb-2">Attendance Requests</h6>
+                <ul class="nav border-bottom d-flex"
+                    id="requestTabs"
+                    role="tablist"
+                    style="border-color: #e5e7eb !important; width: 100%;">
 
-                    @if ($attendanceRequests->isEmpty())
-                        <div class="list-group list-group-flush mb-2">
-                            <li class="list-group-item text-center text-muted py-3">
-                                <i class="fas fa-check-circle me-1"></i> No attendance requests found.
-                            </li>
-                        </div>
-                    @else
-                        <ul class="list-group list-group-flush mb-2"
-                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                    <li class="nav-item flex-fill text-center"
+                        role="presentation">
+                        <button class="nav-link active position-relative w-100 py-3 border-0 bg-transparent fw-semibold text-muted"
+                                id="leave-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#leave-requests"
+                                type="button"
+                                role="tab">
+                            Leave
+                        </button>
+                    </li>
 
-                            @foreach ($attendanceRequests as $record)
-                                @php
-                                    $pendingRequests = $record->requests->where('status', 'pending');
-                                @endphp
+                    <li class="nav-item flex-fill text-center"
+                        role="presentation">
+                        <button class="nav-link position-relative w-100 py-3 border-0 bg-transparent fw-medium text-muted"
+                                id="attendance-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#attendance-requests"
+                                type="button"
+                                role="tab">
+                            Attendance
+                        </button>
+                    </li>
 
-                                @foreach ($pendingRequests as $req)
-                                    @php
-                                        $route = route('company.dashboard.timesheet.index', [
-                                            'company' => $companySubDomain,
-                                            'id' => $req->id ?? null,
-                                        ]);
+                    <li class="nav-item flex-fill text-center"
+                        role="presentation">
+                        <button class="nav-link position-relative w-100 py-3 border-0 bg-transparent fw-medium text-muted"
+                                id="payslip-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#payslip-requests"
+                                type="button"
+                                role="tab">
+                            Payslip
+                        </button>
+                    </li>
+                </ul>
 
-                                        $period =
-                                            $req->type === 'late_clock_in'
-                                                ? \Carbon\Carbon::parse($record->clock_in)->format('h:i A')
-                                                : \Carbon\Carbon::parse($record->clock_out)->format('h:i A');
-                                    @endphp
 
-                                    <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
-                                        style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
-                                        onclick="window.location='{{ $route }}'"
-                                        onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#ffeeba'; this.style.transform='translateY(-1px)';"
-                                        onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+                <div class="tab-content"
+                     id="requestTabsContent">
+                    <div class="tab-pane fade show active"
+                         id="leave-requests"
+                         role="tabpanel">
+                        {{-- Leave Requests Section --}}
+                        <div class="mt-4">
 
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <!-- Left Side: Employee Name -->
-                                            <div>
-                                                <h6 class="mb-0 fw-bold text-dark"
-                                                    style="font-size: 0.9rem;">
-                                                    {{ $record->user->full_name }}
-                                                </h6>
-                                                <small class="text-muted"
-                                                       style="font-size: 0.75rem;">
-                                                    {{ ucfirst(str_replace('_', ' ', $req->type)) }} Request
-                                                </small>
-                                            </div>
-
-                                            <!-- Right Side: Period -->
-                                            <small class="text-muted"
-                                                   style="font-size: 0.75rem;">
-                                                <i class="fas fa-calendar-check me-1 text-success"></i>
-                                                {{ $period }}
-                                            </small>
-                                        </div>
+                            @if ($leaveRequests->isEmpty())
+                                <div class="list-group list-group-flush mb-2">
+                                    <li class="list-group-item text-center text-muted py-3">
+                                        <i class="fas fa-check-circle me-1"></i> No leave requests found.
                                     </li>
-                                @endforeach
-                            @endforeach
+                                </div>
+                            @else
+                                <ul class="list-group list-group-flush mb-2"
+                                    style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
 
-                        </ul>
-                    @endif
-                </div>
+                                    @foreach ($leaveRequests as $leave)
+                                        @php
+                                            $duration =
+                                                \Carbon\Carbon::parse($leave->start_date)->diffInDays(
+                                                    \Carbon\Carbon::parse($leave->end_date),
+                                                ) + 1;
 
+                                            $route = route('company.dashboard.leaves.index', [
+                                                'company' => $companySubDomain,
+                                                'leave' => $leave->id ?? null,
+                                            ]);
+                                        @endphp
 
-                <div class="mb-3">
-                    <h6 class="fw-bold mb-2">Payslip Requests</h6>
+                                        <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm leave-item"
+                                            style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                            onclick="window.location='{{ $route }}'"
+                                            onmouseover="this.style.backgroundColor='#f1f7ff'; this.style.borderColor='#cfe2ff'; this.style.transform='translateY(-1px)';"
+                                            onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
 
-                    @if ($payslipRequests->isEmpty())
-                        <div class="list-group list-group-flush mb-2">
-                            <li class="list-group-item text-center text-muted py-3">
-                                <i class="fas fa-check-circle me-1"></i> No payslip requests found.
-                            </li>
-                        </div>
-                    @else
-                        <ul class="list-group list-group-flush mb-2"
-                            style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <!-- Left Side: Name + Date -->
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold text-dark"
+                                                        style="font-size: 0.9rem;">
+                                                        {{ $leave->user->full_name }}
+                                                    </h6>
+                                                    <small class="text-muted"
+                                                           style="font-size: 0.75rem;">
+                                                        <i class="far fa-calendar-alt me-1"></i>
+                                                        {{ \Carbon\Carbon::parse($leave->start_date)->format('M d') }}
+                                                        -
+                                                        {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
+                                                    </small>
+                                                </div>
 
-                            @foreach ($payslipRequests as $request)
-                                @php
-                                    $route = route('company.dashboard.reports.payslips', [
-                                        'company' => $companySubDomain,
-                                        'id' => $request->id,
-                                    ]);
-
-                                    $period = \Carbon\Carbon::create($request->year, $request->month)->format('F Y');
-                                @endphp
-
-                                <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
-                                    style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
-                                    onclick="window.location='{{ $route }}'"
-                                    onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#b3d7ff'; this.style.transform='translateY(-1px)';"
-                                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
-
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <!-- Left: User Name + Requested Date -->
-                                        <div>
-                                            <h6 class="mb-0 fw-bold text-dark"
-                                                style="font-size: 0.9rem;">
-                                                {{ $request->user->full_name }}
-                                            </h6>
-                                            <small class="text-muted"
-                                                   style="font-size: 0.75rem;">
-                                                <i class="fas fa-history me-1"></i>
-                                                Requested:
-                                                {{ \Carbon\Carbon::parse($request->created_at)->format('M d, Y') }}
-                                            </small>
-                                        </div>
-
-                                        <!-- Right: Period -->
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="me-1 text-success">
-                                                <i class="fas fa-file-invoice-dollar"
-                                                   style="font-size: 0.9rem;"></i>
+                                                <!-- Right Side: Type + Emoji + Days below -->
+                                                <div class="d-flex flex-column align-items-end text-end">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span style="font-size: 1rem;">{!! $leave->leaveType->emoji !!}</span>
+                                                        <span class="fw-medium text-dark small">
+                                                            {{ $leave->leaveType->name ?? 'N/A' }}
+                                                        </span>
+                                                    </div>
+                                                    <small class="text-muted"
+                                                           style="font-size: 0.7rem;">
+                                                        ({{ $duration }} {{ Str::plural('Day', $duration) }})
+                                                    </small>
+                                                </div>
                                             </div>
-                                            <small class="text-dark fw-bold"
-                                                   style="font-size: 0.75rem;">
-                                                {{ $period }}
-                                            </small>
-                                        </div>
-                                    </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    </div>
 
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
+
+
+
+                    <div class="tab-pane fade"
+                         id="attendance-requests"
+                         role="tabpanel">
+                        {{-- Attendance Requests Section --}}
+                        <div class="mt-4">
+
+
+                            @if ($attendanceRequests->isEmpty())
+                                <div class="list-group list-group-flush mb-2">
+                                    <li class="list-group-item text-center text-muted py-3">
+                                        <i class="fas fa-check-circle me-1"></i> No attendance requests found.
+                                    </li>
+                                </div>
+                            @else
+                                <ul class="list-group list-group-flush mb-2"
+                                    style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+
+                                    @foreach ($attendanceRequests as $record)
+                                        @php
+                                            $pendingRequests = $record->requests->where('status', 'pending');
+                                        @endphp
+
+                                        @foreach ($pendingRequests as $req)
+                                            @php
+                                                $route = route('company.dashboard.timesheet.index', [
+                                                    'company' => $companySubDomain,
+                                                    'id' => $req->id ?? null,
+                                                ]);
+
+                                                $period =
+                                                    $req->type === 'late_clock_in'
+                                                        ? \Carbon\Carbon::parse($record->clock_in)->format('h:i A')
+                                                        : \Carbon\Carbon::parse($record->clock_out)->format('h:i A');
+                                            @endphp
+
+                                            <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
+                                                style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                                onclick="window.location='{{ $route }}'"
+                                                onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#ffeeba'; this.style.transform='translateY(-1px)';"
+                                                onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <!-- Left Side: Employee Name -->
+                                                    <div>
+                                                        <h6 class="mb-0 fw-bold text-dark"
+                                                            style="font-size: 0.9rem;">
+                                                            {{ $record->user->full_name }}
+                                                        </h6>
+                                                        <small class="text-muted"
+                                                               style="font-size: 0.75rem;">
+                                                            {{ ucfirst(str_replace('_', ' ', $req->type)) }} Request
+                                                        </small>
+                                                    </div>
+
+                                                    <!-- Right Side: Period -->
+                                                    <small class="text-muted"
+                                                           style="font-size: 0.75rem;">
+                                                        <i class="fas fa-calendar-check me-1 text-success"></i>
+                                                        {{ $period }}
+                                                    </small>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    @endforeach
+
+                                </ul>
+                            @endif
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="payslip-requests"
+                         role="tabpanel">
+                        <div class="mt-4">
+
+                            @if ($payslipRequests->isEmpty())
+                                <div class="list-group list-group-flush mb-2">
+                                    <li class="list-group-item text-center text-muted py-3">
+                                        <i class="fas fa-check-circle me-1"></i> No payslip requests found.
+                                    </li>
+                                </div>
+                            @else
+                                <ul class="list-group list-group-flush mb-2"
+                                    style="max-height: 400px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
+
+                                    @foreach ($payslipRequests as $request)
+                                        @php
+                                            $route = route('company.dashboard.reports.payslips', [
+                                                'company' => $companySubDomain,
+                                                'id' => $request->id,
+                                            ]);
+
+                                            $period = \Carbon\Carbon::create($request->year, $request->month)->format(
+                                                'F Y',
+                                            );
+                                        @endphp
+
+                                        <li class="list-group-item mb-2 p-2 border-0 rounded-4 shadow-sm"
+                                            style="background: #ffffff; border: 1px solid #eef2f7; cursor: pointer; transition: all 0.25s ease-in-out;"
+                                            onclick="window.location='{{ $route }}'"
+                                            onmouseover="this.style.backgroundColor='#f4faff'; this.style.borderColor='#b3d7ff'; this.style.transform='translateY(-1px)';"
+                                            onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#eef2f7'; this.style.transform='translateY(0)';">
+
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <!-- Left: User Name + Requested Date -->
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold text-dark"
+                                                        style="font-size: 0.9rem;">
+                                                        {{ $request->user->full_name }}
+                                                    </h6>
+                                                    <small class="text-muted"
+                                                           style="font-size: 0.75rem;">
+                                                        <i class="fas fa-history me-1"></i>
+                                                        Requested:
+                                                        {{ \Carbon\Carbon::parse($request->created_at)->format('M d, Y') }}
+                                                    </small>
+                                                </div>
+
+                                                <!-- Right: Period -->
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="me-1 text-success">
+                                                        <i class="fas fa-file-invoice-dollar"
+                                                           style="font-size: 0.9rem;"></i>
+                                                    </div>
+                                                    <small class="text-dark fw-bold"
+                                                           style="font-size: 0.75rem;">
+                                                        {{ $period }}
+                                                    </small>
+                                                </div>
+                                            </div>
+
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                    </div>
+
+
+
                 </div>
-
             </div>
 
 
@@ -640,9 +728,14 @@
                                 {{ $doc->employee->f_name }} - {{ $doc->documentType->name ?? 'eSigned Docs' }}
                             </span>
 
-                            <span class="text-danger fw-bold">
-                                {{ $remainingDays }} days
+                            <span class="fw-bold {{ $remainingDays == 0 ? 'text-danger' : 'text-warning' }}">
+                                @if ($remainingDays == 0)
+                                    Expired
+                                @else
+                                    {{ $remainingDays }} days
+                                @endif
                             </span>
+
                         </div>
 
                         <div class="progress"

@@ -20,9 +20,29 @@ class Dashboard extends Component
 
     public $currentMonth;
     public $currentYear;
+    public $upcomingHoliday;
     public $calendarEvents = [];
 
     public $ukHolidays = [];
+
+    public $calendarFilters = [
+        'leave'       => true,
+        'birthday'    => true,
+        'uk_holiday'  => true,
+        'doc_expiry'  => true,
+    ];
+
+
+
+    public function toggleCalendarFilter($type)
+    {
+        if (isset($this->calendarFilters[$type])) {
+            $this->calendarFilters[$type] = !$this->calendarFilters[$type];
+
+            $this->loadCalendarEvents();
+        }
+    }
+
 
 
 
@@ -77,10 +97,12 @@ class Dashboard extends Component
             $period = Carbon::parse($leave->start_date)->toPeriod(Carbon::parse($leave->end_date));
             foreach ($period as $date) {
                 if ($date->month == $this->currentMonth) {
-                    $calendarEvents[$date->toDateString()][] = [
-                        'type' => 'leave',
-                        'text' => $leave->user->full_name . ' - ' . $leave->leaveType->name ?? 'Leave',
-                    ];
+                    if ($this->calendarFilters['leave']) {
+                        $calendarEvents[$date->toDateString()][] = [
+                            'type' => 'leave',
+                            'text' => $leave->user->full_name . ' - ' . $leave->leaveType->name ?? 'Leave',
+                        ];
+                    }
                 }
             }
         }
@@ -90,10 +112,12 @@ class Dashboard extends Component
         foreach ($employees as $emp) {
             $dob = optional($emp->profile)->date_of_birth;
             if ($dob && Carbon::parse($dob)->month == $this->currentMonth) {
-                $calendarEvents[Carbon::create($this->currentYear, $this->currentMonth, Carbon::parse($dob)->day)->toDateString()][] = [
-                    'type' => 'birthday',
-                    'text' => $emp->full_name . "'s Birthday",
-                ];
+                if ($this->calendarFilters['birthday']) {
+                    $calendarEvents[Carbon::create($this->currentYear, $this->currentMonth, Carbon::parse($dob)->day)->toDateString()][] = [
+                        'type' => 'birthday',
+                        'text' => $emp->full_name . "'s Birthday",
+                    ];
+                }
             }
         }
 
@@ -104,16 +128,30 @@ class Dashboard extends Component
 
 
         $this->ukHolidays = $holidays[$year]['UK'] ?? [];
-
+        $today = Carbon::now();
 
         foreach ($this->ukHolidays as $date => $text) {
             if (Carbon::parse($date)->month == $this->currentMonth) {
-                $calendarEvents[$date][] = [
-                    'type' => 'uk_holiday',
-                    'text' => $text,
-                ];
+                if ($this->calendarFilters['uk_holiday']) {
+                    $calendarEvents[$date][] = [
+                        'type' => 'uk_holiday',
+                        'text' => $text,
+                    ];
+                }
             }
         }
+
+
+        foreach ($this->ukHolidays as $date => $text) {
+            $holidayDate = Carbon::parse($date);
+
+            if ($holidayDate->greaterThanOrEqualTo($today)) {
+                $soonestHoliday = $text;
+                break;
+            }
+        }
+
+        $this->upcomingHoliday = $soonestHoliday;
 
 
         // 4. Document Expiry
@@ -130,10 +168,12 @@ class Dashboard extends Component
 
         $allDocs = $companyDocs->merge($empDocs);
         foreach ($allDocs as $doc) {
-            $calendarEvents[Carbon::parse($doc->expires_at)->toDateString()][] = [
-                'type' => 'doc_expiry',
-                'text' => $doc->name . ' Expiry',
-            ];
+            if ($this->calendarFilters['doc_expiry']) {
+                $calendarEvents[Carbon::parse($doc->expires_at)->toDateString()][] = [
+                    'type' => 'doc_expiry',
+                    'text' => $doc->name . ' Expiry',
+                ];
+            }
         }
 
         $this->calendarEvents = $calendarEvents;

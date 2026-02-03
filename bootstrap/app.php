@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'cors' => \App\Http\Middleware\Cors::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'guest' => \App\Http\Middleware\RedirectIfCompanyorEmployeeAuthenticated::class,
+            'log.traffic' => \App\Http\Middleware\LogTraffic::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

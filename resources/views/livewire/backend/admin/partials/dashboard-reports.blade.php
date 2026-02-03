@@ -10,78 +10,121 @@
 
         <div class="d-flex"
              id="wrapper">
-
             <div class="container-fluid py-4 px-4">
+
+                {{-- ================= TOP KPI CARDS ================= --}}
                 <div class="row g-3 mb-4">
-                    <div class="col-xl-2 col-md-4 col-sm-6">
+
+                    {{-- Total Companies --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
                         <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
                             <div class="d-flex justify-content-between">
                                 <small class="text-muted text-uppercase fw-bold">Total Companies</small>
                                 <i class="bi bi-building text-primary"></i>
                             </div>
-                            <h3 class="fw-bold mb-0 mt-1">1,240</h3>
-                            <small class="text-success small"><i class="bi bi-arrow-up"></i> 12%</small>
+                            <h3 class="fw-bold mt-2 mb-0">{{ number_format($totalCompanies) }}</h3>
+                            <small class="text-muted">Today: <strong
+                                        class="text-dark">+{{ $companiesToday ?? 0 }}</strong></small>
                         </div>
                     </div>
 
-                    <div class="col-xl-2 col-md-4 col-sm-6">
+                    {{-- Total Employees --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
                         <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
                             <div class="d-flex justify-content-between">
                                 <small class="text-muted text-uppercase fw-bold">Total Employees</small>
                                 <i class="bi bi-people text-info"></i>
                             </div>
-                            <h3 class="fw-bold mb-0 mt-1">15,600</h3>
-                            <small class="text-muted small">Across all units</small>
+                            <h3 class="fw-bold mt-2 mb-0">{{ number_format($totalEmployees) }}</h3>
+                            <small class="text-muted">Global headcount</small>
                         </div>
                     </div>
 
-                    <div class="col-xl-2 col-md-4 col-sm-6">
-                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted text-uppercase fw-bold">Revenue (MTD)</small>
-                                <i class="bi bi-currency-dollar text-success"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0 mt-1">$45,200</h3>
-                            <small class="text-primary small">Target: $50k</small>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-2 col-md-4 col-sm-6">
-                        <div
-                             class="stat-card p-3 shadow-sm bg-white border-0 h-100 border-start border-danger border-4">
+                    {{-- Expired Subscriptions --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white h-100 border-start border-4 border-danger">
                             <div class="d-flex justify-content-between">
                                 <small class="text-danger text-uppercase fw-bold">Expired Subs</small>
                                 <i class="bi bi-exclamation-octagon text-danger"></i>
                             </div>
-                            <h3 class="fw-bold mb-0 mt-1">12</h3>
-                            <small class="text-danger small fw-bold">Needs Attention</small>
+                            <h3 class="fw-bold mt-2 mb-0 text-danger">{{ $expiredCompanies }}</h3>
+                            <small class="text-muted">Requires immediate action</small>
                         </div>
                     </div>
 
-                    <div class="col-xl-2 col-md-4 col-sm-6">
-                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
+                    {{-- Active Servers / System Health --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white h-100 border-start border-4 border-success">
                             <div class="d-flex justify-content-between">
-                                <small class="text-muted text-uppercase fw-bold">Active Servers</small>
+                                <small class="text-success text-uppercase fw-bold">Active Servers</small>
                                 <i class="bi bi-hdd-network text-success"></i>
                             </div>
-                            <h3 class="fw-bold mb-0 mt-1">08</h3>
-                            <small class="text-success small">● All Healthy</small>
+                            <h3 class="fw-bold mt-2 mb-0 text-success">{{ $activeServers }}</h3>
+                            <small class="text-muted">● Active Client Instances</small>
                         </div>
                     </div>
 
-                    <div class="col-xl-2 col-md-4 col-sm-6">
-                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted text-uppercase fw-bold">Pending Inquiries</small>
-                                <i class="bi bi-chat-dots text-warning"></i>
-                            </div>
-                            <h3 class="fw-bold mb-0 mt-1">24</h3>
-                            <small class="text-warning small">8 Urgent</small>
-                        </div>
-                    </div>
                 </div>
 
+                {{-- ================= REVENUE SECTION ================= --}}
+                <div class="row g-3 mb-4">
+
+                    {{-- Revenue Today --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted text-uppercase fw-bold">Revenue Today</small>
+                                <i class="bi bi-calendar-day text-success"></i>
+                            </div>
+                            <h3 class="fw-bold mt-2 mb-0">£{{ number_format($todayRevenue, 0) }}</h3>
+                            <small class="text-muted">Last 24 hours</small>
+                        </div>
+                    </div>
+
+                    {{-- Revenue This Month --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted text-uppercase fw-bold">Revenue (MTD)</small>
+                                <i class="bi bi-calendar-month text-primary"></i>
+                            </div>
+                            <h3 class="fw-bold mt-2 mb-0">£{{ number_format($monthlyRevenue, 0) }}</h3>
+                            <small class="text-muted">This month</small>
+                        </div>
+                    </div>
+
+                    {{-- Revenue This Year --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white border-0 h-100">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted text-uppercase fw-bold">Revenue (YTD)</small>
+                                <i class="bi bi-calendar-range text-info"></i>
+                            </div>
+                            <h3 class="fw-bold mt-2 mb-0">£{{ number_format($yearlyRevenue, 0) }}</h3>
+                            <small class="text-muted">This year</small>
+                        </div>
+                    </div>
+
+                    {{-- Lifetime Revenue --}}
+                    <div class="col-xl-3 col-md-6 col-sm-6">
+                        <div class="stat-card p-3 shadow-sm bg-white h-100 border-start border-4 border-success">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-success text-uppercase fw-bold">Lifetime Revenue</small>
+                                <i class="bi bi-trophy-fill text-success"></i>
+                            </div>
+                            <h3 class="fw-bold mt-2 mb-0 text-success">
+                                £{{ number_format($lifetimeRevenue, 0) }}
+                            </h3>
+                            <small class="text-muted">All-time earnings</small>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- ================= CHART + INFRA ================= --}}
                 <div class="row g-4 mb-4">
+
+                    {{-- Chart --}}
                     <div class="col-lg-8">
                         <div class="card border-0 shadow-sm p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -96,65 +139,101 @@
                         </div>
                     </div>
 
+                    {{-- Infrastructure --}}
                     <div class="col-lg-4">
                         <div class="card border-0 shadow-sm p-4 h-100">
                             <h6 class="fw-bold text-muted mb-4 text-uppercase">Infrastructure</h6>
 
-                            <div class="storage-item mb-4">
+                            {{-- Disk --}}
+                            <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-1">
                                     <small class="fw-bold">Disk Usage</small>
-                                    <small class="text-muted">75% (1.5TB / 2TB)</small>
+                                    <small class="text-muted">
+                                        {{ $diskPercent }}%
+                                        ({{ $diskUsedTB }}TB / {{ $diskTotalTB }}TB)
+                                    </small>
                                 </div>
+
                                 <div class="progress"
-                                     style="height: 8px;">
+                                     style="height:8px;">
                                     <div class="progress-bar bg-warning"
-                                         style="width: 75%"></div>
+                                         role="progressbar"
+                                         style="width: {{ $diskPercent }}%"
+                                         aria-valuenow="{{ $diskPercent }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="storage-item mb-4">
+
+                            {{-- RAM --}}
+                            <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-1">
                                     <small class="fw-bold">RAM Consumption</small>
-                                    <small class="text-muted">42% (26GB / 64GB)</small>
+                                    <small class="text-muted">
+                                        {{ $ramPercent }}%
+                                        ({{ $usedRam }}GB / {{ $TotalRam }}GB)
+                                    </small>
                                 </div>
+
                                 <div class="progress"
-                                     style="height: 8px;">
+                                     style="height:8px;">
                                     <div class="progress-bar bg-success"
-                                         style="width: 42%"></div>
+                                         role="progressbar"
+                                         style="width: {{ $ramPercent }}%"
+                                         aria-valuenow="{{ $ramPercent }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="storage-item mb-4">
+
+                            {{-- API Latency --}}
+                            <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-1">
                                     <small class="fw-bold">API Latency</small>
-                                    <small class="text-muted">120ms</small>
+                                    <small class="text-muted">
+                                        {{ $latency }} ms
+                                    </small>
                                 </div>
+
                                 <div class="progress"
-                                     style="height: 8px;">
+                                     style="height:8px;">
                                     <div class="progress-bar bg-info"
-                                         style="width: 25%"></div>
+                                         role="progressbar"
+                                         style="width: {{ min(100, round($latency / 5)) }}%"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
                             </div>
 
+
                             <hr>
-                            <div class="system-logs mt-auto">
-                                <h6 class="small fw-bold mb-3">Live System Logs</h6>
-                                <div class="d-flex mb-2">
-                                    <div class="bg-success rounded-circle mt-1 me-2"
-                                         style="width: 8px; height: 8px;"></div>
-                                    <p class="small text-muted mb-0">Backup completed successfully at 02:00 AM</p>
-                                </div>
-                                <div class="d-flex mb-2">
-                                    <div class="bg-warning rounded-circle mt-1 me-2"
-                                         style="width: 8px; height: 8px;"></div>
-                                    <p class="small text-muted mb-0">Traffic spike detected from UK-Region-1</p>
-                                </div>
-                            </div>
+
+                            {{-- Logs --}}
+                            <h6 class="small fw-bold mb-3">Live System Logs</h6>
+                            @if ($latestBackup)
+                                <p class="small text-muted mb-1">🟢 {{ $latestBackup->message }} at
+                                    {{ \Carbon\Carbon::parse($latestBackup->created_at)->format('h:i A') }}</p>
+                            @else
+                                <p class="small text-muted mb-1">🟢 No backup recorded yet</p>
+                            @endif
+
+                            @if (!empty($trafficSpike))
+                                <p class="small text-muted mb-0">🟡 {{ $trafficSpike }}</p>
+                            @endif
+
                         </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
+
 
 
 

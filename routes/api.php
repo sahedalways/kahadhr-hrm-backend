@@ -6,7 +6,7 @@ use App\Http\Controllers\API\HomeController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['cors'])->group(function () {
+Route::middleware(['cors', 'log.traffic'])->group(function () {
 
 
   Route::prefix('auth')->controller(AuthController::class)->group(function () {

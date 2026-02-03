@@ -57,25 +57,29 @@
         <div class="col-lg-8">
             <div class="dashboard-section mb-4 border-0 shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="calendar-nav d-flex align-items-center gap-1 bg-light rounded-pill p-1 border">
+                    <div class="calendar-nav d-flex align-items-center gap-2 bg-light rounded-pill px-2 py-1 border"
+                         style="font-size: 0.85rem;">
 
-
+                        <!-- Previous Month -->
                         <button wire:click="previousMonth"
-                                class="btn btn-link ...">
-                            <i class="fas fa-chevron-left"></i>
+                                class="btn btn-link p-0 text-dark">
+                            <i class="fas fa-chevron-left small"></i>
                         </button>
 
-                        <span class="fw-bold">
+                        <!-- Current Month -->
+                        <span class="fw-bold mx-2"
+                              style="font-size: 0.9rem;">
                             {{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->format('F Y') }}
                         </span>
 
+                        <!-- Next Month -->
                         <button wire:click="nextMonth"
-                                class="btn btn-link ...">
-                            <i class="fas fa-chevron-right"></i>
+                                class="btn btn-link p-0 text-dark">
+                            <i class="fas fa-chevron-right small"></i>
                         </button>
 
-
                     </div>
+
 
                     <div class="d-flex gap-2">
                         <span wire:click="toggleCalendarFilter('leave')"

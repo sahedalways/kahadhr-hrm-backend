@@ -122,17 +122,16 @@
                 </div>
 
                 {{-- ================= CHART + INFRA ================= --}}
-                <div class="row g-4 mb-4">
+                <div class="row g-4 mb-4"
+                     wire:ignore>
 
                     {{-- Chart --}}
-                    <div class="col-lg-8">
+                    <div class="col-lg-8"
+                         wire:poll.1s="updateHealthData">
                         <div class="card border-0 shadow-sm p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h6 class="fw-bold text-muted mb-0">SYSTEM HEALTH TRENDS</h6>
-                                <select class="form-select form-select-sm w-25">
-                                    <option>Last 24 Hours</option>
-                                    <option>Last 7 Days</option>
-                                </select>
+
                             </div>
                             <canvas id="healthChart"
                                     height="280"></canvas>
@@ -242,84 +241,96 @@
 
     <div class="row g-4 mb-4">
         <div class="col-lg-8">
+
+            {{-- Recent Companies --}}
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold text-muted mb-0 text-uppercase">Recent Registered Companies</h6>
-                    <button class="btn btn-sm btn-outline-primary">View All</button>
+                    <button class="btn btn-sm btn-outline-primary"
+                            onclick="window.location='{{ route('super-admin.companies') }}'">
+                        View All
+                    </button>
+
                 </div>
                 <div class="table-responsive px-3 pb-3">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr class="small text-muted text-uppercase">
                                 <th>Company</th>
-                                <th>Domain</th>
                                 <th>Plan / Status</th>
                                 <th>Expiry Date</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm bg-primary-soft text-primary rounded me-2 d-flex align-items-center justify-content-center"
-                                             style="width: 35px; height: 35px; background: #eef2ff;">
-                                            <i class="bi bi-building"></i>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0 fw-bold small">XYZ IT Solutions Ltd.</p>
-                                            <small class="text-muted">company@company.com</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-light text-dark border">xyz.hr.com</span></td>
-                                <td>
-                                    <span class="badge bg-soft-warning text-warning text-uppercase">Trial</span>
-                                    <span class="badge bg-soft-success text-success">Active</span>
-                                </td>
-                                <td>
-                                    <p class="mb-0 small fw-bold text-danger">Feb 16, 2026</p>
-                                    <small class="text-muted">14 days left</small>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                </td>
-                            </tr>
+                            @foreach ($recentCompanies as $company)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                <img src="{{ $company->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                                                     alt="{{ $company->company_name }}"
+                                                     class="rounded-circle"
+                                                     style="width: 35px; height: 35px; object-fit: cover;">
+                                            </div>
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm bg-info-soft text-info rounded me-2 d-flex align-items-center justify-content-center"
-                                             style="width: 35px; height: 35px; background: #e0f2fe;">
-                                            <i class="bi bi-building"></i>
+                                            <div>
+                                                <p class="mb-0 fw-bold small">{{ $company->company_name }}</p>
+                                                <small class="text-muted">{{ $company->company_email }}</small>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="mb-0 fw-bold small">ABC Tech Solutions Ltd.</p>
-                                            <small class="text-muted">abc@company.com</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-light text-dark border">abc.hr.com</span></td>
-                                <td>
-                                    <span class="badge bg-soft-warning text-warning text-uppercase">Trial</span>
-                                    <span class="badge bg-soft-success text-success">Active</span>
-                                </td>
-                                <td>
-                                    <p class="mb-0 small fw-bold text-danger">Feb 16, 2026</p>
-                                    <small class="text-muted">14 days left</small>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-light border"><i class="bi bi-pencil"></i></button>
-                                </td>
-                            </tr>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                              class="badge bg-soft-warning text-warning text-uppercase">{{ $company->billing_plan_id ?? 'Trial' }}</span>
+                                        <span class="badge bg-soft-success text-success">{{ $company->status }}</span>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 small fw-bold text-danger">
+                                            {{ \Carbon\Carbon::parse($company->subscription_end)->format('M d, Y') }}
+                                        </p>
+                                        @php
+                                            $daysLeft = \Carbon\Carbon::parse($company->subscription_end)
+                                                ->startOfDay()
+                                                ->diffInDays(\Carbon\Carbon::now()->startOfDay());
+                                        @endphp
+
+                                        <small class="text-muted">{{ $daysLeft }} days left</small>
+
+
+                                    </td>
+
+
+                                    <td>
+                                        <button class="btn btn-sm btn-light border"
+                                                style="cursor: pointer;"
+                                                onclick="window.location='{{ route('super-admin.company.details.show', $company->id) }}'">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+
+
+                                    </td>
+
+
+
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            {{-- Recent Employees --}}
             <div class="card border-0 shadow-sm mt-5">
-                <div class="card-header bg-white border-0 py-3">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                     <h6 class="fw-bold text-muted mb-0 text-uppercase">New Registered Employees (Global)</h6>
+
+                    <button class="btn btn-sm btn-outline-primary"
+                            onclick="window.location='{{ route('super-admin.employees') }}'">
+                        View All
+                    </button>
+
                 </div>
                 <div class="table-responsive px-3 pb-3">
                     <table class="table table-sm table-hover align-middle mb-0">
@@ -333,22 +344,34 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>John Doe</strong><br><small class="text-muted">john@example.com</small>
-                                </td>
-                                <td><span class="text-primary fw-bold small">XYZ IT Solutions</span></td>
-                                <td class="small">Feb 02, 2026</td>
-                                <td><span class="badge bg-success">Active</span></td>
-                                <td><i class="bi bi-three-dots"></i></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Sarah Smith</strong><br><small class="text-muted">sarah@abc.com</small>
-                                </td>
-                                <td><span class="text-primary fw-bold small">ABC Tech Solutions</span></td>
-                                <td class="small">Feb 01, 2026</td>
-                                <td><span class="badge bg-success">Active</span></td>
-                                <td><i class="bi bi-three-dots"></i></td>
-                            </tr>
+                            @foreach ($recentEmployees as $employee)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $employee->f_name }} {{ $employee->l_name }}</strong><br>
+                                        <small class="text-muted">{{ $employee->email }}</small>
+                                    </td>
+                                    <td><span
+                                              class="text-primary fw-bold small">{{ $employee->company->company_name ?? 'N/A' }}</span>
+                                    </td>
+                                    <td class="small">
+                                        {{ \Carbon\Carbon::parse($employee->start_date)->format('M d, Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ $employee->is_active ? 'success' : 'secondary' }}">
+                                            {{ $employee->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </td>
+                                    <td>
+
+                                        <button class="btn btn-sm btn-light border"
+                                                style="cursor: pointer;"
+                                                onclick="window.location='{{ route('super-admin.dashboard.employees.details', $employee->id) }}'">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -356,64 +379,86 @@
 
         </div>
 
+
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0 py-3">
                     <h6 class="fw-bold text-muted mb-0 text-uppercase">Subscription Condition</h6>
                 </div>
                 <div class="card-body pt-0">
-                    <div class="p-3 border rounded mb-3 bg-light-warning"
-                         style="background-color: #fff9eb; border-color: #ffeeba !important;">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge bg-warning text-dark small">Expiring Soon (5)</span>
-                            <small class="text-muted fw-bold">Next 7 Days</small>
+                    <div class="card border-0 shadow-sm"
+                         style="border-radius: 12px; transition: transform 0.2s;">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-uppercase fw-bold text-muted mb-1"
+                                       style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                        Expiring Soon
+                                    </p>
+                                    <h3 class="fw-bold mb-0 text-dark">{{ $expiringCount }}</h3>
+                                    <small class="text-muted">
+                                        <i class="fa fa-calendar-alt me-1"></i> Next 7 Days
+                                    </small>
+                                </div>
+
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fa fa-exclamation-triangle text-light fs-6"></i>
+
+
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-top border-light">
+                                <p class="small text-muted mb-0">
+                                    <strong>{{ $expiringCount }} companies</strong> reaching end of cycle this week.
+                                </p>
+                            </div>
                         </div>
-                        <p class="small mb-0 text-dark">5 companies will end their trial/subscription this week.</p>
-                        <a href="#"
-                           class="small text-warning fw-bold text-decoration-none mt-2 d-block">View Details →</a>
                     </div>
+
 
                     <div class="p-3 border rounded mb-3"
                          style="background-color: #fdf2f2; border-color: #f8d7da !important;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge bg-danger small">Payment Failed (2)</span>
+                            <span class="badge bg-danger small">
+                                Payment Failed ({{ $failedCount }})
+                            </span>
                             <small class="text-muted fw-bold">Critical</small>
                         </div>
-                        <p class="small mb-0 text-dark">Recent payment attempts failed for 2 companies.</p>
-                        <a href="#"
-                           class="small text-danger fw-bold text-decoration-none mt-2 d-block">Check Billing →</a>
+                        <p class="small mb-0 text-dark">
+                            Recent payment attempts failed for {{ $failedCount }}
+                            {{ Str::plural('company', $failedCount) }}.
+                        </p>
+
                     </div>
+
 
                     <div class="mt-4">
                         <h6 class="small fw-bold text-muted text-uppercase mb-3">Plan Distribution</h6>
-                        <div class="d-flex align-items-center mb-2">
-                            <small class="w-25">Trial</small>
-                            <div class="progress w-75"
-                                 style="height: 6px;">
-                                <div class="progress-bar bg-warning"
-                                     style="width: 60%"></div>
+
+                        @php
+                            $colors = [
+                                'trial' => 'warning',
+                                'active' => 'primary',
+                                'expired' => 'danger',
+                                'suspended' => 'secondary',
+                            ];
+                        @endphp
+
+                        @foreach ($planStats as $plan => $percent)
+                            <div class="d-flex align-items-center mb-2">
+                                <small class="w-25 text-capitalize">{{ $plan }}</small>
+                                <div class="progress w-75"
+                                     style="height: 6px;">
+                                    <div class="progress-bar bg-{{ $colors[$plan] }}"
+                                         style="width: {{ $percent }}%"></div>
+                                </div>
+                                <small class="ms-2">{{ $percent }}%</small>
                             </div>
-                            <small class="ms-2">60%</small>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <small class="w-25">Standard</small>
-                            <div class="progress w-75"
-                                 style="height: 6px;">
-                                <div class="progress-bar bg-primary"
-                                     style="width: 30%"></div>
-                            </div>
-                            <small class="ms-2">30%</small>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <small class="w-25">Business</small>
-                            <div class="progress w-75"
-                                 style="height: 6px;">
-                                <div class="progress-bar bg-success"
-                                     style="width: 10%"></div>
-                            </div>
-                            <small class="ms-2">10%</small>
-                        </div>
+                        @endforeach
                     </div>
+
                 </div>
             </div>
         </div>
@@ -421,3 +466,70 @@
 
 
 </div>
+
+
+<script>
+    const ctx = document.getElementById('healthChart').getContext('2d');
+    const data = {
+        labels: @json(array_column($healthData, 'time')),
+        datasets: [{
+                label: 'Disk Usage (%)',
+                data: @json(array_column($healthData, 'disk')),
+                borderColor: 'rgb(255, 205, 86)',
+                backgroundColor: 'rgba(255, 205, 86, 0.2)',
+                tension: 0.3
+            },
+            {
+                label: 'RAM Usage (%)',
+                data: @json(array_column($healthData, 'ram')),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3
+            },
+            {
+                label: 'API Latency (ms)',
+                data: @json(array_column($healthData, 'latency')),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.3,
+                yAxisID: 'latencyAxis'
+            }
+        ]
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Usage (%)'
+                    }
+                },
+                latencyAxis: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Latency (ms)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    };
+
+    new Chart(ctx, config);
+</script>

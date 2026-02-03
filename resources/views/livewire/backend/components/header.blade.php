@@ -233,7 +233,7 @@
                                         <a class="dropdown-item d-flex align-items-center py-2"
                                            href="javascript:void(0)">
                                             <div class="icon-box-support me-2">
-                                                <i class="fas fa-headset text-primary"></i>
+                                                <i class="fas fa-headset "></i>
                                             </div>
                                             <span class="fw-medium">Technical Support</span>
                                         </a>

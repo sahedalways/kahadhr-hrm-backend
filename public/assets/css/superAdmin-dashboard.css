@@ -1,0 +1,89 @@
+:root {
+    --sidebar-width: 260px;
+    --primary-blue: #0d6efd;
+    --soft-bg: #f8f9fa;
+}
+
+#wrapper {
+    overflow-x: hidden;
+}
+
+/* Sidebar Styling */
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: var(--sidebar-width);
+    transition: all 0.3s ease;
+    background-color: #1a1c1e !important;
+}
+
+.list-group-item {
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    color: #a0aec0 !important;
+}
+
+.list-group-item:hover {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.active-link {
+    background-color: var(--primary-blue) !important;
+    color: white !important;
+    border-radius: 8px;
+}
+
+/* Page Content */
+#page-content-wrapper {
+    width: 100%;
+}
+
+.stat-card {
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.bg-success-soft {
+    background-color: #e6fffa;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Bootstrap Overrides */
+.card {
+    border-radius: 15px;
+}
+
+.progress {
+    background-color: #edf2f7;
+}
+
+.bg-soft-success {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+}
+.bg-soft-warning {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+.bg-soft-danger {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+
+.avatar-sm {
+    font-size: 1.1rem;
+    color: #6366f1;
+}
+
+table thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 12px 10px !important;
+}

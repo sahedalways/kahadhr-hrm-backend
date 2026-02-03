@@ -151,7 +151,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
                        data-bs-toggle="tooltip"
                        data-bs-placement="right"
@@ -161,7 +161,7 @@
                         <i class="fas fa-chart-line text-sm opacity-10"></i>
                         <span class="nav-link-text ms-1">Reports</span>
                     </a>
-                </li>
+                </li> --}}
 
                 {{-- <li class="nav-item">
                     <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"

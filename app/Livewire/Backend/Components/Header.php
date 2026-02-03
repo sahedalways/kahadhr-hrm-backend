@@ -52,29 +52,27 @@ class Header extends Component
         $this->unreadCount = 0;
 
         $this->dispatch('markAllAsRead');
-
     }
 
 
 
 
-public function newNotification($notification)
-{
-    $authId   = auth()->id();
-    $userType = auth()->user()->user_type;
+    public function newNotification($notification)
+    {
+        $authId   = auth()->id();
+        $userType = auth()->user()->user_type;
 
-    if (array_key_exists('user_id', $notification)) {
+        if (array_key_exists('user_id', $notification)) {
 
-        if (
-            ($userType === 'company' && $notification['user_id'] === null) ||
-            ($userType !== 'company' && (int)$notification['user_id'] === (int)$authId)
-        ) {
-            $notification['is_read'] = 0;
-            $this->unreadCount++;
-
+            if (
+                ($userType === 'company' && $notification['user_id'] === null) ||
+                ($userType !== 'company' && (int)$notification['user_id'] === (int)$authId)
+            ) {
+                $notification['is_read'] = 0;
+                $this->unreadCount++;
+            }
         }
     }
-}
 
 
     public function mount()

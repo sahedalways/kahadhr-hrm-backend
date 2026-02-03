@@ -5,9 +5,8 @@
 
 @endphp
 
-
-
 <div class="position-relative">
+
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky
         @if (in_array($userType, ['admin', 'superAdmin'])) admin-fixed-header @endif"
          id="navbarBlur"
@@ -228,14 +227,21 @@
 
 
 
-                                <li><a class="dropdown-item"
-                                       href="#"><i class="fas fa-headset me-2"></i>
-                                        Support</a>
-                                </li>
+                                @if (auth()->check() && auth()->user()->user_type === 'company')
+                                    <li data-bs-toggle="modal"
+                                        data-bs-target="#techSupportModal">
+                                        <a class="dropdown-item d-flex align-items-center py-2"
+                                           href="javascript:void(0)">
+                                            <div class="icon-box-support me-2">
+                                                <i class="fas fa-headset text-primary"></i>
+                                            </div>
+                                            <span class="fw-medium">Technical Support</span>
+                                        </a>
+                                    </li>
+                                    <hr class="dropdown-divider">
+                                @endif
 
                                 {{-- Logout --}}
-
-                                <hr class="dropdown-divider">
 
                                 <li>
 
@@ -264,10 +270,12 @@
 
                 </div>
 
+
             </div>
 
         </div>
     </nav>
+
 
 
 </div>

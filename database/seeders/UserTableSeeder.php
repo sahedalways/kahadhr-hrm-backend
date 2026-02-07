@@ -89,11 +89,17 @@ class UserTableSeeder extends Seeder
     $employeesCompany1 = [
       ['f_name' => 'John', 'l_name' => 'Doe', 'email' => 'emp@abc.com', 'phone_no' => '01710000001'],
       ['f_name' => 'Jane', 'l_name' => 'Smith', 'email' => 'jane@abc.com', 'phone_no' => '01710000002'],
+      ['f_name' => 'Michael', 'l_name' => 'Scott', 'email' => 'michael@abc.com', 'phone_no' => '01710000003'],
+      ['f_name' => 'Dwight', 'l_name' => 'Schrute', 'email' => 'dwight@abc.com', 'phone_no' => '01710000004'],
+      ['f_name' => 'Pam', 'l_name' => 'Beesly', 'email' => 'pam@abc.com', 'phone_no' => '01710000005'],
     ];
 
     $employeesCompany2 = [
       ['f_name' => 'Alice', 'l_name' => 'Brown', 'email' => 'emp@xyz.com', 'phone_no' => '01720000001'],
       ['f_name' => 'Bob', 'l_name' => 'Johnson', 'email' => 'jane@xyz.com', 'phone_no' => '01720000002'],
+      ['f_name' => 'Charlie', 'l_name' => 'Davis', 'email' => 'charlie@xyz.com', 'phone_no' => '01720000003'],
+      ['f_name' => 'Emma', 'l_name' => 'Wilson', 'email' => 'emma@xyz.com', 'phone_no' => '01720000004'],
+      ['f_name' => 'Noah', 'l_name' => 'Miller', 'email' => 'noah@xyz.com', 'phone_no' => '01720000005'],
     ];
 
     $employeeModels1 = [];

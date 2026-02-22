@@ -1336,7 +1336,8 @@
     </div>
 
     {{-- will work after tablate --}}
-    <div class="chat-app-container d-md-none d-block mobile-chat-container">
+    <div class="chat-app-container d-md-none d-block mobile-chat-container"
+         wire:ignore.self>
         <div class="d-flex h-100">
 
             {{-- SIDEBAR --}}
@@ -1345,9 +1346,11 @@
                 {{-- Add new --}}
                 <div style="min-height: 77px"
                      class="p-3 d-flex justify-content-between align-items-center border-bottom gap-2">
-                    <button class="btn btn-outline-danger d-md-none"
-                            id="sidebarClose">
-                        <i class="fa-solid fa-xmark text-danger"></i>
+                    <button class="btn btn-outline-danger d-md-none p-1"
+                            id="sidebarClose"
+                            style="font-size: 0.9rem; width: 30px; height: 30px;">
+                        <i class="fa-solid fa-xmark text-danger"
+                           style="font-size: 0.9rem;"></i>
                     </button>
                     <div class="dropdown"
                          wire:ignore>

@@ -56,57 +56,54 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="dashboard-section mb-4 border-0 shadow-sm">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="calendar-nav d-flex align-items-center gap-2 bg-light rounded-pill px-2 py-1 border"
-                         style="font-size: 0.85rem;">
+                <div
+                     class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
 
-                        <!-- Previous Month -->
+                    <!-- Calendar Navigation -->
+                    <div
+                         class="calendar-nav d-flex align-items-center gap-1 gap-md-2 bg-light rounded-pill px-2 py-1 border flex-shrink-0">
                         <button wire:click="previousMonth"
                                 class="btn btn-link p-0 text-dark">
                             <i class="fas fa-chevron-left small"></i>
                         </button>
 
-                        <!-- Current Month -->
-                        <span class="fw-bold mx-2"
+                        <span class="fw-bold mx-1 mx-md-2"
                               style="font-size: 0.9rem;">
                             {{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->format('F Y') }}
                         </span>
 
-                        <!-- Next Month -->
                         <button wire:click="nextMonth"
                                 class="btn btn-link p-0 text-dark">
                             <i class="fas fa-chevron-right small"></i>
                         </button>
-
                     </div>
 
-
-                    <div class="d-flex gap-2">
+                    <!-- Calendar Filters -->
+                    <div class="d-flex flex-wrap gap-1 gap-md-2 mt-2 mt-md-0">
                         <span wire:click="toggleCalendarFilter('leave')"
-                              class="badge badge-green px-3 py-2 clickable
-          {{ !$calendarFilters['leave'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                              class="badge badge-green px-2 px-md-3 py-1 py-md-2 clickable
+              {{ !$calendarFilters['leave'] ? 'opacity-50 text-decoration-line-through' : '' }}">
                             Leaves
                         </span>
 
                         <span wire:click="toggleCalendarFilter('birthday')"
-                              class="badge badge-pink px-3 py-2 clickable
-          {{ !$calendarFilters['birthday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                              class="badge badge-pink px-2 px-md-3 py-1 py-md-2 clickable
+              {{ !$calendarFilters['birthday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
                             Birthdays
                         </span>
 
                         <span wire:click="toggleCalendarFilter('uk_holiday')"
-                              class="badge badge-danger px-3 py-2 clickable
-          {{ !$calendarFilters['uk_holiday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                              class="badge badge-danger px-2 px-md-3 py-1 py-md-2 clickable
+              {{ !$calendarFilters['uk_holiday'] ? 'opacity-50 text-decoration-line-through' : '' }}">
                             UK Holidays
                         </span>
 
                         <span wire:click="toggleCalendarFilter('doc_expiry')"
-                              class="badge badge-orange px-3 py-2 clickable
-          {{ !$calendarFilters['doc_expiry'] ? 'opacity-50 text-decoration-line-through' : '' }}">
+                              class="badge badge-orange px-2 px-md-3 py-1 py-md-2 clickable
+              {{ !$calendarFilters['doc_expiry'] ? 'opacity-50 text-decoration-line-through' : '' }}">
                             Doc Expiry
                         </span>
                     </div>
-
 
                 </div>
 

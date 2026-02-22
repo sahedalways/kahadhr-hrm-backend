@@ -22,7 +22,6 @@ class CheckSubscriptionStatus
             $company->subscription_status === 'trial' &&
             Carbon::today()->greaterThan(Carbon::parse($company->subscription_end))
         ) {
-
             return redirect()->route('subscription.expired');
         }
 

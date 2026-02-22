@@ -21,6 +21,13 @@ require __DIR__ . '/dev-tools.php';
 
 
 Route::get('/trial-expired', function () {
+  if (auth()->check() && auth()->user()->company->subscription_status === 'active') {
+    return redirect()->route(
+      'company.dashboard.index',
+      ['company' => auth()->user()->company->sub_domain]
+    );
+  }
+
   return view('subscription.trial-expired');
 })->name('subscription.expired');
 

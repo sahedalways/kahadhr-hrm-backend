@@ -9,6 +9,7 @@ use App\Models\Shift;
 use App\Models\ShiftBreak;
 use App\Models\ShiftDate;
 use App\Models\ShiftTemplates;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -1971,6 +1972,66 @@ class ScheduleIndex extends BaseComponent
         $this->dragSource = [];
         $this->toast('Shift moved successfully!', 'success');
     }
+
+
+
+    public function downloadSchedulePDF()
+    {
+        $employees = Employee::where('company_id', auth()->user()->company->id)
+            ->orderBy('f_name')
+            ->get();
+
+        $weekDays = $this->weekDays;
+        $calendarShifts = $this->calendarShifts;
+        $viewMode = $this->viewMode;
+
+
+
+        $weeks = [];
+
+        if ($viewMode === 'monthly') {
+            $dateInMonth = $this->startDate ?? Carbon::now();
+            $startOfMonth = Carbon::parse($dateInMonth)->startOfMonth();
+            $endOfMonth = Carbon::parse($dateInMonth)->endOfMonth();
+            $calendarStart = $startOfMonth->copy()->startOfWeek(Carbon::MONDAY);
+            $calendarEnd = $endOfMonth->copy()->endOfWeek(Carbon::SUNDAY);
+
+            $dates = [];
+            $current = $calendarStart->copy();
+            while ($current->lte($calendarEnd) && count($dates) < 42) {
+                $dates[] = $current->copy();
+                $current->addDay();
+            }
+            $weeks = array_chunk($dates, 7);
+        }
+        $calendarShiftsByEmployee = [];
+
+        foreach ($calendarShifts as $dateKey => $shifts) {
+            foreach ($shifts as $shift) {
+                foreach ($shift['employees'] as $emp) {
+                    $calendarShiftsByEmployee[$emp['id']][$dateKey][] = $shift;
+                }
+            }
+        }
+
+        $pdf = Pdf::loadView('livewire.backend.company.schedule.schedule-pdf', [
+            'employees' => $employees,
+            'weekDays' => $weekDays,
+            'calendarShifts' => $calendarShiftsByEmployee,
+            'viewMode' => $viewMode,
+            'weeks' => $weeks
+        ])->setPaper('a4', 'landscape');
+
+        $startDate = Carbon::parse($this->startDate ?? now())->format('d F');
+        $endDate   = Carbon::parse($this->endDate ?? now())->format('d F');
+
+        $filename = 'schedule_all_employees_' . "_{$startDate}_to_{$endDate}.pdf";
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $filename);
+    }
+
 
 
     public function render()

@@ -3,6 +3,7 @@
 
 // all those super admin routes below
 
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/admin.php';
@@ -18,6 +19,7 @@ require __DIR__ . '/employee.php';
 
 // dev tools routes below
 require __DIR__ . '/dev-tools.php';
+
 
 
 Route::get('/trial-expired', function () {

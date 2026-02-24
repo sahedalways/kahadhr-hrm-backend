@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Employee\Schedule;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\ShiftDate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class ScheduleIndex extends BaseComponent
@@ -253,6 +254,47 @@ class ScheduleIndex extends BaseComponent
             $this->currentDate->addMonth();
         }
     }
+
+
+    public function downloadSchedulePDF()
+    {
+        $employee = auth()->user()->employee;
+        $weekDays = $this->weekDays;
+        $calendarShifts = $this->calendarShifts;
+        $viewMode = $this->viewMode;
+
+        $weeks = [];
+
+        if ($viewMode === 'monthly') {
+            $dateInMonth = $this->startDate ?? Carbon::now();
+            $startOfMonth = Carbon::parse($dateInMonth)->startOfMonth();
+            $endOfMonth = Carbon::parse($dateInMonth)->endOfMonth();
+            $calendarStart = $startOfMonth->copy()->startOfWeek(Carbon::MONDAY);
+            $calendarEnd = $endOfMonth->copy()->endOfWeek(Carbon::SUNDAY);
+
+            $dates = [];
+            $current = $calendarStart->copy();
+            while ($current->lte($calendarEnd) && count($dates) < 42) {
+                $dates[] = $current->copy();
+                $current->addDay();
+            }
+            $weeks = array_chunk($dates, 7);
+        }
+
+        $pdf = Pdf::loadView('livewire.backend.employee.schedule.schedule-pdf', compact('employee', 'weekDays', 'calendarShifts', 'viewMode', 'weeks'))
+            ->setPaper('a4', 'landscape');
+
+        $startDate = Carbon::parse($this->startDate ?? now())->format('d F');
+        $endDate   = Carbon::parse($this->endDate ?? now())->format('d F');
+
+        $filename = 'schedule_' . $employee->id . "_{$startDate}_to_{$endDate}.pdf";
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $filename);
+    }
+
+
 
 
 

@@ -6,6 +6,8 @@
         ])
     </div>
 
+
+
     <div class="table-responsive">
         <table class="table table-bordered schedule-table m-0">
             {{-- ---------- WEEKLY MODE HEADER ---------- --}}

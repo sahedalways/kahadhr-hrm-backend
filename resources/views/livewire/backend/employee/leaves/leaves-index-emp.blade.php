@@ -117,6 +117,7 @@
                             <th>Total Hours</th>
                             <th>Paid Status</th>
                             <th>Paid Hours</th>
+                            <th>Reason</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -147,6 +148,7 @@
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
+                                <td>{{ $leave->reason ?? 'N/A ' }}</td>
                                 <td>
                                     @if ($leave->status == 'pending')
                                         <span class="badge bg-warning">Pending</span>
@@ -224,7 +226,7 @@
                                 <input type="text"
                                        class="form-control"
                                        wire:model="other_leave_reason"
-                                       placeholder="Enter reason">
+                                       placeholder="Enter other leave type">
                                 @error('other_leave_reason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -257,7 +259,21 @@
                         @error('remaining')
                             <div class="text-danger mb-2">{{ $message }}</div>
                         @enderror
+
+
+                        <div class="mb-2">
+                            <label>Reason </label>
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="reason"
+                                   placeholder="Enter leave reason">
+                            @error('reason')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                     </div>
+
+
 
 
 

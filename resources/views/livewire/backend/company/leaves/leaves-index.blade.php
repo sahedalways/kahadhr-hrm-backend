@@ -454,12 +454,14 @@
                         </div>
 
                         <!-- 3. Reason/Description -->
+
+
                         <div
                              class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
                             <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
                                style="min-width: 25px;"></i>
                             <div class="fw-normal text-dark flex-grow-1">
-                                {{ $calendarLeaveInfo->other_reason ?? '-' }}
+                                {{ $calendarLeaveInfo->other_reason ?: ($calendarLeaveInfo->reason ?: '-') }}
                             </div>
                         </div>
 
@@ -606,7 +608,8 @@
                              class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
                             <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
                                style="min-width: 25px;"></i>
-                            <div class="fw-normal text-dark flex-grow-1">{{ $requestDetails->other_reason ?? '-' }}
+                            <div class="fw-normal text-dark flex-grow-1">
+                                {{ $requestDetails->other_reason ?: ($requestDetails->reason ?: '-') }}
                             </div>
                         </div>
 
@@ -795,11 +798,13 @@
 
 
                         <!-- 3. Reason/Description -->
+
                         <div
                              class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
                             <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
                                style="min-width: 25px;"></i>
-                            <div class="fw-normal text-dark flex-grow-1">{{ $calendarLeaveInfo->other_reason ?? '-' }}
+                            <div class="fw-normal text-dark flex-grow-1">
+                                {{ $calendarLeaveInfo->other_reason ?: ($calendarLeaveInfo->reason ?: '-') }}
                             </div>
                         </div>
 

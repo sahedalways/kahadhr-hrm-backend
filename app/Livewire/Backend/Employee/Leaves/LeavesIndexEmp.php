@@ -29,6 +29,7 @@ class LeavesIndexEmp extends BaseComponent
     public $hasMore = true;
 
     public $leaveTypes;
+    public $reason;
     public $totalAnnualHours = 0;
     public $usedAnnualHours = 0;
     public $remainingAnnualHours = 0;
@@ -59,6 +60,7 @@ class LeavesIndexEmp extends BaseComponent
     public function resetInputFields()
     {
         $this->leave_type_id = $this->start_date = $this->end_date = null;
+        $this->reason = null;
         $this->resetErrorBag();
     }
 
@@ -67,6 +69,7 @@ class LeavesIndexEmp extends BaseComponent
         // Base validation
         $rules = [
             'leave_type_id' => 'required|exists:leave_types,id',
+            'reason' => 'nullable|string|max:255',
             'start_date'    => 'required|date',
             'end_date'      => 'required|date|after_or_equal:start_date',
         ];
@@ -108,6 +111,7 @@ class LeavesIndexEmp extends BaseComponent
             'end_date'      => $this->end_date,
             'total_hours'   => $totalHours,
             'other_reason'  => $this->other_leave_reason,
+            'reason'  => $this->reason,
             'status'        => 'pending',
         ]);
 

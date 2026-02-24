@@ -24,6 +24,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
             $table->enum('paid_status', ['paid', 'unpaid'])->nullable();
             $table->decimal('paid_hours', 8, 2)->nullable();
+            $table->string('reason')->nullable();
             $table->timestamps();
         });
     }

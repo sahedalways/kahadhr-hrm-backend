@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->decimal('total_hours', 8, 2);
+            $table->decimal('remaining_annual_hours', 8, 2)->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
             $table->enum('paid_status', ['paid', 'unpaid'])->nullable();
             $table->decimal('paid_hours', 8, 2)->nullable();

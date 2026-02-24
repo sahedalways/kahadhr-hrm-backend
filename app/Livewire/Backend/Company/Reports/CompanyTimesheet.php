@@ -190,7 +190,7 @@ class CompanyTimesheet extends BaseComponent
 
             return [
                 'employee' => $att->user->employee->full_name ?? '',
-                'date' => $clockIn->format('Y-m-d'),
+                'date' => $clockIn->format('d-m-Y'),
                 'clock_in' => $clockIn->format('h:i A'),
                 'clock_out' => $clockOut ? $clockOut->format('h:i A') : '---',
                 'worked_hours' => "{$hours}:" . str_pad($minutes, 2, '0', STR_PAD_LEFT),

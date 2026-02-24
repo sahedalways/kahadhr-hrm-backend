@@ -10,7 +10,7 @@
 
         <!-- LEFT: Title -->
         <div class="col-auto">
-            <h5 class="fw-500 text-primary m-0">Documents By Type</h5>
+            <h5 class="fw-500 text-primary m-0">Employees Docs</h5>
         </div>
 
         <!-- RIGHT: Export Buttons -->
@@ -659,14 +659,39 @@
                                 <input type="file"
                                        class="form-control"
                                        wire:model="file_path"
-                                       accept="application/pdf">
+                                       accept="application/pdf, image/*">
                                 @error('file_path')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
+                            @if ($file_path)
+                                <div class="mt-2">
+                                    @php
+                                        $ext = strtolower(
+                                            pathinfo($file_path->getClientOriginalName(), PATHINFO_EXTENSION),
+                                        );
+                                    @endphp
+
+                                    @if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                        <img src="{{ $file_path->temporaryUrl() }}"
+                                             alt="Uploaded Image"
+                                             class="img-fluid rounded shadow-sm"
+                                             style="max-height: 200px;">
+                                    @elseif ($ext === 'pdf')
+                                        <div class="border rounded p-2 bg-light d-inline-block">
+                                            <i class="bi bi-file-earmark-pdf-fill text-danger"></i>
+                                            <span class="ms-2">{{ $file_path->getClientOriginalName() }}</span>
+                                        </div>
+                                    @else
+                                        <span>{{ $file_path->getClientOriginalName() }}</span>
+                                    @endif
+                                </div>
+                            @endif
+
+
                             <div class="col-md-12 mb-2">
-                                <label class="form-label">Expires At <span class="text-danger">*</span></label>
+                                <label class="form-label">Expires At </label>
                                 <input type="date"
                                        class="form-control"
                                        wire:model="expires_at"
@@ -853,8 +878,7 @@
 
                                 {{-- Expiry --}}
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Expires At <span
-                                              class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold">Expires At </label>
                                     <input type="date"
                                            class="form-control form-control-sm"
                                            wire:model.live="expires_at">
@@ -862,12 +886,12 @@
 
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Change File (PDF)</label>
+                                    <label class="form-label fw-semibold">Change File (PDF/Image)</label>
 
                                     <input type="file"
                                            class="form-control form-control-sm"
                                            wire:model="new_file"
-                                           accept="application/pdf">
+                                           accept="application/pdf, image/*">
 
                                     @error('new_file')
                                         <span class="text-danger">{{ $message }}</span>
@@ -877,6 +901,16 @@
                                         <div class="small text-success mt-1">
                                             New file selected: {{ $new_file->getClientOriginalName() }}
                                         </div>
+
+                                        <!-- Show preview if it's an image -->
+                                        @if (Str::startsWith($new_file->getMimeType(), 'image/'))
+                                            <div class="mt-2">
+                                                <img src="{{ $new_file->temporaryUrl() }}"
+                                                     alt="Preview"
+                                                     class="img-thumbnail"
+                                                     style="max-width: 200px;">
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
 

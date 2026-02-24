@@ -137,11 +137,12 @@ class CompanyLeaves extends BaseComponent
             return [
                 'employee' => $leave->user->employee->full_name ?? '',
                 'leave_type' => $leave->leaveType->name ?? '',
-                'start_date' => $leave->start_date,
-                'end_date' => $leave->end_date,
+                'start_date' => Carbon::parse($leave->start_date)->format('d-m-Y'),
+                'end_date'   => Carbon::parse($leave->end_date)->format('d-m-Y'),
                 'hours' => $leave->total_hours,
                 'status' => ucfirst($leave->status),
                 'paid_status' => ucfirst($leave->paid_status ?? '---'),
+                'remaining_annual_hours' => $leave->remaining_annual_hours,
             ];
         });
 
@@ -162,6 +163,7 @@ class CompanyLeaves extends BaseComponent
                     'Hours',
                     'Status',
                     'Paid Status',
+                    'Remaining Annual Hours',
                 ],
                 'keys' => [
                     'employee',
@@ -171,6 +173,7 @@ class CompanyLeaves extends BaseComponent
                     'hours',
                     'status',
                     'paid_status',
+                    'remaining_annual_hours',
                 ],
             ]
         );

@@ -650,8 +650,15 @@
                                         <input type="file"
                                                x-ref="fileInput"
                                                class="d-none"
-                                               accept="application/pdf"
-                                               x-on:change="fileUrl = URL.createObjectURL($refs.fileInput.files[0]);"
+                                               accept="application/pdf, image/*"
+                                               x-on:change="
+            file = $refs.fileInput.files[0];
+            if(file){
+                fileUrl = URL.createObjectURL(file);
+            } else {
+                fileUrl = null;
+            }
+        "
                                                wire:model="file_path">
                                     </div>
 
@@ -668,8 +675,7 @@
                                     @if ($file_path)
                                         <div class="row mt-3">
                                             <div class="col-12 mb-3">
-                                                <label class="form-label">Expires At <span
-                                                          class="text-danger">*</span></label>
+                                                <label class="form-label">Expires At </label>
                                                 <input type="date"
                                                        class="form-control"
                                                        wire:model="expires_at"

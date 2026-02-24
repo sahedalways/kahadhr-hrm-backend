@@ -152,9 +152,9 @@ class DocumentManageTypesIndex extends BaseComponent
     {
         $this->validate([
             'doc_type_id' => 'required',
-            'expires_at'  => 'required|date',
+            'expires_at'  => 'nullable|date',
             'emp_id'      => 'required|integer|exists:employees,id',
-            'new_file'   => 'nullable|file|mimes:pdf|max:20240',
+            'new_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif|max:20240'
         ]);
 
         $document = EmpDocument::findOrFail($this->editDocId);
@@ -168,8 +168,16 @@ class DocumentManageTypesIndex extends BaseComponent
                 Storage::disk('public')->delete($document->file_path);
             }
 
+            $file = $this->new_file;
 
-            $filePath = $this->new_file->store('pdf/employee/documents', 'public');
+
+            if (str_contains($file->getMimeType(), 'image')) {
+
+                $filePath = $file->store('image/employee/documents', 'public');
+            } else {
+                $filePath = $file->store('pdf/employee/documents', 'public');
+            }
+
             $document->file_path = $filePath;
         }
 
@@ -284,9 +292,9 @@ class DocumentManageTypesIndex extends BaseComponent
     {
         $this->validate([
             'doc_type_id' => 'required',
-            'expires_at' => 'required|date',
+            'expires_at' => 'nullable|date',
             'emp_id' => 'required|integer|exists:employees,id',
-            'file_path' => 'required|file|mimes:pdf|max:20240',
+            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp|max:20480',
             'send_email' => 'boolean',
         ]);
 
@@ -300,7 +308,16 @@ class DocumentManageTypesIndex extends BaseComponent
             }
         }
 
-        $filePath = $this->file_path->store('pdf/employee/documents', 'public');
+        $filePath = null;
+        if ($this->file_path) {
+            $extension = $this->file_path->getClientOriginalExtension();
+            $folder = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])
+                ? 'image/employee/documents'
+                : 'pdf/employee/documents';
+
+            $filePath = $this->file_path->store($folder, 'public');
+        }
+
 
 
         EmpDocument::create([

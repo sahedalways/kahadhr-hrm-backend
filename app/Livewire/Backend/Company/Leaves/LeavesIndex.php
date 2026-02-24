@@ -215,6 +215,7 @@ class LeavesIndex extends BaseComponent
             'status'      => 'approved',
             'paid_status' => $this->paidStatus ?? null,
             'paid_hours'  => $this->paidStatus === 'paid' ? $this->paidHours : null,
+            'remaining_annual_hours' => ($leaveBalance->total_annual_hours ?? 0) - ($leaveBalance->used_annual_hours ?? 0),
         ]);
 
 
@@ -236,6 +237,8 @@ class LeavesIndex extends BaseComponent
         }
 
 
+
+
         $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
         $message = "{$leaveTypeName} request approved for you.";
 
@@ -254,6 +257,12 @@ class LeavesIndex extends BaseComponent
 
 
         $leaveBalance->save();
+
+        $request->update([
+            'remaining_annual_hours' => ($leaveBalance->total_annual_hours ?? 0) - ($leaveBalance->used_annual_hours ?? 0),
+        ]);
+
+
         $this->dispatch('closemodal');
         $this->dispatch('reload-page');
 
@@ -364,6 +373,14 @@ class LeavesIndex extends BaseComponent
                 'message' => $message
             ],
         ]);
+
+
+        $request->update([
+            'remaining_annual_hours' => ($leaveBalance->total_annual_hours ?? 0) - ($leaveBalance->used_annual_hours ?? 0),
+        ]);
+
+
+
 
         // Fire real-time event
         event(new NotificationEvent($notification));

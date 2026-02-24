@@ -241,11 +241,18 @@ class ManageDocuments extends BaseComponent
         }
 
         $this->validate([
-            'expires_at' => 'required|date',
+            'expires_at' => 'nullable|date',
             'file_path' => 'required|file|mimes:pdf,jpg,png|max:20480',
         ]);
 
-        $filePath = $this->file_path->store('pdf/employee/documents', 'public');
+        $file = $this->file_path;
+
+        if (strtolower($file->getClientOriginalExtension()) === 'pdf') {
+            $filePath = $file->store('pdf/employee/documents', 'public');
+        } else {
+            $filePath = $file->store('image/employee/documents', 'public');
+        }
+
 
         EmpDocument::create([
             'doc_type_id' => $this->selectedType,

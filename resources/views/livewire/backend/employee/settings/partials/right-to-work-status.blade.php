@@ -1,7 +1,15 @@
 @php
     $rtw = $this->rightToWorkStatus;
     $latestShareDoc = $rtw['doc'];
-    $daysLeft = $rtw['daysLeft'];
+
+    $daysLeft = null;
+
+    if ($latestShareDoc && $latestShareDoc->expires_at) {
+        $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+
+        $daysLeft = \Carbon\Carbon::now()->diffInDays($expiresAt, false);
+        $daysLeft = (int) $daysLeft;
+    }
 @endphp
 
 <div class="col-12 mt-3">
@@ -20,11 +28,19 @@
                 <strong class="{{ $daysLeft !== null && $daysLeft <= 60 ? 'blink-red' : '' }}"
                         style="color: {{ $daysLeft !== null && $daysLeft <= 60 ? '#dc3545' : '#198754' }};
                                font-size: 16px; display: block;">
-                    {{ \Carbon\Carbon::parse($latestShareDoc->expires_at)->format('d F Y') }}
+                    {{ $expiresAt->format('d F Y') }}
                 </strong>
 
                 <span class="text-muted x-small">
-                    {{ $daysLeft !== null ? ($daysLeft < 0 ? 'Expired' : "$daysLeft days left") : '' }}
+                    @if ($daysLeft !== null)
+                        @if ($daysLeft < 0)
+                            Expired
+                        @elseif($daysLeft === 0)
+                            Expires Today
+                        @else
+                            {{ $daysLeft }} {{ $daysLeft === 1 ? 'day' : 'days' }} left
+                        @endif
+                    @endif
                 </span>
             @else
                 <span class="badge bg-light text-muted"

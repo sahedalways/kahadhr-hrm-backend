@@ -149,6 +149,136 @@
 
 
 
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
+                            <div class="card-body p-4">
+                                @if ($employee->profile?->addressHistory)
+                                    @php
+                                        $addr = $employee->profile->addressHistory;
+                                    @endphp
+
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-3">
+                                            <h6 class="fw-semibold text-muted small mb-2">Previous Address</h6>
+                                            <div class="text-dark small"
+                                                 style="line-height:1.5;">
+                                                {{ $addr->house_no }}, {{ $addr->street }}<br>
+                                                {{ $addr->city }}, {{ $addr->state }}, {{ $addr->postcode }}<br>
+                                                <span class="text-muted">{{ $addr->country }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+
+                                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                    <div class="card-body p-4">
+                                        <div
+                                             class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                            <h6 class="fw-bold text-dark text-uppercase small mb-0">Emergency Contacts
+                                            </h6>
+
+                                            @if ($employee->emergencyContacts->count() < 2)
+                                                <button type="button"
+                                                        class="btn btn-sm btn-primary d-flex align-items-center px-3 py-1"
+                                                        wire:click="openEmergencyContactModal">
+                                                    <i class="fas fa-user-plus me-1"></i> Add Contact
+                                                </button>
+                                            @else
+                                                <span class="text-warning small fw-semibold">
+                                                    Limit Reached: Max 2 contacts
+                                                </span>
+                                            @endif
+                                        </div>
+
+
+                                        <div class="table-responsive bg-white shadow-sm border rounded-3">
+                                            <table class="table table-hover mb-0 align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="ps-3 py-2 text-muted fw-semibold">Name</th>
+                                                        <th class="py-2 text-muted fw-semibold">Relationship</th>
+                                                        <th class="py-2 text-muted fw-semibold">Mobile</th>
+                                                        <th class="py-2 text-muted fw-semibold">Email</th>
+                                                        <th class="py-2 text-muted fw-semibold">Address</th>
+                                                        <th class="py-2 text-muted fw-semibold text-center">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($employee->emergencyContacts as $contact)
+                                                        <tr class="align-middle">
+                                                            <td class="ps-3 fw-semibold">{{ $contact->name }}</td>
+                                                            <td>{{ $contact->relationship }}</td>
+                                                            <td>{{ $contact->mobile }}</td>
+                                                            <td>{{ $contact->email ?? '-' }}</td>
+                                                            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                                                title="{{ $contact->address }}">
+                                                                {{ $contact->address }}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex justify-content-center gap-1">
+                                                                    <button class="btn btn-outline-secondary btn-sm p-1"
+                                                                            style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"
+                                                                            wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
+                                                                        <i class="fas fa-pencil-alt"
+                                                                           style="font-size:0.75rem;"></i>
+                                                                    </button>
+
+                                                                    <button class="btn btn-outline-danger btn-sm p-1"
+                                                                            style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"
+                                                                            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                                            wire:click="deleteEmergencyContact({{ $contact->id }})">
+                                                                        <i class="fas fa-trash-alt"
+                                                                           style="font-size:0.75rem;"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+
+                                                    @if ($employee->emergencyContacts->isEmpty())
+                                                        <tr>
+                                                            <td colspan="6"
+                                                                class="text-center py-4 text-muted">No emergency
+                                                                contacts
+                                                                found.</td>
+                                                        </tr>
+                                                    @endif
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+
+
+                                    <style>
+                                        .py-2-5 {
+                                            padding-top: 0.65rem;
+                                            padding-bottom: 0.65rem;
+                                        }
+
+                                        .transition-all {
+                                            transition: all 0.3s ease;
+                                        }
+
+                                        .btn-primary:hover {
+                                            transform: translateY(-2px);
+                                            shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+                                        }
+
+                                        #countryDropdownButton,
+                                        #stateDropdownButton,
+                                        #cityDropdownButton,
+                                        #countryDropdownMenu,
+                                        #stateDropdownMenu,
+                                        #cityDropdownMenu {
+                                            box-shadow: none !important;
+                                        }
+                                    </style>
+
+
+                                </div>
+                            </div>
+                        </div>
 
 
                         <style>
@@ -757,39 +887,134 @@
                     </div>
 
 
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
+                        <div class="card-body p-4">
+                            @if ($employee->profile?->addressHistory)
+                                @php
+                                    $addr = $employee->profile->addressHistory;
+                                @endphp
+
+                                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                    <div class="card-body p-3">
+                                        <h6 class="fw-semibold text-muted small mb-2">Previous Address</h6>
+                                        <div class="text-dark small"
+                                             style="line-height:1.5;">
+                                            {{ $addr->house_no }}, {{ $addr->street }}<br>
+                                            {{ $addr->city }}, {{ $addr->state }}, {{ $addr->postcode }}<br>
+                                            <span class="text-muted">{{ $addr->country }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body p-4">
+                                    <div
+                                         class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                        <h6 class="fw-bold text-dark text-uppercase small mb-0">Emergency Contacts</h6>
+
+                                        @if ($employee->emergencyContacts->count() < 2)
+                                            <button type="button"
+                                                    class="btn btn-sm btn-primary d-flex align-items-center px-3 py-1"
+                                                    wire:click="openEmergencyContactModal">
+                                                <i class="fas fa-user-plus me-1"></i> Add Contact
+                                            </button>
+                                        @else
+                                            <span class="text-warning small fw-semibold">
+                                                Limit Reached: Max 2 contacts
+                                            </span>
+                                        @endif
+                                    </div>
+
+
+                                    <div class="table-responsive bg-white shadow-sm border rounded-3">
+                                        <table class="table table-hover mb-0 align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-3 py-2 text-muted fw-semibold">Name</th>
+                                                    <th class="py-2 text-muted fw-semibold">Relationship</th>
+                                                    <th class="py-2 text-muted fw-semibold">Mobile</th>
+                                                    <th class="py-2 text-muted fw-semibold">Email</th>
+                                                    <th class="py-2 text-muted fw-semibold">Address</th>
+                                                    <th class="py-2 text-muted fw-semibold text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($employee->emergencyContacts as $contact)
+                                                    <tr class="align-middle">
+                                                        <td class="ps-3 fw-semibold">{{ $contact->name }}</td>
+                                                        <td>{{ $contact->relationship }}</td>
+                                                        <td>{{ $contact->mobile }}</td>
+                                                        <td>{{ $contact->email ?? '-' }}</td>
+                                                        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                                            title="{{ $contact->address }}">
+                                                            {{ $contact->address }}
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="d-flex justify-content-center gap-1">
+                                                                <button class="btn btn-outline-secondary btn-sm p-1"
+                                                                        style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"
+                                                                        wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
+                                                                    <i class="fas fa-pencil-alt"
+                                                                       style="font-size:0.75rem;"></i>
+                                                                </button>
+
+                                                                <button class="btn btn-outline-danger btn-sm p-1"
+                                                                        style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"
+                                                                        onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                                        wire:click="deleteEmergencyContact({{ $contact->id }})">
+                                                                    <i class="fas fa-trash-alt"
+                                                                       style="font-size:0.75rem;"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+
+                                                @if ($employee->emergencyContacts->isEmpty())
+                                                    <tr>
+                                                        <td colspan="6"
+                                                            class="text-center py-4 text-muted">No emergency contacts
+                                                            found.</td>
+                                                    </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
 
 
 
+                                <style>
+                                    .py-2-5 {
+                                        padding-top: 0.65rem;
+                                        padding-bottom: 0.65rem;
+                                    }
+
+                                    .transition-all {
+                                        transition: all 0.3s ease;
+                                    }
+
+                                    .btn-primary:hover {
+                                        transform: translateY(-2px);
+                                        shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+                                    }
+
+                                    #countryDropdownButton,
+                                    #stateDropdownButton,
+                                    #cityDropdownButton,
+                                    #countryDropdownMenu,
+                                    #stateDropdownMenu,
+                                    #cityDropdownMenu {
+                                        box-shadow: none !important;
+                                    }
+                                </style>
 
 
-                    <style>
-                        .py-2-5 {
-                            padding-top: 0.65rem;
-                            padding-bottom: 0.65rem;
-                        }
-
-                        .transition-all {
-                            transition: all 0.3s ease;
-                        }
-
-                        .btn-primary:hover {
-                            transform: translateY(-2px);
-                            shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
-                        }
-
-                        #countryDropdownButton,
-                        #stateDropdownButton,
-                        #cityDropdownButton,
-                        #countryDropdownMenu,
-                        #stateDropdownMenu,
-                        #cityDropdownMenu {
-                            box-shadow: none !important;
-                        }
-                    </style>
-
-
-                </div>
-            </div>
+                            </div>
+                        </div>
+                    </div>
         </form>
     </div>
 
@@ -823,6 +1048,115 @@
         }
     </style>
 
+
+
+    <div wire:ignore.self
+         class="modal fade"
+         id="addEmergencyContact"
+         data-bs-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h6 class="modal-title fw-600">
+                        {{ $mode == 'edit' ? 'Edit Emergency Contact' : 'Add Emergency Contact' }}
+                    </h6>
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="saveContact">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="name"
+                                   placeholder="Enter name">
+                            @error('name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="mobile"
+                                   placeholder="Enter mobile number"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            @error('mobile')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control"
+                                   wire:model="email"
+                                   placeholder="Enter email (optional)">
+                            @error('email')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control"
+                                      wire:model="address"
+                                      placeholder="Enter address"></textarea>
+                            @error('address')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Relationship <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="relationship"
+                                   placeholder="Enter relationship">
+                            @error('relationship')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+
+                        <button type="submit"
+                                class="btn btn-success"
+                                wire:loading.attr="disabled"
+                                wire:target="saveContact">
+                            <span wire:loading
+                                  wire:target="saveContact">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                Saving...
+                            </span>
+                            <span wire:loading.remove
+                                  wire:target="saveContact">
+                                {{ $mode == 'edit' ? 'Update' : 'Save' }}
+                            </span>
+                        </button>
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
@@ -842,5 +1176,16 @@
                 }
             }
         });
+    });
+</script>
+
+
+<script>
+    window.addEventListener('show-emergency-modal', () => {
+        new bootstrap.Modal(document.getElementById('addEmergencyContact')).show();
+    });
+
+    window.addEventListener('hide-emergency-modal', () => {
+        bootstrap.Modal.getInstance(document.getElementById('addEmergencyContact')).hide();
     });
 </script>

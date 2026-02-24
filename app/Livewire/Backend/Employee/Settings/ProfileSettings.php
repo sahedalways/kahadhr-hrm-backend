@@ -7,6 +7,7 @@ use App\Models\CustomEmployeeProfileField;
 use App\Models\CustomEmployeeProfileFieldValue;
 use Livewire\WithFileUploads;
 use App\Models\DocumentType;
+use App\Models\EmergencyContact;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -74,6 +75,15 @@ class ProfileSettings extends BaseComponent
         "Refugee Status",
         "Other",
     ];
+
+    public $name;
+    public $mobile;
+    public $email;
+    public $address;
+    public $relationship;
+
+    public $contactId;
+    public $mode;
 
 
     public function toggleDepartments()
@@ -681,5 +691,108 @@ class ProfileSettings extends BaseComponent
 
 
         $this->toast('Employee Profile Updated Successfully!', 'success');
+    }
+
+
+
+
+
+
+    public function deleteEmergencyContact($contactId)
+    {
+        $contact = EmergencyContact::findOrFail($contactId);
+
+        $contact->delete();
+
+        // Refresh employee contacts
+        $this->employee->refresh();
+
+        $this->toast('Emergency contact deleted successfully.', 'success');
+    }
+
+
+    public function openEmergencyContactModal()
+    {
+        $this->resetFields();
+        $this->dispatch('show-emergency-modal');
+    }
+
+    public function resetFields()
+    {
+        $this->contactId = null;
+        $this->mode = 'create';
+
+        $this->name = '';
+        $this->mobile = '';
+        $this->email = '';
+        $this->address = '';
+        $this->relationship = '';
+
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
+
+    public function openEditEmergencyContactModal($id)
+    {
+
+        $contact = EmergencyContact::findOrFail($id);
+
+        $this->contactId = $contact->id;
+        $this->name = $contact->name;
+        $this->mobile = $contact->mobile;
+        $this->email = $contact->email;
+        $this->address = $contact->address;
+        $this->relationship = $contact->relationship;
+
+        $this->mode = 'edit';
+        $this->dispatch('show-emergency-modal');
+    }
+
+
+    public function saveContact()
+    {
+        $rules = [
+            'name'         => 'required|string|max:255',
+            'mobile'       => 'required|string|max:20',
+            'email'        => 'nullable|email|max:255',
+            'address'      => 'required|string|max:500',
+            'relationship' => 'required|string|max:255',
+        ];
+
+        $this->validate($rules);
+
+        if ($this->contactId) {
+
+            EmergencyContact::findOrFail($this->contactId)->update([
+                'name'         => $this->name,
+                'mobile'       => $this->mobile,
+                'email'        => $this->email,
+                'address'      => $this->address,
+                'relationship' => $this->relationship,
+            ]);
+
+            $this->toast('Emergency contact updated successfully.', 'success');
+        } else {
+            // If adding, check limit (max 2)
+            if ($this->employee->emergencyContacts()->count() >= 2) {
+                $this->toast('You can add only 2 emergency contacts.', 'error');
+                return;
+            }
+
+            EmergencyContact::create([
+                'employee_id'  => auth()->user()->employee->id,
+                'name'         => $this->name,
+                'mobile'       => $this->mobile,
+                'email'        => $this->email,
+                'address'      => $this->address,
+                'relationship' => $this->relationship,
+            ]);
+
+            $this->toast('Emergency contact added successfully.', 'success');
+        }
+
+        $this->dispatch('closemodal');
+        $this->resetFields();
     }
 }

@@ -66,8 +66,8 @@ class LeaveSettings extends BaseComponent
     {
         $validatedData = $this->validate([
             'selectedEmployee'     => 'required|exists:users,id',
-            'total_annual_hours'   => 'required|numeric|min:0',
-            'total_leave_in_liew'  => 'required|numeric|min:0',
+            'total_annual_hours'   => 'required|numeric|gt:0',
+            'total_leave_in_liew'  => 'nullable|numeric',
         ]);
 
 
@@ -107,7 +107,7 @@ class LeaveSettings extends BaseComponent
         $message = "Congrats! Your leave hours updated: {$leaveBalance->total_annual_hours}h, Lieu: {$leaveBalance->total_leave_in_liew}h.";
 
         $notification = Notification::create([
-            'company_id' => $this->company_id,
+            'company_id' => $this->company->id,
             'user_id' => $userId,
             'type' => 'increased_leave_hours',
             'data' => [

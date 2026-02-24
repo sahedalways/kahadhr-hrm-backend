@@ -41,19 +41,18 @@
                             </thead>
                             <tbody>
                                 @php
-                                    $dateInMonth = \Carbon\Carbon::parse($weekDays[0]['full_date']);
-                                    $startOfMonth = $dateInMonth->copy()->startOfMonth();
-                                    $endOfMonth = $dateInMonth->copy()->endOfMonth();
 
+                                    $dateInMonth = $this->startDate ?? \Carbon\Carbon::now();
+                                    $startOfMonth = \Carbon\Carbon::parse($dateInMonth)->startOfMonth();
+                                    $endOfMonth = \Carbon\Carbon::parse($dateInMonth)->endOfMonth();
+
+                                    // Always start calendar from Monday
                                     $calendarStart = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
                                     $calendarEnd = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
                                     $dates = [];
                                     $current = $calendarStart->copy();
-                                    while ($current->lte($calendarEnd)) {
-                                        if (count($dates) >= 42) {
-                                            break;
-                                        } // max 6 weeks
+                                    while ($current->lte($calendarEnd) && count($dates) < 42) {
                                         $dates[] = $current->copy();
                                         $current->addDay();
                                     }
@@ -71,13 +70,14 @@
 
                                             <td class="schedule-cell month-cell {{ $day->equalTo(\Carbon\Carbon::today()) ? 'bg-primary-light-cell' : '' }}"
                                                 style="position: relative; height: 80px; width: 14.285%;"
-                                                x-data="{ hover: false }" @mouseenter="hover = true"
+                                                x-data="{ hover: false }"
+                                                @mouseenter="hover = true"
                                                 @mouseleave="hover = false">
 
                                                 @if ($isInCurrentMonth)
                                                     {{-- Date Number --}}
                                                     <div class="small text-end p-1 text-dark {{ $day->equalTo(\Carbon\Carbon::today()) ? 'fw-bold' : '' }}"
-                                                        style="font-size: 0.85rem;">
+                                                         style="font-size: 0.85rem;">
                                                         {{ $day->day }}
                                                     </div>
 
@@ -94,12 +94,12 @@
                                                             @endphp
 
 
-                                                            <div  class="position-relative">
+                                                            <div class="position-relative">
 
                                                                 <div class="shift-block text-white rounded px-1 py-0 mb-3 mx-auto"
-                                                                    style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;">
+                                                                     style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;">
                                                                     <div class="fw-semibold text-truncate"
-                                                                        style="max-width: 100%;">
+                                                                         style="max-width: 100%;">
                                                                         {{ $shift['shift']['title'] }}</div>
                                                                     <div>
                                                                         {{ \Carbon\Carbon::parse($shift['start_time'])->format('g:i A') }}
@@ -111,26 +111,28 @@
 
                                                                 <div class="dropdown shift-dropdown">
                                                                     <button class="btn btn-xs btn-link text-white p-0"
-                                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                                       <i class="fa-solid fa-bars"></i>
+                                                                            data-bs-toggle="dropdown"
+                                                                            aria-expanded="false">
+                                                                        <i class="fa-solid fa-bars"></i>
                                                                     </button>
                                                                     <ul
                                                                         class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
                                                                         <li>
                                                                             @foreach ($shift['employees'] as $emp)
                                                                                 <button class="dropdown-item"
-                                                                                    type="button"
-                                                                                    wire:click="editOneEmpShift({{ $shift['id'] }}, {{ $emp['id'] }})">
+                                                                                        type="button"
+                                                                                        wire:click="editOneEmpShift({{ $shift['id'] }}, {{ $emp['id'] }})">
                                                                                     <i
-                                                                                        class="fas fa-edit fa-fw me-1"></i>
+                                                                                       class="fas fa-edit fa-fw me-1"></i>
                                                                                     Edit {{ $emp['name'] }}
                                                                                 </button>
                                                                             @endforeach
                                                                         </li>
                                                                         <li>
-                                                                            <button class="dropdown-item" type="button"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#{{ $modalId }}">
+                                                                            <button class="dropdown-item"
+                                                                                    type="button"
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#{{ $modalId }}">
                                                                                 <i class="fas fa-eye fa-fw me-1"></i>
                                                                                 View
                                                                             </button>
@@ -140,11 +142,11 @@
                                                                         </li>
                                                                         <li>
                                                                             <button class="dropdown-item text-danger"
-                                                                                type="button"
-                                                                                wire:click="deleteShiftForAllEmp({{ $shift['id'] }})"
-                                                                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+                                                                                    type="button"
+                                                                                    wire:click="deleteShiftForAllEmp({{ $shift['id'] }})"
+                                                                                    onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
                                                                                 <i
-                                                                                    class="fas fa-trash-alt fa-fw me-1"></i>
+                                                                                   class="fas fa-trash-alt fa-fw me-1"></i>
                                                                                 Delete
                                                                             </button>
                                                                         </li>
@@ -157,20 +159,24 @@
 
 
 
-                                                            <div class="modal fade" id="{{ $modalId }}"
-                                                                tabindex="-1" aria-hidden="true" wire:ignore.self
-                                                                data-bs-backdrop="static" data-bs-keyboard="false">
+                                                            <div class="modal fade"
+                                                                 id="{{ $modalId }}"
+                                                                 tabindex="-1"
+                                                                 aria-hidden="true"
+                                                                 wire:ignore.self
+                                                                 data-bs-backdrop="static"
+                                                                 data-bs-keyboard="false">
                                                                 <div
-                                                                    class="modal-dialog modal-dialog-centered modal-lg">
+                                                                     class="modal-dialog modal-dialog-centered modal-lg">
                                                                     <div class="modal-content">
                                                                         <div class="modal-header bg-primary text-white">
                                                                             <h5 class="modal-title text-white">
                                                                                 {{ $shift['shift']['title'] ?? '-' }}
                                                                             </h5>
                                                                             <button type="button"
-                                                                                class="btn-close btn-close-white"
-                                                                                data-bs-dismiss="modal"
-                                                                                aria-label="Close"></button>
+                                                                                    class="btn-close btn-close-white"
+                                                                                    data-bs-dismiss="modal"
+                                                                                    aria-label="Close"></button>
                                                                         </div>
                                                                         <div class="modal-body">
                                                                             <div class="row mb-2">
@@ -202,7 +208,7 @@
                                                                                     {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
                                                                                     @if ($moreCount > 0)
                                                                                         <span
-                                                                                            class="text-muted">+{{ $moreCount }}
+                                                                                              class="text-muted">+{{ $moreCount }}
                                                                                             more</span>
                                                                                     @endif
                                                                                 </div>
@@ -219,7 +225,7 @@
                                                                                 <div class="mb-2">
                                                                                     <strong>Breaks:</strong>
                                                                                     <table
-                                                                                        class="table table-sm table-bordered mt-1">
+                                                                                           class="table table-sm table-bordered mt-1">
                                                                                         <thead>
                                                                                             <tr>
                                                                                                 <th>Title</th>
@@ -234,7 +240,7 @@
                                                                                                     <td>{{ $break['title'] }}
                                                                                                     </td>
                                                                                                     <td> <span
-                                                                                                            class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
+                                                                                                              class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
                                                                                                             {{ $break['type'] }}
                                                                                                         </span>
                                                                                                     </td>
@@ -249,8 +255,8 @@
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button"
-                                                                                class="btn btn-secondary"
-                                                                                data-bs-dismiss="modal">Close</button>
+                                                                                    class="btn btn-secondary"
+                                                                                    data-bs-dismiss="modal">Close</button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -260,13 +266,13 @@
 
 
                                                     @if (!$hasShift)
-                                                        <button
-                                                            wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
-                                                            class="btn btn-sm btn-primary position-absolute tooltip-btn"
-                                                            style="width: 28px; height: 28px; top: 50%; left: 50%;
+                                                        <button wire:click="openAddShiftPanelForMonth('{{ $day->format('Y-m-d') }}')"
+                                                                class="btn btn-sm btn-primary position-absolute tooltip-btn"
+                                                                style="width: 28px; height: 28px; top: 50%; left: 50%;
                            transform: translate(-50%, -50%);
                            padding: 0; border-radius: 50%; z-index: 10;"
-                                                            x-show="hover" data-tooltip="Add Shift">
+                                                                x-show="hover"
+                                                                data-tooltip="Add Shift">
                                                             +
                                                         </button>
                                                     @endif
@@ -290,9 +296,11 @@
                                 <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
                                     style="position: relative;"
                                     wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
-                                    wire:mouseleave="$set('hoveredCell', null)" x-data="{ dragging: false }"
+                                    wire:mouseleave="$set('hoveredCell', null)"
+                                    x-data="{ dragging: false }"
                                     x-on:drop.prevent="if ($el.querySelector('.user-select-none')) return; $wire.handleDrop('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                    x-on:dragover.prevent="dragging = true" x-on:dragleave="dragging = false"
+                                    x-on:dragover.prevent="dragging = true"
+                                    x-on:dragleave="dragging = false"
                                     :class="{ 'bg-light': dragging }">
 
 
@@ -303,46 +311,51 @@
                                     @if ($onLeave)
                                         {{-- Leave cell --}}
                                         <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
-                                            style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px;
+                                             style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px;
                 pointer-events: none; ">
                                             <span class="text-danger small fw-bold px-2">Unavailable</span>
                                         </div>
                                     @elseif ($content && $content['type'] === 'Shift')
                                         <div class="shift-block text-white rounded position-relative shadow-sm p-3"
-                                            style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all .25s ease-in-out;"
-                                            draggable="true"
-                                            x-on:dragstart="$wire.handleDrag('{{ $day['full_date'] }}', {{ $employee['id'] }}, {{ $content['id'] }})">
-                                            <div class="small fw-bold text-truncate" style="max-width: 100%;">
+                                             style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all .25s ease-in-out;"
+                                             draggable="true"
+                                             x-on:dragstart="$wire.handleDrag('{{ $day['full_date'] }}', {{ $employee['id'] }}, {{ $content['id'] }})">
+                                            <div class="small fw-bold text-truncate"
+                                                 style="max-width: 100%;">
                                                 {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
                                             </div>
                                             <div class="smaller opacity-75">{{ $content['time'] }}</div>
 
                                             {{-- Single trigger + menu --}}
                                             <div class="shift-dropdown position-absolute"
-                                                style="top: 0; right: 6px;">
+                                                 style="top: 0; right: 6px;">
                                                 <button type="button"
-                                                    class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
-                                                   <i class="fa-solid fa-bars"></i>
+                                                        class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
+                                                    <i class="fa-solid fa-bars"></i>
                                                 </button>
 
-                                                <ul class="dropdown-schedule-celll d-none" wire:ignore.self>
+                                                <ul class="dropdown-schedule-celll d-none"
+                                                    wire:ignore.self>
                                                     <li>
-                                                        <button class="dropdown-item" type="button"
-                                                            wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
+                                                        <button class="dropdown-item"
+                                                                type="button"
+                                                                wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
                                                             <i class="fas fa-edit fa-fw me-1"></i> Edit
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item" type="button"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                                        <button class="dropdown-item"
+                                                                type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
                                                             <i class="fas fa-eye fa-fw me-1"></i> View
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item text-danger" type="button"
-                                                            wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+                                                        <button class="dropdown-item text-danger"
+                                                                type="button"
+                                                                wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
                                                             <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
                                                         </button>
                                                     </li>
@@ -354,9 +367,12 @@
                                         </div>
 
                                         <div class="modal fade"
-                                            id="shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                            tabindex="-1" aria-hidden="true" wire:ignore.self
-                                            data-bs-backdrop="static" data-bs-keyboard="false">
+                                             id="shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                             tabindex="-1"
+                                             aria-hidden="true"
+                                             wire:ignore.self
+                                             data-bs-backdrop="static"
+                                             data-bs-keyboard="false">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <!-- Header -->
@@ -365,8 +381,10 @@
                                                             <i class="fas fa-calendar-check me-2"></i>
                                                             {{ $content['title'] ?? 'Shift Details' }}
                                                         </h5>
-                                                        <button type="button" class="btn-close btn-close-white"
-                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <button type="button"
+                                                                class="btn-close btn-close-white"
+                                                                data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
                                                     </div>
 
                                                     <!-- Body -->
@@ -378,16 +396,16 @@
                                                                     <i class="fas fa-clock text-primary me-2"></i>
                                                                     <strong>Time:</strong>
                                                                     <span
-                                                                        class="ms-1">{{ $content['time'] ?? '-' }}</span>
+                                                                          class="ms-1">{{ $content['time'] ?? '-' }}</span>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-6">
                                                                 <div class="d-flex align-items-center mb-2">
                                                                     <i
-                                                                        class="fas fa-map-marker-alt text-primary me-2"></i>
+                                                                       class="fas fa-map-marker-alt text-primary me-2"></i>
                                                                     <strong>Address:</strong>
                                                                     <span
-                                                                        class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
+                                                                          class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -448,7 +466,7 @@
                                                                                     <td>{{ $break['title'] }}</td>
                                                                                     <td>
                                                                                         <span
-                                                                                            class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
+                                                                                              class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
                                                                                             {{ $break['type'] }}
                                                                                         </span>
                                                                                     </td>
@@ -465,8 +483,9 @@
 
                                                     <!-- Footer -->
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">
+                                                        <button type="button"
+                                                                class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">
                                                             <i class="fas fa-times me-1"></i> Close
                                                         </button>
                                                     </div>
@@ -474,12 +493,11 @@
                                             </div>
                                         </div>
                                     @else
-                                        <button
-                                            wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                            class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
-                                            style="width: 28px; height: 28px; top: 50%; left: 50%;
+                                        <button wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
+                                                class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
+                                                style="width: 28px; height: 28px; top: 50%; left: 50%;
                    transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
-                                            data-tooltip="Add Shift">
+                                                data-tooltip="Add Shift">
                                             +
                                         </button>
                                     @endif
@@ -495,35 +513,43 @@
 
 
     @if ($showAddShiftPanel)
-        <div class="shift-panel-overlay" wire:click="closeAddShiftPanel">
-            <div class="shift-panel" wire:click.stop>
+        <div class="shift-panel-overlay"
+             wire:click="closeAddShiftPanel">
+            <div class="shift-panel"
+                 wire:click.stop>
 
                 {{-- HEADER --}}
                 <div
-                    class="shift-panel-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+                     class="shift-panel-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
                     <h6 class="mb-0 fw-semibold">
                         {{ \Carbon\Carbon::parse($selectedDate)->format('l, M d, Y') }}
                     </h6>
 
-                    <button type="button" wire:click="closeAddShiftPanel"
-                        class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 28px; height: 28px; padding: 0;">
-                        <i class="fas fa-times" style="font-size: 14px; color: #000;"></i>
+                    <button type="button"
+                            wire:click="closeAddShiftPanel"
+                            class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 28px; height: 28px; padding: 0;">
+                        <i class="fas fa-times"
+                           style="font-size: 14px; color: #000;"></i>
                     </button>
                 </div>
 
                 {{-- TABS --}}
                 <ul class="nav nav-tabs shift-tabs px-3 pt-2">
-                    <li class="nav-item" wire:click="clickShiftDetailsTab">
-                        <button class="nav-link {{ $isShiftTempTab ? '' : 'active' }}" data-bs-toggle="tab"
-                            data-bs-target="#shift-details">
+                    <li class="nav-item"
+                        wire:click="clickShiftDetailsTab">
+                        <button class="nav-link {{ $isShiftTempTab ? '' : 'active' }}"
+                                data-bs-toggle="tab"
+                                data-bs-target="#shift-details">
                             Details
                         </button>
                     </li>
 
-                    <li class="nav-item ms-2" wire:click="clickTempTab">
-                        <button class="nav-link {{ $isShiftTempTab ? 'active' : '' }}" data-bs-toggle="tab"
-                            data-bs-target="#shift-templates">
+                    <li class="nav-item ms-2"
+                        wire:click="clickTempTab">
+                        <button class="nav-link {{ $isShiftTempTab ? 'active' : '' }}"
+                                data-bs-toggle="tab"
+                                data-bs-target="#shift-templates">
                             Templates
                         </button>
                     </li>
@@ -534,9 +560,11 @@
                 <div class="tab-content shift-panel-body px-4 py-3 ">
 
                     {{-- DETAILS TAB --}}
-                    <div class="tab-pane fade {{ $isShiftTempTab ? '' : 'show active' }}" id="shift-details">
+                    <div class="tab-pane fade {{ $isShiftTempTab ? '' : 'show active' }}"
+                         id="shift-details">
 
-                        <form wire:submit.prevent="saveShift" class="d-flex flex-column gap-3">
+                        <form wire:submit.prevent="saveShift"
+                              class="d-flex flex-column gap-3">
 
                             {{-- DATE --}}
                             <div class="row align-items-md-center g-2 mb-3 shift-form-row">
@@ -553,13 +581,16 @@
 
                                         <!-- Date input -->
                                         <div class="input-group input-group-sm w-100 w-md-auto"
-                                            style="max-width: 160px;">
-                                            <input type="date" class="form-control no-calendar-icon"
-                                                wire:model.live="selectedDate" id="shiftDate"
-                                                wire:change="dateChanged">
+                                             style="max-width: 160px;">
+                                            <input type="date"
+                                                   class="form-control no-calendar-icon"
+                                                   wire:model.live="selectedDate"
+                                                   id="shiftDate"
+                                                   wire:change="dateChanged">
 
-                                            <span class="input-group-text bg-white" style="cursor: pointer;"
-                                                onclick="document.getElementById('shiftDate').showPicker()">
+                                            <span class="input-group-text bg-white"
+                                                  style="cursor: pointer;"
+                                                  onclick="document.getElementById('shiftDate').showPicker()">
                                                 <i class="far fa-calendar-alt text-muted"></i>
                                             </span>
                                         </div>
@@ -571,9 +602,10 @@
 
                                         <!-- All day switch -->
                                         <div class="form-check form-switch ms-md-auto">
-                                            <input class="form-check-input" type="checkbox"
-                                                wire:model="newShift.all_day"
-                                                wire:change="toggleOnAllDay($event.target.checked)">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   wire:model="newShift.all_day"
+                                                   wire:change="toggleOnAllDay($event.target.checked)">
                                             <label class="form-check-label small text-muted ms-1">
                                                 All day
                                             </label>
@@ -598,19 +630,24 @@
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
 
                                         <!-- Start time -->
-                                        <input type="time" class="form-control form-control-sm"
-                                            wire:model.live="newShift.start_time" wire:change="calculateTotalHours()"
-                                            @if ($newShift['all_day']) readonly @endif>
+                                        <input type="time"
+                                               class="form-control form-control-sm"
+                                               wire:model.live="newShift.start_time"
+                                               wire:change="calculateTotalHours()"
+                                               @if ($newShift['all_day']) readonly @endif>
 
                                         <span class="text-muted d-none d-md-inline">→</span>
 
                                         <!-- End time -->
-                                        <input type="time" class="form-control form-control-sm"
-                                            wire:model.live="newShift.end_time" wire:change="calculateTotalHours()"
-                                            @if ($newShift['all_day']) readonly @endif>
+                                        <input type="time"
+                                               class="form-control form-control-sm"
+                                               wire:model.live="newShift.end_time"
+                                               wire:change="calculateTotalHours()"
+                                               @if ($newShift['all_day']) readonly @endif>
 
                                         <!-- Total hours -->
-                                        <span class="small fw-semibold ms-md-auto" style="color:#000;">
+                                        <span class="small fw-semibold ms-md-auto"
+                                              style="color:#000;">
                                             {{ $newShift['total_hours'] ?? '08:00' }} hrs
                                         </span>
 
@@ -652,9 +689,12 @@
                                         @endif
                                     </span>
 
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
-                                        wire:click="getDefaultBreaks()" class="text-primary small ms-auto"
-                                        style="font-size: 0.8rem;">
+                                    <a href="#"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#customAddBreakModal"
+                                       wire:click="getDefaultBreaks()"
+                                       class="text-primary small ms-auto"
+                                       style="font-size: 0.8rem;">
                                         Edit Breaks
                                     </a>
                                 </div>
@@ -662,8 +702,9 @@
                                 {{-- Repeat + Timezone --}}
                                 <div class="d-flex align-items-center mb-3">
                                     <a href="#"
-                                        class="me-3 text-primary small {{ $isSavedRepeatShift ? 'p-2 bg-light rounded' : '' }}"
-                                        data-bs-toggle="modal" data-bs-target="#customRepeatShiftModal">
+                                       class="me-3 text-primary small {{ $isSavedRepeatShift ? 'p-2 bg-light rounded' : '' }}"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#customRepeatShiftModal">
                                         <i class="fas fa-redo me-2"></i>
                                         @if ($isSavedRepeatShift)
 
@@ -689,14 +730,20 @@
                                     @endif
                                 </div>
                             @else
-                                <div class="gap-2 d-flex align-items-center flex-wrap mb-3 text-primary" style="font-size: 0.875rem;">
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#customAddBreakModal"
-                                        wire:click="getDefaultBreaks()" class="text-primary small">
+                                <div class="gap-2 d-flex align-items-center flex-wrap mb-3 text-primary"
+                                     style="font-size: 0.875rem;">
+                                    <a href="#"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#customAddBreakModal"
+                                       wire:click="getDefaultBreaks()"
+                                       class="text-primary small">
                                         <i class="fas fa-coffee me-2"></i> Add break
                                     </a>
 
-                                    <a href="#" class="text-primary small" data-bs-toggle="modal"
-                                        data-bs-target="#customRepeatShiftModal">
+                                    <a href="#"
+                                       class="text-primary small"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#customRepeatShiftModal">
                                         <i class="fas fa-redo me-2"></i>
                                         @if ($isSavedRepeatShift)
                                             {{ $frequency }}
@@ -724,7 +771,8 @@
                             @endif
 
                             @if ($isSavedRepeatShift)
-                                <div class="d-flex align-items-center mb-3 text-primary" style="font-size: 0.875rem;">
+                                <div class="d-flex align-items-center mb-3 text-primary"
+                                     style="font-size: 0.875rem;">
                                     <a class="text-primary small">
                                         <i class="fas fa-globe me-2"></i> Europe/London
                                     </a>
@@ -737,16 +785,20 @@
                             <div class="row align-items-md-center g-2 mb-3 shift-form-row">
                                 <!-- Label -->
                                 <div class="col-12 col-md-3">
-                                    <label for="shiftTitleInput" class="fw-semibold mb-1 mb-md-0">
+                                    <label for="shiftTitleInput"
+                                           class="fw-semibold mb-1 mb-md-0">
                                         Shift Title <span class="text-danger">*</span>
                                     </label>
                                 </div>
 
                                 <!-- Input -->
                                 <div class="col-12 col-md-9">
-                                    <input type="text" id="shiftTitleInput" wire:model.defer="newShift.title"
-                                        class="form-control form-control-sm" placeholder="Enter shift title…"
-                                        required>
+                                    <input type="text"
+                                           id="shiftTitleInput"
+                                           wire:model.defer="newShift.title"
+                                           class="form-control form-control-sm"
+                                           placeholder="Enter shift title…"
+                                           required>
 
                                     @error('newShift.title')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -770,13 +822,16 @@
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
 
                                         <!-- Job input -->
-                                        <input type="text" class="form-control form-control-sm"
-                                            wire:model.defer="newShift.job" placeholder="Enter job…">
+                                        <input type="text"
+                                               class="form-control form-control-sm"
+                                               wire:model.defer="newShift.job"
+                                               placeholder="Enter job…">
 
                                         <!-- Color picker -->
-                                        <input type="color" wire:model="newShift.color"
-                                            class="form-control form-control-color border-0 p-0"
-                                            style="width: 38px; height: 31px;">
+                                        <input type="color"
+                                               wire:model="newShift.color"
+                                               class="form-control form-control-color border-0 p-0"
+                                               style="width: 38px; height: 31px;">
 
                                     </div>
 
@@ -802,8 +857,10 @@
 
                                 <!-- Input -->
                                 <div class="col-12 col-md-9">
-                                    <input type="text" wire:model.defer="newShift.address"
-                                        class="form-control form-control-sm" placeholder="Enter address…">
+                                    <input type="text"
+                                           wire:model.defer="newShift.address"
+                                           class="form-control form-control-sm"
+                                           placeholder="Enter address…">
 
                                     @error('newShift.address')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -819,8 +876,26 @@
                                 </div>
                                 <div class="col-9">
 
-                                    <textarea wire:model.defer="newShift.note" class="form-control form-control-sm" rows="3"                      
-                                                  placeholder="Add a note…"></textarea>
+                                    <textarea wire:model.defer="newShift.note"
+                                              class="form-control form-control-sm"
+                                              rows="3"
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                              placeholder="Add a note…"></textarea>
 
                                     @error('newShift.note')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -837,7 +912,8 @@
 
                     {{-- TEMPLATES --}}
 
-                    <div class="tab-pane fade {{ $isShiftTempTab ? 'show active' : '' }}" id="shift-templates">
+                    <div class="tab-pane fade {{ $isShiftTempTab ? 'show active' : '' }}"
+                         id="shift-templates">
                         <div class="mb-4">
 
                             @if (count($templates) > 0)
@@ -852,13 +928,14 @@
                             @forelse($templates as $template)
                                 <div class="col-12 col-md-6">
                                     <div class="card border-0 shadow-lg position-relative text-white"
-                                        style="background-color: #001f3f; width: 100%; min-height: 280px; border-radius: 12px;">
+                                         style="background-color: #001f3f; width: 100%; min-height: 280px; border-radius: 12px;">
 
                                         {{-- Delete Icon --}}
-                                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-                                            wire:click="deleteTemplate({{ $template->id }})"
-                                            style="border-radius: 50%; width: 10px; height: 32px;">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 d-flex justify-content-center align-items-center"
+                                                wire:click="deleteTemplate({{ $template->id }})"
+                                                style="border-radius: 50%; width: 28px; height: 28px; padding: 0;">
+                                            <i class="fas fa-trash-alt"
+                                               style="font-size: 0.8rem;"></i>
                                         </button>
 
                                         <div class="card-body d-flex flex-column p-4">
@@ -866,14 +943,15 @@
                                             <div class="mb-3">
                                                 <h5 class="fw-bold mb-2 text-white">{{ $template->title }}</h5>
                                                 <span class="badge"
-                                                    style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;">
+                                                      style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;">
                                                     {{ $template->job ?? 'Standard Shift' }}
                                                 </span>
                                             </div>
 
                                             <div class="flex-grow-1">
                                                 <div class="d-flex align-items-center mb-2">
-                                                    <i class="far fa-clock text-info me-3" style="width: 16px;"></i>
+                                                    <i class="far fa-clock text-info me-3"
+                                                       style="width: 16px;"></i>
                                                     <div class="small">
                                                         <span class="d-block fw-bold">
                                                             {{ \Carbon\Carbon::parse($template->start_time)->format('h:i A') }}
@@ -887,15 +965,16 @@
                                                 @if ($template->address)
                                                     <div class="d-flex align-items-start mb-2">
                                                         <i class="fas fa-map-marker-alt text-warning me-3 mt-1"
-                                                            style="width: 16px;"></i>
+                                                           style="width: 16px;"></i>
                                                         <span class="small">{{ $template->address }}</span>
                                                     </div>
                                                 @endif
 
                                                 <div class="d-flex align-items-center mt-3">
                                                     <i class="far fa-calendar-alt text-light me-3"
-                                                        style="width: 16px;"></i>
-                                                    <span class="small" style="font-size: 0.8rem;">
+                                                       style="width: 16px;"></i>
+                                                    <span class="small"
+                                                          style="font-size: 0.8rem;">
                                                         {{ $template->created_at->format('d M Y') }}
                                                     </span>
                                                 </div>
@@ -903,8 +982,8 @@
 
                                             <div class="mt-4">
                                                 <button class="btn btn-light w-100 py-2 fw-bold shadow-sm"
-                                                    wire:click="applyTemplate({{ $template->id }})"
-                                                    style="border-radius: 8px; font-size: 0.9rem;">
+                                                        wire:click="applyTemplate({{ $template->id }})"
+                                                        style="border-radius: 8px; font-size: 0.9rem;">
                                                     <i class="fas fa-plus-circle me-2"></i> Use Template
                                                 </button>
                                             </div>
@@ -930,39 +1009,51 @@
                 @if ($isShiftTempTab == false)
                     <div class="shift-panel-footer d-flex align-items-center px-4 py-3 border-top bg-white">
                         <!-- Normal state -->
-                        <button class="btn btn-primary" wire:click="publishShift" wire:loading.attr="disabled"
-                            wire:target="publishShift">
+                        <button class="btn btn-primary"
+                                wire:click="publishShift"
+                                wire:loading.attr="disabled"
+                                wire:target="publishShift">
 
                             <!-- Normal content -->
-                            <span wire:loading.remove wire:target="publishShift">
+                            <span wire:loading.remove
+                                  wire:target="publishShift">
                                 <i class="fas fa-upload me-2"></i> Publish
                             </span>
 
                             <!-- Loading content -->
-                            <span wire:loading wire:target="publishShift">
-                                <span class="spinner-border spinner-border-sm me-2" role="status"
-                                    aria-hidden="true"></span>
+                            <span wire:loading
+                                  wire:target="publishShift">
+                                <span class="spinner-border spinner-border-sm me-2"
+                                      role="status"
+                                      aria-hidden="true"></span>
                                 Publishing...
                             </span>
                         </button>
 
 
 
+
                         <div class="d-flex gap-2 ms-auto">
-                            <div class="d-flex gap-2 ms-auto">
-                                <button class="btn btn-light" wire:click="saveAsTemplate"
-                                    wire:loading.attr="disabled" wire:target="saveAsTemplate"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Save as template">
-                                    <span wire:loading.remove wire:target="saveAsTemplate">
-                                        <i class="far fa-clone"></i>
-                                    </span>
-                                    <span wire:loading wire:target="saveAsTemplate">
-                                        <span class="spinner-border spinner-border-sm" role="status"
-                                            aria-hidden="true"></span>
-                                        Saving...
-                                    </span>
-                                </button>
-                            </div>
+                            <button class="btn btn-light btn-sm"
+                                    wire:click="saveAsTemplate"
+                                    wire:loading.attr="disabled"
+                                    wire:target="saveAsTemplate"
+                                    data-bs-toggle="tooltip"
+                                    title="Save as template">
+
+                                <span wire:loading.remove
+                                      wire:target="saveAsTemplate">
+                                    <i class="far fa-clone me-1"></i> Save as Template
+                                </span>
+
+                                <span wire:loading
+                                      wire:target="saveAsTemplate">
+                                    <span class="spinner-border spinner-border-sm"
+                                          role="status"
+                                          aria-hidden="true"></span>
+                                    Saving...
+                                </span>
+                            </button>
                         </div>
                     </div>
                 @endif

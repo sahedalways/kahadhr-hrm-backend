@@ -67,7 +67,7 @@ class ScheduleIndex extends BaseComponent
 
         $today = Carbon::today();
 
-        $this->calendarShifts = ShiftDate::whereDate('date', $today)
+        $this->calendarShifts = ShiftDate::whereBetween('date', [$this->startDate, $this->endDate])
             ->whereHas('employees', fn($q) => $q->where('user_id', $user->id))
             ->whereHas('shift', fn($q) => $q->where('company_id', $this->company_id))
             ->with([
@@ -146,27 +146,23 @@ class ScheduleIndex extends BaseComponent
     public function getWeekDaysProperty()
     {
         $days = [];
-        $current = $this->startDate->copy();
-        $end = $this->endDate->copy();
 
-        $maxIterations = $this->viewMode === 'monthly' ? $this->startDate->daysInMonth : 7;
-        $count = 0;
+        if ($this->viewMode === 'weekly') {
+            $monday = $this->startDate->copy()->startOfWeek(Carbon::MONDAY);
 
-        while ($current->lte($end) && $count < $maxIterations) {
-            $days[] = [
-                'full_date' => $current->format('Y-m-d'),
-
-                'day' => $this->viewMode === 'weekly' ? $current->format('D') : $current->format('j'),
-                'date' => $current->format('d/m'),
-                'highlight' => $current->equalTo($this->currentDate->copy()->startOfDay()),
-            ];
-            $current->addDay();
-            $count++;
+            for ($i = 0; $i < 7; $i++) {
+                $day = $monday->copy()->addDays($i);
+                $days[] = [
+                    'full_date' => $day->format('Y-m-d'),
+                    'day'       => $day->format('D'),
+                    'date'      => $day->format('d/m'),
+                    'highlight' => $day->equalTo($this->currentDate->copy()->startOfDay()),
+                ];
+            }
         }
 
         return $days;
     }
-
 
     public function getDisplayDateRangeProperty()
     {

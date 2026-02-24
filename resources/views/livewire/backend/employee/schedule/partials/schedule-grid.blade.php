@@ -26,11 +26,14 @@
             <tbody>
                 {{-- ---------- MONTHLY MODE ---------- --}}
                 @if ($viewMode === 'monthly')
-                    @php
-                        $dateInMonth = \Carbon\Carbon::parse($weekDays[0]['full_date']);
-                        $startOfMonth = $dateInMonth->copy()->startOfMonth();
-                        $endOfMonth = $dateInMonth->copy()->endOfMonth();
 
+                    @php
+
+                        $dateInMonth = $this->startDate ?? \Carbon\Carbon::now();
+                        $startOfMonth = \Carbon\Carbon::parse($dateInMonth)->startOfMonth();
+                        $endOfMonth = \Carbon\Carbon::parse($dateInMonth)->endOfMonth();
+
+                        // Always start calendar from Monday
                         $calendarStart = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
                         $calendarEnd = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
 
@@ -40,12 +43,16 @@
                             $dates[] = $current->copy();
                             $current->addDay();
                         }
+
                         $weeks = array_chunk($dates, 7);
                     @endphp
 
+
                     <tr>
-                        <td colspan="7" class="p-0 border-0">
-                            <table class="table table-bordered text-center mb-0" style="table-layout:fixed;width:100%;">
+                        <td colspan="7"
+                            class="p-0 border-0">
+                            <table class="table table-bordered text-center mb-0"
+                                   style="table-layout:fixed;width:100%;">
                                 <thead>
                                     <tr>
                                         <th>Monday</th>
@@ -67,12 +74,13 @@
                                                 @endphp
                                                 <td class="schedule-cell month-cell {{ $day->equalTo(\Carbon\Carbon::today()) ? 'bg-primary-light-cell' : '' }}"
                                                     style="position:relative;height:80px;width:14.285%;"
-                                                    x-data="{ hover: false }" @mouseenter="hover=true"
+                                                    x-data="{ hover: false }"
+                                                    @mouseenter="hover=true"
                                                     @mouseleave="hover=false">
 
                                                     @if ($isInCurrentMonth)
                                                         <div class="small text-end p-1 text-dark {{ $day->equalTo(\Carbon\Carbon::today()) ? 'fw-bold' : '' }}"
-                                                            style="font-size:0.85rem;">
+                                                             style="font-size:0.85rem;">
                                                             {{ $day->day }}
                                                         </div>
 
@@ -84,9 +92,12 @@
                                                         @if ($hasShift)
                                                             @foreach ($this->calendarShifts[$dateKey] as $shift)
                                                                 @php $modalId = 'shiftDetailsModal-'.$shift['id']; @endphp
-                                                                <div  style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;" class="position-relative">
-                                                                    <div class=" shift-block text-white rounded px-1 py-0 mb-1 mx-auto"
-                                                                       >
+                                                                <div style="background-color:{{ $shift['shift']['color'] }};font-size:11px;cursor:pointer;max-width:90%;"
+                                                                     class="position-relative"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#{{ $modalId }}">
+                                                                    <div
+                                                                         class=" shift-block text-white rounded px-1 py-0 mb-1 mx-auto">
                                                                         <div class="fw-semibold text-truncate">
                                                                             {{ $shift['shift']['title'] }}
                                                                         </div>
@@ -97,47 +108,29 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="dropdown shift-dropdown">
-                                                                        <button
-                                                                            class="btn btn-xs btn-link text-white p-0"
-                                                                            data-bs-toggle="dropdown"
-                                                                            aria-expanded="false">
-                                                                            <i class="fa-solid fa-bars"></i>
-                                                                        </button>
-                                                                        <ul
-                                                                            class="dropdown-menu dropdown-menu-end shadow-sm dropdown-schedule-cell">
-                                                                            <li>
-                                                                                <button class="dropdown-item"
-                                                                                    type="button"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#{{ $modalId }}">
-                                                                                    <i class="fa-solid fa-bars"></i>
-                                                                                    View
-                                                                                </button>
-                                                                            </li>
-                                                                            <li>
-                                                                                <hr class="dropdown-divider">
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
+
                                                                 </div>
 
                                                                 {{-- Modal --}}
-                                                                <div class="modal fade" id="{{ $modalId }}"
-                                                                    tabindex="-1" aria-hidden="true" wire:ignore.self
-                                                                    data-bs-backdrop="static" data-bs-keyboard="false">
+                                                                <div class="modal fade"
+                                                                     id="{{ $modalId }}"
+                                                                     tabindex="-1"
+                                                                     aria-hidden="true"
+                                                                     wire:ignore.self
+                                                                     data-bs-backdrop="static"
+                                                                     data-bs-keyboard="false">
                                                                     <div
-                                                                        class="modal-dialog modal-dialog-centered modal-lg">
+                                                                         class="modal-dialog modal-dialog-centered modal-lg">
                                                                         <div class="modal-content">
                                                                             <div
-                                                                                class="modal-header bg-primary text-white">
+                                                                                 class="modal-header bg-primary text-white">
                                                                                 <h5 class="modal-title text-white">
                                                                                     {{ $shift['shift']['title'] ?? '-' }}
                                                                                 </h5>
                                                                                 <button type="button"
-                                                                                    class="btn-close btn-close-white"
-                                                                                    data-bs-dismiss="modal"
-                                                                                    aria-label="Close"></button>
+                                                                                        class="btn-close btn-close-white"
+                                                                                        data-bs-dismiss="modal"
+                                                                                        aria-label="Close"></button>
                                                                             </div>
                                                                             <div class="modal-body">
                                                                                 <div class="row mb-2">
@@ -153,27 +146,10 @@
                                                                                     </div>
                                                                                 </div>
 
-                                                                                @if (!empty($shift['employees']))
-                                                                                    @php
-
-                                                                                        $employees = collect(
-                                                                                            $shift['employees'],
-                                                                                        )
-                                                                                            ->where(
-                                                                                                'id',
-                                                                                                $employee['id'],
-                                                                                            )
-                                                                                            ->pluck('name')
-                                                                                            ->toArray();
-                                                                                    @endphp
-
-                                                                                    @if ($employees)
-                                                                                        <div class="mb-2 mt-2">
-                                                                                            <strong>Employee:</strong>
-                                                                                            {{ $employees[0] }}
-                                                                                        </div>
-                                                                                    @endif
-                                                                                @endif
+                                                                                <div class="mb-2 mt-2">
+                                                                                    <strong>Employee:</strong>
+                                                                                    {{ auth()->user()->employee->full_name }}
+                                                                                </div>
 
                                                                                 @if (!empty($shift['shift']['note']))
                                                                                     <div class="mb-2">
@@ -186,7 +162,7 @@
                                                                                     <div class="mb-2">
                                                                                         <strong>Breaks:</strong>
                                                                                         <table
-                                                                                            class="table table-sm table-bordered mt-1">
+                                                                                               class="table table-sm table-bordered mt-1">
                                                                                             <thead>
                                                                                                 <tr>
                                                                                                     <th>Title</th>
@@ -202,7 +178,7 @@
                                                                                                         </td>
                                                                                                         <td>
                                                                                                             <span
-                                                                                                                class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
+                                                                                                                  class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
                                                                                                                 {{ $break['type'] }}
                                                                                                             </span>
                                                                                                         </td>
@@ -217,8 +193,8 @@
                                                                             </div>
                                                                             <div class="modal-footer">
                                                                                 <button type="button"
-                                                                                    class="btn btn-secondary"
-                                                                                    data-bs-dismiss="modal">Close</button>
+                                                                                        class="btn btn-secondary"
+                                                                                        data-bs-dismiss="modal">Close</button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -237,160 +213,154 @@
 
                     {{-- ---------- WEEKLY MODE BODY ---------- --}}
                 @else
-                    @foreach ($employees as $employee)
-                        <tr>
-                            @foreach ($weekDays as $day)
-                                @php
-                                    $content = $this->getCellContent($employee['id'], $day['full_date']);
+                    @php
+                        $employee = auth()->user()->employee;
+                    @endphp
+                    <tr>
+                        @foreach ($weekDays as $day)
+                            @php
+                                $content = $this->getCellContent($employee['id'], $day['full_date']);
 
-                                    $onLeave = hasLeave($employee['id'], $day['full_date']);
-                                @endphp
-                                <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
-                                    style="position:relative;">
+                                $onLeave = hasLeave($employee['id'], $day['full_date']);
+                            @endphp
+                            <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
+                                style="position:relative;">
 
-                                    @if ($onLeave)
-                                        <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
-                                            style="background-color:#f8d7da;opacity:0.7;border-radius:4px;pointer-events:none;">
-                                            <span class="text-danger small fw-bold px-2">Unavailable</span>
+                                @if ($onLeave)
+                                    <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
+                                         style="background-color:#f8d7da;opacity:0.7;border-radius:4px;pointer-events:none;">
+                                        <span class="text-danger small fw-bold px-2">Unavailable</span>
+                                    </div>
+                                @elseif ($content && $content['type'] === 'Shift')
+                                    @php $modalId = 'shiftDetailsModal-'.$employee['id'].'-'.\Str::slug($content['title']); @endphp
+                                    <div class="shift-block text-white rounded position-relative shadow-sm p-3"
+                                         style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s ease-in-out;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#{{ $modalId }}">
+                                        <div class="small fw-bold text-truncate">
+                                            {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
                                         </div>
-                                    @elseif ($content && $content['type'] === 'Shift')
-                                        @php $modalId = 'shiftDetailsModal-'.$employee['id'].'-'.\Str::slug($content['title']); @endphp
-                                        <div class="shift-block text-white rounded position-relative shadow-sm p-3"
-                                            style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s ease-in-out;">
-                                            <div class="small fw-bold text-truncate">
-                                                {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
-                                            </div>
-                                            <div class="smaller opacity-75">{{ $content['time'] }}</div>
+                                        <div class="smaller opacity-75">{{ $content['time'] }}</div>
+                                    </div>
 
-                                            <div class="shift-dropdown position-absolute" style="top:0; right:6px;">
-                                                <button type="button"
-                                                    class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
-                                                    <i class="fa-solid fa-bars"></i>
-                                                </button>
-                                                <ul class="dropdown-schedule-celll d-none">
-                                                    <li>
-                                                        <button class="dropdown-item" type="button"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#{{ $modalId }}">
-                                                            <i class="fas fa-eye fa-fw me-1"></i> View
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                        {{-- Modal --}}
-                                        <div class="modal fade" id="{{ $modalId }}" tabindex="-1"
-                                            aria-hidden="true" wire:ignore.self data-bs-backdrop="static"
-                                            data-bs-keyboard="false">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title text-white mb-0">
-                                                            <i class="fas fa-calendar-check me-2"></i>
-                                                            {{ $content['title'] ?? 'Shift Details' }}
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white"
-                                                            data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row mb-3">
-                                                            <div class="col-sm-6">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i class="fas fa-clock text-primary me-2"></i>
-                                                                    <strong>Time:</strong>
-                                                                    <span
-                                                                        class="ms-1">{{ $content['time'] ?? '-' }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i
-                                                                        class="fas fa-map-marker-alt text-primary me-2"></i>
-                                                                    <strong>Address:</strong>
-                                                                    <span
-                                                                        class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
-                                                                </div>
+                                    {{-- Modal --}}
+                                    <div class="modal fade"
+                                         id="{{ $modalId }}"
+                                         tabindex="-1"
+                                         aria-hidden="true"
+                                         wire:ignore.self
+                                         data-bs-backdrop="static"
+                                         data-bs-keyboard="false">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white mb-0">
+                                                        <i class="fas fa-calendar-check me-2"></i>
+                                                        {{ $content['title'] ?? 'Shift Details' }}
+                                                    </h5>
+                                                    <button type="button"
+                                                            class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row mb-3">
+                                                        <div class="col-sm-6">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                                <strong>Time:</strong>
+                                                                <span
+                                                                      class="ms-1">{{ $content['time'] ?? '-' }}</span>
                                                             </div>
                                                         </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                                                <strong>Address:</strong>
+                                                                <span
+                                                                      class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                                        @if (!empty($content['employees']))
-                                                            @php
-                                                                // keep only the row owner
-                                                                $employees = collect($content['employees'])
-                                                                    ->where('id', $employee['id'])
-                                                                    ->pluck('name')
-                                                                    ->toArray();
-                                                            @endphp
+                                                    @if (!empty($content['employees']))
+                                                        @php
+                                                            // keep only the row owner
+                                                            $employees = collect($content['employees'])
+                                                                ->where('id', $employee['id'])
+                                                                ->pluck('name')
+                                                                ->toArray();
+                                                        @endphp
 
-                                                            @if ($employees)
-                                                                <div class="d-flex align-items-center mb-3">
-                                                                    <i class="fas fa-users text-success me-2"></i>
-                                                                    <strong>Employee:</strong>
-                                                                    <span class="ms-1">{{ $employees[0] }}</span>
-                                                                </div>
-                                                            @endif
-                                                        @endif
-
-                                                        @if (!empty($content['shift']['note']))
-                                                            <div class="d-flex align-items-start mb-3">
-                                                                <i class="fas fa-sticky-note text-info me-2 mt-1"></i>
-                                                                <div>
-                                                                    <strong>Note:</strong>
-                                                                    <p class="mb-0">{{ $content['shift']['note'] }}
-                                                                    </p>
-                                                                </div>
+                                                        @if ($employees)
+                                                            <div class="d-flex align-items-center mb-3">
+                                                                <i class="fas fa-users text-success me-2"></i>
+                                                                <strong>Employee:</strong>
+                                                                <span class="ms-1">{{ $employees[0] }}</span>
                                                             </div>
                                                         @endif
+                                                    @endif
 
-                                                        @if (!empty($content['breaks']))
-                                                            <div class="mb-0">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i class="fas fa-coffee text-warning me-2"></i>
-                                                                    <strong>Breaks:</strong>
-                                                                </div>
-                                                                <div class="table-responsive">
-                                                                    <table class="table table-sm table-bordered mb-0">
-                                                                        <thead class="table-light">
+                                                    @if (!empty($content['shift']['note']))
+                                                        <div class="d-flex align-items-start mb-3">
+                                                            <i class="fas fa-sticky-note text-info me-2 mt-1"></i>
+                                                            <div>
+                                                                <strong>Note:</strong>
+                                                                <p class="mb-0">{{ $content['shift']['note'] }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if (!empty($content['breaks']))
+                                                        <div class="mb-0">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-coffee text-warning me-2"></i>
+                                                                <strong>Breaks:</strong>
+                                                            </div>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm table-bordered mb-0">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th>Title</th>
+                                                                            <th>Type</th>
+                                                                            <th>Duration (hr)</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($content['breaks'] as $break)
                                                                             <tr>
-                                                                                <th>Title</th>
-                                                                                <th>Type</th>
-                                                                                <th>Duration (hr)</th>
+                                                                                <td>{{ $break['title'] }}</td>
+                                                                                <td>
+                                                                                    <span
+                                                                                          class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
+                                                                                        {{ $break['type'] }}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td>{{ $break['duration'] }}</td>
                                                                             </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            @foreach ($content['breaks'] as $break)
-                                                                                <tr>
-                                                                                    <td>{{ $break['title'] }}</td>
-                                                                                    <td>
-                                                                                        <span
-                                                                                            class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
-                                                                                            {{ $break['type'] }}
-                                                                                        </span>
-                                                                                    </td>
-                                                                                    <td>{{ $break['duration'] }}</td>
-                                                                                </tr>
-                                                                            @endforeach
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
-                                                        @endif
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button"
+                                                            class="btn btn-secondary"
                                                             data-bs-dismiss="modal">
-                                                            <i class="fas fa-times me-1"></i> Close
-                                                        </button>
-                                                    </div>
+                                                        <i class="fas fa-times me-1"></i> Close
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
-                                </td>
-                            @endforeach
-                        </tr>
-                    @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+
                 @endif
             </tbody>
         </table>

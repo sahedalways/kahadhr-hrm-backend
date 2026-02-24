@@ -676,7 +676,8 @@
                                         @if ($msg->attachment_type === 'image' || $msg->attachment_type === 'gif')
                                             <img src="{{ $msg->attachment_url }}"
                                                  style="max-width:200px;"
-                                                 class="rounded">
+                                                 class="rounded clickable-image cursor-pointer"
+                                                 data-src="{{ $msg->attachment_url ?? asset('assets/default-image.jpg') }}">
                                         @elseif($msg->attachment_type === 'video')
                                             <video controls
                                                    style="max-width:200px;">
@@ -1958,7 +1959,8 @@
                                         @if ($msg->attachment_type === 'image' || $msg->attachment_type === 'gif')
                                             <img src="{{ $msg->attachment_url }}"
                                                  style="max-width:200px;"
-                                                 class="rounded">
+                                                 class="rounded clickable-image cursor-pointer"
+                                                 data-src="{{ $msg->attachment_url ?? asset('assets/default-image.jpg') }}">
                                         @elseif($msg->attachment_type === 'video')
                                             <video controls
                                                    style="max-width:200px;">

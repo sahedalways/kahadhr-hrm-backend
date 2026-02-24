@@ -109,7 +109,8 @@
                                                                 </div>
 
 
-                                                                <div class="dropdown shift-dropdown">
+                                                                <div class="dropdown shift-dropdown position-absolute"
+                                                                     style="top: 0; right: 7px; z-index: 1050;">
                                                                     <button class="btn btn-xs btn-link text-white p-0"
                                                                             data-bs-toggle="dropdown"
                                                                             aria-expanded="false">

@@ -175,14 +175,11 @@ class CompanyTimesheet extends BaseComponent
             }
 
 
-            if (strtolower($att->status) === 'approved') {
-                $hours = 8;
-                $minutes = 0;
-            } else {
-                $actualWorkedMinutes = max($workedMinutes - $totalBreakMinutes, 0);
-                $hours = floor($actualWorkedMinutes / 60);
-                $minutes = $actualWorkedMinutes % 60;
-            }
+
+            $actualWorkedMinutes = max($workedMinutes - $totalBreakMinutes, 0);
+            $hours = floor($actualWorkedMinutes / 60);
+            $minutes = $actualWorkedMinutes % 60;
+
 
             $breakHours = floor($totalBreakMinutes / 60);
             $breakMinutes = $totalBreakMinutes % 60;

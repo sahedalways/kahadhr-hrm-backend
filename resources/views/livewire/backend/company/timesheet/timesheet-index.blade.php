@@ -136,99 +136,32 @@
                     Pending Requests ({{ $records->sum(fn($r) => $r->requests->where('status', 'pending')->count()) }})
                 </h3>
 
-
-
                 @foreach ($records as $record)
                     @php
-                        $pendingRequests = $record->requests
-                            ->where('status', 'pending')
-                            ->sortByDesc(fn($r) => $r->id == $highlightId);
+                        $pendingRequests = $record->requests->where('status', 'pending');
                     @endphp
 
                     @foreach ($pendingRequests as $req)
-                        @php
-                            $location =
-                                $req->type === 'late_clock_in'
-                                    ? $record->clock_in_location
-                                    : $record->clock_out_location;
+                        <div class="request-item mb-2 d-flex justify-content-between align-items-center p-3 border"
+                             wire:click="viewRequest({{ $req->id }})"
+                             style="
+                    cursor: pointer;
+                    border-radius: 8px;
+                    background: {{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }};
+                    transition: all 0.3s ease;
+                 "
+                             onmouseover="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff20' }}'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"
+                             onmouseout="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }}'; this.style.boxShadow='none';">
 
-                            $isHighlighted = $req->id == $highlightId;
-                        @endphp
-
-                        <div
-                             class="request-item mb-2 border-bottom pb-2 gap-4
-            {{ $isHighlighted ? 'bg-warning-subtle border-warning rounded-2 p-2' : '' }}">
-
-                            {{-- Header --}}
-                            <div class="request-info d-flex justify-content-between align-items-center"
-                                 wire:click="toggleReason({{ $req->id }})"
-                                 style="cursor: pointer;">
-                                <div>
-                                    <p class="mb-0 request-name">
-                                        {{ $record->user->full_name }}
-                                        ({{ \Carbon\Carbon::parse($record->clock_in)->format('h:i A') }})
-                                    </p>
-
-                                    <small class="text-muted d-block">
-                                        {{ ucfirst(str_replace('_', ' ', $req->type)) }} Request -
-                                        <b class="text-warning">Pending</b>
-                                    </small>
-
-                                    @if ($location)
-                                        <small class="text-info d-block">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            {{ $location }}
-                                        </small>
-                                    @endif
-                                </div>
-
-                                <div class="toggle-icon">
-                                    <i class="fas"
-                                       :class="{ 'fa-chevron-down': {{ $expandedRequest === $req->id ? 'true' : 'false' }}, 'fa-chevron-right': {{ $expandedRequest === $req->id ? 'false' : 'true' }} }"></i>
-                                </div>
+                            <div>
+                                <p class="mb-1 fw-bold text-white">{{ $record->user->full_name }}</p>
+                                <small class="text-light">
+                                    {{ ucfirst(str_replace('_', ' ', $req->type)) }} - Pending
+                                </small>
                             </div>
 
-                            {{-- Actions --}}
-                            <div class="request-actions mt-2">
-                                <button class="btn btn-sm action-btn approve-btn"
-                                        wire:click="approveRequest({{ $req->id }})"
-                                        onclick="return confirm('Are you sure you want to approve this request?')"
-                                        wire:loading.attr="disabled"
-                                        wire:target="approveRequest({{ $req->id }})">
-                                    <span wire:loading
-                                          wire:target="approveRequest({{ $req->id }})">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
-                                    <span wire:loading.remove
-                                          wire:target="approveRequest({{ $req->id }})">
-                                        <i class="fas fa-check"></i>
-                                    </span>
-                                </button>
-
-                                <button class="btn btn-sm action-btn reject-btn"
-                                        wire:click="rejectRequest({{ $req->id }})"
-                                        onclick="return confirm('Are you sure you want to reject this request?')"
-                                        wire:loading.attr="disabled"
-                                        wire:target="rejectRequest({{ $req->id }})">
-                                    <span wire:loading
-                                          wire:target="rejectRequest({{ $req->id }})">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
-                                    <span wire:loading.remove
-                                          wire:target="rejectRequest({{ $req->id }})">
-                                        <i class="fas fa-times"></i>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Reason --}}
-                        <div class="request-reason mt-2 transition-all duration-300 overflow-hidden"
-                             style="max-height: {{ $expandedRequest === $req->id ? '200px' : '0' }}">
-                            <div class="card">
-                                <div class="card-body py-2 px-3">
-                                    <small class="d-block fw-bold">Reason: {{ $req->reason }}</small>
-                                </div>
+                            <div>
+                                <i class="fas fa-eye text-primary fs-5"></i>
                             </div>
                         </div>
                     @endforeach
@@ -304,53 +237,60 @@
 
                                                 {{-- Date number --}}
                                                 <span class="date-number fw-bold">{{ $day->day }}</span>
-
                                                 @php
                                                     $isCurrentMonth = $day->month === $this->startDate->month;
                                                     $isPastOrToday = $day->lessThanOrEqualTo(today());
 
-                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
-                                                    $attendanceUsers = collect(
-                                                        $this->attendanceCalendar[$dateKey] ?? [],
-                                                    )
-                                                        ->pluck('user_id')
-                                                        ->unique();
+                                                    $attendances = collect($this->attendanceCalendar[$dateKey] ?? []);
+                                                    $totalAtt = $attendances->count();
+                                                    $visibleAtt = $attendances->take(2); // সর্বোচ্চ ২ টা দেখাবে
+                                                    $moreCount = $totalAtt - 2;
 
-                                                    // Employees who had shift but no attendance
-                                                    $absentUsers = collect($shiftEmployees)
-                                                        ->diff($attendanceUsers)
-                                                        ->map(
-                                                            fn($id) => optional($this->employees->firstWhere('id', $id))
-                                                                ->full_name ?? 'Unknown',
-                                                        );
+                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
+                                                    $attendanceUserIds = $attendances->pluck('user_id')->unique();
+                                                    $absentCount = collect($shiftEmployees)
+                                                        ->diff($attendanceUserIds)
+                                                        ->count();
                                                 @endphp
 
-                                                {{-- Attendance blocks --}}
-                                                @if ($isCurrentMonth && !empty($this->attendanceCalendar[$dateKey]))
-                                                    @foreach ($this->attendanceCalendar[$dateKey] as $att)
-                                                        @include(
-                                                            'livewire.backend.company.timesheet.partials._attendance-block',
-                                                            ['att' => $att]
-                                                        )
-                                                    @endforeach
+                                                {{-- Attendance Section --}}
+                                                @if ($isCurrentMonth && $totalAtt > 0)
+                                                    <div class="d-flex flex-column gap-1">
+                                                        @foreach ($visibleAtt as $att)
+                                                            <div class="attendance-wrapper"
+                                                                 style="transform: scale(0.95); margin-left: -5px; margin-right: -5px;">
+                                                                @include(
+                                                                    'livewire.backend.company.timesheet.partials._attendance-block',
+                                                                    ['att' => $att]
+                                                                )
+                                                            </div>
+                                                        @endforeach
+
+
+
+                                                        {{-- More Indicator --}}
+                                                        @if ($moreCount > 0)
+                                                            <div class="text-center py-1 rounded"
+                                                                 style="font-size: 10px; cursor: pointer; background: #f8f9fa; color: #007bff; border: 1px dashed #007bff; font-weight: 600;"
+                                                                 wire:click="openAttendanceMoreModal('{{ $dateKey }}')">
+                                                                +{{ $moreCount }} others
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 @endif
 
+
                                                 {{-- Absent indicator --}}
-                                                @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
-                                                    @if ($isCurrentMonth && $isPastOrToday && $absentUsers->isNotEmpty())
-                                                        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-1"
-                                                             style="width:80%; cursor:pointer;"
+                                                @if ($isCurrentMonth && $isPastOrToday && $absentCount > 0)
+                                                    <div class="position-absolute bottom-0 start-0 w-100 px-1 pb-1">
+                                                        <div class="badge bg-danger d-flex align-items-center justify-content-center gap-1 w-100 shadow-sm"
+                                                             style="font-size: 10px; height: 22px; cursor: pointer; border-radius: 4px;"
                                                              wire:click="showAbsentDetails('{{ $dateKey }}')">
-
-                                                            {{-- Absent count badge --}}
-                                                            <span
-                                                                  class="badge bg-danger d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill small shadow-sm w-100 text-center">
-                                                                <i class="fas fa-user-times"></i>
-                                                                {{ $absentUsers->count() }} Absent
-                                                            </span>
-
+                                                            <i class="fas fa-user-times"
+                                                               style="font-size: 9px;"></i>
+                                                            <span>{{ $absentCount }} Absent</span>
                                                         </div>
-                                                    @endif
+                                                    </div>
                                                 @endif
 
 
@@ -366,7 +306,7 @@
                 @else
                     <div class="d-flex">
 
-                        {{-- sidebar --}}
+
                         <div class="mt-n3">
                             <div class="schedule-sidebar p-2 border-end"
                                  style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
@@ -495,7 +435,10 @@
     <div wire:ignore.self
          class="modal fade"
          id="attendanceDetailModal"
-         tabindex="-1">
+         tabindex="-1"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content shadow-lg border-0 rounded-4">
 
@@ -632,42 +575,98 @@
 
                         {{-- Time Info --}}
                         <div class="row text-center mb-3">
+
                             <div class="col-6">
-                                <div class="border rounded-3 p-2">
-                                    <small class="text-muted d-block">Clock In</small>
-                                    <span class="fw-bold">
-                                        {{ \Carbon\Carbon::parse($selectedAttendance->clock_in)->format('h:i A') }}
-                                    </span>
+                                <div
+                                     class="border rounded-3 p-2 d-flex align-items-center justify-content-center gap-1">
+                                    <div class="flex-grow-1 text-start">
+                                        <small class="text-muted d-block">Clock In</small>
+
+                                        @if ($editingClockIn)
+                                            <input type="time"
+                                                   class="form-control form-control-sm"
+                                                   wire:model.defer="clockInTime"
+                                                   wire:change="updateClockIn">
+                                        @else
+                                            <span class="fw-bold">
+                                                {{ \Carbon\Carbon::parse($clockInTime)->format('h:i A') }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Small edit icon with tooltip --}}
+                                    <button class="btn btn-sm btn-outline-secondary p-1"
+                                            wire:click="toggleClockInEdit"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Edit Clock In Time">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </button>
                                 </div>
                             </div>
+
+                            {{-- Clock Out --}}
                             <div class="col-6">
-                                <div class="border rounded-3 p-2">
-                                    <small class="text-muted d-block">Clock Out</small>
-                                    <span class="fw-bold">
-                                        {{ $selectedAttendance->clock_out
-                                            ? \Carbon\Carbon::parse($selectedAttendance->clock_out)->format('h:i A')
-                                            : '---' }}
-                                    </span>
+                                <div
+                                     class="border rounded-3 p-2 d-flex align-items-center justify-content-center gap-1">
+                                    <div class="flex-grow-1 text-start">
+                                        <small class="text-muted d-block">Clock Out</small>
+
+                                        @if ($editingClockOut)
+                                            <input type="time"
+                                                   class="form-control form-control-sm"
+                                                   wire:model.defer="clockOutTime"
+                                                   wire:change="updateClockOut">
+                                        @else
+                                            <span class="fw-bold">
+                                                {{ $clockOutTime ? \Carbon\Carbon::parse($clockOutTime)->format('h:i A') : '---' }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Small edit icon with tooltip --}}
+                                    <button class="btn btn-sm btn-outline-secondary p-1"
+                                            wire:click="toggleClockOutEdit"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Edit Clock Out Time">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-
+                        {{-- Initialize tooltips --}}
+                        <script>
+                            document.addEventListener('livewire:load', function() {
+                                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                                tooltipTriggerList.map(function(tooltipTriggerEl) {
+                                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                                });
+                            });
+                        </script>
                         <div class="row text-center mb-3">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="border rounded-3 p-2">
                                     <small class="text-muted d-block">Shift Hours</small>
                                     <span class="fw-bold">{{ $hours['shift_hours'] }}</span>
                                 </div>
                             </div>
-                            <div class="col-6">
+
+                            <div class="col-4">
                                 <div class="border rounded-3 p-2">
                                     <small class="text-muted d-block">Worked Hours</small>
                                     <span class="fw-bold">{{ $hours['worked_hours'] }}</span>
                                 </div>
                             </div>
-                        </div>
 
+                            <div class="col-4">
+                                <div class="border rounded-3 p-2">
+                                    <small class="text-muted d-block">Break Hours</small>
+                                    <span class="fw-bold">{{ $hours['break_hours'] }}</span>
+                                </div>
+                            </div>
+                        </div>
 
 
                         {{-- Location --}}
@@ -743,12 +742,193 @@
 
                     @endif
                 </div>
+                <div class="modal-footer border-0 pt-0">
+                    @if ($selectedAttendance)
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                onclick="if(confirm('Are you sure you want to delete this attendance?')) { @this.deleteAttendance({{ $selectedAttendance->id }}); }">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
 
+                        {{-- Close Button --}}
+                        <button type="button"
+                                class="btn btn-sm btn-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
 
 
+    <div wire:ignore.self
+         class="modal fade"
+         id="viewRequestInfo"
+         data-bs-backdrop="static"
+         tabindex="-1"
+         aria-labelledby="viewRequestInfoLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"
+                        id="viewRequestInfoLabel">
+                        Pending Request
+                    </h5>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body p-4">
+                    @if ($requestDetails)
+                        <!-- 1. Employee Card -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <img src="{{ $requestDetails->user->employee->avatar_url ?? 'https://via.placeholder.com/40' }}"
+                                 class="rounded-circle me-3 border border-1"
+                                 alt="{{ $requestDetails->user->full_name }}"
+                                 style="min-width: 40px; width: 40px; height: 40px; object-fit: cover;">
+                            <div class="fw-bold text-dark flex-grow-1">{{ $requestDetails->user->full_name }}</div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+                        <!-- Request Type -->
+                        <div class="d-flex align-items-center mb-3 bg-light p-3 rounded-3 shadow-sm info-card border">
+                            <div class="me-3 fs-5"
+                                 style="min-width: 25px;">
+                                <span>{{ $requestDetails->typeEmoji }}</span>
+                            </div>
+                            <div class="fw-medium text-dark flex-grow-1">
+                                {{ $requestDetails->typeName }}
+                            </div>
+                        </div>
+
+                        <!-- Time & Location -->
+                        <div
+                             class="d-flex align-items-center mb-3 bg-secondary-subtle p-3 rounded-3 shadow-sm border border-secondary-subtle">
+                            <i class="fas fa-map-marker-alt me-3 fs-5 text-secondary-icon"
+                               style="min-width: 25px;"></i>
+                            <div class="fw-normal text-dark flex-grow-1">
+                                <div><strong>Time:</strong>
+                                    {{ \Carbon\Carbon::parse($requestDetails->start_date)->format('h:i A') }}</div>
+                                <div><strong>Location:</strong> {{ $requestDetails->clock_in_location }}</div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Reason -->
+                        <div
+                             class="d-flex align-items-center mb-4 bg-primary-subtle p-3 rounded-3 shadow-sm border border-primary-subtle">
+                            <i class="fas fa-comment-alt me-3 fs-5 text-primary-icon"
+                               style="min-width: 25px;"></i>
+                            <div class="fw-normal text-dark flex-grow-1">
+                                {{ $requestDetails->reason ?: '-' }}
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-1"></i> No request selected.
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer justify-content-between">
+                    <button type="button"
+                            class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <div>
+                        @if ($requestDetails && $requestDetails->status === 'pending')
+                            <button type="button"
+                                    class="btn btn-danger rounded-pill px-4 shadow-sm me-2"
+                                    wire:click="rejectRequest({{ $requestDetails->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="rejectRequest">
+                                <span wire:loading.remove
+                                      wire:target="rejectRequest">
+                                    <i class="fas fa-times-circle me-1"></i> Reject
+                                </span>
+                                <span wire:loading.delay
+                                      wire:target="rejectRequest">
+                                    <span class="spinner-border spinner-border-sm me-1"></span> Rejecting...
+                                </span>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-primary rounded-pill px-4 shadow-sm"
+                                    wire:click="approveRequest({{ $requestDetails->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="approveRequest">
+                                <span wire:loading.remove
+                                      wire:target="approveRequest">
+                                    <i class="fas fa-check-circle me-1"></i> Approve
+                                </span>
+                                <span wire:loading.delay
+                                      wire:target="approveRequest">
+                                    <span class="spinner-border spinner-border-sm me-1"></span> Approving...
+                                </span>
+                            </button>
+                        @elseif ($requestDetails)
+                            <span
+                                  class="badge
+                            @if ($requestDetails->status === 'approved') bg-success
+                            @elseif($requestDetails->status === 'rejected') bg-danger
+                            @else bg-info @endif
+                            px-3 py-2 fs-6">
+                                {{ ucfirst($requestDetails->status) }}
+                            </span>
+                        @endif
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div wire:ignore.self
+         class="modal fade"
+         id="moreAttendanceDetailModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title">More Attendances ({{ $selectedDate }})</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        @foreach ($selectedDateAttendances as $att)
+                            <li class="list-group-item attendance-item"
+                                style="cursor:pointer;"
+                                data-bs-dismiss="modal">
+                                @include('livewire.backend.company.timesheet.partials._attendance-block', [
+                                    'att' => $att,
+                                ])
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div wire:ignore.self
          class="modal fade"
@@ -958,5 +1138,20 @@
         element.addEventListener('click', function(e) {
             e.stopPropagation();
         });
+    });
+</script>
+
+
+<script>
+    window.addEventListener('show-request-modal', () => {
+        var modalEl = document.getElementById('viewRequestInfo');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    });
+</script>
+<script>
+    window.addEventListener('show-more-attendance-modal', event => {
+        var myModal = new bootstrap.Modal(document.getElementById('moreAttendanceDetailModal'));
+        myModal.show();
     });
 </script>

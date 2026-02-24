@@ -7,9 +7,9 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use App\Models\Employee;
+use App\Models\LeaveRequest;
 use App\Models\Notification;
 use App\Models\ShiftDate;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
@@ -52,11 +52,13 @@ class TimesheetIndex extends BaseComponent
     public $employeeSearch;
 
     public $currentAttendance = [];
+    public $selectedDateAttendances = [];
     public $attendanceCalendar = [];
 
     public $shiftMap = [];
 
     public $selectedAttendance = null;
+    public $selectedDate = null;
 
     public $absentDetails = [];
 
@@ -69,6 +71,51 @@ class TimesheetIndex extends BaseComponent
     public $absentDate;
     public $totalAbsents;
     public bool $selectAllUsers = false;
+
+    public $requestDetails;
+    public $highlightId;
+
+    public $editingClockIn = false;
+    public $editingClockOut = false;
+
+    public function toggleClockInEdit()
+    {
+        $this->editingClockIn = !$this->editingClockIn;
+    }
+
+    public function toggleClockOutEdit()
+    {
+        $this->editingClockOut = !$this->editingClockOut;
+    }
+
+
+    public function updateClockIn()
+    {
+        if (!$this->selectedAttendance) return;
+
+        $this->selectedAttendance->update([
+            'clock_in' => Carbon::parse($this->clockInTime),
+        ]);
+
+        $this->buildAttendanceCalendar();
+        $this->editingClockIn = false;
+
+        $this->toast('Clock In updated!', 'success');
+    }
+
+    public function updateClockOut()
+    {
+        if (!$this->selectedAttendance) return;
+
+        $this->selectedAttendance->update([
+            'clock_out' => $this->clockOutTime ? Carbon::parse($this->clockOutTime) : null,
+        ]);
+
+        $this->buildAttendanceCalendar();
+        $this->editingClockOut = false;
+
+        $this->toast('Clock Out updated!', 'success');
+    }
 
 
 
@@ -102,6 +149,13 @@ class TimesheetIndex extends BaseComponent
         $this->selectedAttendance = Attendance::with(['user', 'requests'])
             ->where('company_id', $this->company_id)
             ->find($attendanceId);
+
+        if ($this->selectedAttendance) {
+            $this->clockInTime = Carbon::parse($this->selectedAttendance->clock_in)->format('H:i');
+            $this->clockOutTime = $this->selectedAttendance->clock_out
+                ? Carbon::parse($this->selectedAttendance->clock_out)->format('H:i')
+                : null;
+        }
 
         $this->dispatch('open-attendance-modal');
     }
@@ -192,55 +246,82 @@ class TimesheetIndex extends BaseComponent
     }
 
 
+    public function deleteAttendance($attendanceId)
+    {
+        $attendance = Attendance::find($attendanceId);
+
+        if (!$attendance) {
+            $this->toast('Attendance not found.', 'error');
+            return;
+        }
+
+
+        AttendanceRequest::where('attendance_id', $attendanceId)->delete();
+
+        $attendance->delete();
+
+        $this->toast('Attendance deleted successfully!', 'success');
+
+
+        $this->selectedAttendance = null;
+        $this->buildAttendanceCalendar();
+        $this->resetLoaded();
+
+        $this->dispatch('closemodal');
+    }
+
+
     public function getShiftHours($attendance)
     {
+        $clockIn = $attendance->clock_in instanceof Carbon ? $attendance->clock_in : Carbon::parse($attendance->clock_in);
+        $clockOut = $attendance->clock_out instanceof Carbon ? $attendance->clock_out : Carbon::parse($attendance->clock_out);
 
-        $date = Carbon::parse($attendance->clock_in)->format('Y-m-d');
+        if (!$clockIn) {
+            return [
+                'shift_hours'  => '8h 0m',
+                'worked_hours' => '---',
+                'break_hours'  => '0h 0m'
+            ];
+        }
+
+        $date = $clockIn->format('Y-m-d');
         $employeeId = $attendance->user->employee->id;
-
 
         $shiftDate = ShiftDate::where('date', $date)
             ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
             ->with('breaks')
             ->first();
 
+        $breakMinutes = 0;
+        if ($shiftDate) {
+            foreach ($shiftDate->breaks as $b) {
+                $duration = $b->duration ?? 0;
+                $hoursPart = floor($duration);
+                $minutesPart = round(($duration - $hoursPart) * 100);
+                $breakMinutes += $hoursPart * 60 + $minutesPart;
+            }
+        }
 
-
-        if (!$shiftDate) {
+        if (!$clockOut) {
             return [
-                'shift_hours' => '---',
-                'worked_hours' => '---'
+                'shift_hours'  => '8h 0m',
+                'worked_hours' => '0h 0m',
+                'break_hours'  => sprintf('%dh %dm', intdiv($breakMinutes, 60), $breakMinutes % 60)
             ];
         }
 
-
-        $shiftStart = Carbon::createFromFormat('H:i:s', $shiftDate->start_time);
-        $shiftEnd = Carbon::createFromFormat('H:i:s', $shiftDate->end_time);
-        $totalShiftMinutes = $shiftEnd->diffInMinutes($shiftStart);
-
-
-
-
-        $breakMinutes = $shiftDate->breaks->sum(fn($b) => $b->duration);
-
-
-        if ($attendance->clock_in && $attendance->clock_out) {
-            $clockIn = Carbon::parse($attendance->clock_in);
-            $clockOut = Carbon::parse($attendance->clock_out);
-            $workedMinutes = $clockOut->diffInMinutes($clockIn) - $breakMinutes;
-        } else {
-            $workedMinutes = 0;
+        if ($clockOut->lessThan($clockIn)) {
+            $clockOut->addDay();
         }
 
+        $workedMinutes = $clockIn->diffInMinutes($clockOut);
+
         return [
-            'shift_hours' => sprintf('%dh %dm', intdiv(abs($totalShiftMinutes), 60), abs($totalShiftMinutes) % 60),
-            'worked_hours' => sprintf('%dh %dm', intdiv(abs($workedMinutes), 60), abs($workedMinutes) % 60),
+            'shift_hours'  => '8h 0m',
+            'worked_hours' => sprintf('%dh %dm', intdiv($workedMinutes, 60), $workedMinutes % 60),
+            'break_hours'  => sprintf('%dh %dm', intdiv($breakMinutes, 60), $breakMinutes % 60)
         ];
     }
-
-
-
-
     protected function loadEmployees()
     {
         $query = Employee::where('company_id', $this->company_id)
@@ -312,26 +393,35 @@ class TimesheetIndex extends BaseComponent
     public function getWeekDaysProperty()
     {
         $days = [];
-        $current = $this->startDate->copy();
-        $end = $this->endDate->copy();
 
-        $maxIterations = $this->viewMode === 'monthly' ? $this->startDate->daysInMonth : 7;
-        $count = 0;
+        if ($this->viewMode === 'weekly') {
+            $monday = $this->startDate->copy()->startOfWeek(Carbon::MONDAY);
 
-        while ($current->lte($end) && $count < $maxIterations) {
-            $days[] = [
-                'full_date' => $current->format('Y-m-d'),
-
-                'day' => $this->viewMode === 'weekly' ? $current->format('D') : $current->format('j'),
-                'date' => $current->format('d/m'),
-                'highlight' => $current->equalTo($this->currentDate->copy()->startOfDay()),
-            ];
-            $current->addDay();
-            $count++;
+            for ($i = 0; $i < 7; $i++) {
+                $day = $monday->copy()->addDays($i);
+                $days[] = [
+                    'full_date' => $day->format('Y-m-d'),
+                    'day'       => $day->format('D'),
+                    'date'      => $day->format('d/m'),
+                    'highlight' => $day->equalTo($this->currentDate->copy()->startOfDay()),
+                ];
+            }
         }
 
         return $days;
     }
+
+
+
+    public function openAttendanceMoreModal($dateKey)
+    {
+        $this->selectedDate = $dateKey;
+        $this->selectedDateAttendances = collect($this->attendanceCalendar[$dateKey] ?? []);
+
+
+        $this->dispatch('show-more-attendance-modal');
+    }
+
 
 
 
@@ -619,6 +709,7 @@ class TimesheetIndex extends BaseComponent
         $this->toast('Request approved successfully!', 'success');
 
 
+        $this->dispatch('closemodal');
         $this->resetLoaded();
     }
 
@@ -656,6 +747,8 @@ class TimesheetIndex extends BaseComponent
 
         $this->toast('Request rejected successfully!', 'error');
         $this->resetLoaded();
+
+        $this->dispatch('closemodal');
     }
 
 
@@ -683,6 +776,8 @@ class TimesheetIndex extends BaseComponent
         // refresh modal data
         $this->selectedAttendance = $attendance->fresh(['user', 'requests']);
         $this->buildAttendanceCalendar();
+
+        $this->dispatch('closemodal');
     }
 
     public function rejectAttendance($attendanceId)
@@ -702,6 +797,8 @@ class TimesheetIndex extends BaseComponent
 
         $this->selectedAttendance = $attendance->fresh(['user', 'requests']);
         $this->buildAttendanceCalendar();
+
+        $this->dispatch('closemodal');
     }
 
 
@@ -783,12 +880,48 @@ class TimesheetIndex extends BaseComponent
             return;
         }
 
-        if ($all->contains(fn($r) => $r->status === 'rejected')) {
+        if ($all->contains(fn(AttendanceRequest $r) => $r->status === 'rejected')) {
             $attendance->update(['status' => 'rejected']);
             return;
         }
     }
 
+    public function viewRequest($requestId)
+    {
+        $this->highlightId = $requestId;
+
+        $this->requestDetails = AttendanceRequest::with('user.employee', 'attendance')
+            ->find($requestId);
+
+        if ($this->requestDetails && $this->requestDetails->attendance) {
+            $attendance = $this->requestDetails->attendance;
+
+
+            $this->requestDetails->typeName = ucfirst(str_replace('_', ' ', $this->requestDetails->type));
+            $this->requestDetails->typeEmoji = $this->requestDetails->type === 'late_clock_in' ? '⏰' : '🕔';
+
+
+            $this->requestDetails->reason = $this->requestDetails->reason ?: '-';
+
+
+            $this->requestDetails->start_date = $attendance->clock_in;
+            $this->requestDetails->end_date   = $attendance->clock_out ?? $attendance->clock_in;
+
+
+            $this->requestDetails->clock_in_location  = $attendance->clock_in_location ?? '-';
+            $this->requestDetails->clock_out_location = $attendance->clock_out_location ?? '-';
+
+            // Status
+            $this->requestDetails->status = $this->requestDetails->status;
+
+            $this->requestDetails->time = $attendance->clock_in;
+
+
+            $this->requestDetails->location = $attendance->clock_in_location;
+
+            $this->dispatch('show-request-modal');
+        }
+    }
 
 
 

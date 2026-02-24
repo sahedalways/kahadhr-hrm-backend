@@ -92,7 +92,7 @@
                         @php
                             $docsForType = $documents->where('doc_type_id', $type->id)->sortByDesc('created_at');
 
-                            $latestDocs = $docsForType->take(3)->values();
+                            $latestDocs = $docsForType->take(10)->values();
                         @endphp
 
                         @if ($latestDocs->count())

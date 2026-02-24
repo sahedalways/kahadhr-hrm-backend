@@ -819,7 +819,6 @@ class EmployeeDetails extends BaseComponent
             $this->street = $profile->street;
             $this->city = $profile->city ?: null;
             $this->state = $profile->state ?: null;
-            $this->address = $profile->address ?: null;
             $this->postcode = $profile->postcode;
             $this->country = $profile->country ?: 'United Kingdom';
             $this->home_phone = $profile->home_phone;
@@ -978,7 +977,6 @@ class EmployeeDetails extends BaseComponent
             'l_name' => 'required|string|max:255',
             'title' => 'required|in:Mr,Mrs',
             'job_title' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
             'house_no' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'start_date' => 'required|date',
@@ -1022,7 +1020,6 @@ class EmployeeDetails extends BaseComponent
             'street'                 => 'Street',
             'city'                     => 'City',
             'state'                    => 'State',
-            'address'                    => 'Current Address',
             'postcode'                 => 'Postcode',
             'country'                  => 'Country',
             'nationality'              => 'Nationality',
@@ -1085,7 +1082,6 @@ class EmployeeDetails extends BaseComponent
                 'street' => $this->street,
                 'house_no' => $this->house_no,
                 'city' => $this->city ?? null,
-                'address' => $this->address,
                 'state' => $this->state ?? null,
                 'postcode' => $this->postcode,
                 'country' => $this->country,

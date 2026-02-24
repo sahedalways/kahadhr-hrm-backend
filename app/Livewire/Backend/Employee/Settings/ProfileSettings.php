@@ -42,7 +42,7 @@ class ProfileSettings extends BaseComponent
     public $job_title, $department_id, $team_id;
     public $contract_hours, $salary_type, $start_date, $end_date;
 
-    public $date_of_birth, $house_no, $address, $street, $city, $state, $postcode, $country,
+    public $date_of_birth, $house_no, $street, $city, $state, $postcode, $country,
         $home_phone, $mobile_phone, $personal_email,
         $gender, $marital_status, $tax_reference_number,
         $immigration_status,
@@ -276,7 +276,7 @@ class ProfileSettings extends BaseComponent
         $this->marital_status             = $this->employee->profile?->marital_status;
         $this->tax_reference_number       = $this->employee->profile?->tax_reference_number;
         $this->tax_reference_number       = $this->employee->profile?->tax_reference_number;
-        $this->address         = $this->employee->profile?->address ?: null;
+
 
         $this->passport_number            = $this->employee->profile?->passport_number;
         $this->passport_expiry_date       = optional($this->employee->profile?->passport_expiry_date)->format('Y-m-d');
@@ -554,7 +554,6 @@ class ProfileSettings extends BaseComponent
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
             'title' => 'required|in:Mr,Mrs',
-            'address' => 'required|string|max:255',
             'house_no' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'postcode' => 'required|string|max:20',
@@ -594,7 +593,6 @@ class ProfileSettings extends BaseComponent
             'street'                 => 'Street',
             'city'                     => 'City',
             'state'                    => 'State',
-            'address'                    => 'Current Address',
             'postcode'                 => 'Postcode',
             'country'                  => 'Country',
             'nationality'              => 'Nationality',
@@ -643,7 +641,6 @@ class ProfileSettings extends BaseComponent
             ['emp_id' => $this->employee->id],
             [
                 'house_no' => $validatedData['house_no'],
-                'address' => $validatedData['address'],
                 'street' => $validatedData['street'],
                 'city' => $validatedData['city'] ?? null,
                 'state' => $validatedData['state'] ?? null,

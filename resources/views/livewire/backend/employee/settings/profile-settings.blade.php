@@ -11,6 +11,176 @@
             <div class="row g-4">
                 <div class="col-lg-8">
 
+                    <div class="d-block d-md-none">
+
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2 text-center">
+                                    Job Assignment
+                                </h6>
+
+                                <div class="mb-3 pb-3 border-bottom">
+                                    <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                        Job Title
+                                    </label>
+                                    <span class="{{ $job_title ? 'fw-bold' : 'fst-italic' }}">
+                                        {{ $job_title ?? 'N/A' }}
+                                    </span>
+
+                                </div>
+
+                                <div class="row g-3">
+
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <label
+                                                           class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                        Employment Status
+                                                    </label>
+                                                    <span class="badge bg-soft-primary text-primary">
+                                                        {{ ucfirst($employment_status ?? 'N/A') }}
+                                                    </span>
+                                                </div>
+                                                <i class="fas fa-briefcase text-muted"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <label
+                                                           class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                        Hours/Week
+                                                    </label>
+                                                    <span class="fw-semibold">{{ $contract_hours ?? '0' }} hrs</span>
+                                                </div>
+                                                <i class="fas fa-clock text-muted"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Right to Work --}}
+                                    <div class="col-12">
+                                        @include('livewire.backend.employee.settings.partials.right-to-work-status')
+                                    </div>
+
+                                    {{-- Departments --}}
+                                    <div class="col-12">
+                                        <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                            <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                Departments
+                                            </label>
+
+                                            @php $max = 5; @endphp
+
+                                            @if ($departments->isEmpty())
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @else
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
+                                                        <span
+                                                              class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                                            {{ $department->name }}
+                                                        </span>
+                                                    @endforeach
+
+                                                    @if ($departments->count() > $max)
+                                                        <button wire:click="toggleDepartments"
+                                                                class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                            {{ $showAllDepartments ? 'See less' : 'View more' }}
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Teams --}}
+                                    <div class="col-12">
+                                        <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                            <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                Teams
+                                            </label>
+
+                                            @php
+                                                $assignedTeams = $employee->user ? $employee->user->teams : collect();
+                                                $max = 5;
+                                            @endphp
+
+                                            @if ($assignedTeams->isEmpty())
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @else
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
+                                                        @php
+                                                            $isLead = $team->team_lead_id === $employee->user_id;
+                                                        @endphp
+                                                        <span
+                                                              class="badge rounded-pill px-3 py-2
+    {{ $isLead ? 'bg-soft-primary text-primary' : 'bg-light text-dark border' }}">
+                                                            {{ $team->name }}
+
+                                                            @if ($isLead)
+                                                                <span class="ms-1 fw-semibold text-dark">★ Leader</span>
+                                                            @endif
+                                                        </span>
+                                                    @endforeach
+
+                                                    @if ($assignedTeams->count() > $max)
+                                                        <button wire:click="toggleTeams"
+                                                                class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                            {{ $showAllTeams ? 'See less' : 'View more' }}
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+                        <style>
+                            .py-2-5 {
+                                padding-top: 0.65rem;
+                                padding-bottom: 0.65rem;
+                            }
+
+                            .transition-all {
+                                transition: all 0.3s ease;
+                            }
+
+                            .btn-primary:hover {
+                                transform: translateY(-2px);
+                                shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+                            }
+
+                            #countryDropdownButton,
+                            #stateDropdownButton,
+                            #cityDropdownButton,
+                            #countryDropdownMenu,
+                            #stateDropdownMenu,
+                            #cityDropdownMenu {
+                                box-shadow: none !important;
+                            }
+                        </style>
+
+
+                    </div>
+
+
+
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
                             <h6 class="fw-bold text-primary text-uppercase mb-0 ls-1"> Personal Information</h6>
@@ -129,25 +299,6 @@
                         <div class="card-body p-4 pt-2">
                             <div class="row g-3"
                                  x-data="addressAutocomplete()">
-                                <div class="col-12 mb-2"
-                                     x-data="addressAutocomplete()">
-                                    <label class="form-label small fw-semibold text-secondary">
-                                        Address
-                                        <span class="text-danger">*</span></label>
-                                    <div class="position-relative">
-                                        <input type="text"
-                                               class="form-control border-light-subtle py-2 shadow-none"
-                                               x-model="query"
-                                               wire:model="address"
-                                               placeholder="Type to search your address..."
-                                               autocomplete="off">
-                                    </div>
-                                    @error('address')
-                                        <span class="text-danger x-small">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-
 
 
                                 <div class="col-md-6"
@@ -263,7 +414,7 @@
 
 
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-secondary">Zip / Postal Code <span
+                                    <label class="form-label small fw-bold text-secondary">Post Code <span
                                               class="text-danger">*</span></label>
                                     <input type="text"
                                            class="form-control border-light-subtle shadow-none"
@@ -307,363 +458,370 @@
 
 
                     </div>
-                    @if (!empty($customFields) && $customFields->count())
-                        @foreach ($customFields as $field)
-                            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                                <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
-                                    <h6 class="fw-bold text-primary text-uppercase mb-0 ls-1"> More Information</h6>
+
+
+
+
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
+                            <h6 class="fw-bold text-primary text-uppercase mb-0 ls-1"> Compliance & ID</h6>
+                        </div>
+                        <div class="card-body p-4 pt-2">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">Nationality <span
+                                              class="text-danger">*</span></label>
+                                    <select class="form-select border-light-subtle shadow-none"
+                                            wire:model.live="nationality">
+                                        @foreach ($nationalities as $nation)
+                                            <option value="{{ $nation }}">{{ $nation }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('nationality')
+                                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                <div class="card-body p-4 pt-2">
-                                    <div class="row g-3"
-                                         <div
-                                         class="col-md-6 mb-2">
+
+
+                                @if ($nationality && $nationality !== 'British')
+                                    <div class="col-md-12 ">
                                         <label class="form-label">
-                                            {{ $field->name }}
-                                            @if ($field->required)
-                                                <span class="text-danger">*</span>
-                                            @endif
+                                            Share Code
                                         </label>
+                                        <input type="text"
+                                               class="form-control"
+                                               wire:model.live="share_code"
+                                               placeholder="Example: WLE JFZ 6FT">
 
-                                        @if ($field->type === 'text')
-                                            <input type="text"
-                                                   class="form-control"
-                                                   placeholder="Enter {{ $field->name }}"
-                                                   wire:model.defer="customValues.{{ $field->id }}">
-                                        @elseif($field->type === 'date')
-                                            <input type="date"
-                                                   class="form-control"
-                                                   placeholder="{{ $field->name }}"
-                                                   wire:model.defer="customValues.{{ $field->id }}">
-                                        @elseif($field->type === 'textarea')
-                                            <textarea class="form-control"
-                                                      placeholder="Enter {{ $field->name }}"
-                                                      wire:model.defer="customValues.{{ $field->id }}"></textarea>
-                                        @elseif($field->type === 'select')
-                                            <select class="form-select"
-                                                    wire:model.defer="customValues.{{ $field->id }}">
-                                                <option value="">{{ $field->name }}</option>
-                                                @foreach ($field->options ?? [] as $opt)
-                                                    <option value="{{ $opt }}">{{ $opt }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        @endif
-
-
-                                        @error('customValues.' . $field->id)
-                                            <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                        @error('share_code')
+                                            <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
-                        @endforeach
+                                @endif
 
-                </div>
-            </div>
-    </div>
-    @endif
 
-    <div class="mt-5 pt-4 border-top">
-        <div class="d-flex justify-content-center align-items-center gap-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">National Insurance / Tax Ref
+                                        <span class="text-danger">*</span></label>
+                                    <input type="text"
+                                           class="form-control border-light-subtle shadow-none "
+                                           wire:model="tax_reference_number"
+                                           placeholder="Enter Tax Ref Number">
+                                    @error('tax_reference_number')
+                                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
-            <button type="submit"
-                    class="btn btn-primary px-5 py-2-5 rounded-pill shadow-sm d-flex align-items-center fw-bold transition-all"
-                    wire:loading.attr="disabled"
-                    wire:target="save">
+                                <div class="col-12 border-top pt-3 mt-3">
+                                    <label class="form-label small fw-bold text-secondary">Passport Number <span
+                                              class="text-danger">*</span></label>
+                                    <input type="text"
+                                           class="form-control border-light-subtle shadow-none"
+                                           wire:model="passport_number"
+                                           placeholder="Enter Passport Number">
+                                    @error('passport_number')
+                                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
-                <span wire:loading.remove
-                      wire:target="save">
-                    <i class="fas fa-check-circle me-2"></i> Save Changes
-                </span>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">
+                                        Passport Expiry <span class="text-danger">*</span>
+                                    </label>
 
-                <span wire:loading
-                      wire:target="save">
-                    <span class="spinner-border spinner-border-sm me-2"
-                          role="status"
-                          aria-hidden="true"></span>
-                    Processing...
-                </span>
-            </button>
-        </div>
-    </div>
-</div>
+                                    <input type="date"
+                                           class="form-control border-light-subtle shadow-none"
+                                           wire:model="passport_expiry_date"
+                                           min="{{ now()->addDay()->format('Y-m-d') }}">
 
-<div class="col-lg-4">
+                                    @error('passport_expiry_date')
+                                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
-    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
-        <div class="card-body p-4">
-            <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2 text-center">
-                Job Assignment
-            </h6>
 
-            <div class="mb-3 pb-3 border-bottom">
-                <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
-                    Job Title
-                </label>
-                <span class="{{ $job_title ? 'fw-bold' : 'fst-italic' }}">
-                    {{ $job_title ?? 'N/A' }}
-                </span>
 
-            </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="row g-3">
 
-                <div class="col-6">
-                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
-                                    Employment Status
-                                </label>
-                                <span class="badge bg-soft-primary text-primary">
-                                    {{ ucfirst($employment_status ?? 'N/A') }}
+
+                    @if (!empty($customFields) && $customFields->count())
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
+                                <h6 class="fw-bold text-primary text-uppercase mb-0 ls-1">More Information</h6>
+                            </div>
+                            <div class="card-body p-4 pt-2">
+                                <div class="row g-3">
+                                    @foreach ($customFields as $field)
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">
+                                                {{ $field->name }}
+                                                @if ($field->required)
+                                                    <span class="text-danger">*</span>
+                                                @endif
+                                            </label>
+
+                                            @if ($field->type === 'text')
+                                                <input type="text"
+                                                       class="form-control"
+                                                       placeholder="Enter {{ $field->name }}"
+                                                       wire:model.defer="customValues.{{ $field->id }}">
+                                            @elseif($field->type === 'date')
+                                                <input type="date"
+                                                       class="form-control"
+                                                       placeholder="{{ $field->name }}"
+                                                       wire:model.defer="customValues.{{ $field->id }}">
+                                            @elseif($field->type === 'textarea')
+                                                <textarea class="form-control"
+                                                          placeholder="Enter {{ $field->name }}"
+                                                          wire:model.defer="customValues.{{ $field->id }}"></textarea>
+                                            @elseif($field->type === 'select')
+                                                <select class="form-select"
+                                                        wire:model.defer="customValues.{{ $field->id }}">
+                                                    <option value="">{{ $field->name }}</option>
+                                                    @foreach ($field->options ?? [] as $opt)
+                                                        <option value="{{ $opt }}">{{ $opt }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            @endif
+
+                                            @error('customValues.' . $field->id)
+                                                <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+
+                    <div class="mt-5 pt-4 border-top">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+
+                            <button type="submit"
+                                    class="btn btn-primary px-5 py-2-5 rounded-pill shadow-sm d-flex align-items-center fw-bold transition-all"
+                                    wire:loading.attr="disabled"
+                                    wire:target="save">
+
+                                <span wire:loading.remove
+                                      wire:target="save">
+                                    <i class="fas fa-check-circle me-2"></i> Save Changes
                                 </span>
-                            </div>
-                            <i class="fas fa-briefcase text-muted"></i>
+
+                                <span wire:loading
+                                      wire:target="save">
+                                    <span class="spinner-border spinner-border-sm me-2"
+                                          role="status"
+                                          aria-hidden="true"></span>
+                                    Processing...
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-6">
-                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
+                <div class="col-md-4 d-none d-md-block">
+
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light bg-opacity-25">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold text-dark text-uppercase small mb-3 border-bottom pb-2 text-center">
+                                Job Assignment
+                            </h6>
+
+                            <div class="mb-3 pb-3 border-bottom">
                                 <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
-                                    Hours/Week
+                                    Job Title
                                 </label>
-                                <span class="fw-semibold">{{ $contract_hours ?? '0' }} hrs</span>
+                                <span class="{{ $job_title ? 'fw-bold' : 'fst-italic' }}">
+                                    {{ $job_title ?? 'N/A' }}
+                                </span>
+
                             </div>
-                            <i class="fas fa-clock text-muted"></i>
+
+                            <div class="row g-3">
+
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                    Employment Status
+                                                </label>
+                                                <span class="badge bg-soft-primary text-primary">
+                                                    {{ ucfirst($employment_status ?? 'N/A') }}
+                                                </span>
+                                            </div>
+                                            <i class="fas fa-briefcase text-muted"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                                    Hours/Week
+                                                </label>
+                                                <span class="fw-semibold">{{ $contract_hours ?? '0' }} hrs</span>
+                                            </div>
+                                            <i class="fas fa-clock text-muted"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Right to Work --}}
+                                <div class="col-12">
+                                    @include('livewire.backend.employee.settings.partials.right-to-work-status')
+                                </div>
+
+                                {{-- Departments --}}
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                            Departments
+                                        </label>
+
+                                        @php $max = 5; @endphp
+
+                                        @if ($departments->isEmpty())
+                                            <span class="text-muted fst-italic">N/A</span>
+                                        @else
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
+                                                    <span
+                                                          class="badge rounded-pill bg-light text-dark border px-3 py-2">
+                                                        {{ $department->name }}
+                                                    </span>
+                                                @endforeach
+
+                                                @if ($departments->count() > $max)
+                                                    <button wire:click="toggleDepartments"
+                                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                        {{ $showAllDepartments ? 'See less' : 'View more' }}
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                {{-- Teams --}}
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
+                                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
+                                            Teams
+                                        </label>
+
+                                        @php
+                                            $assignedTeams = $employee->user ? $employee->user->teams : collect();
+                                            $max = 5;
+                                        @endphp
+
+                                        @if ($assignedTeams->isEmpty())
+                                            <span class="text-muted fst-italic">N/A</span>
+                                        @else
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
+                                                    @php
+                                                        $isLead = $team->team_lead_id === $employee->user_id;
+                                                    @endphp
+                                                    <span
+                                                          class="badge rounded-pill px-3 py-2
+    {{ $isLead ? 'bg-soft-primary text-primary' : 'bg-light text-dark border' }}">
+                                                        {{ $team->name }}
+
+                                                        @if ($isLead)
+                                                            <span class="ms-1 fw-semibold text-dark">★ Leader</span>
+                                                        @endif
+                                                    </span>
+                                                @endforeach
+
+                                                @if ($assignedTeams->count() > $max)
+                                                    <button wire:click="toggleTeams"
+                                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
+                                                        {{ $showAllTeams ? 'See less' : 'View more' }}
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
+
+
+
+
+
+
+
+                    <style>
+                        .py-2-5 {
+                            padding-top: 0.65rem;
+                            padding-bottom: 0.65rem;
+                        }
+
+                        .transition-all {
+                            transition: all 0.3s ease;
+                        }
+
+                        .btn-primary:hover {
+                            transform: translateY(-2px);
+                            shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+                        }
+
+                        #countryDropdownButton,
+                        #stateDropdownButton,
+                        #cityDropdownButton,
+                        #countryDropdownMenu,
+                        #stateDropdownMenu,
+                        #cityDropdownMenu {
+                            box-shadow: none !important;
+                        }
+                    </style>
+
+
                 </div>
-
-                {{-- Right to Work --}}
-                <div class="col-12">
-                    @include('livewire.backend.employee.settings.partials.right-to-work-status')
-                </div>
-
-                {{-- Departments --}}
-                <div class="col-12">
-                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
-                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
-                            Departments
-                        </label>
-
-                        @php $max = 5; @endphp
-
-                        @if ($departments->isEmpty())
-                            <span class="text-muted fst-italic">N/A</span>
-                        @else
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach ($departments->take($showAllDepartments ? $departments->count() : $max) as $department)
-                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
-                                        {{ $department->name }}
-                                    </span>
-                                @endforeach
-
-                                @if ($departments->count() > $max)
-                                    <button wire:click="toggleDepartments"
-                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
-                                        {{ $showAllDepartments ? 'See less' : 'View more' }}
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Teams --}}
-                <div class="col-12">
-                    <div class="p-3 rounded-3 border border-1 border-light bg-white shadow-sm">
-                        <label class="d-block text-muted x-small text-uppercase fw-bold mb-1">
-                            Teams
-                        </label>
-
-                        @php
-                            $assignedTeams = $employee->user ? $employee->user->teams : collect();
-                            $max = 5;
-                        @endphp
-
-                        @if ($assignedTeams->isEmpty())
-                            <span class="text-muted fst-italic">N/A</span>
-                        @else
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach ($assignedTeams->take($showAllTeams ? $assignedTeams->count() : $max) as $team)
-                                    @php
-                                        $isLead = $team->team_lead_id === $employee->user_id;
-                                    @endphp
-                                    <span
-                                          class="badge rounded-pill px-3 py-2
-    {{ $isLead ? 'bg-soft-primary text-primary' : 'bg-light text-dark border' }}">
-                                        {{ $team->name }}
-
-                                        @if ($isLead)
-                                            <span class="ms-1 fw-semibold text-dark">★ Leader</span>
-                                        @endif
-                                    </span>
-                                @endforeach
-
-                                @if ($assignedTeams->count() > $max)
-                                    <button wire:click="toggleTeams"
-                                            class="btn btn-sm btn-link text-decoration-none fw-semibold ms-1">
-                                        {{ $showAllTeams ? 'See less' : 'View more' }}
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
             </div>
-        </div>
+        </form>
     </div>
-
-
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
-            <h6 class="fw-bold text-primary text-uppercase mb-0 ls-1"> Compliance & ID</h6>
-        </div>
-        <div class="card-body p-4 pt-2">
-            <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label small fw-bold text-secondary">Nationality <span
-                              class="text-danger">*</span></label>
-                    <select class="form-select border-light-subtle shadow-none"
-                            wire:model.live="nationality">
-                        @foreach ($nationalities as $nation)
-                            <option value="{{ $nation }}">{{ $nation }}</option>
-                        @endforeach
-                    </select>
-                    @error('nationality')
-                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-
-                @if ($nationality && $nationality !== 'British')
-                    <div class="col-md-12 ">
-                        <label class="form-label">
-                            Share Code
-                        </label>
-                        <input type="text"
-                               class="form-control"
-                               wire:model.live="share_code"
-                               placeholder="Example: WLE JFZ 6FT">
-
-                        @error('share_code')
-                            <span class="text-danger">{{ $message }}</span>
-                        @enderror
-                    </div>
-                @endif
-
-
-                <div class="col-12">
-                    <label class="form-label small fw-bold text-secondary">National Insurance / Tax Ref
-                        <span class="text-danger">*</span></label>
-                    <input type="text"
-                           class="form-control border-light-subtle shadow-none "
-                           wire:model="tax_reference_number"
-                           placeholder="Enter Tax Ref Number">
-                    @error('tax_reference_number')
-                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="col-12 border-top pt-3 mt-3">
-                    <label class="form-label small fw-bold text-secondary">Passport Number <span
-                              class="text-danger">*</span></label>
-                    <input type="text"
-                           class="form-control border-light-subtle shadow-none"
-                           wire:model="passport_number"
-                           placeholder="Enter Passport Number">
-                    @error('passport_number')
-                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label small fw-bold text-secondary">
-                        Passport Expiry <span class="text-danger">*</span>
-                    </label>
-
-                    <input type="date"
-                           class="form-control border-light-subtle shadow-none"
-                           wire:model="passport_expiry_date"
-                           min="{{ now()->addDay()->format('Y-m-d') }}">
-
-                    @error('passport_expiry_date')
-                        <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
-                    @enderror
-                </div>
-
-
-
-            </div>
-        </div>
-    </div>
-
-
-
 
     <style>
-        .py-2-5 {
-            padding-top: 0.65rem;
-            padding-bottom: 0.65rem;
+        .ls-1 {
+            letter-spacing: 0.5px;
         }
 
-        .transition-all {
-            transition: all 0.3s ease;
+        .x-small {
+            font-size: 0.75rem;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        .bg-soft-primary {
+            background-color: rgba(13, 110, 253, 0.1);
         }
 
-        #countryDropdownButton,
-        #stateDropdownButton,
-        #cityDropdownButton,
-        #countryDropdownMenu,
-        #stateDropdownMenu,
-        #cityDropdownMenu {
-            box-shadow: none !important;
+        .btn-white {
+            background: #fff;
+            color: #0d6efd;
+            border: none;
+        }
+
+        .btn-white:hover {
+            background: #f8f9fa;
+            color: #0a58ca;
+        }
+
+        input::placeholder {
+            font-size: 0.85rem;
+            color: #adb5bd;
         }
     </style>
-
-
-</div>
-</div>
-</form>
-</div>
-
-<style>
-    .ls-1 {
-        letter-spacing: 0.5px;
-    }
-
-    .x-small {
-        font-size: 0.75rem;
-    }
-
-    .bg-soft-primary {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-
-    .btn-white {
-        background: #fff;
-        color: #0d6efd;
-        border: none;
-    }
-
-    .btn-white:hover {
-        background: #f8f9fa;
-        color: #0a58ca;
-    }
-
-    input::placeholder {
-        font-size: 0.85rem;
-        color: #adb5bd;
-    }
-</style>
 
 </div>
 

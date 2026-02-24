@@ -218,8 +218,8 @@
                                                               style="color: #6c757d; font-size: 13px; display: block;">Right
                                                             to Work Expiry</span>
                                                         <span class="badge mt-1"
-                                                              style="background:#f8f9fa; color:#6c757d; font-weight:600; border: 1px solid #dee2e6;">
-                                                            Not Required (British)
+                                                              style="background:#0d6efd; color:#fff; font-weight:600; border: 1px solid #0d6efd;">
+                                                            Permanent
                                                         </span>
                                                     </div>
                                                 </td>
@@ -965,9 +965,9 @@
                                             <label class="text-muted small d-block">Right to Work Expiry</label>
 
                                             @if ($employee->nationality === 'British')
-                                                <span class="badge bg-light text-muted mt-1"
-                                                      style="border: 1px solid #dee2e6;">
-                                                    Not Required (British)
+                                                <span class="badge mt-1"
+                                                      style="background:#0d6efd; color:#fff; font-weight:600; border:1px solid #0d6efd;">
+                                                    Permanent
                                                 </span>
                                             @elseif ($rtwExp)
                                                 <span class="fw-bold {{ $daysLeft !== null && $daysLeft <= 60 ? 'text-danger blink-red' : 'text-dark' }}"

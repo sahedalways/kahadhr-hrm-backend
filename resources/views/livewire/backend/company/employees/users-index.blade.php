@@ -201,8 +201,8 @@
                                             @if ($employee->nationality === 'British')
                                                 <td>
                                                     <span class="badge"
-                                                          style="background:#e9ecef; color:#6c757d; font-weight:600;">
-                                                        Not Required (British)
+                                                          style="background:#0d6efd; color:#fff; font-weight:600;">
+                                                        Permanent
                                                     </span>
                                                 </td>
                                             @else

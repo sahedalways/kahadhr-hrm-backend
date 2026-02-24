@@ -11,9 +11,9 @@
         </label>
 
         @if ($employee->nationality === 'British')
-            <span class="badge bg-light text-muted"
-                  style="border: 1px solid #dee2e6;">
-                Not Required (British)
+            <span class="badge"
+                  style="background:#0d6efd; color:#fff; font-weight:600; border:1px solid #0d6efd;">
+                Permanent
             </span>
         @else
             @if ($latestShareDoc && $latestShareDoc->expires_at)

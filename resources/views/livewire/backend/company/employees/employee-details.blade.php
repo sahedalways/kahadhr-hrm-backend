@@ -365,8 +365,8 @@
                                                               style="color: #6c757d; font-size: 13px; display: block;">Right
                                                             to Work Expiry</span>
                                                         <span class="badge mt-1"
-                                                              style="background:#f8f9fa; color:#6c757d; font-weight:600; border: 1px solid #dee2e6;">
-                                                            Not Required (British)
+                                                              style="background:#0d6efd; color:#fff; font-weight:600; border:1px solid #0d6efd;">
+                                                            Permanent
                                                         </span>
                                                     </div>
                                                 </td>
@@ -1180,9 +1180,9 @@
                                             <label class="text-muted small d-block">Right to Work Expiry</label>
 
                                             @if ($employee->nationality === 'British')
-                                                <span class="badge bg-light text-muted mt-1"
-                                                      style="border: 1px solid #dee2e6;">
-                                                    Not Required (British)
+                                                <span class="badge mt-1"
+                                                      style="background:#0d6efd; color:#fff; font-weight:600; border:1px solid #0d6efd;">
+                                                    Permanent
                                                 </span>
                                             @elseif ($rtwExp)
                                                 <span class="fw-bold {{ $daysLeft !== null && $daysLeft <= 60 ? 'text-danger blink-red' : 'text-dark' }}"
@@ -1661,9 +1661,11 @@
                                 <label class="form-label small fw-semibold text-secondary">Contract Hours (Weekly)
                                     <span class="text-danger">*</span></label>
                                 <input type="number"
+                                       step="0.01"
+                                       min="0"
                                        class="form-control border-light-subtle shadow-none"
                                        wire:model="contract_hours"
-                                       placeholder="e.g. 40">
+                                       placeholder="e.g. 40 or 30.50">
 
                                 @error('contract_hours')
                                     <span class="text-danger x-small">{{ $message }}</span>
@@ -1721,7 +1723,7 @@
 
                                     <div class="row g-3">
 
-                                        <div class="col-12 mb-2"
+                                        {{-- <div class="col-12 mb-2"
                                              x-data="addressAutocomplete()">
                                             <label class="form-label small fw-semibold text-secondary">
                                                 Address
@@ -1736,7 +1738,7 @@
                                             @error('address')
                                                 <span class="text-danger x-small">{{ $message }}</span>
                                             @enderror
-                                        </div>
+                                        </div> --}}
 
                                         <hr class="my-3 opacity-25">
 
@@ -1861,15 +1863,14 @@
 
 
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-semibold text-secondary">Zip / Postal
-                                                Code
+                                            <label class="form-label small fw-semibold text-secondary">Post Code
                                                 <span class="text-danger">*</span></label>
 
                                             <input type="text"
                                                    class="form-control border-light-subtle shadow-none"
                                                    wire:model="postcode"
-                                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                                   placeholder="e.g. 1234">
+                                                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                                   placeholder="e.g. AB1234">
                                             @error('postcode')
                                                 <span class="text-danger x-small">{{ $message }}</span>
                                             @enderror

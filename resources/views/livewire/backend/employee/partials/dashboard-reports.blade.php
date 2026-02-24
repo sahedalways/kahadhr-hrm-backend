@@ -194,9 +194,6 @@
                 <div
                      class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 bg-white border-bottom">
 
-
-
-
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-muted small fw-bold text-uppercase me-2">Filters:</span>
 

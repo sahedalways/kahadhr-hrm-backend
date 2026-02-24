@@ -269,7 +269,7 @@
                                             <div class="text-end">
                                                 <span class="badge rounded-pill bg-danger text-white px-3 py-2 shadow-sm"
                                                       style="font-size: 0.85rem; font-weight: 700;">
-                                                    €{{ number_format($expense->amount, 2) }}
+                                                    £{{ number_format($expense->amount, 2) }}
                                                 </span>
                                             </div>
                                         </div>

@@ -29,7 +29,8 @@ trait Exportable
             }
 
             $pdfData = array_merge($pdfData, ['data' => $data]);
-            $pdf = Pdf::loadView($pdfView, $pdfData);
+            $pdf = Pdf::loadView($pdfView, $pdfData)
+                ->setPaper('a3', 'landscape');
 
             return response()->streamDownload(function () use ($pdf) {
                 echo $pdf->output();

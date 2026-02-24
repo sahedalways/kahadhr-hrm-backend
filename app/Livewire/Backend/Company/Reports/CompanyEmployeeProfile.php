@@ -118,7 +118,7 @@ class CompanyEmployeeProfile extends BaseComponent
     public function updatedSelectAllFields($value)
     {
         if ($value) {
-            $this->selectedFields = $this->profileFields;
+            $this->selectedFields = array_keys($this->profileFields);
         } else {
             $this->selectedFields = [];
         }
@@ -194,6 +194,7 @@ class CompanyEmployeeProfile extends BaseComponent
 
         $keys = $this->selectedFields;
         array_unshift($keys, 'employee_name');
+
 
         return $this->export(
             $data,

@@ -43,7 +43,8 @@ if (!function_exists('getFileUrl')) {
       }
 
 
-      $siteSettings = SiteSetting::first();
+      $siteSettings = SiteSetting::withoutGlobalScope('filterByUserType')->first();
+
       if ($siteSettings && $siteSettings->logo) {
         return getFileUrl('image/settings/logo.' . $siteSettings->logo);
       }
@@ -59,8 +60,8 @@ if (!function_exists('getFileUrl')) {
    * Generic image upload helper
    *
    * @param UploadedFile|null $file
-   * @param string $directory 
-   * @param string|null $oldFilePath 
+   * @param string $directory
+   * @param string|null $oldFilePath
    * @return string|null
    */
   if (!function_exists('uploadImage')) {

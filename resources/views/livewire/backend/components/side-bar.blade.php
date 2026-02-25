@@ -61,7 +61,7 @@
                  class="navbar-brand-img h-100 scale-200 mx-auto"
                  alt="main_logo">
             @if (app('authUser')->user_type !== 'superAdmin')
-                <span class="mb-0 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
+                <span class="mb-0 mt-2 h6 font-weight-bold ">{{ siteSetting()->site_title }} </span>
             @endif
         </a>
     </div>

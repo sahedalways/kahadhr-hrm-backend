@@ -14,6 +14,8 @@
             border-collapse: collapse;
             width: 100%;
             margin-bottom: 20px;
+            page-break-inside: auto;
+            /* allow table to break across pages */
         }
 
         th,
@@ -21,6 +23,9 @@
             border: 1px solid #333;
             padding: 4px;
             text-align: center;
+            page-break-inside: avoid;
+            /* keep cell content together */
+            page-break-after: auto;
         }
 
         th {
@@ -33,29 +38,26 @@
             border-radius: 2px;
             font-size: 10px;
             margin-bottom: 2px;
-        }
-
-        .page-break {
-            page-break-after: always;
+            display: inline-block;
+            page-break-inside: avoid;
+            /* keep shift together */
         }
 
         h3 {
             margin-bottom: 10px;
         }
+
+        /* Removed page-break-after: always */
     </style>
 </head>
 
 <body>
     @foreach ($employees as $employee)
-        <h3>Schedule for {{ mb_convert_encoding($employee->full_name, 'UTF-8', 'UTF-8') }}</h3>
+        <h3>Schedule for {{ $employee->full_name }}</h3>
 
         @php
-            // Get all the dates to display for this employee
-            if ($viewMode === 'weekly') {
-                $displayDates = $weekDays;
-            } else {
-                // monthly: flatten weeks to a single list of dates
-                $displayDates = [];
+            $displayDates = $viewMode === 'weekly' ? $weekDays : [];
+            if ($viewMode !== 'weekly') {
                 foreach ($weeks as $week) {
                     foreach ($week as $day) {
                         $displayDates[] = [
@@ -67,7 +69,6 @@
                 }
             }
 
-            // employee's shifts
             $empShifts = $calendarShifts[$employee->id] ?? [];
         @endphp
 
@@ -90,7 +91,7 @@
                             @foreach ($shifts as $shift)
                                 <div class="shift-block"
                                      style="background-color: {{ $shift['shift']['color'] ?? '#6c757d' }}">
-                                    {{ mb_convert_encoding($shift['shift']['title'], 'UTF-8', 'UTF-8') }}<br>
+                                    {{ $shift['shift']['title'] }}<br>
                                     {{ \Carbon\Carbon::parse($shift['start_time'])->format('g:i A') }} -
                                     {{ \Carbon\Carbon::parse($shift['end_time'])->format('g:i A') }}
                                 </div>
@@ -100,8 +101,6 @@
                 </tr>
             </tbody>
         </table>
-
-        <div class="page-break"></div>
     @endforeach
 </body>
 

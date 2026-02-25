@@ -321,13 +321,6 @@
                                         <td class="text-start"
                                             style="max-width: 100%; white-space:nowrap;">
 
-
-
-
-
-
-
-
                                             @if ($employee->documents && $employee->documents->count() > 0)
                                                 @php
                                                     $grouped = $employee->documents
@@ -441,6 +434,15 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
+
+                                                <style>
+                                                    .d-flex::-webkit-scrollbar {
+                                                        display: none;
+                                                    }
+                                                </style>
+
+                                                <link rel="stylesheet"
+                                                      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
                                             @else
                                                 <div
                                                      style="display:flex; align-items:center; justify-content:center; height:100px;">

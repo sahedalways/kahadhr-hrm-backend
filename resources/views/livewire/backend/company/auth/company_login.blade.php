@@ -26,8 +26,8 @@
                                     <div class="d-flex flex-column align-items-center justify-content-center">
                                         <img src="{{ getCompanyLogoUrl() }}"
                                              alt="Logo"
-                                             class="login-logo mb-2"
-                                             style="width: 100px; height: auto;">
+                                             class="login-logo mb-3"
+                                             style="width: 140px; height: auto;">
                                     </div>
 
 

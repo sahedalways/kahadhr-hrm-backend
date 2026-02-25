@@ -20,7 +20,7 @@
                                     <div class="d-flex flex-column align-items-center justify-content-center mt-2 mb-4">
                                         <img src="{{ siteSetting()->logo_url }}"
                                              alt="Logo"
-                                             class="login-logo mb-2"
+                                             class="login-logo mb-3"
                                              style="width: 100px; height: auto;">
                                         <h6 class="text-primary">Set Your Password</h6>
                                     </div>

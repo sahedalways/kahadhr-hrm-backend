@@ -5,6 +5,7 @@
         </div>
     </div>
 
+
     <div class="row">
         <div class="col-12">
 
@@ -14,6 +15,8 @@
                           wire:submit.prevent="save">
 
                         <h5 class="fw-bold mb-0">Company Information</h5>
+
+                        <hr class="my-3 opacity-25">
 
                         <!-- Company Name -->
                         <div class="col-md-6">
@@ -33,16 +36,21 @@
 
                         <!-- House Number -->
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Company House Number <span
-                                      class="text-danger">*</span></label>
-                            <input type="text"
+                            <label class="form-label fw-semibold">
+                                Company House Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="number"
                                    class="form-control shadow-sm"
                                    wire:model="company_house_number"
-                                   placeholder="House No. / Flat No.">
+                                   placeholder="House No. / Flat No."
+                                   min="0"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             @error('company_house_number')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror
                         </div>
+
+
 
                         {{-- Business Type --}}
                         <div class="col-md-6 mb-2 mt-3">
@@ -74,22 +82,7 @@
 
                                 <div class="row g-3">
 
-                                    <div class="col-12 mb-2"
-                                         x-data="addressAutocomplete()">
-                                        <label class="form-label small fw-semibold text-secondary">Current
-                                            Address
-                                            <span class="text-danger">*</span></label>
-                                        <div class="position-relative">
-                                            <input type="text"
-                                                   class="form-control border-light-subtle py-2 shadow-none"
-                                                   wire:model="address"
-                                                   placeholder="Type to search your address..."
-                                                   autocomplete="off">
-                                        </div>
-                                        @error('address')
-                                            <span class="text-danger x-small">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+
 
                                     <hr class="my-3 opacity-25">
 
@@ -213,15 +206,14 @@
 
 
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-semibold text-secondary">Zip / Postal
-                                            Code
+                                        <label class="form-label small fw-semibold text-secondary">Post Code
                                             <span class="text-danger">*</span></label>
 
                                         <input type="text"
                                                class="form-control border-light-subtle shadow-none"
                                                wire:model="postcode"
-                                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                               placeholder="e.g. 1234">
+                                               oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                               placeholder="e.g. 1234AB">
                                         @error('postcode')
                                             <span class="text-danger x-small">{{ $message }}</span>
                                         @enderror

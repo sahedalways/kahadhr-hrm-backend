@@ -549,7 +549,8 @@
                                     <input type="text"
                                            class="form-control border-light-subtle shadow-none"
                                            wire:model="postcode"
-                                           placeholder="1234">
+                                           oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+                                           placeholder="e.g. AB1234">
                                     @error('postcode')
                                         <span class="text-danger x-small mt-1 d-block">{{ $message }}</span>
                                     @enderror

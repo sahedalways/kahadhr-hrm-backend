@@ -245,7 +245,6 @@ class ProfileSettings extends BaseComponent
                 Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
             'company_logo' => 'nullable|image|max:2048',
-            'address' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
@@ -279,7 +278,6 @@ class ProfileSettings extends BaseComponent
             'country'          => $this->country,
             'postcode'          => $this->postcode,
             'street'          => $this->street,
-            'address'          => $this->address,
 
         ]);
 

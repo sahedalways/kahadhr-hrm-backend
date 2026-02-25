@@ -1047,6 +1047,16 @@
 
 
 
+
+
+    <script>
+        window.addEventListener('showAbsentModal', () => {
+            const modal = new bootstrap.Modal(document.getElementById('absentModal'));
+            modal.show();
+        });
+    </script>
+
+
     <div wire:ignore.self
          class="modal fade"
          id="absentModal"
@@ -1073,9 +1083,41 @@
                 </div>
             </div>
         </div>
-
-
     </div>
+
+    <script>
+        window.addEventListener('open-attendance-modal', () => {
+            const modal = new bootstrap.Modal(
+                document.getElementById('attendanceDetailModal')
+            );
+            modal.show();
+        });
+    </script>
+
+
+
+
+    {{-- TIME UPDATE --}}
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+
 
     <script>
         window.addEventListener('showAbsentModal', () => {
@@ -1086,72 +1128,26 @@
 
 
 
-</div>
-
-
-<script>
-    window.addEventListener('open-attendance-modal', () => {
-        const modal = new bootstrap.Modal(
-            document.getElementById('attendanceDetailModal')
-        );
-        modal.show();
-    });
-</script>
-
-
-
-
-{{-- TIME UPDATE --}}
-<script>
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
+    <script>
+        // Prevent dropdown from closing when clicking inside
+        document.querySelectorAll('.dropdown-menu').forEach(function(element) {
+            element.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         });
-        document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
+    </script>
+
+
+    <script>
+        window.addEventListener('show-request-modal', () => {
+            var modalEl = document.getElementById('viewRequestInfo');
+            var modal = new bootstrap.Modal(modalEl);
+            modal.show();
         });
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-</script>
-
-
-<script>
-    window.addEventListener('showAbsentModal', () => {
-        const modal = new bootstrap.Modal(document.getElementById('absentModal'));
-        modal.show();
-    });
-</script>
-
-
-
-<script>
-    // Prevent dropdown from closing when clicking inside
-    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
-        element.addEventListener('click', function(e) {
-            e.stopPropagation();
+    </script>
+    <script>
+        window.addEventListener('show-more-attendance-modal', event => {
+            var myModal = new bootstrap.Modal(document.getElementById('moreAttendanceDetailModal'));
+            myModal.show();
         });
-    });
-</script>
-
-
-<script>
-    window.addEventListener('show-request-modal', () => {
-        var modalEl = document.getElementById('viewRequestInfo');
-        var modal = new bootstrap.Modal(modalEl);
-        modal.show();
-    });
-</script>
-<script>
-    window.addEventListener('show-more-attendance-modal', event => {
-        var myModal = new bootstrap.Modal(document.getElementById('moreAttendanceDetailModal'));
-        myModal.show();
-    });
-</script>
+    </script>

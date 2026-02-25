@@ -72,15 +72,27 @@
 
 <script>
     document.getElementById('downloadScheduleImg').addEventListener('click', function() {
-        // Target the whole container including sidebar
         const container = document.querySelector('.all-schedule-info');
+
+
+        const desktopWidth = 1400;
+
         html2canvas(container, {
             scrollY: -window.scrollY,
-            useCORS: true
+            useCORS: true,
+            width: desktopWidth,
+            windowWidth: desktopWidth,
+            scale: 2,
+            onclone: (clonedDoc) => {
+
+                const clonedContainer = clonedDoc.querySelector('.all-schedule-info');
+                clonedContainer.style.width = desktopWidth + 'px';
+                clonedContainer.style.display = 'flex';
+            }
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = 'schedule.png';
-            link.href = canvas.toDataURL();
+            link.href = canvas.toDataURL('image/png');
             link.click();
         });
     });

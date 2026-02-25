@@ -60,10 +60,28 @@
 
 <script>
     document.getElementById('downloadScheduleImg').addEventListener('click', function() {
-        html2canvas(document.querySelector('.schedule-grid-container')).then(canvas => {
+        const element = document.querySelector('.schedule-grid-container');
+
+
+        const desktopWidth = 1280;
+
+        html2canvas(element, {
+            useCORS: true,
+            allowTaint: true,
+            width: desktopWidth,
+            windowWidth: desktopWidth,
+            scale: 2,
+            onclone: (clonedDoc) => {
+
+                const clonedElement = clonedDoc.querySelector('.schedule-grid-container');
+                clonedElement.style.width = desktopWidth + 'px';
+                clonedElement.style.overflow =
+                    'visible';
+            }
+        }).then(canvas => {
             const link = document.createElement('a');
             link.download = 'schedule.png';
-            link.href = canvas.toDataURL();
+            link.href = canvas.toDataURL('image/png');
             link.click();
         });
     });

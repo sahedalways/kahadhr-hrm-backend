@@ -325,6 +325,9 @@
 
 
 
+
+
+
                                             @if ($employee->documents && $employee->documents->count() > 0)
                                                 @php
                                                     $grouped = $employee->documents
@@ -334,165 +337,110 @@
                                                         });
                                                 @endphp
 
-
-
-
-                                                @foreach ($grouped as $type => $docs)
-                                                    @php
-
-                                                        $latestDocs = $docs
-                                                            ->sortByDesc('created_at')
-                                                            ->take(10)
-                                                            ->values();
-
-                                                        $latestDoc = $docs->sortByDesc('created_at')->first();
-
-                                                        $latestExpiresAt =
-                                                            $latestDoc && $latestDoc->expires_at
-                                                                ? \Carbon\Carbon::parse($latestDoc->expires_at)
-                                                                : null;
-
-                                                        $showTypeNotify = false;
-                                                        $notificationType = null;
-
-                                                        if ($latestExpiresAt) {
-                                                            // Expired
-                                                            if ($latestExpiresAt->isPast()) {
-                                                                $showTypeNotify = true;
-                                                                $notificationType = 'expired';
-                                                            }
-                                                            // Expiring within 60 days (future only)
-                                                            elseif (
-                                                                now()->diffInDays($latestExpiresAt, false) > 0 &&
-                                                                now()->diffInDays($latestExpiresAt, false) <= 60
-                                                            ) {
-                                                                $showTypeNotify = true;
-                                                                $notificationType = 'soon';
-                                                            }
-                                                        }
-
-                                                    @endphp
-
-                                                    <div lass="text-center"
-                                                         style="width:100%; vertical-align:middle; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:12px;">
-                                                        @foreach ($grouped as $type => $docs)
-                                                            @php
-                                                                $latestDocs = $docs
-                                                                    ->sortByDesc('created_at')
-                                                                    ->take(10)
-                                                                    ->values();
-                                                                $latestDoc = $docs->sortByDesc('created_at')->first();
-                                                                $latestExpiresAt =
-                                                                    $latestDoc && $latestDoc->expires_at
-                                                                        ? \Carbon\Carbon::parse($latestDoc->expires_at)
-                                                                        : null;
-                                                                $showTypeNotify = false;
-                                                                $notificationType = null;
-
-                                                                if ($latestExpiresAt) {
-                                                                    if ($latestExpiresAt->isPast()) {
-                                                                        $showTypeNotify = true;
-                                                                        $notificationType = 'expired';
-                                                                    } elseif (
-                                                                        now()->diffInDays($latestExpiresAt, false) >
-                                                                            0 &&
-                                                                        now()->diffInDays($latestExpiresAt, false) <= 60
-                                                                    ) {
-                                                                        $showTypeNotify = true;
-                                                                        $notificationType = 'soon';
-                                                                    }
+                                                <div class="text-center"
+                                                     style="width:100%; vertical-align:middle; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:12px;">
+                                                    @foreach ($grouped as $type => $docs)
+                                                        @php
+                                                            $latestDocs = $docs
+                                                                ->sortByDesc('created_at')
+                                                                ->take(10)
+                                                                ->values();
+                                                            $latestDoc = $docs->sortByDesc('created_at')->first();
+                                                            $latestExpiresAt =
+                                                                $latestDoc && $latestDoc->expires_at
+                                                                    ? \Carbon\Carbon::parse($latestDoc->expires_at)
+                                                                    : null;
+                                                            $showTypeNotify = false;
+                                                            $notificationType = null;
+                                                            if ($latestExpiresAt) {
+                                                                if ($latestExpiresAt->isPast()) {
+                                                                    $showTypeNotify = true;
+                                                                    $notificationType = 'expired';
+                                                                } elseif (
+                                                                    now()->diffInDays($latestExpiresAt, false) > 0 &&
+                                                                    now()->diffInDays($latestExpiresAt, false) <= 60
+                                                                ) {
+                                                                    $showTypeNotify = true;
+                                                                    $notificationType = 'soon';
                                                                 }
-                                                            @endphp
+                                                            }
+                                                        @endphp
 
+                                                        <div class="border rounded p-2 mb-2"
+                                                             style="max-width:440px; flex: 0 0 calc(50% - 6px); position:relative;">
 
-                                                            <div class="border rounded p-2 mb-2"
-                                                                 style="max-width:440px; flex: 0 0 calc(50% - 6px); position:relative;">
+                                                            @if ($showTypeNotify)
+                                                                <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
+                                                                      wire:loading.attr="disabled"
+                                                                      title="Notify employee"
+                                                                      style="position:absolute; top:6px; right:6px; background:#dc3545; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; transition:all 0.25s ease; box-shadow:0 3px 8px rgba(0,0,0,0.25);"
+                                                                      onmouseover="this.style.transform='scale(1.2)'; this.style.background='#b02a37';"
+                                                                      onmouseout="this.style.transform='scale(1)'; this.style.background='#dc3545';">
+                                                                    <i class="bi bi-bell-fill"
+                                                                       wire:loading.remove></i>
+                                                                    <i class="bi bi-arrow-repeat"
+                                                                       wire:loading
+                                                                       style="animation:spin 1s linear infinite;"></i>
+                                                                </span>
+                                                            @endif
 
-                                                                @if ($showTypeNotify)
-                                                                    <span wire:click.stop="notifyEmployee({{ $latestDoc->doc_type_id }}, {{ $employee->id }}, '{{ $notificationType }}')"
-                                                                          wire:loading.attr="disabled"
-                                                                          title="Notify employee"
-                                                                          style="position:absolute; top:6px; right:6px; background:#dc3545; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; transition:all 0.25s ease; box-shadow:0 3px 8px rgba(0,0,0,0.25);"
-                                                                          onmouseover="this.style.transform='scale(1.2)'; this.style.background='#b02a37';"
-                                                                          onmouseout="this.style.transform='scale(1)'; this.style.background='#dc3545';">
-                                                                        <i class="bi bi-bell-fill"
-                                                                           wire:loading.remove></i>
-                                                                        <i class="bi bi-arrow-repeat"
-                                                                           wire:loading
-                                                                           style="animation:spin 1s linear infinite;"></i>
-                                                                    </span>
-                                                                @endif
+                                                            <div class="mb-2">
+                                                                <strong>{{ $type }}</strong>
+                                                            </div>
 
-                                                                <div class="mb-2">
-                                                                    <strong>{{ $type }}</strong>
-                                                                </div>
+                                                            <div class="d-flex align-items-center"
+                                                                 style="overflow-x:auto; overflow-y:hidden; padding:16px 8px; min-height:105px; max-width:100%; scrollbar-width:none;">
+                                                                @foreach ($latestDocs as $index => $doc)
+                                                                    @php
+                                                                        $colors = [
+                                                                            '#4e73df',
+                                                                            '#1cc88a',
+                                                                            '#36b9cc',
+                                                                            '#f6c23e',
+                                                                            '#e74a3b',
+                                                                        ];
+                                                                        $currentColor =
+                                                                            $colors[$index % count($colors)];
+                                                                        $extension = pathinfo(
+                                                                            $doc->file_path,
+                                                                            PATHINFO_EXTENSION,
+                                                                        );
+                                                                        $zIndex = count($latestDocs) - $index;
+                                                                    @endphp
 
-                                                                <div class="d-flex align-items-center"
-                                                                     style="overflow-x:auto; overflow-y:hidden; padding:16px 8px; min-height:105px; max-width:100%; scrollbar-width:none;">
-                                                                    @foreach ($latestDocs as $index => $doc)
-                                                                        @php
-                                                                            $colors = [
-                                                                                '#4e73df',
-                                                                                '#1cc88a',
-                                                                                '#36b9cc',
-                                                                                '#f6c23e',
-                                                                                '#e74a3b',
-                                                                            ];
-                                                                            $currentColor =
-                                                                                $colors[$index % count($colors)];
-                                                                            $extension = pathinfo(
-                                                                                $doc->file_path,
-                                                                                PATHINFO_EXTENSION,
-                                                                            );
-                                                                            $zIndex = count($latestDocs) - $index;
-                                                                        @endphp
+                                                                    <div class="doc-card-wrapper"
+                                                                         style="position:relative; min-width:90px; margin-right:-70px; z-index:{{ $zIndex }}; transition:all 0.4s; cursor:pointer;"
+                                                                         onmouseover="this.style.zIndex='999'; this.style.transform='translateY(-12px) scale(1.08)'; this.style.marginRight='10px';"
+                                                                         onmouseout="this.style.zIndex='{{ $zIndex }}'; this.style.transform='translateY(0) scale(1)'; this.style.marginRight='-70px';"
+                                                                         data-bs-toggle="modal"
+                                                                         data-bs-target="#documentModal"
+                                                                         wire:click="openDocModal({{ $doc->id }}, {{ $index + 1 }})">
 
-                                                                        <div class="doc-card-wrapper"
-                                                                             style="position:relative; min-width:90px; margin-right:-70px; z-index:{{ $zIndex }}; transition:all 0.4s; cursor:pointer;"
-                                                                             onmouseover="this.style.zIndex='999'; this.style.transform='translateY(-12px) scale(1.08)'; this.style.marginRight='10px';"
-                                                                             onmouseout="this.style.zIndex='{{ $zIndex }}'; this.style.transform='translateY(0) scale(1)'; this.style.marginRight='-70px';"
-                                                                             data-bs-toggle="modal"
-                                                                             data-bs-target="#documentModal"
-                                                                             wire:click="openDocModal({{ $doc->id }}, {{ $index + 1 }})">
-
+                                                                        <div
+                                                                             style="background:white; border-radius:10px; padding:10px; border-top:3px solid {{ $currentColor }}; text-align:center; border:1px solid #eee;">
                                                                             <div
-                                                                                 style="background:white; border-radius:10px; padding:10px; border-top:3px solid {{ $currentColor }}; text-align:center; border:1px solid #eee;">
-                                                                                <!-- Icon -->
-                                                                                <div
-                                                                                     style="width:36px; height:36px; background:{{ $currentColor }}15; color:{{ $currentColor }}; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; font-size:1.1rem;">
-                                                                                    @if (in_array($extension, ['jpg', 'png', 'jpeg']))
-                                                                                        <i class="bi bi-image"></i>
-                                                                                    @elseif($extension === 'pdf')
-                                                                                        <i
-                                                                                           class="bi bi-file-earmark-pdf"></i>
-                                                                                    @else
-                                                                                        <i
-                                                                                           class="bi bi-file-earmark-text"></i>
-                                                                                    @endif
-                                                                                </div>
-
-                                                                                <!-- Filename -->
-                                                                                <div
-                                                                                     style="font-weight:700;font-size:0.65rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                                                                    File-{{ $index + 1 }}.{{ $extension }}
-                                                                                </div>
+                                                                                 style="width:36px; height:36px; background:{{ $currentColor }}15; color:{{ $currentColor }}; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; font-size:1.1rem;">
+                                                                                @if (in_array($extension, ['jpg', 'png', 'jpeg']))
+                                                                                    <i class="bi bi-image"></i>
+                                                                                @elseif($extension === 'pdf')
+                                                                                    <i
+                                                                                       class="bi bi-file-earmark-pdf"></i>
+                                                                                @else
+                                                                                    <i
+                                                                                       class="bi bi-file-earmark-text"></i>
+                                                                                @endif
+                                                                            </div>
+                                                                            <div
+                                                                                 style="font-weight:700;font-size:0.65rem;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                                                File-{{ $index + 1 }}.{{ $extension }}
                                                                             </div>
                                                                         </div>
-                                                                    @endforeach
-                                                                </div>
+                                                                    </div>
+                                                                @endforeach
                                                             </div>
-                                                        @endforeach
-                                                    </div>
-                                                @endforeach
-
-                                                <style>
-                                                    .d-flex::-webkit-scrollbar {
-                                                        display: none;
-                                                    }
-                                                </style>
-
-                                                <link rel="stylesheet"
-                                                      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             @else
                                                 <div
                                                      style="display:flex; align-items:center; justify-content:center; height:100px;">
@@ -615,9 +563,13 @@
                             @if ($file_path)
                                 <div class="mt-2">
                                     @php
+
                                         $ext = strtolower(
                                             pathinfo($file_path->getClientOriginalName(), PATHINFO_EXTENSION),
                                         );
+
+                                        $fileName = $file_path->getClientOriginalName();
+                                        $displayName = Illuminate\Support\Str::limit($fileName, 20);
                                     @endphp
 
                                     @if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
@@ -626,12 +578,13 @@
                                              class="img-fluid rounded shadow-sm"
                                              style="max-height: 200px;">
                                     @elseif ($ext === 'pdf')
-                                        <div class="border rounded p-2 bg-light d-inline-block">
+                                        <div class="border rounded p-2 bg-light d-inline-block"
+                                             title="{{ $fileName }}">
                                             <i class="bi bi-file-earmark-pdf-fill text-danger"></i>
-                                            <span class="ms-2">{{ $file_path->getClientOriginalName() }}</span>
+                                            <span class="ms-2">{{ $displayName }}</span>
                                         </div>
                                     @else
-                                        <span>{{ $file_path->getClientOriginalName() }}</span>
+                                        <span title="{{ $fileName }}">{{ $displayName }}</span>
                                     @endif
                                 </div>
                             @endif

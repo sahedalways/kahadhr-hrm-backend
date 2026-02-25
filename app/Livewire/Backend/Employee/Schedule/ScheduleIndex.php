@@ -38,20 +38,17 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
 
         if ($mode === 'weekly') {
-
-            $this->startDate = now()->startOfDay();
-            $this->endDate = now()->addDays(6)->endOfDay();
+            $this->startDate = now()->startOfWeek(Carbon::MONDAY);
+            $this->endDate   = now()->endOfWeek(Carbon::SUNDAY);
         } elseif ($mode === 'monthly') {
             $this->startDate = now()->startOfMonth();
-            $this->endDate = now()->endOfMonth();
+            $this->endDate   = now()->endOfMonth();
         }
-
 
         $this->loadShifts();
     }
@@ -220,8 +217,14 @@ class ScheduleIndex extends BaseComponent
     {
         $this->company_id = auth()->user()->employee->company_id;
 
-        $this->startDate = Carbon::today();
-        $this->endDate = Carbon::today()->copy()->addDays(6);
+        if ($this->viewMode === 'weekly') {
+            $this->startDate = Carbon::today()->startOfWeek(Carbon::MONDAY);
+            $this->endDate   = Carbon::today()->endOfWeek(Carbon::SUNDAY);
+        } else {
+            $this->startDate = Carbon::today()->startOfMonth();
+            $this->endDate   = Carbon::today()->endOfMonth();
+        }
+
         $this->currentDate = Carbon::today();
         $this->loadEmployees();
         $this->loadShifts();
@@ -232,29 +235,28 @@ class ScheduleIndex extends BaseComponent
     public function goToPrevious()
     {
         if ($this->viewMode === 'weekly') {
-            $this->startDate->subWeek();
-            $this->endDate->subWeek();
-            $this->currentDate->subWeek();
+            $this->startDate->subWeek()->startOfWeek(Carbon::MONDAY);
+            $this->endDate->subWeek()->endOfWeek(Carbon::SUNDAY);
         } elseif ($this->viewMode === 'monthly') {
             $this->startDate->subMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
-            $this->currentDate->subMonth();
         }
+
+        $this->loadShifts();
     }
 
     public function goToNext()
     {
         if ($this->viewMode === 'weekly') {
-            $this->startDate->addWeek();
-            $this->endDate->addWeek();
-            $this->currentDate->addWeek();
+            $this->startDate->addWeek()->startOfWeek(Carbon::MONDAY);
+            $this->endDate->addWeek()->endOfWeek(Carbon::SUNDAY);
         } elseif ($this->viewMode === 'monthly') {
             $this->startDate->addMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
-            $this->currentDate->addMonth();
         }
-    }
 
+        $this->loadShifts();
+    }
 
     public function downloadSchedulePDF()
     {

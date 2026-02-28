@@ -46,7 +46,8 @@ class ChargeCompanies extends Command
         foreach ($companies as $company) {
 
             $minCharge = config('billing.minimum_monthly_charge', 50);
-            $employeeCount = Employee::withoutGlobalScope('filterByUserType')
+            $employeeCount = Employee::withTrashed()
+                ->withoutGlobalScope('filterByUserType')
                 ->where('company_id', $company->id)
                 ->whereDate('billable_from', '<=', now()->endOfMonth())
                 ->count();

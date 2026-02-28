@@ -20,7 +20,7 @@ class ExpireShareCodeStatus extends Command
 
         foreach ($employees as $employee) {
 
-            // Get latest Share Code document
+
             $latestDoc = EmpDocument::where('emp_id', $employee->id)
                 ->whereHas('documentType', function ($q) {
                     $q->where('name', 'Share Code');

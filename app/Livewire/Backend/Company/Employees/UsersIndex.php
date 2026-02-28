@@ -13,8 +13,6 @@ use App\Models\Team;
 use App\Models\User;
 use App\Traits\Exportable;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 

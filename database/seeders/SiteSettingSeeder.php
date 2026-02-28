@@ -16,7 +16,7 @@ class SiteSettingSeeder extends Seeder
       'hero_image'        => 'webp',
       'site_phone_number' => '+8801877556633',
       'site_email'             => 'info@kahadhr.com',
-      'copyright_text'    => '© ' . date('Y') . ' Kahadhr. All rights reserved.',
+      'copyright_text'    => '© 2026 KahadHR. All rights reserved. Developed and Maintenances by MARSSTATION',
     ]);
   }
 }

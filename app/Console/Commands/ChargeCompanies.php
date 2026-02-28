@@ -10,9 +10,19 @@ use App\Models\Employee;
 use App\Models\Invoice;
 use App\Services\PaymentGateway;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ChargeCompanies extends Command
 {
+    protected PaymentGateway $gateway;
+
+    public function __construct(PaymentGateway $gateway)
+    {
+        parent::__construct();
+        $this->gateway = $gateway;
+    }
+
+
     protected $signature = 'companies:charge';
     protected $description = 'Charge all companies based on employee count every month';
 
@@ -24,25 +34,43 @@ class ChargeCompanies extends Command
             ->whereDate('subscription_end', '<=', Carbon::today())
             ->get();
 
+
+        $rate = optional(CompanyChargeRate::first())->rate;
+
+        if (!$rate) {
+            $this->error('No company charge rate found. Skipping charges.');
+            return;
+        }
+
+
         foreach ($companies as $company) {
-            $employeeCount = Employee::where('company_id', $company->id)
+
+            $minCharge = config('billing.minimum_monthly_charge', 50);
+            $employeeCount = Employee::withoutGlobalScope('filterByUserType')
+                ->where('company_id', $company->id)
                 ->whereDate('billable_from', '<=', now()->endOfMonth())
                 ->count();
 
-            // Skip if no employees
-            if ($employeeCount == 0) continue;
+            if ($employeeCount == 0) {
+                $amount = $minCharge;
+                $this->info("No employees found for {$company->company_name}. Applying minimum charge: {$minCharge} GBP");
+            } else {
+                $amount = $employeeCount * $rate;
+            }
 
-            $rate = CompanyChargeRate::first()->rate;
-            $amount = $employeeCount * $rate;
+            $vat = 0;
+            $total = $amount + $vat;
 
             $card = $company->defaultCard();
+
+
 
             if (!$card || !$card->stripe_payment_method_id) {
                 $this->error("No valid card for {$company->company_name}");
                 continue;
             }
 
-            $result = PaymentGateway::charge(
+            $result = $this->gateway->charge(
                 $card->stripe_payment_method_id,
                 $amount
             );
@@ -58,10 +86,6 @@ class ChargeCompanies extends Command
 
 
                 $invoiceNumber = 'INV-' . strtoupper(uniqid());
-                $subtotal = $company->monthlyAmount();
-                $vat = 0;
-                $total = $subtotal + $vat;
-                $rate = CompanyChargeRate::first()->value('rate');
 
                 Invoice::create([
                     'company_id' => $company->id,
@@ -69,7 +93,7 @@ class ChargeCompanies extends Command
                     'billing_period_end' => now()->endOfMonth(),
                     'employee_fee' => $rate,
                     'total_employees_billed' => $employeeCount,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $amount,
                     'total' => $total,
                     'vat' => $vat,
                     'invoice_date' => now(),
@@ -90,8 +114,6 @@ class ChargeCompanies extends Command
                 ]);
 
                 PaymentStatusEmailJob::dispatch($company->id, 'payment_failed');
-
-
 
 
                 if ($company->payment_failed_count >= 3) {

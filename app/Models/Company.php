@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Company extends Model
 {
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -53,12 +55,6 @@ class Company extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    // One Company → Many Bank Infos
-    public function bankInfos()
-    {
-        return $this->hasOne(CompanyBankInfo::class);
     }
 
 
@@ -225,14 +221,12 @@ class Company extends Model
         return $chargeRate ? $chargeRate->rate : 0;
     }
 
-    /**
-     * Calculate monthly amount for this company
-     *
-     * @return float
-     */
     public function monthlyAmount(): float
     {
-        $employeeCount = $this->employees()->count();
+        $employeeCount = $this->employees()
+            ->withoutGlobalScope('filterByUserType')
+            ->count();
+
         return $employeeCount * $this->perEmployeeCharge();
     }
 
@@ -242,11 +236,19 @@ class Company extends Model
         return $this->hasOne(CalendarYearSetting::class, 'company_id', 'id');
     }
 
+    public function bankInfos()
+    {
+        return $this->hasOne(CompanyBankInfo::class);
+    }
 
+    // ✅ defaultCard মেথড
     public function defaultCard()
     {
-        return $this->bankInfos()->latest()->first();
+        return $this->bankInfos()
+            ->withoutGlobalScope('filterByUserType')
+            ->first();
     }
+
 
 
     public function hasValidCard()

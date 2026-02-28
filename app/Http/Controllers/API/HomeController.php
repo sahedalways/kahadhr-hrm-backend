@@ -17,6 +17,7 @@ class HomeController extends BaseController
         try {
             $siteInfo = SiteSetting::first();
             $socialInfo = SocialInfoSettings::first();
+            $chargeRate = CompanyChargeRate::value('rate');
 
 
             if ($siteInfo) {
@@ -41,6 +42,7 @@ class HomeController extends BaseController
                 'data' => [
                     'site_info' => $siteInfo,
                     'social_info' => $socialInfo,
+                    'company_charge_rate' => $chargeRate,
                 ],
             ], 200);
         } catch (\Exception $e) {

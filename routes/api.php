@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\ContactController;
+use App\Http\Controllers\API\DemoRequestController;
 use App\Http\Controllers\API\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,7 @@ Route::middleware(['cors', 'log.traffic'])->group(function () {
 
   // for contact us route
   Route::post('/contact/submit', [ContactController::class, 'store'])->middleware('throttle:2,1');
+  Route::post('/demo-request', [DemoRequestController::class, 'store'])->middleware('throttle:2,1');
 });
 
 

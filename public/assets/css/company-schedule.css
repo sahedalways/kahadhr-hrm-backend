@@ -19,7 +19,7 @@
     border-radius: 0.5rem;
 }
 
-.schedule-table.table-bordered> :not(caption)>*>* {
+.schedule-table.table-bordered > :not(caption) > * > * {
     border-width: 0 1px 1px 0;
     border-color: #d8d8d8;
 }
@@ -33,7 +33,7 @@ tr {
     border-color: #d8d8d8;
 }
 
-.schedule-table.table-bordered> :not(caption)>*>*:first-child {
+.schedule-table.table-bordered > :not(caption) > * > *:first-child {
     border-left-width: 1px;
 }
 
@@ -74,7 +74,7 @@ tr {
     background-color: #ffcccc;
 }
 
-.schedule-table tbody tr:nth-child(4)~tr td {
+.schedule-table tbody tr:nth-child(4) ~ tr td {
     border-top: none;
     border-bottom: 1px solid #eee;
 }
@@ -85,7 +85,6 @@ tr {
     padding-bottom: 1rem;
     max-height: 400px;
 }
-
 
 .smaller {
     font-size: 0.65rem;
@@ -103,7 +102,9 @@ tr {
 
 .employee-row {
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+    transition:
+        background 0.2s,
+        transform 0.2s;
 }
 
 .employee-row:hover {
@@ -117,7 +118,6 @@ tr {
     object-fit: cover;
     border: 2px solid #fff;
 }
-
 
 .shift-panel {
     position: fixed;
@@ -164,7 +164,6 @@ tr {
     backdrop-filter: blur(2px);
     z-index: 1050;
 }
-
 
 @keyframes slideIn {
     from {

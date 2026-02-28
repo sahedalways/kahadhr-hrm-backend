@@ -31,11 +31,19 @@ class SendOtpSmsForVerifyJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Load the SMS settings (company-specific or global)
         $settings = SmsSetting::first();
 
         if (!$settings) {
             \Log::error("No SMS settings found. Cannot send OTP.");
+            return;
+        }
+
+        if (
+            empty($settings->account_sid) ||
+            empty($settings->auth_token) ||
+            empty($settings->from_number)
+        ) {
+            \Log::error("Twilio credentials missing.");
             return;
         }
 
@@ -45,15 +53,18 @@ class SendOtpSmsForVerifyJob implements ShouldQueue
             $messageBody = "Use {$this->otp} as ONE-TIME verification of your phone number. " .
                 "Your safety is in your hands. Never share this OTP. - {$siteName}";
 
-            // Example with Twilio
-            $client = new Client($settings->account_sid, $settings->auth_token);
+            $client = new Client(
+                (string) $settings->account_sid,
+                (string) $settings->auth_token
+            );
+
             $client->messages->create($this->phone, [
                 'from' => $settings->from_number,
                 'body' => $messageBody
             ]);
 
             \Log::info("OTP sent to {$this->phone}: {$this->otp}");
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error("Failed to send OTP to {$this->phone}: " . $e->getMessage());
         }
     }

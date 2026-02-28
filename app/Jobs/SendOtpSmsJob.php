@@ -38,21 +38,40 @@ class SendOtpSmsJob implements ShouldQueue
             return;
         }
 
+        if (
+            empty($settings->account_sid) ||
+            empty($settings->auth_token) ||
+            empty($settings->from_number)
+        ) {
+            \Log::error("Twilio credentials missing", [
+                'sid' => $settings->account_sid,
+                'token' => $settings->auth_token,
+                'from' => $settings->from_number,
+            ]);
+            return;
+        }
+
+        if (!preg_match('/^\+\d{10,15}$/', $this->phone)) {
+            \Log::error("Invalid phone format: {$this->phone}");
+            return;
+        }
+
         try {
-            $siteName = siteSetting()->site_title ?? 'Kahadhr HRM';
+            $siteName = siteSetting()->site_title ?? 'KahadHR';
+            $messageBody = "Use {$this->otp} as ONE-TIME KEY. Your safety is in your hands. Never share this OTP. - {$siteName}";
 
-            $messageBody = "Use {$this->otp} as ONE-TIME KEY. " .
-                "Your safety is in your hands. Never share this OTP. - {$siteName}";
+            $client = new Client(
+                (string) $settings->account_sid,
+                (string) $settings->auth_token
+            );
 
-            // Example with Twilio
-            $client = new Client($settings->account_sid, $settings->auth_token);
             $client->messages->create($this->phone, [
                 'from' => $settings->from_number,
                 'body' => $messageBody
             ]);
 
             \Log::info("OTP sent to {$this->phone}: {$this->otp}");
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error("Failed to send OTP to {$this->phone}: " . $e->getMessage());
         }
     }

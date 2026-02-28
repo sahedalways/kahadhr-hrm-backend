@@ -879,9 +879,7 @@ class EmployeeDetails extends BaseComponent
         );
 
 
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl)
-            ->onConnection('sync')
-            ->onQueue('urgent');
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
 
         $this->toast('Verification link sent successfully!', 'success');
     }
@@ -1446,9 +1444,7 @@ class EmployeeDetails extends BaseComponent
         );
 
         // Dispatch job
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl)
-            ->onConnection('sync')
-            ->onQueue('urgent');
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
 
         $this->toast('Password reset link sent successfully!', 'success');
     }

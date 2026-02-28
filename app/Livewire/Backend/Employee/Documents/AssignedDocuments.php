@@ -29,12 +29,12 @@ class AssignedDocuments extends BaseComponent
 
     public function mount()
     {
-     if (request()->has('id')) {
-         $this->openDocId = request('id');
+        if (request()->has('id')) {
+            $this->openDocId = request('id');
 
 
-         $this->openDocumentModal($this->openDocId);
-    }
+            $this->openDocumentModal($this->openDocId);
+        }
 
 
         $this->loaded = collect();
@@ -154,7 +154,7 @@ class AssignedDocuments extends BaseComponent
         ]);
 
 
-        EmployeeSignedNotificationJob::dispatch($this->currentDocument->id)->onConnection('sync')->onQueue('urgent');
+        EmployeeSignedNotificationJob::dispatch($this->currentDocument->id);
 
 
         $documentName = $this->currentDocument->name;
@@ -196,6 +196,6 @@ class AssignedDocuments extends BaseComponent
     {
         $this->currentDocument = CompanyDocument::find($docId);
 
-         $this->dispatch('show-doc-modal');
+        $this->dispatch('show-doc-modal');
     }
 }

@@ -122,7 +122,7 @@ class DocumentManageIndex extends BaseComponent
         ]);
 
         if ($this->emp_id) {
-            EmployeeAssignedNotificationJob::dispatch($doc->id)->onConnection('sync')->onQueue('urgent');
+            EmployeeAssignedNotificationJob::dispatch($doc->id);
 
             $userId = Employee::where('id', $this->emp_id)
                 ->select('user_id')

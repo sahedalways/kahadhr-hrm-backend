@@ -565,7 +565,7 @@ class UsersIndex extends BaseComponent
 
         // Dispatch queued job
         // SendEmployeeInvitation::dispatch($employee, $inviteUrl);
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl)->onConnection('sync')->onQueue('urgent');
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
 
         // Reset form
         $this->reset(['email', 'f_name', 'l_name', 'department_id', 'team_id', 'role', 'employment_status', 'contract_hours', 'phone_no', 'job_title', 'start_date', 'end_date', 'is_active', 'title', 'nationality', 'date_of_birth', 'share_code']);

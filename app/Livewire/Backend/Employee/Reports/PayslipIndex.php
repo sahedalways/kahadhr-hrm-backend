@@ -141,7 +141,7 @@ class PayslipIndex extends BaseComponent
             'status' => 'pending',
         ]);
 
-        PayslipRequestNotificationJob::dispatch($request->id)->onConnection('sync')->onQueue('urgent');
+        PayslipRequestNotificationJob::dispatch($request->id);
 
 
         $submitterName = auth()->user()->full_name;

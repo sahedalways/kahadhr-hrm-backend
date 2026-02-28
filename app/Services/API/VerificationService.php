@@ -3,7 +3,7 @@
 namespace App\Services\API;
 
 use App\Jobs\SendOtpEmailJob;
-
+use App\Jobs\SendOtpSmsForVerifyJob;
 use App\Repositories\API\VerificationRepository;
 use Carbon\Carbon;
 
@@ -30,9 +30,6 @@ class VerificationService
       SendOtpEmailJob::dispatch($email, $otp, $name)->onConnection('sync')->onQueue('urgent');
     }
 
-    // if ($phone) {
-    //   // SendOtpSmsForVerifyJob::dispatch($phone, $otp)->onConnection('sync')->onQueue('urgent');
-    // }
 
     return true;
   }
@@ -50,9 +47,9 @@ class VerificationService
     ]);
 
 
-    // if ($phoneNo) {
-    //   SendOtpSmsForVerifyJob::dispatch($phoneNo, $otp)->onConnection('sync')->onQueue('urgent');
-    // }
+    if ($phoneNo) {
+      SendOtpSmsForVerifyJob::dispatch($phoneNo, $otp)->onConnection('sync')->onQueue('urgent');
+    }
 
     return true;
   }

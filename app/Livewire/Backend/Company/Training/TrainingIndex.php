@@ -77,12 +77,12 @@ class TrainingIndex extends BaseComponent
 
         $this->loadMore();
 
-         if (request()->has('id')) {
-         $this->openTrainingId = request('id');
+        if (request()->has('id')) {
+            $this->openTrainingId = request('id');
 
 
-         $this->viewReport($this->openTrainingId);
-    }
+            $this->viewReport($this->openTrainingId);
+        }
     }
 
     public function render()
@@ -93,7 +93,7 @@ class TrainingIndex extends BaseComponent
     }
 
 
-       public function updatedSendEmail($value)
+    public function updatedSendEmail($value)
     {
         if ($value) {
             $gateway = EmailSetting::where('company_id', $this->company_id)->first();
@@ -275,7 +275,7 @@ class TrainingIndex extends BaseComponent
             if ($this->send_email) {
                 $user = User::find($emp['id']);
                 if ($user && $user->email) {
-                    SendTrainingNotification::dispatch($user, $training)->onConnection('sync')->onQueue('urgent');
+                    SendTrainingNotification::dispatch($user, $training);
                 }
             }
 
@@ -287,7 +287,7 @@ class TrainingIndex extends BaseComponent
             $notification = Notification::create([
                 'company_id' => $this->company_id,
                 'user_id'    => $emp['id'],
-                'notifiable_id' => $training ->id,
+                'notifiable_id' => $training->id,
                 'type'       => 'assigned_training',
                 'data'       => [
                     'message' => $message
@@ -453,7 +453,7 @@ class TrainingIndex extends BaseComponent
         $this->training = Training::with(['assignments.user'])
             ->findOrFail($trainingId);
 
-       $this->dispatch('show-training-modal');
+        $this->dispatch('show-training-modal');
     }
 
 
@@ -468,7 +468,7 @@ class TrainingIndex extends BaseComponent
             return;
         }
 
-        SendTrainingReminder::dispatch($id)->onConnection('sync')->onQueue('urgent');
+        SendTrainingReminder::dispatch($id);
 
         $this->toast('Reminder sent successfully!', 'success');
     }

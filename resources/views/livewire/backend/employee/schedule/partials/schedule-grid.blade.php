@@ -1,4 +1,4 @@
-<div class="flex-grow-1 schedule-grid-container">
+<div class="flex-grow-1 schedule-grid-container ">
     <div class="bg-white d-flex justify-content-center align-items-center py-2">
         @include('livewire.backend.employee.schedule.partials.header_nav', [
             'startDate' => $startDate ?? 'Oct 27',
@@ -9,7 +9,7 @@
 
 
     <div class="table-responsive">
-        <table class="table table-bordered schedule-table m-0">
+        <table class="table table-bordered schedule-table m-0 {{ $viewMode === 'weekly' ? 'weekly-mode' : '' }}">
             {{-- ---------- WEEKLY MODE HEADER ---------- --}}
             @if ($viewMode === 'weekly')
                 <thead>
@@ -218,15 +218,17 @@
                     @php
                         $employee = auth()->user()->employee;
                     @endphp
-                    <tr>
+                    <tr class="weekly-mode-rows">
                         @foreach ($weekDays as $day)
                             @php
                                 $content = $this->getCellContent($employee['id'], $day['full_date']);
 
                                 $onLeave = hasLeave($employee['id'], $day['full_date']);
+                                $dayLabel = $day['day'] . ' ' . $day['date'];
                             @endphp
                             <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
-                                style="position:relative;">
+                                style="position:relative;"
+                                data-day-label="{{ $dayLabel }}">
 
                                 @if ($onLeave)
                                     <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
@@ -235,8 +237,8 @@
                                     </div>
                                 @elseif ($content && $content['type'] === 'Shift')
                                     @php $modalId = 'shiftDetailsModal-'.$employee['id'].'-'.\Str::slug($content['title']); @endphp
-                                    <div class="shift-block text-white rounded position-relative shadow-sm p-3"
-                                         style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s ease-in-out;"
+                                    <div class="shift-block text-white rounded shadow-sm p-3"
+                                         style="background-color:{{ $content['color'] ?? '#6c757d' }};cursor:pointer;transition:all .25s ease-in-out;"
                                          data-bs-toggle="modal"
                                          data-bs-target="#{{ $modalId }}">
                                         <div class="small fw-bold text-truncate">
@@ -389,4 +391,22 @@
         document.querySelectorAll('.dropdown-schedule-celll').forEach(el => el.classList.add('d-none'));
         document.querySelectorAll('.shift-block').forEach(el => el.classList.remove('active-z'));
     });
+</script>
+
+
+<script>
+    (function() {
+        function checkMobile() {
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+        }
+
+
+        checkMobile();
+
+        window.addEventListener('resize', checkMobile);
+    })();
 </script>

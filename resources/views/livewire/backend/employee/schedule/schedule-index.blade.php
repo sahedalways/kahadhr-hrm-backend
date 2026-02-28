@@ -44,7 +44,6 @@
             <div class="d-flex">
 
                 <div class="w-100">
-
                     @include('livewire.backend.employee.schedule.partials.schedule-grid')
                 </div>
             </div>

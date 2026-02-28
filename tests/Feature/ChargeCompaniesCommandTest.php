@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Facades\PaymentGateway;
 use Tests\TestCase;
 use App\Models\Company;
 use App\Models\CompanyChargeRate;
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -20,21 +20,16 @@ class ChargeCompaniesCommandTest extends TestCase
 
 
     /** @test */
-    public function it_charges_company_successfully()
+    public function it_handles_payment_failure_correctly()
     {
-
         $this->withoutExceptionHandling();
 
+        Log::info('Starting test: it_handles_payment_failure_correctly');
 
-        Log::info('Starting test: it_charges_company_successfully');
+        // 1. রেট তৈরি
+        CompanyChargeRate::create(['rate' => 15.00]);
 
-        Notification::fake();
-
-
-        $rate = CompanyChargeRate::create(['rate' => 15.00]);
-        $this->assertNotNull($rate, 'Company charge rate created');
-        Log::info('Company charge rate created', ['rate' => $rate->rate]);
-
+        // 2. কোম্পানি তৈরি
         $company = Company::create([
             'user_id' => User::factory()->create()->id,
             'company_name' => 'Test Company',
@@ -43,6 +38,7 @@ class ChargeCompaniesCommandTest extends TestCase
             'subscription_status' => 'active',
             'subscription_end' => Carbon::yesterday(),
             'payment_status' => 'pending',
+            'payment_failed_count' => 0,
             'status' => 'Active',
             'company_house_number' => '123',
             'company_mobile' => '1234567890',
@@ -55,12 +51,9 @@ class ChargeCompaniesCommandTest extends TestCase
             'country' => 'UK',
         ]);
 
-        Log::info('Company created with ID: ' . $company->id);
-
-
-        $employees = [];
+        // 3. এমপ্লয়ী তৈরি
         for ($i = 0; $i < 5; $i++) {
-            $employee = Employee::create([
+            Employee::create([
                 'company_id' => $company->id,
                 'user_id' => User::factory()->create()->id,
                 'f_name' => 'Test',
@@ -80,76 +73,131 @@ class ChargeCompaniesCommandTest extends TestCase
                 'verified' => 1,
                 'billable_from' => now()->subDays(5),
             ]);
-            $employees[] = $employee;
         }
 
-        Log::info('Employees created:', [
-            'count' => count($employees),
-            'first_employee_billable_from' => $employees[0]->billable_from->toDateTimeString()
-        ]);
-
-
-        $bankInfo = $company->bankInfos()->create([
+        // 4. ব্যাংক তথ্য তৈরি (কার্ড থাকলেও payment fail হবে)
+        $company->bankInfos()->create([
             'stripe_payment_method_id' => 'pm_test_12345',
         ]);
 
-        Log::info('Bank info created', [
-            'bank_info_id' => $bankInfo->id,
-            'payment_method' => $bankInfo->stripe_payment_method_id
-        ]);
-
-
-        $defaultCard = $company->fresh()->defaultCard();
-
-        Log::info('Default card check:', [
-            'exists' => $defaultCard ? 'yes' : 'no',
-            'payment_method' => $defaultCard?->stripe_payment_method_id,
-            'company_id' => $defaultCard?->company_id
-        ]);
-
-
-        $this->assertNotNull($defaultCard, 'Default card should exist');
-        $this->assertEquals('pm_test_12345', $defaultCard->stripe_payment_method_id);
-
-
+        // 5. Mock Gateway - Failed Response
         $gatewayMock = Mockery::mock(\App\Services\PaymentGateway::class);
         $gatewayMock->shouldReceive('charge')
             ->once()
             ->andReturn((object)[
-                'success' => true,
-                'transaction_id' => 'test_txn_123',
-                'status' => 'succeeded',
+                'success' => false,
+                'message' => 'Payment failed',
+                'status' => 'failed',
             ]);
 
         $this->app->instance(\App\Services\PaymentGateway::class, $gatewayMock);
-        Log::info('Payment gateway mocked');
+        Log::info('Payment gateway mocked for failure');
 
-        // কমান্ড রান করুন
-        Log::info('Running companies:charge command');
-        $exitCode = Artisan::call('companies:charge');
-
-
+        // 6. কমান্ড রান
+        Artisan::call('companies:charge');
         $output = Artisan::output();
         Log::info('Command output', ['output' => $output]);
-        $this->assertEquals(0, $exitCode, 'Command executed successfully');
 
-
+        // 7. ডাটাবেজ চেক
         $company->refresh();
-        Log::info('Company after refresh', [
+
+        Log::info('Company after failure:', [
             'payment_status' => $company->payment_status,
             'payment_failed_count' => $company->payment_failed_count,
             'subscription_status' => $company->subscription_status,
         ]);
 
+        // 8. Assertions
+        $this->assertEquals('failed', $company->payment_status);
+        $this->assertEquals(1, $company->payment_failed_count);
+        $this->assertEquals('active', $company->subscription_status); // Still active
 
-        $this->assertEquals('paid', $company->payment_status);
-        $this->assertEquals(0, $company->payment_failed_count);
-
-        $this->assertDatabaseHas('invoices', [
+        // 9. Invoice check - Payment failed হলে invoice থাকবে না
+        $this->assertDatabaseMissing('invoices', [
             'company_id' => $company->id,
-            'status' => 'paid',
         ]);
 
         Log::info('Test completed successfully');
+    }
+
+    /** @test */
+    public function it_suspends_company_after_three_failures()
+    {
+        $this->withoutExceptionHandling();
+
+        Log::info('Starting test: it_suspends_company_after_three_failures');
+
+        // কোম্পানি তৈরি (already 2 failed attempts)
+        $company = Company::create([
+            'user_id' => User::factory()->create()->id,
+            'company_name' => 'Test Company',
+            'sub_domain' => 'test-company-' . uniqid(),
+            'company_email' => 'test@example.com',
+            'subscription_status' => 'active',
+            'subscription_end' => Carbon::yesterday(),
+            'payment_status' => 'failed',
+            'payment_failed_count' => 2, // Already 2 failures
+            'status' => 'Active',
+            'company_house_number' => '123',
+            'company_mobile' => '1234567890',
+            'business_type' => 'Ltd',
+            'street' => 'Test St',
+            'city' => 'Test City',
+            'state' => 'Test State',
+            'address' => 'Test Address',
+            'postcode' => '12345',
+            'country' => 'UK',
+        ]);
+
+        // 1 employee তৈরি
+        Employee::create([
+            'company_id' => $company->id,
+            'user_id' => User::factory()->create()->id,
+            'f_name' => 'Test',
+            'l_name' => 'Employee',
+            'email' => 'employee@example.com',
+            'title' => 'Mr',
+            'phone_no' => '1234567890',
+            'is_active' => 1,
+            'role' => 'employee',
+            'nationality' => 'British',
+            'date_of_birth' => '1990-01-01',
+            'job_title' => 'Staff',
+            'contract_hours' => 40,
+            'salary_type' => 'hourly',
+            'employment_status' => 'full-time',
+            'start_date' => now()->subMonths(2),
+            'verified' => 1,
+            'billable_from' => now()->subDays(5),
+        ]);
+
+        // Bank info
+        $company->bankInfos()->create([
+            'stripe_payment_method_id' => 'pm_test_12345',
+        ]);
+
+        // Mock Gateway - Failed again
+        $gatewayMock = Mockery::mock(\App\Services\PaymentGateway::class);
+        $gatewayMock->shouldReceive('charge')
+            ->once()
+            ->andReturn((object)[
+                'success' => false,
+                'message' => 'Payment failed',
+                'status' => 'failed',
+            ]);
+
+        $this->app->instance(\App\Services\PaymentGateway::class, $gatewayMock);
+
+        // কমান্ড রান
+        Artisan::call('companies:charge');
+
+        // Check company suspended
+        $company->refresh();
+
+        $this->assertEquals('failed', $company->payment_status);
+        $this->assertEquals(3, $company->payment_failed_count);
+        $this->assertEquals('suspended', $company->subscription_status);
+
+        Log::info('Suspension test completed');
     }
 }

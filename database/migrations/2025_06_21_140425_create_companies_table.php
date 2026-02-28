@@ -35,7 +35,7 @@ return new class extends Migration
             $table->enum('subscription_status', ['active', 'trial', 'expired', 'suspended'])
                 ->default('trial');
             $table->integer('payment_failed_count')->default(0);
-            $table->enum('payment_status', ['paid', 'unpaid', 'pending'])->default('pending');
+            $table->enum('payment_status', ['paid', 'unpaid', 'pending', 'failed'])->default('pending');
             $table->date('subscription_start')->nullable();
             $table->date('subscription_end')->nullable();
             $table->date('trial_ends_at')->nullable();

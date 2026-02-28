@@ -7,8 +7,8 @@ use App\Models\ShiftDate;
 use App\Models\SiteSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 if (!function_exists('siteSetting')) {
   function siteSetting()
@@ -221,5 +221,36 @@ if (!function_exists('todaysShiftForUser')) {
       ->count();
 
     return $groupUnread + $teamUnread + $personalUnread;
+  }
+
+
+
+
+
+
+  /**
+   * Verify reCAPTCHA token with Google
+   */
+  function verifyRecaptcha($token)
+  {
+    try {
+      $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        'secret' => config('services.recaptcha.secret_key'),
+        'response' => $token
+      ]);
+
+      $body = $response->json();
+
+
+      if (isset($body['success']) && $body['success'] === true) {
+        return true;
+      }
+
+      Log::warning('reCAPTCHA verification failed', $body);
+      return false;
+    } catch (\Exception $e) {
+      Log::error('reCAPTCHA verification error: ' . $e->getMessage());
+      return false;
+    }
   }
 }

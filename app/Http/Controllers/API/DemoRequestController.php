@@ -35,7 +35,7 @@ class DemoRequestController extends BaseController
         }
 
 
-        $recaptchaVerified = $this->verifyRecaptcha($request->recaptcha_token);
+        $recaptchaVerified = verifyRecaptcha($request->recaptcha_token);
 
         if (!$recaptchaVerified) {
             return response()->json([
@@ -90,31 +90,6 @@ class DemoRequestController extends BaseController
         }
     }
 
-    /**
-     * Verify reCAPTCHA token with Google
-     */
-    private function verifyRecaptcha($token)
-    {
-        try {
-            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $token
-            ]);
-
-            $body = $response->json();
-
-
-            if (isset($body['success']) && $body['success'] === true) {
-                return true;
-            }
-
-            Log::warning('reCAPTCHA verification failed', $body);
-            return false;
-        } catch (\Exception $e) {
-            Log::error('reCAPTCHA verification error: ' . $e->getMessage());
-            return false;
-        }
-    }
 
     /**
      * Send notification emails

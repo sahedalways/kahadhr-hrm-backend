@@ -14,6 +14,16 @@ class ContactController extends BaseController
     {
         $validated = $request->validated();
 
+        $recaptchaVerified = verifyRecaptcha($request->recaptcha_token);
+
+        if (!$recaptchaVerified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'reCAPTCHA verification failed. Please try again.'
+            ], 400);
+        }
+
+
         // Save to database
         $contact = Contact::create($validated);
 

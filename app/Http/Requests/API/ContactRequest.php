@@ -20,6 +20,7 @@ class ContactRequest extends FormRequest
             'phone'      => 'nullable|string|max:20',
             'topic'      => 'required|string',
             'description' => 'required|string|min:10',
+            'recaptcha_token' => 'required|string',
         ];
     }
 
@@ -32,6 +33,7 @@ class ContactRequest extends FormRequest
             'email.email'         => 'Enter a valid email address.',
             'topic.required'      => 'Please select a topic.',
             'description.required' => 'Description is required.',
+            'recaptcha_token.required' => 'Recaptcha is required.',
         ];
     }
 }

@@ -31,6 +31,5 @@ class UpdateExpiredDocuments extends Command
         }
 
         $this->info("Total documents updated to expired: $updatedCount");
-        return Command::SUCCESS;
     }
 }

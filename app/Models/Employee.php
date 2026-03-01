@@ -41,6 +41,7 @@ class Employee extends Model
         'leave_in_liew',
         'annual_leave_hours',
         'billable_from',
+        'is_billable',
         'deleted_at',
     ];
 
@@ -50,6 +51,7 @@ class Employee extends Model
         'is_active'        => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'is_billable' => 'boolean',
     ];
 
 

@@ -548,6 +548,7 @@ class UsersIndex extends BaseComponent
             'invite_token' => Str::random(64),
             'invite_token_expires_at' => Carbon::now()->addHours(48),
             'billable_from' => now()->addDays(3),
+            'is_billable' => false
 
         ]);
 

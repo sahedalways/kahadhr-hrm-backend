@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\InvoiceEmailJob;
 use App\Jobs\PaymentStatusEmailJob;
 use Illuminate\Console\Command;
 use App\Models\Company;
@@ -49,6 +50,7 @@ class ChargeCompanies extends Command
             $employeeCount = Employee::withTrashed()
                 ->withoutGlobalScope('filterByUserType')
                 ->where('company_id', $company->id)
+                ->where('is_billable', true)
                 ->whereDate('billable_from', '<=', now()->endOfMonth())
                 ->count();
 
@@ -88,7 +90,7 @@ class ChargeCompanies extends Command
 
                 $invoiceNumber = 'INV-' . strtoupper(uniqid());
 
-                Invoice::create([
+                $invoice = Invoice::create([
                     'company_id' => $company->id,
                     'billing_period_start' => now()->startOfMonth(),
                     'billing_period_end' => now()->endOfMonth(),
@@ -102,6 +104,24 @@ class ChargeCompanies extends Command
                     'currency' => 'GBP',
                     'status' => 'paid',
                 ]);
+
+                Employee::onlyTrashed()
+                    ->withoutGlobalScope('filterByUserType')
+                    ->where('company_id', $company->id)
+                    ->forceDelete();
+
+
+                Employee::query()
+                    ->withoutGlobalScope('filterByUserType')
+                    ->where('company_id', $company->id)
+                    ->whereNull('deleted_at')
+                    ->update([
+                        'billable_from' => now()->addDays(3),
+                        'is_billable' => false,
+                        'updated_at' => now(),
+                    ]);
+
+                InvoiceEmailJob::dispatch($invoice->id, $company->id);
 
                 $this->info("Charged and invoiced {$company->company_name}: {$total} GBP");
             } else {

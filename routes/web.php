@@ -73,3 +73,12 @@ Route::get('/password-set-success', function () {
 //     return "Error: " . $e->getMessage();
 //   }
 // });
+
+
+Route::get('/test-queue', function () {
+  dispatch(function () {
+    logger('Queue is working at ' . now());
+  })->delay(now()->addSeconds(10));
+
+  return 'Job dispatched! Check logs after 10 seconds.';
+});

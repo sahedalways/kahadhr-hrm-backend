@@ -3,6 +3,7 @@
 
 // all those super admin routes below
 
+use App\Jobs\SendTestMailJob;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
@@ -43,15 +44,11 @@ Route::get('/password-set-success', function () {
 })->name('password.set.success');
 
 
-// Route::get('/send-test-mail', function () {
-//     Mail::raw('This is a test email from Laravel.', function ($message) {
-//         $message->to('ssahed65@gmail.com')
-//             ->subject('Laravel Test Email');
-//     });
+Route::get('/send-test-mail', function () {
+  SendTestMailJob::dispatch()->delay(now()->addSeconds(10));
 
-//     return 'Test email sent to ssahed65@gmail.com';
-// });
-
+  return 'Queued mail dispatched! Check after 10 seconds.';
+});
 
 // Route::get('/send-test-sms', function () {
 //   try {
@@ -73,12 +70,3 @@ Route::get('/password-set-success', function () {
 //     return "Error: " . $e->getMessage();
 //   }
 // });
-
-
-Route::get('/test-queue', function () {
-  dispatch(function () {
-    logger('Queue is working at ' . now());
-  })->delay(now()->addSeconds(10));
-
-  return 'Job dispatched! Check logs after 10 seconds.';
-});

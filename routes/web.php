@@ -44,11 +44,11 @@ Route::get('/password-set-success', function () {
 })->name('password.set.success');
 
 
-Route::get('/send-test-mail', function () {
-  SendTestMailJob::dispatch()->delay(now()->addSeconds(10));
+// Route::get('/send-test-mail', function () {
+//   SendTestMailJob::dispatch()->delay(now()->addSeconds(10));
 
-  return 'Queued mail dispatched! Check after 10 seconds.';
-});
+//   return 'Queued mail dispatched! Check after 10 seconds.';
+// });
 
 // Route::get('/send-test-sms', function () {
 //   try {

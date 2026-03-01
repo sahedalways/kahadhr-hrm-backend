@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
@@ -32,3 +33,14 @@ Schedule::command('notify:document-expiry')->dailyAt('00:00');
 Schedule::command('sharecode:expire')->daily();
 
 Schedule::command('backup:run')->dailyAt('02:00');
+
+Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=60')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->before(function () {
+        Log::info('Queue worker started at ' . now());
+    })
+    ->after(function () {
+        Log::info('Queue worker finished at ' . now());
+    });

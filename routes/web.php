@@ -53,23 +53,23 @@ Route::get('/password-set-success', function () {
 // });
 
 
-Route::get('/send-test-sms', function () {
-  try {
-    $twilio = new Client(
-      env('TWILIO_SID'),
-      env('TWILIO_AUTH_TOKEN')
-    );
+// Route::get('/send-test-sms', function () {
+//   try {
+//     $twilio = new Client(
+//       env('TWILIO_SID'),
+//       env('TWILIO_AUTH_TOKEN')
+//     );
 
-    $message = $twilio->messages->create(
-      '+8801616516753',
-      [
-        'from' => env('TWILIO_PHONE_NUMBER'),
-        'body' => 'This is a test SMS from KahadHR application!'
-      ]
-    );
+//     $message = $twilio->messages->create(
+//       '+8801616516753',
+//       [
+//         'from' => env('TWILIO_PHONE_NUMBER'),
+//         'body' => 'This is a test SMS from KahadHR application!'
+//       ]
+//     );
 
-    return "Test SMS sent successfully to +8801XXXXXXXXX! SID: " . $message->sid;
-  } catch (\Exception $e) {
-    return "Error: " . $e->getMessage();
-  }
-});
+//     return "Test SMS sent successfully to +8801616516753! SID: " . $message->sid;
+//   } catch (\Exception $e) {
+//     return "Error: " . $e->getMessage();
+//   }
+// });

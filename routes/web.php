@@ -3,7 +3,7 @@
 
 // all those super admin routes below
 
-use App\Http\Controllers\ScheduleController;
+use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/admin.php';
@@ -41,3 +41,35 @@ Route::get('/password-set-success', function () {
     'user_type' => request()->get('user_type', 'Company'),
   ]);
 })->name('password.set.success');
+
+
+// Route::get('/send-test-mail', function () {
+//     Mail::raw('This is a test email from Laravel.', function ($message) {
+//         $message->to('ssahed65@gmail.com')
+//             ->subject('Laravel Test Email');
+//     });
+
+//     return 'Test email sent to ssahed65@gmail.com';
+// });
+
+
+Route::get('/send-test-sms', function () {
+  try {
+    $twilio = new Client(
+      env('TWILIO_SID'),
+      env('TWILIO_AUTH_TOKEN')
+    );
+
+    $message = $twilio->messages->create(
+      '+8801616516753',
+      [
+        'from' => env('TWILIO_PHONE_NUMBER'),
+        'body' => 'This is a test SMS from KahadHR application!'
+      ]
+    );
+
+    return "Test SMS sent successfully to +8801XXXXXXXXX! SID: " . $message->sid;
+  } catch (\Exception $e) {
+    return "Error: " . $e->getMessage();
+  }
+});

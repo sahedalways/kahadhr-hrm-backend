@@ -40,7 +40,7 @@ class AuthController extends BaseController
 
         $baseDomain = config('app.base_domain');
 
-        $fullDomain = "company.{$baseDomain}";
+        $fullDomain = "https://company.{$baseDomain}";
 
 
         return $this->sendResponse([

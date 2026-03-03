@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CompanyLogin extends BaseComponent
 {
-    public $email = '', $phone_no, $userId, $password = "", $success = false;
+    public $email = 'abc@company.com', $phone_no, $userId, $password = "12345678", $success = false;
     public $otp = [],  $showOtpModal = false;
     public $company;
     public $updating_field;

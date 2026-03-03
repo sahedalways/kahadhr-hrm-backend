@@ -13,14 +13,14 @@ Route::middleware(['cors', 'log.traffic'])->group(function () {
   Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
     // Registration route
-    Route::post('register', 'register');
+    Route::post('register', 'register')->middleware('throttle:2,1');
 
     // Send OTP route
-    Route::post('send-email-otp', 'sendEmailOtp');
-    Route::post('send-phone-otp', 'sendPhoneOtp');
+    Route::post('send-email-otp', 'sendEmailOtp')->middleware('throttle:2,1');
+    Route::post('send-phone-otp', 'sendPhoneOtp')->middleware('throttle:2,1');
 
     // resend email OTP route
-    Route::post('resend-email-otp', 'resendEmailOtp');
+    Route::post('resend-email-otp', 'resendEmailOtp')->middleware('throttle:2,1');
 
     // verify otp
     Route::post('verify-otp', 'verifyOtp');

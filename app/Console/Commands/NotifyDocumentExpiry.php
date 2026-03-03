@@ -20,7 +20,8 @@ class NotifyDocumentExpiry extends Command
         $cutoff = Carbon::now()->addDays(30);
 
 
-        $docs = EmpDocument::with(['employee.user', 'documentType'])
+        $docs = EmpDocument::withoutGlobalScopes()
+            ->with(['employee.user', 'documentType'])
             ->whereNotNull('expires_at')
             ->where(function ($q) use ($today, $cutoff) {
                 $q->whereDate('expires_at', '<', $today)

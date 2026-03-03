@@ -47,7 +47,8 @@ class SubscriptionReminder extends Command
                 }
 
                 // Prevent duplicate notification same day
-                $alreadySent = Notification::where('company_id', $company->id)
+                $alreadySent = Notification::withoutGlobalScopes()
+                    ->where('company_id', $company->id)
                     ->where('type', 'card_reminder')
                     ->whereDate('created_at', Carbon::today())
                     ->exists();

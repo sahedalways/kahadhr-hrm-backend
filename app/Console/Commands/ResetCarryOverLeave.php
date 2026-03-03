@@ -16,7 +16,7 @@ class ResetCarryOverLeave extends Command
     {
         $today = Carbon::today();
 
-        $employees = Employee::all();
+        $employees = Employee::withoutGlobalScopes()->get();
 
         foreach ($employees as $employee) {
             $joinDate = Carbon::parse($employee->start_date);

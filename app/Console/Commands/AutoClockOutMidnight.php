@@ -29,7 +29,8 @@ class AutoClockOutMidnight extends Command
     public function handle()
     {
 
-        $attendances = Attendance::whereNotNull('clock_in')
+        $attendances = Attendance::withoutGlobalScopes()
+            ->whereNotNull('clock_in')
             ->whereNull('clock_out')
             ->get();
 

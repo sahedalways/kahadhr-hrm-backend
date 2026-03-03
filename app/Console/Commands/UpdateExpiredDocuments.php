@@ -18,7 +18,8 @@ class UpdateExpiredDocuments extends Command
     {
         $today = Carbon::now()->startOfDay();
 
-        $documents = CompanyDocument::where('status', 'pending')
+        $documents = CompanyDocument::withoutGlobalScopes()
+            ->where('status', 'pending')
             ->whereNotNull('expires_at')
             ->whereDate('expires_at', '<', $today)
             ->get();

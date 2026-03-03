@@ -14,14 +14,15 @@ class ExpireShareCodeStatus extends Command
 
     public function handle()
     {
-        $employees = Employee::where('nationality', '!=', 'British')
+        $employees = Employee::withoutGlobalScopes()
+            ->where('nationality', '!=', 'British')
             ->whereNotNull('share_code')
             ->get();
 
         foreach ($employees as $employee) {
 
-
-            $latestDoc = EmpDocument::where('emp_id', $employee->id)
+            $latestDoc = EmpDocument::withoutGlobalScopes()
+                ->where('emp_id', $employee->id)
                 ->whereHas('documentType', function ($q) {
                     $q->where('name', 'Share Code');
                 })

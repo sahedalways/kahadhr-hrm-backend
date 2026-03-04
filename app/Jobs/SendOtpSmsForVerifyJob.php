@@ -38,10 +38,11 @@ class SendOtpSmsForVerifyJob implements ShouldQueue
             return;
         }
 
+
         if (
-            empty($settings->account_sid) ||
-            empty($settings->auth_token) ||
-            empty($settings->from_number)
+            empty($settings->twilio_sid) ||
+            empty($settings->twilio_auth_token) ||
+            empty($settings->twilio_from)
         ) {
             \Log::error("Twilio credentials missing.");
             return;
@@ -54,12 +55,12 @@ class SendOtpSmsForVerifyJob implements ShouldQueue
                 "Your safety is in your hands. Never share this OTP. - {$siteName}";
 
             $client = new Client(
-                (string) $settings->account_sid,
-                (string) $settings->auth_token
+                (string) $settings->twilio_sid,
+                (string) $settings->twilio_auth_token
             );
 
             $client->messages->create($this->phone, [
-                'from' => $settings->from_number,
+                'from' => $settings->twilio_from,
                 'body' => $messageBody
             ]);
 

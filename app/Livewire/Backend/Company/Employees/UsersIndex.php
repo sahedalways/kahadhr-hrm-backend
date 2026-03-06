@@ -563,7 +563,6 @@ class UsersIndex extends BaseComponent
 
 
         // Dispatch queued job
-        // SendEmployeeInvitation::dispatch($employee, $inviteUrl);
         SendEmployeeInvitation::dispatch($employee, $inviteUrl);
 
         // Reset form

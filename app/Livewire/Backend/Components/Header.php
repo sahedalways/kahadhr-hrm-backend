@@ -142,6 +142,20 @@ class Header extends Component
         }
 
 
+        if ($user && $user->user_type == 'company' && $user->company) {
+            $sub = $user->company->sub_domain;
+
+            auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+
+            return redirect()->route('company.auth.CompanyLogin', [
+                'company' => $sub
+            ]);
+        }
+
+
+
         auth()->logout();
         session()->invalidate();
         session()->regenerateToken();

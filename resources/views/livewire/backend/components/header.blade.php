@@ -421,36 +421,6 @@
 
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const isRunningInput = document.getElementById('isRunning');
-
-        if (isRunningInput) {
-            const headerTime = document.getElementById('headerTimer');
-            let latestSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;
-
-            console.log("headerTime", headerTime.textContent);
-
-            function startCountdown() {
-                let hours = Math.floor(latestSeconds / 3600);
-                let minutes = Math.floor((latestSeconds % 3600) / 60);
-                let seconds = latestSeconds % 60;
-
-                headerTime.textContent =
-                    String(hours).padStart(2, '0') + ':' +
-                    String(minutes).padStart(2, '0') + ':' +
-                    String(seconds).padStart(2, '0');
-
-                latestSeconds++;
-            }
-
-            setInterval(startCountdown, 1000);
-        }
-    });
-</script>
-
-
-
 
 
 <script>

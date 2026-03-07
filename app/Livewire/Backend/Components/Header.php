@@ -35,25 +35,18 @@ class Header extends Component
     }
 
 
-    public function loadTimerState()
+
+
+    protected function getListeners()
     {
-        $attendance = Attendance::where('user_id', auth()->user()->id)
-            ->whereNull('clock_out')
-            ->latest()
-            ->first();
+        return array_merge($this->listeners, [
+            "echo:header-timer-update,header-timer-update" => 'handleBrowserTimerUpdate',
+        ]);
+    }
 
-        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
-
-        if ($attendance && $attendance->clock_in) {
-            $this->isRunning = true;
-            $clockInTime = Carbon::parse($attendance->clock_in)->setTimezone($userTimeZone);
-            $this->initialSeconds = $clockInTime->diffInSeconds(now()->setTimezone($userTimeZone));
-            $this->headerTimer = gmdate("H:i:s", $this->initialSeconds);
-        } else {
-            $this->isRunning = false;
-            $this->initialSeconds = 0;
-            $this->headerTimer = '00:00:00';
-        }
+    public function handleBrowserTimerUpdate($payload)
+    {
+        $this->updateTimer($payload['time'], $payload['running']);
     }
 
 
@@ -90,8 +83,6 @@ class Header extends Component
     public function mount()
     {
         $this->loadUnreadCount();
-
-        $this->loadTimerState();
 
         if ($this->headerTimer) {
             $parts = explode(':', $this->headerTimer);

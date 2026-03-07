@@ -61,14 +61,12 @@
 
                             <input type="hidden"
                                    id="headerInitialSeconds"
-                                   value="{{ $headerTimer
-                                       ? explode(':', $headerTimer)[0] * 3600 + explode(':', $headerTimer)[1] * 60 + explode(':', $headerTimer)[2]
-                                       : 0 }}">
+                                   value="{{ $initialSeconds }}">
+
 
                             <input type="hidden"
-                                   id="headerRunning"
-                                   value="{{ $isRunning ? 1 : 0 }}">
-
+                                   id="isRunning"
+                                   value="{{ $isRunning ? '1' : '0' }}">
 
                             @if ($isRunning)
                                 <div class="timer-running-dot rounded-circle bg-white"
@@ -421,34 +419,38 @@
     });
 </script>
 
+
+
 <script>
-    const headerDisplay = document.getElementById('headerTimer');
+    document.addEventListener("DOMContentLoaded", function() {
+        const isRunningInput = document.getElementById('isRunning');
 
-    let headerSeconds =
-        parseInt(document.getElementById('headerInitialSeconds').value) || 0;
+        if (isRunningInput) {
+            const headerTime = document.getElementById('headerTimer');
+            let latestSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;
 
-    function updateHeaderTimer() {
+            console.log("headerTime", headerTime.textContent);
 
-        const running =
-            document.getElementById('headerRunning').value == "1";
+            function startCountdown() {
+                let hours = Math.floor(latestSeconds / 3600);
+                let minutes = Math.floor((latestSeconds % 3600) / 60);
+                let seconds = latestSeconds % 60;
 
-        if (!running) return;
+                headerTime.textContent =
+                    String(hours).padStart(2, '0') + ':' +
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
 
-        let h = Math.floor(headerSeconds / 3600);
-        let m = Math.floor((headerSeconds % 3600) / 60);
-        let s = headerSeconds % 60;
+                latestSeconds++;
+            }
 
-        headerDisplay.textContent =
-            String(h).padStart(2, '0') + ':' +
-            String(m).padStart(2, '0') + ':' +
-            String(s).padStart(2, '0');
-
-        headerSeconds++;
-
-    }
-
-    setInterval(updateHeaderTimer, 1000);
+            setInterval(startCountdown, 1000);
+        }
+    });
 </script>
+
+
+
 
 
 <script>

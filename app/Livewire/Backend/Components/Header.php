@@ -24,6 +24,7 @@ class Header extends Component
 
 
     public $headerTimer = '00:00:00';
+    public $initialSeconds = 0;
     public $isRunning = false;
 
     public function updateTimer($time, $running)
@@ -33,16 +34,26 @@ class Header extends Component
         $this->isRunning = $running;
     }
 
-    protected function getListeners()
-    {
-        return array_merge($this->listeners, [
-            "echo:header-timer-update,header-timer-update" => 'handleBrowserTimerUpdate',
-        ]);
-    }
 
-    public function handleBrowserTimerUpdate($payload)
+    public function loadTimerState()
     {
-        $this->updateTimer($payload['time'], $payload['running']);
+        $attendance = Attendance::where('user_id', auth()->user()->id)
+            ->whereNull('clock_out')
+            ->latest()
+            ->first();
+
+        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
+
+        if ($attendance && $attendance->clock_in) {
+            $this->isRunning = true;
+            $clockInTime = Carbon::parse($attendance->clock_in)->setTimezone($userTimeZone);
+            $this->initialSeconds = $clockInTime->diffInSeconds(now()->setTimezone($userTimeZone));
+            $this->headerTimer = gmdate("H:i:s", $this->initialSeconds);
+        } else {
+            $this->isRunning = false;
+            $this->initialSeconds = 0;
+            $this->headerTimer = '00:00:00';
+        }
     }
 
 
@@ -80,34 +91,11 @@ class Header extends Component
     {
         $this->loadUnreadCount();
 
+        $this->loadTimerState();
 
-        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
-
-
-        $today = now()->setTimezone($userTimeZone)->toDateString();
-
-
-        $attendance = Attendance::where('user_id', auth()->id())
-            ->whereDate('clock_in', $today)
-            ->whereNull('clock_out')
-            ->latest()
-            ->first();
-
-        if ($attendance) {
-
-            $clockInTime = Carbon::parse($attendance->clock_in)->setTimezone($userTimeZone);
-
-            $currentTime = now()->setTimezone($userTimeZone);
-
-
-            $seconds = $currentTime->diffInSeconds($clockInTime);
-
-
-            $this->headerTimer = gmdate("H:i:s", $seconds);
-            $this->isRunning = true;
-        } else {
-            $this->headerTimer = '00:00:00';
-            $this->isRunning = false;
+        if ($this->headerTimer) {
+            $parts = explode(':', $this->headerTimer);
+            $this->initialSeconds = ($parts[0] * 3600) + ($parts[1] * 60) + $parts[2];
         }
     }
 

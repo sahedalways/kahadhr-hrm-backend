@@ -56,7 +56,18 @@
                             <i class="bi bi-stopwatch fs-5"></i>
 
 
-                            <span class="timer-time font-monospace fs-5 lh-1 text-white">{{ $headerTimer }}</span>
+                            <span id="headerTimer"
+                                  class="timer-time font-monospace fs-5 lh-1 text-white">{{ $headerTimer }}</span>
+
+                            <input type="hidden"
+                                   id="headerInitialSeconds"
+                                   value="{{ $headerTimer
+                                       ? explode(':', $headerTimer)[0] * 3600 + explode(':', $headerTimer)[1] * 60 + explode(':', $headerTimer)[2]
+                                       : 0 }}">
+
+                            <input type="hidden"
+                                   id="headerRunning"
+                                   value="{{ $isRunning ? 1 : 0 }}">
 
 
                             @if ($isRunning)
@@ -411,11 +422,32 @@
 </script>
 
 <script>
-    document.addEventListener('livewire:init', () => {
-        setInterval(() => {
-            Livewire.dispatch('tick');
-        }, 1000);
-    });
+    const headerDisplay = document.getElementById('headerTimer');
+
+    let headerSeconds =
+        parseInt(document.getElementById('headerInitialSeconds').value) || 0;
+
+    function updateHeaderTimer() {
+
+        const running =
+            document.getElementById('headerRunning').value == "1";
+
+        if (!running) return;
+
+        let h = Math.floor(headerSeconds / 3600);
+        let m = Math.floor((headerSeconds % 3600) / 60);
+        let s = headerSeconds % 60;
+
+        headerDisplay.textContent =
+            String(h).padStart(2, '0') + ':' +
+            String(m).padStart(2, '0') + ':' +
+            String(s).padStart(2, '0');
+
+        headerSeconds++;
+
+    }
+
+    setInterval(updateHeaderTimer, 1000);
 </script>
 
 

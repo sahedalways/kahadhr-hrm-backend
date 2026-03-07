@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Backend\Components;
 
+use App\Models\Attendance;
 use App\Models\Notification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -17,7 +19,6 @@ class Header extends Component
     protected $listeners = [
         'newNotificationForDetails' => 'newNotification',
         'update-header-timer' => 'updateTimer',
-        'tick' => 'increaseOneSecond',
     ];
 
 
@@ -78,24 +79,38 @@ class Header extends Component
     public function mount()
     {
         $this->loadUnreadCount();
+
+
+        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
+
+
+        $today = now()->setTimezone($userTimeZone)->toDateString();
+
+
+        $attendance = Attendance::where('user_id', auth()->id())
+            ->whereDate('clock_in', $today)
+            ->whereNull('clock_out')
+            ->latest()
+            ->first();
+
+        if ($attendance) {
+
+            $clockInTime = Carbon::parse($attendance->clock_in)->setTimezone($userTimeZone);
+
+            $currentTime = now()->setTimezone($userTimeZone);
+
+
+            $seconds = $currentTime->diffInSeconds($clockInTime);
+
+
+            $this->headerTimer = gmdate("H:i:s", $seconds);
+            $this->isRunning = true;
+        } else {
+            $this->headerTimer = '00:00:00';
+            $this->isRunning = false;
+        }
     }
 
-
-    public function increaseOneSecond()
-    {
-        if (!$this->isRunning) return;
-
-        $parts = explode(':', $this->headerTimer);
-        $seconds = ($parts[0] * 3600) + ($parts[1] * 60) + $parts[2];
-
-        $seconds++;
-
-        $h = floor($seconds / 3600);
-        $m = floor(($seconds % 3600) / 60);
-        $s = $seconds % 60;
-
-        $this->headerTimer = sprintf('%02d:%02d:%02d', $h, $m, $s);
-    }
 
     public function render()
     {

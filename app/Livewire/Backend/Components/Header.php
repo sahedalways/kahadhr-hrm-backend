@@ -149,9 +149,11 @@ class Header extends Component
             session()->invalidate();
             session()->regenerateToken();
 
-            return redirect()->route('company.auth.CompanyLogin', [
-                'company' => $sub
-            ]);
+            $baseDomain = config('app.base_domain');
+
+            $fullDomain = "https://{$sub}.{$baseDomain}";
+
+            return redirect()->away($fullDomain);
         }
 
 

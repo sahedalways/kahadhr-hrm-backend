@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
     <title>Employee Invitation</title>
 
     <style>
@@ -119,9 +120,15 @@
                 To get started, please set your account password by clicking the button below:
             </p>
 
-            <!-- Invitation Link -->
-            <div class="details-box" style="text-align: center;">
-                <a href="{{ $inviteUrl }}" class="btn-link" target="_blank">Set Your Password</a>
+
+            <div class="details-box"
+                 style="text-align: center;">
+                <a href="{{ $inviteUrl }}"
+                   class="btn-link"
+                   target="_blank"
+                   style="color:#fff;">
+                    Set Your Password
+                </a>
             </div>
 
             <p>
@@ -143,7 +150,8 @@
             </p>
 
             <p>
-                <a href="{{ config('app.frontend_url') }}" target="_blank">
+                <a href="{{ config('app.frontend_url') }}"
+                   target="_blank">
                     {{ config('app.frontend_url') }}
                 </a>
             </p>

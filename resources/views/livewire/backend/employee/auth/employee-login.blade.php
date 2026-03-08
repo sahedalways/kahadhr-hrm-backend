@@ -118,7 +118,7 @@
 
                                                 <span wire:loading.remove
                                                       wire:target="login">
-                                                    Login
+                                                    Employee Login
                                                 </span>
                                             </button>
                                         </div>

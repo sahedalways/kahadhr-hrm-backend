@@ -421,6 +421,35 @@
 
 
 
+<script>
+    const isRunning = document.getElementById('isRunning');
+
+    const timeDisplay = document.getElementById('headerTimer');
+    let updatedSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;
+
+    if (isRunning == 1) {
+        function startCountdownTime() {
+            let hours = Math.floor(updatedSeconds / 3600);
+            let minutes = Math.floor((updatedSeconds % 3600) / 60);
+            let seconds = updatedSeconds % 60;
+
+            timeDisplay.textContent =
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+
+
+            updatedSeconds++;
+        }
+
+
+        setInterval(startCountdownTime, 1000);
+
+    }
+</script>
+
+
+
 
 
 <script>

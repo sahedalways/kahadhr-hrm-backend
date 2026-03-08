@@ -371,11 +371,11 @@ class ClockModal extends BaseComponent
 
 
 
-        $this->dispatch(
-            'update-header-timer',
-            time: $this->elapsedTime,
-            running: !$this->attendance->clock_out
-        )->to('backend.components.header');
+        // $this->dispatch(
+        //     'update-header-timer',
+        //     time: $this->elapsedTime,
+        //     running: !$this->attendance->clock_out
+        // )->to('backend.components.header');
     }
 
 
@@ -418,12 +418,12 @@ class ClockModal extends BaseComponent
             $statusLabel = 'Not Started';
         }
 
-        $this->dispatch(
-            'attendance-status-updated',
-            showClockIn: $showClockInButton,
-            showClockOut: $showClockOutButton,
-            status: $statusLabel
-        )->to('backend.components.header');
+        // $this->dispatch(
+        //     'attendance-status-updated',
+        //     showClockIn: $showClockInButton,
+        //     showClockOut: $showClockOutButton,
+        //     status: $statusLabel
+        // )->to('backend.components.header');
 
 
         return view('livewire.backend.employee.clock-modal.clock-modal', [

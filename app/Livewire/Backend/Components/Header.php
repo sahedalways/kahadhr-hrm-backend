@@ -18,7 +18,6 @@ class Header extends Component
 
     protected $listeners = [
         'newNotificationForDetails' => 'newNotification',
-        'update-header-timer' => 'updateTimer',
     ];
 
 
@@ -27,27 +26,7 @@ class Header extends Component
     public $initialSeconds = 0;
     public $isRunning = false;
 
-    public function updateTimer($time, $running)
-    {
-
-        $this->headerTimer = $time;
-        $this->isRunning = $running;
-    }
-
-
-
-
-    protected function getListeners()
-    {
-        return array_merge($this->listeners, [
-            "echo:header-timer-update,header-timer-update" => 'handleBrowserTimerUpdate',
-        ]);
-    }
-
-    public function handleBrowserTimerUpdate($payload)
-    {
-        $this->updateTimer($payload['time'], $payload['running']);
-    }
+    public $attendance;
 
 
 
@@ -80,9 +59,68 @@ class Header extends Component
     }
 
 
+
+    public function updateWorkingHoursCount()
+    {
+        $userTimeZone = auth()->user()->timezone ?? 'Asia/Dhaka';
+
+        $userTodayStart = now()->setTimezone('Asia/Dhaka')->startOfDay();
+        $userTodayEnd   = now()->setTimezone('Asia/Dhaka')->endOfDay();
+
+        $this->attendance = Attendance::where('user_id', Auth::id())
+            ->whereBetween('clock_in', [$userTodayStart, $userTodayEnd])
+            ->latest()
+            ->first();
+
+
+        if (!$this->attendance) {
+            $this->headerTimer = '00:00:00';
+            $this->isRunning = false;
+            return;
+        }
+
+
+
+        if ($this->attendance) {
+            $clockInTime = Carbon::parse($this->attendance->clock_in, $userTimeZone);
+            $currentTime = now()->setTimezone($userTimeZone);
+
+            if ($this->attendance->clock_out) {
+                $clockOutTime = Carbon::parse($this->attendance->clock_out, $userTimeZone);
+
+                $elapsedSeconds = $clockOutTime->diffInSeconds($clockInTime);
+            } else {
+                $elapsedSeconds = $currentTime->diffInSeconds($clockInTime);
+            }
+
+
+            $elapsedSeconds = abs($elapsedSeconds);
+
+            $hours = floor($elapsedSeconds / 3600);
+            $minutes = floor(($elapsedSeconds % 3600) / 60);
+            $seconds = $elapsedSeconds % 60;
+
+            $this->headerTimer = sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+            if ($this->attendance->clock_in && $this->attendance->clock_out) {
+                $this->isRunning = false;
+                return;
+            } else if ($this->attendance->clock_in) {
+                $this->isRunning = true;
+                return;
+            }
+        } else {
+            $this->headerTimer = '00:00:00';
+            $this->isRunning = false;
+        }
+    }
+
+
+
+
     public function mount()
     {
         $this->loadUnreadCount();
+        $this->updateWorkingHoursCount();
 
         if ($this->headerTimer) {
             $parts = explode(':', $this->headerTimer);

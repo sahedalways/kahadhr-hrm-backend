@@ -422,7 +422,7 @@
 
 
 <script>
-    const isRunning = document.getElementById('isRunning');
+    const isRunning = document.getElementById('isRunning').value;
 
     const timeDisplay = document.getElementById('headerTimer');
     let updatedSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;

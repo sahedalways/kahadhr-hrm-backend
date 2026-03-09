@@ -565,7 +565,8 @@
                                     <input type="text"
                                            class="form-control border-light-subtle shadow-none"
                                            wire:model="house_no"
-                                           placeholder="Enter House Number">
+                                           placeholder="Enter House Number"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 
                                     @error('house_no')
                                         <span class="text-danger x-small">{{ $message }}</span>
@@ -1165,21 +1166,43 @@
 
 
 <script>
-    document.addEventListener('click', function(e) {
-        ['country', 'state', 'city', 'immigration'].forEach(type => {
-            const btn = document.getElementById(type + 'DropdownButton');
-            const menu = document.getElementById(type + 'DropdownMenu');
-            if (btn && menu) {
-                if (btn.contains(e.target)) {
-                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                } else if (!menu.contains(e.target)) {
-                    menu.style.display = 'none';
-                }
-            }
-        });
-    });
-</script>
+    function closeDropdown() {
+        document.getElementById('countryDropdownMenu').style.display = 'none';
+        document.getElementById('stateDropdownMenu').style.display = 'none';
+        document.getElementById('cityDropdownMenu').style.display = 'none';
 
+    }
+
+
+    document.getElementById('countryDropdownButton')
+        .addEventListener('click', function() {
+
+            let menu = document.getElementById('countryDropdownMenu');
+
+            menu.style.display =
+                menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+
+    document.getElementById('stateDropdownButton')
+        .addEventListener('click', function() {
+
+            let menu = document.getElementById('stateDropdownMenu');
+
+            menu.style.display =
+                menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+
+    document.getElementById('cityDropdownButton')
+        .addEventListener('click', function() {
+
+            let menu = document.getElementById('cityDropdownMenu');
+
+            menu.style.display =
+                menu.style.display === 'block' ? 'none' : 'block';
+        });
+</script>
 
 <script>
     window.addEventListener('show-emergency-modal', () => {

@@ -212,6 +212,19 @@ class EmployeeDetails extends BaseComponent
             return;
         }
 
+
+        if ($country === 'United Kingdom') {
+            $this->allStates = [
+                ['name' => 'England', 'state_code' => 'GB-ENG'],
+                ['name' => 'Scotland', 'state_code' => 'GB-SCT'],
+                ['name' => 'Wales', 'state_code' => 'GB-WLS'],
+                ['name' => 'Northern Ireland', 'state_code' => 'GB-NIR'],
+            ];
+
+            $this->states = $this->allStates;
+            return;
+        }
+
         $cacheKey = 'states.' . md5($country);
 
         $this->allStates = Cache::remember(
@@ -232,7 +245,6 @@ class EmployeeDetails extends BaseComponent
             }
         );
 
-
         $this->states = $this->allStates;
     }
 
@@ -242,6 +254,105 @@ class EmployeeDetails extends BaseComponent
     {
         $this->city = null;
         $this->citySearch = '';
+
+        if ($this->country === 'United Kingdom') {
+
+            $cities = [
+
+                'England' => [
+                    "Bath",
+                    "Birmingham",
+                    "Bradford",
+                    "Brighton and Hove",
+                    "Bristol",
+                    "Cambridge",
+                    "Canterbury",
+                    "Carlisle",
+                    "Chelmsford",
+                    "Chester",
+                    "Chichester",
+                    "Colchester",
+                    "Coventry",
+                    "Derby",
+                    "Doncaster",
+                    "Durham",
+                    "Ely",
+                    "Exeter",
+                    "Gloucester",
+                    "Hereford",
+                    "Kingston upon Hull",
+                    "Lancaster",
+                    "Leeds",
+                    "Leicester",
+                    "Lichfield",
+                    "Lincoln",
+                    "Liverpool",
+                    "London",
+                    "Manchester",
+                    "Milton Keynes",
+                    "Newcastle upon Tyne",
+                    "Norwich",
+                    "Nottingham",
+                    "Oxford",
+                    "Peterborough",
+                    "Plymouth",
+                    "Portsmouth",
+                    "Preston",
+                    "Ripon",
+                    "Salford",
+                    "Salisbury",
+                    "Sheffield",
+                    "Southampton",
+                    "Southend-on-Sea",
+                    "St Albans",
+                    "Stoke-on-Trent",
+                    "Sunderland",
+                    "Truro",
+                    "Wakefield",
+                    "Wells",
+                    "Westminster",
+                    "Winchester",
+                    "Wolverhampton",
+                    "Worcester",
+                    "York"
+                ],
+
+                'Scotland' => [
+                    "Aberdeen",
+                    "Dundee",
+                    "Dunfermline",
+                    "Edinburgh",
+                    "Glasgow",
+                    "Inverness",
+                    "Perth",
+                    "Stirling"
+                ],
+
+                'Wales' => [
+                    "Bangor",
+                    "Cardiff",
+                    "Newport",
+                    "St Asaph",
+                    "St Davids",
+                    "Swansea",
+                    "Wrexham"
+                ],
+
+                'Northern Ireland' => [
+                    "Armagh",
+                    "Bangor",
+                    "Belfast",
+                    "Lisburn",
+                    "Londonderry (Derry)",
+                    "Newry"
+                ],
+            ];
+
+            $this->allCities = $cities[$state] ?? [];
+            $this->cities = $this->allCities;
+
+            return;
+        }
 
         $cacheKey = 'cities.' . md5($this->country . '_' . $state);
 
@@ -263,10 +374,8 @@ class EmployeeDetails extends BaseComponent
             }
         );
 
-
         $this->cities = $this->allCities;
     }
-
 
 
 

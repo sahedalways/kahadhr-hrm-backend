@@ -22,7 +22,6 @@
         "twilio/sdk": "^8.8"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^4.1",
         "barryvdh/laravel-dompdf": "^3.1",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",

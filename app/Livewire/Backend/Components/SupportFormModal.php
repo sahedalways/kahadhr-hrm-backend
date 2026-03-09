@@ -40,9 +40,18 @@ class SupportFormModal extends BaseComponent
         }
 
 
-        $fileName = time() . '_' . $this->attachment->getClientOriginalName();
-        $this->attachment->storeAs('support', $fileName, 'public');
-        $attachmentUrl = asset('storage/support/' . $fileName);
+        $attachmentUrl = null;
+
+        if ($this->attachment) {
+
+            $fileName = time() . '_' . $this->attachment->getClientOriginalName();
+
+            $this->attachment->storeAs('support', $fileName, 'public');
+
+            $attachmentUrl = asset('storage/support/' . $fileName);
+        }
+
+
 
         $contact = [
             'company_name'   => $this->company_name,

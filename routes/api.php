@@ -15,8 +15,6 @@ Route::middleware(['cors', 'log.traffic'])->group(function () {
     // Registration route
     Route::post('register', 'register')->middleware('throttle:2,1');
 
-
-
     // Send OTP route
     Route::post('send-email-otp', 'sendEmailOtp')->middleware('throttle:2,1');
     Route::post('send-phone-otp', 'sendPhoneOtp')->middleware('throttle:2,1');

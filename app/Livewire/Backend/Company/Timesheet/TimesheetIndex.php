@@ -162,6 +162,22 @@ class TimesheetIndex extends BaseComponent
 
 
 
+    private function refreshStats()
+    {
+        $flat = $this->flatAttendances();
+
+        $this->totalAbsents  = $this->calculateTotalAbsents();
+        $this->totalLeaves   = $this->calculateTotalLeaves();
+
+        $this->totalPending  = $flat->where('status', 'pending')->count();
+        $this->totalApproved = $flat->where('status', 'approved')->count();
+        $this->totalRejected = $flat->where('status', 'rejected')->count();
+
+        $this->totalHours = $this->calculateTotalHours();
+    }
+
+
+
 
     public function updatedEmployeeSearch()
     {
@@ -387,6 +403,9 @@ class TimesheetIndex extends BaseComponent
             ->get()
             ->groupBy(fn($row) => $row->date)               // Y-m-d
             ->map(fn($g) => $g->pluck('employee_id')->toArray());
+
+
+        $this->refreshStats();
     }
 
 
@@ -552,18 +571,7 @@ class TimesheetIndex extends BaseComponent
         $this->weeks = $days->chunk(7);
         $this->loadEmployees();
         $this->buildAttendanceCalendar();
-
-
-        $flat = $this->flatAttendances();
-
-        $this->totalAbsents  = $this->calculateTotalAbsents();
-        $this->totalLeaves   = $this->calculateTotalLeaves();
-
-        $this->totalPending  = $flat->where('status', 'pending')->count();
-        $this->totalApproved = $flat->where('status', 'approved')->count();
-        $this->totalRejected = $flat->where('status', 'rejected')->count();
-
-        $this->totalHours    = $this->calculateTotalHours();
+        $this->refreshStats();
     }
 
     public function render()

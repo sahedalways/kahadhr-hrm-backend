@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', \App\Http\Middleware\ShareAuthUser::class);
 
         $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
             'superAdmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'companyAdmin' => \App\Http\Middleware\CompanyAdmin::class,
             'checkEmployee' => \App\Http\Middleware\CheckEmployee::class,

@@ -566,8 +566,7 @@
                                     <input type="text"
                                            class="form-control border-light-subtle shadow-none"
                                            wire:model="house_no"
-                                           placeholder="Enter House Number"
-                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                           placeholder="Enter House Number">
 
                                     @error('house_no')
                                         <span class="text-danger x-small">{{ $message }}</span>

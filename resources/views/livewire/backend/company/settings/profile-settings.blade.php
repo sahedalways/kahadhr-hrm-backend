@@ -42,9 +42,7 @@
                             <input type="number"
                                    class="form-control shadow-sm"
                                    wire:model="company_house_number"
-                                   placeholder="House No. / Flat No."
-                                   min="0"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                   placeholder="House No. / Flat No.">
                             @error('company_house_number')
                                 <span class="text-danger small">{{ $message }}</span>
                             @enderror

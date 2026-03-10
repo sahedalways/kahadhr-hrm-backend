@@ -58,7 +58,7 @@
 
             <!-- Total Leave In Lieu -->
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Total Leave in Lieu </label>
+                <label class="form-label fw-semibold">Total Carry Forward </label>
                 <input type="number"
                        class="form-control shadow-sm"
                        wire:model="total_leave_in_liew"

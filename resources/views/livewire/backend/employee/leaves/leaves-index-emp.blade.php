@@ -83,10 +83,10 @@
                         </div>
                     </div>
 
-                    <!-- Leave in Liew Card -->
+                    <!-- Carry Forward Card -->
                     <div class="p-3 rounded shadow-sm bg-light border flex-grow-1">
                         <h6 class="mb-2 text-uppercase fw-bold text-primary">
-                            <i class="fas fa-hourglass-half me-1"></i> Leave In Liew (hrs)
+                            <i class="fas fa-hourglass-half me-1"></i> Carry Forward (hrs)
                         </h6>
                         <div class="d-flex justify-content-start align-items-center flex-wrap gap-2">
                             <span class="badge bg-primary">Total: {{ number_format($totalLeaveInLiewHours, 2) }}</span>

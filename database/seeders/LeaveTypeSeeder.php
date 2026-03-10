@@ -27,7 +27,7 @@ class LeaveTypeSeeder extends Seeder
                 'emoji' => '✈️',
             ],
             [
-                'name'  => 'Leave in Lieu',
+                'name'  => 'Carry Forward',
                 'emoji' => '🤝🏻',
             ],
             [

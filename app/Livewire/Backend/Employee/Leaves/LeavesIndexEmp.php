@@ -97,7 +97,7 @@ class LeavesIndexEmp extends BaseComponent
             }
         } elseif ($this->leave_type_id == 5) {
             if ($totalHours > $this->remainingLeaveInLiewHours) {
-                $this->toast('You do not have enough leave in Liew hours.', 'error');
+                $this->toast('You do not have enough Carry Forward hours.', 'error');
                 return;
             }
         }

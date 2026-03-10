@@ -20,6 +20,28 @@ class ScheduleIndex extends BaseComponent
     public $calendarShifts = [];
 
 
+    public $modalContentWeekly = [];
+    public $modalContentMonthly = [];
+
+
+
+    public function openShiftModalWeekly($content)
+    {
+        $this->modalContentWeekly = $content;
+
+        $this->dispatch('showShiftModalWeekly');
+    }
+
+
+    public function openShiftModalMonthly($content)
+    {
+        $this->modalContentMonthly = $content;
+
+        $this->dispatch('showShiftModalMonthly');
+    }
+
+
+
 
     protected function loadEmployees()
     {

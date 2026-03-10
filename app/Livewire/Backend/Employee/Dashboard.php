@@ -228,7 +228,7 @@ class Dashboard extends Component
                     : 0,
             ],
             [
-                'name' => 'Leave in Lieu',
+                'name' => 'Carry Forward',
                 'emoji' => '🤝🏻',
                 'total' => $balance->total_leave_in_liew,
                 'used' => $balance->used_leave_in_liew,

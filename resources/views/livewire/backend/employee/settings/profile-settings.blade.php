@@ -490,6 +490,7 @@
                                             @forelse ($states as $s)
                                                 <a href="#"
                                                    class="dropdown-item"
+                                                   onclick="closeDropdown()"
                                                    wire:click.prevent="$set('state', '{{ $s['name'] }}'); $set('city', null); closeDropdown()">
                                                     {{ $s['name'] }}
                                                 </a>

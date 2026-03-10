@@ -672,7 +672,7 @@
 
         if (!wrapper || !hiddenInput) return;
 
-        wrapper.innerHTML = ''; // clear previous charts
+        wrapper.innerHTML = '';
 
         let leaveBalances = [];
         try {
@@ -742,11 +742,11 @@
                     }
                 });
 
-                // Remaining days text
+
                 const subtext = document.createElement('small');
                 subtext.className = 'text-muted text-center';
                 subtext.style.whiteSpace = 'nowrap';
-                subtext.innerText = `${balance.remaining} Days Remaining`;
+                subtext.innerText = `${balance.remaining} Hours Remaining`;
                 container.appendChild(subtext);
             }
 
@@ -754,6 +754,7 @@
             const label = document.createElement('p');
             label.className = 'small mb-0 mt-2 text-center fw-bold';
             label.innerText = balance.name;
+
             container.appendChild(label);
 
             wrapper.appendChild(container);

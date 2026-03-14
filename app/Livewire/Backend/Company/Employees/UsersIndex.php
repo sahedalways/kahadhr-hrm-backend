@@ -13,6 +13,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Traits\Exportable;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 
@@ -530,49 +531,81 @@ class UsersIndex extends BaseComponent
         $this->validate($rules, [], $attributes);
 
 
-
-        // Save employee
-        $employee = Employee::create([
-            'company_id' => auth()->user()->company->id,
-            'email' => $this->email,
-            'f_name' => $this->f_name,
-            'l_name' => $this->l_name,
-            'job_title' => $this->job_title == '' || $this->job_title === null ? null : $this->job_title,
-            'nationality' => $this->nationality,
-            'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
-            'share_code' => $this->share_code ?? null,
-            'phone_no' => $this->phone_no ?? null,
-            'role' => 'employee',
-            'contract_hours' => $this->contract_hours !== '' ? $this->contract_hours : null,
-            'employment_status' =>  $this->employment_status ?? null,
-            'invite_token' => Str::random(64),
-            'invite_token_expires_at' => Carbon::now()->addHours(48),
-            'billable_from' => now()->addDays(3),
-            'is_billable' => false
-
-        ]);
+        if (!auth()->user()->company) {
+            throw new \Exception('Company not found');
+        }
 
 
-        $inviteUrl = route(
-            'employee.auth.set-password',
-            [
-                'company' => app('authUser')->company->sub_domain,
-                'token' => $employee->invite_token,
-            ]
-        );
+
+        try {
+
+            DB::beginTransaction();
 
 
-        // Dispatch queued job
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+            $employee = Employee::create([
+                'company_id' => optional(auth()->user()->company)->id,
+                'email' => $this->email,
+                'f_name' => $this->f_name,
+                'l_name' => $this->l_name,
+                'job_title' => $this->job_title == '' || $this->job_title === null ? null : $this->job_title,
+                'nationality' => $this->nationality,
+                'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,
+                'share_code' => $this->share_code ?? null,
+                'phone_no' => $this->phone_no ?? null,
+                'role' => 'employee',
+                'contract_hours' => $this->contract_hours !== '' ? $this->contract_hours : null,
+                'employment_status' => $this->employment_status ?? null,
+                'invite_token' => Str::random(64),
+                'invite_token_expires_at' => Carbon::now()->addHours(48),
+                'billable_from' => now()->addDays(3),
+                'is_billable' => false
+            ]);
 
-        // Reset form
-        $this->reset(['email', 'f_name', 'l_name', 'department_id', 'team_id', 'role', 'employment_status', 'contract_hours', 'phone_no', 'job_title', 'start_date', 'end_date', 'is_active', 'title', 'nationality', 'date_of_birth', 'share_code']);
+            $inviteUrl = route('employee.auth.set-password', [
+                'company' => auth()->user()->company->sub_domain,
+                'token'   => $employee->invite_token,
+            ]);
 
 
-        $this->dispatch('closemodal');
-        $this->resetInputFields();
-        $this->resetLoaded();
-        $this->toast('Employee added successfully!', 'success');
+            DB::commit();
+
+
+            SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+
+            // Reset form
+            $this->reset([
+                'email',
+                'f_name',
+                'l_name',
+                'department_id',
+                'team_id',
+                'role',
+                'employment_status',
+                'contract_hours',
+                'phone_no',
+                'job_title',
+                'start_date',
+                'end_date',
+                'is_active',
+                'title',
+                'nationality',
+                'date_of_birth',
+                'share_code'
+            ]);
+
+            $this->dispatch('closemodal');
+            $this->resetInputFields();
+            $this->resetLoaded();
+
+            $this->toast('Employee added successfully!', 'success');
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            logger()->error('Employee creation failed: ' . $e->getMessage());
+
+            $this->toast('Something went wrong. Please try again.', 'error');
+        }
     }
 
 

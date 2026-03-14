@@ -1063,9 +1063,7 @@
                                                     <i class="fas fa-home me-2"></i>Current Address
                                                 </h6>
 
-                                                <p class="fw-semibold text-dark mb-1">
-                                                    {{ $profile->address ?? 'N/A' }}
-                                                </p>
+
 
                                                 <span class="text-muted small">
                                                     {{ $profile->city ?? 'N/A' }},

@@ -469,33 +469,39 @@ class TimesheetIndex extends BaseComponent
         return $this->loaded;
     }
 
-
     public function calculateTotalAbsents()
     {
         $total = 0;
 
         foreach ($this->shiftMap as $date => $shiftEmployeeIds) {
 
-
             if (Carbon::parse($date)->isFuture()) {
                 continue;
             }
 
-            $attendanceUserIds = collect($this->attendanceCalendar[$date] ?? [])
+
+            $userIds = Employee::whereIn('id', $shiftEmployeeIds)
+                ->pluck('user_id')
+                ->filter();
+
+            if ($userIds->isEmpty()) {
+                $total += count($shiftEmployeeIds);
+                continue;
+            }
+
+            $presentUserIds = Attendance::whereIn('user_id', $userIds)
+                ->whereDate('clock_in', $date)
+                ->where('status', 'approved')
                 ->pluck('user_id')
                 ->unique();
 
-            $absentCount = collect($shiftEmployeeIds)
-                ->diff($attendanceUserIds)
-                ->count();
+            $absentCount = $userIds->diff($presentUserIds)->count();
 
             $total += $absentCount;
         }
 
         return $total;
     }
-
-
 
 
     public function calculateTotalLeaves()

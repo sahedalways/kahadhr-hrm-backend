@@ -244,17 +244,19 @@ class ProfileSettings extends BaseComponent
                 'regex:/^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,6}$/',
                 Rule::unique('companies', 'registered_domain')->ignore($this->company->id),
             ],
-            'company_logo' => 'nullable|image|max:2048',
             'street' => 'required|string|max:255',
             'postcode' => 'required|string|max:20',
             'country' => 'required|string|max:100',
             'state' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
+            'company_logo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:2048',
+        ], [
+            'company_logo.image' => 'The uploaded file must be a valid image.',
+            'company_logo.mimes' => 'The company logo must be an image of type: jpeg, jpg, png, gif, webp, HEIC, HEIF.',
+            'company_logo.max'   => 'The company logo must not exceed 2 MB.',
         ]);
 
         $company = $this->company;
-
-
 
 
         if ($this->company_logo instanceof UploadedFile) {

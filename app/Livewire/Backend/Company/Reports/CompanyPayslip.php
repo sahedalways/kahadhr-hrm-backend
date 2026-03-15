@@ -76,11 +76,11 @@ class CompanyPayslip extends BaseComponent
         $this->loadMore();
 
         if (request()->has('id')) {
-         $this->openPayslipId = request('id');
+            $this->openPayslipId = request('id');
 
 
-         $this->loadRequests($this->openPayslipId);
-    }
+            $this->loadRequests($this->openPayslipId);
+        }
     }
 
     public function render()
@@ -199,16 +199,22 @@ class CompanyPayslip extends BaseComponent
     public function savePayslip()
     {
         $this->validate([
-            'file' => 'required|file|mimes:pdf|max:2048',
+            'file'    => 'required|file|mimes:pdf|max:2048',
             'user_id' => 'required|exists:users,id',
-            'month' => 'required|string',
-            'year' => 'required|numeric',
+            'month'   => 'required|string',
+            'year'    => 'required|numeric',
+        ], [
+            'file.required' => 'Please upload a file.',
+            'file.file'     => 'The uploaded file is not valid.',
+            'file.mimes'    => 'The uploaded file must be a PDF.',
+            'file.max'      => 'The uploaded file must not exceed 2 MB.',
         ]);
+
 
         $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.pdf';
         $path = $this->file->storeAs('company/payslips', $fileName, 'public');
 
-       $item = PaySlip::create([
+        $item = PaySlip::create([
             'company_id' => $this->company_id,
             'user_id' => $this->user_id,
             'period' => $this->month . ' ' . $this->year,
@@ -381,8 +387,8 @@ class CompanyPayslip extends BaseComponent
 
     public function deletePayslip($payload)
     {
-            $id = $payload['id'] ?? null;
-            if (!$id) return;
+        $id = $payload['id'] ?? null;
+        if (!$id) return;
 
 
         $ps = PaySlip::find($id);

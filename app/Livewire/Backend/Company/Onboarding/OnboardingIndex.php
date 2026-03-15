@@ -76,7 +76,7 @@ class OnboardingIndex extends BaseComponent
                 'unique:announcements',
             ],
             'description' => 'required|string',
-            'mediaFile' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav|max:50000',
+            'mediaFile' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,heic,heif,mp4,mov,avi,mp3,wav,m4a|max:50000'
         ]);
 
         $mediaPath = $this->mediaFile ? $this->mediaFile->store('announcements', 'public') : null;

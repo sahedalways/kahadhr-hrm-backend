@@ -39,8 +39,8 @@ class CompanyEmployeeProfile extends BaseComponent
             'is_active' => 'Status',
             'role' => 'Role',
             'job_title' => 'Job Title',
-            'department_id' => 'Department',
-            'team_id' => 'Team',
+            'departments' => 'Department',
+            'teams' => 'Team',
             'contract_hours' => 'Contract Hours',
             'salary_type' => 'Salary Type',
             'start_date' => 'Start Date',
@@ -49,8 +49,7 @@ class CompanyEmployeeProfile extends BaseComponent
             'billable_from' => 'Billable From',
 
             'date_of_birth' => 'Date of Birth',
-            'street_1' => 'Street 1',
-            'street_2' => 'Street 2',
+            'street' => 'Street Address',
             'city' => 'City',
             'state' => 'State',
             'postcode' => 'Postcode',
@@ -107,7 +106,7 @@ class CompanyEmployeeProfile extends BaseComponent
 
     public function updatedSelectedEmployees()
     {
-        // Auto uncheck "All Employees" if any employee unchecked
+
         if (count($this->selectedEmployees) != $this->employees->count()) {
             $this->selectAllUsers = false;
         }
@@ -147,41 +146,98 @@ class CompanyEmployeeProfile extends BaseComponent
             ->whereIn('id', $this->selectedEmployees)
             ->get();
 
+
+
         $data = $employees->map(function ($emp) {
 
             $row = [];
 
             foreach ($this->selectedFields as $field) {
 
-                // Employee table field
+
+                $value = 'N/A';
+
+
+                if ($field === 'departments') {
+                    $departments = $emp->user
+                        ? $emp->user->teams->pluck('department')->filter()->unique('id')->values()
+                        : collect();
+                    $value = $departments->pluck('name')->implode(', ') ?: 'N/A';
+                }
+
+
+                if ($field === 'teams') {
+                    $teams = $emp->user ? $emp->user->teams : collect();
+                    $value = $teams->pluck('name')->implode(', ') ?: 'N/A';
+                }
+
+
+                if (Schema::hasColumn('employees', $field)) {
+                    $value = $emp->$field ?? 'N/A';
+                }
+
+                if ($value === 'N/A' && $emp->profile && Schema::hasColumn('employee_profiles', $field)) {
+                    $value = $emp->profile->$field ?? 'N/A';
+                }
+
+
+                if ($field === 'is_active') {
+                    $value = $emp->is_active ? 'Active' : 'Inactive';
+                }
+
+                if ($field === 'verified') {
+                    $value = $emp->verified ? 'Verified' : 'Not Verified';
+                }
+
+
+                // Format dates
                 if (in_array($field, [
-                    'f_name',
-                    'l_name',
-                    'email',
-                    'avatar',
-                    'is_active',
-                    'role',
-                    'job_title',
-                    'department_id',
-                    'team_id',
-                    'contract_hours',
-                    'salary_type',
+                    'date_of_birth',
                     'start_date',
                     'end_date',
-                    'verified',
-                    'billable_from'
-                ])) {
-                    $row[$field] = $emp->$field ?? '';
+                    'billable_from',
+                    'brp_expiry_date',
+                    'right_to_work_expiry_date',
+                    'passport_expiry_date'
+                ]) && $value !== 'N/A') {
+                    $value = \Carbon\Carbon::parse($value)->format('d-m-Y');
                 }
-                // EmployeeProfile table field
-                else {
-                    $row[$field] = $emp->profile ? ($emp->profile->$field ?? '') : '';
+
+
+                if ($field === 'salary_type' && is_string($value)) {
+                    $value = ucfirst($value);
                 }
+
+
+                if ($field === 'right_to_work_expiry_date') {
+                    if ($emp->profile && $emp->profile->nationality === 'British') {
+                        $value = 'Permanent';
+                    } elseif ($emp->latestShareDoc && $emp->latestShareDoc->expires_at) {
+                        $value = \Carbon\Carbon::parse($emp->latestShareDoc->expires_at)->format('d-m-Y');
+                    } else {
+                        $value = 'Not Verified';
+                    }
+                }
+
+
+                $row[$field] = $value;
             }
 
-            $row['employee_name'] = $emp->full_name;
+
+
+            $row['employee_name'] = isset($emp->full_name) ? ucfirst($emp->full_name) : 'N/A';
+
+
+            $row['is_verified'] = $emp->user ? 'Verified' : 'Not Verified';
+
             return $row;
         });
+
+
+
+
+
+
 
         $this->dispatch('closemodal');
 

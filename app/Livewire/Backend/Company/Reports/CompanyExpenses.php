@@ -261,12 +261,17 @@ class CompanyExpenses extends BaseComponent
     public function save()
     {
         $this->validate([
-            'category' => 'required|string',
-            'amount' => 'required|numeric',
-            'description' => 'required|string',
-            'attachments' => 'required|array|max:3',
-            'attachments.*' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'category'       => 'required|string',
+            'amount'         => 'required|numeric',
+            'description'    => 'required|string',
+            'attachments'    => 'required|array|max:3',
+            'attachments.*'  => 'file|mimes:pdf,jpg,jpeg,png,heic,heif|max:2048',
+        ], [
+            'attachments.*.file'  => 'Each uploaded file must be valid.',
+            'attachments.*.mimes' => 'Each file must be a PDF or image (jpg, jpeg, png, HEIC, HEIF).',
+            'attachments.*.max'   => 'Each file must not exceed 2 MB.',
         ]);
+
 
 
 

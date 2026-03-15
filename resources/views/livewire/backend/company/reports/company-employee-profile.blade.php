@@ -74,14 +74,16 @@
             </style>
 
             <div class="col-md-6"
-                 wire:ignore.self>
+                 x-data="{ open: false }"
+                 @click.away="open = false"
+                 @keydown.escape.window="open = false">
+
                 <label class="form-label fw-bold text-secondary">Select Employees</label>
 
                 <div class="dropdown">
                     <button class="btn btn-white border w-100 d-flex justify-content-between align-items-center py-2"
                             type="button"
-                            data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside">
+                            @click="open = !open">
 
                         <span class="text-truncate"
                               style="max-width:85%;">
@@ -97,11 +99,21 @@
                             @endif
                         </span>
 
-                        <i class="fas fa-chevron-down small text-muted"></i>
+                        <i class="fas fa-chevron-down small text-muted"
+                           :class="{ 'rotate-180': open }"
+                           style="transition: transform 0.2s;"></i>
                     </button>
 
-                    <div class="dropdown-menu p-3 w-100 shadow-lg border-0"
-                         style="min-width:300px;">
+                    <div class="dropdown-menu p-3 w-100 shadow-lg border-0 show"
+                         style="min-width:300px;"
+                         x-show="open"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95">
+
                         @if ($employees->count() > 0)
                             <div class="form-check mb-2 pb-2 border-bottom">
                                 <input class="form-check-input"
@@ -137,23 +149,27 @@
                                     </div>
                                 @endforeach
                             @endif
-
                         </div>
 
                     </div>
                 </div>
 
-
+                <style>
+                    .rotate-180 {
+                        transform: rotate(180deg);
+                    }
+                </style>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6"
+                 x-data="{ open: false }">
                 <label class="form-label fw-bold text-secondary">Export Fields</label>
 
                 <div class="dropdown">
                     <button class="btn btn-white border w-100 d-flex justify-content-between align-items-center py-2"
                             type="button"
-                            data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside">
+                            @click="open = !open"
+                            @click.away="open = false">
 
                         <span class="d-flex flex-wrap gap-1 text-truncate"
                               style="max-width:85%;">
@@ -178,13 +194,14 @@
 
                         </span>
 
-
-
                         <i class="fas fa-columns small text-muted"></i>
                     </button>
 
-                    <div class="dropdown-menu p-3 w-100 shadow-lg border-0"
-                         style="min-width:300px;">
+                    <div class="dropdown-menu p-3 w-100 shadow-lg border-0 show"
+                         style="min-width:300px;"
+                         x-show="open"
+                         x-transition
+                         @click.away="open = false">
                         <div class="form-check mb-2 pb-2 border-bottom">
                             <input class="form-check-input"
                                    type="checkbox"
@@ -214,7 +231,6 @@
                             @endforeach
 
                         </div>
-
                     </div>
                 </div>
             </div>

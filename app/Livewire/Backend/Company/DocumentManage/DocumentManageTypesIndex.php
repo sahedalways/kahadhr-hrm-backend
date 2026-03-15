@@ -154,7 +154,11 @@ class DocumentManageTypesIndex extends BaseComponent
             'doc_type_id' => 'required',
             'expires_at'  => 'nullable|date',
             'emp_id'      => 'required|integer|exists:employees,id',
-            'new_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif|max:20240'
+            'new_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,webp,heic,heif|max:10240',
+        ], [
+            'new_file.mimes' => 'The uploaded file must be a PDF or an image (jpg, jpeg, png, gif, webp, HEIC, HEIF).',
+            'new_file.max'   => 'The uploaded file size must not exceed 10 MB.',
+            'new_file.file'  => 'The uploaded file is not valid.',
         ]);
 
         $document = EmpDocument::findOrFail($this->editDocId);

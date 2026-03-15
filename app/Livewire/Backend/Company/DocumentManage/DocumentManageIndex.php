@@ -94,8 +94,13 @@ class DocumentManageIndex extends BaseComponent
             'name' => 'nullable|string|max:255',
             'expires_at' => 'nullable|date',
             'emp_id' => 'nullable|integer|exists:employees,id',
-            'file_path' => 'required|file|mimes:pdf|max:20240',
             'send_email' => 'boolean',
+            'file_path' => 'required|file|mimes:pdf|max:5120',
+        ], [
+            'file_path.required' => 'Please upload a file.',
+            'file_path.file'     => 'The uploaded file is not valid.',
+            'file_path.mimes'    => 'The uploaded file must be a PDF.',
+            'file_path.max'      => 'The uploaded file must not exceed 5 MB.',
         ]);
 
         if ($this->send_email) {

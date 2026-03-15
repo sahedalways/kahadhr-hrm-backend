@@ -145,12 +145,9 @@
 
                                             <!-- Verified / Unverified Badge -->
                                             @if ($employee->user)
-                                                @if ($employee->user->email_verified_at)
-                                                    <span class="badge bg-success mb-2">Verified</span>
-                                                @else
-                                                    <span class="badge bg-light text-dark mb-2">Not Verified</span>
-                                                @endif
-
+                                                <span class="badge bg-success mb-2">Verified</span>
+                                            @else
+                                                <span class="badge bg-light text-dark mb-2">Not Verified</span>
                                             @endif
 
 

@@ -347,11 +347,13 @@
                                  class="chat-list-item position-relative {{ $receiverId === 'teamGroup_' . $group->id ? 'active-chat border-start border-3 border-primary' : '' }}"
                                  wire:click="startNewChat('teamGroup_{{ $group->id }}')"
                                  style="
-            {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
-            {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
-         ">
+        {{ $receiverId === 'teamGroup_' . $group->id ? 'background-color:#f0f0f0;' : '' }}
+        {{ isset($unreadCounts['teamGroup_' . $group->id]) && $unreadCounts['teamGroup_' . $group->id] > 0 ? 'background-color:#ffe5e5;' : '' }}
+     ">
 
-                                <div class="d-flex align-items-center justify-content-between">
+
+                                <div class="d-flex align-items-center justify-content-between w-100">
+
 
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle p-2 me-3 flex-wrap"
@@ -374,15 +376,15 @@
                                             @endif
                                         </div>
                                     </div>
-                                </div>
 
-                                <div style="display:flex; align-items:flex-end;">
+
                                     <div class="dropdown"
                                          wire:ignore>
-                                        <button class="btn btn-sm btn-light border-0 py-2 px-1"
+                                        <button class="btn btn-sm btn-light border-0 d-flex align-items-center justify-content-center dropdown-toggle"
                                                 type="button"
                                                 data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                                aria-expanded="false"
+                                                style="width: 28px; height: 28px; padding: 0;">
                                             <i class="fa-solid fa-ellipsis text-muted"></i>
                                         </button>
 
@@ -415,8 +417,6 @@
                                         </ul>
                                     </div>
                                 </div>
-
-
                             </div>
                         @endforeach
                     @endif

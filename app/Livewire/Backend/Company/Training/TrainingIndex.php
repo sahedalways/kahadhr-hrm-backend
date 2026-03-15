@@ -222,6 +222,10 @@ class TrainingIndex extends BaseComponent
 
             'require_proof' => 'boolean',
             'send_email' => 'boolean',
+        ], [
+            'instruction_file.file'  => 'The uploaded instruction file must be valid.',
+            'instruction_file.mimes' => 'The instruction file must be a video (mp4, mov, avi, wmv) or PDF.',
+            'instruction_file.max'   => 'The instruction file size must not exceed 212 MB.',
         ]);
 
 

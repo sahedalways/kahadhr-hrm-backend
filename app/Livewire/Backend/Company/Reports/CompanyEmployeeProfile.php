@@ -65,7 +65,7 @@ class CompanyEmployeeProfile extends BaseComponent
             'immigration_status' => 'Immigration Status',
             'brp_number' => 'BRP Number',
             'brp_expiry_date' => 'BRP Expiry Date',
-            'right_to_work_expiry_date' => 'Right To Work Expiry Date',
+            'right_to_work_expiry_date' => 'Right To Work Expiry',
             'passport_number' => 'Passport Number',
             'passport_expiry_date' => 'Passport Expiry Date',
         ];

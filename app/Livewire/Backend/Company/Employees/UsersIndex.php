@@ -620,7 +620,9 @@ class UsersIndex extends BaseComponent
     {
         if (!$this->hasMore) return;
 
-        $query = Employee::query();
+        $query = Employee::with([
+            'user.teams.department',
+        ]);
 
         if ($this->search && $this->search != '') {
             $searchTerm = '%' . $this->search . '%';
@@ -723,6 +725,7 @@ class UsersIndex extends BaseComponent
     {
         $employees = $this->loaded;
 
+
         if ($employees->isEmpty()) {
             $this->toast('No employees to export!', 'info');
             return;
@@ -736,8 +739,8 @@ class UsersIndex extends BaseComponent
             'Email',
             'Phone',
             'Job Title',
-            'Department',
-            'Team',
+            'Departments',
+            'Teams',
             'Contract Hours',
             'Status',
             'Start Date',
@@ -766,18 +769,29 @@ class UsersIndex extends BaseComponent
         $data = $employees->map(function ($emp) {
             return [
                 'employee_id'    => $emp->id,
-                'f_name'         => $emp->f_name,
-                'l_name'         => $emp->l_name,
-                'email'          => $emp->email,
-                'phone_no'       => $emp->user?->phone_no ?? '',
-                'job_title'      => $emp->job_title,
-                'department'     => $emp->department?->name ?? '',
-                'team'           => $emp->team?->name ?? '',
-                'contract_hours' => $emp->contract_hours ?? '',
+                'f_name'         => $emp->f_name ?: 'N/A',
+                'l_name'         => $emp->l_name ?: 'N/A',
+                'email'          => $emp->email ?: 'N/A',
+                'phone_no'       => $emp->user?->phone_no ?: 'N/A',
+                'job_title'      => $emp->job_title ?: 'N/A',
+                'department' => $emp->user && $emp->user->teams->isNotEmpty()
+                    ? $emp->user->teams
+                    ->pluck('department')
+                    ->filter()
+                    ->unique('id')
+                    ->pluck('name')
+                    ->implode(', ')
+                    : 'N/A',
+                'team' => $emp->user?->teams && $emp->user->teams->isNotEmpty()
+                    ? $emp->user->teams
+                    ->map(fn($team) => $team->name . ($team->team_lead_id === $emp->user_id ? ' (Leader)' : ''))
+                    ->implode(', ')
+                    : 'N/A',
+                'contract_hours' => $emp->contract_hours ?: 'N/A',
                 'status'         => $emp->is_active ? 'Active' : 'Former',
-                'start_date'     => optional($emp->start_date)->format('Y-m-d'),
-                'end_date'       => optional($emp->end_date)->format('Y-m-d'),
-                'created_at'     => $emp->created_at->format('Y-m-d H:i:s'),
+                'start_date'     => optional($emp->start_date)->format('Y-m-d') ?: 'N/A',
+                'end_date'       => optional($emp->end_date)->format('Y-m-d') ?: 'N/A',
+                'created_at'     => optional($emp->created_at)->format('Y-m-d H:i:s') ?: 'N/A',
             ];
         });
 
@@ -849,7 +863,7 @@ class UsersIndex extends BaseComponent
 
 
             try {
-                Employee::create([
+                $employee = Employee::create([
                     'company_id' => auth()->user()->company->id,
                     'email' => $rowAssoc['email'],
                     'f_name' => $rowAssoc['f_name'] ?? null,
@@ -862,6 +876,23 @@ class UsersIndex extends BaseComponent
                     'role' => 'employee',
                     'job_title' => $rowAssoc['job_title'] ?? null,
                 ]);
+
+                if (!empty($rowAssoc['department'])) {
+                    $department = Department::where('name', $rowAssoc['department'])->first();
+                    if ($department) {
+                        $employee->department()->associate($department);
+                        $employee->save();
+                    }
+                }
+
+
+                if (!empty($rowAssoc['teams'])) {
+                    $teamNames = array_map('trim', explode(',', $rowAssoc['teams']));
+                    $teams = Team::whereIn('name', $teamNames)->get();
+                    if ($teams->isNotEmpty() && $employee->user) {
+                        $employee->user->teams()->sync($teams->pluck('id'));
+                    }
+                }
             } catch (\Exception $e) {
                 $this->toast("Row " . ($index + 2) . ": " . $e->getMessage(), 'error');
                 continue;

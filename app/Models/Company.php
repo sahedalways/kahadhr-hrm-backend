@@ -19,6 +19,8 @@ class Company extends Model
         'company_house_number',
         'company_mobile',
         'company_email',
+        'support_phone_no',
+        'support_email',
         'business_type',
         'address_contact_info',
         'company_logo',
@@ -107,8 +109,8 @@ class Company extends Model
                 'site_title'        => $company->company_name,
                 'logo'              =>  $superAdminSetting->logo ?? null,
                 'favicon'           =>  $superAdminSetting->favicon ?? null,
-                'site_phone_number' => $company->company_mobile ?? null,
-                'site_email'        => $superAdminSetting->site_email ?? null,
+                'site_phone_number' => null,
+                'site_email'        => null,
                 'copyright_text'    => $copyrightText,
             ]);
 

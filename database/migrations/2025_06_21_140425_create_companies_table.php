@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('company_house_number');
             $table->string('company_mobile');
             $table->string('company_email');
+            $table->string('support_email')->nullable();
+            $table->string('support_phone_no')->nullable();
             $table->string('business_type')->nullable();
             $table->string('street')->nullable();
             $table->string('city')->nullable();

@@ -43,7 +43,18 @@ trait Exportable
 
             $extraHeadings = [
                 [siteSetting()->site_title ?? 'My Site'],
-                ['Email: ' . (siteSetting()->site_email ?? '') . ' | Phone: ' . (siteSetting()->site_phone_number ?? '')],
+                [
+                    'Email: ' . (
+                        auth()->user()->user_type === 'company'
+                        ? auth()->user()->company->support_email ?? 'N/A'
+                        : siteSetting()->site_email ?? 'N/A'
+                    )
+                        . ' | Phone: ' . (
+                            auth()->user()->user_type === 'company'
+                            ? auth()->user()->company->support_phone_no ?? 'N/A'
+                            : siteSetting()->site_phone_number ?? 'N/A'
+                        )
+                ],
                 ['Print Date: ' . now()->format('d M Y, H:i')],
                 [$filename],
                 []

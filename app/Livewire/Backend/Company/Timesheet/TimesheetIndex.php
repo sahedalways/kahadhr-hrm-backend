@@ -7,7 +7,6 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
 use App\Models\Employee;
-use App\Models\LeaveRequest;
 use App\Models\Notification;
 use App\Models\ShiftDate;
 use Carbon\Carbon;

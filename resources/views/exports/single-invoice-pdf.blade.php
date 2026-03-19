@@ -93,11 +93,11 @@
         <h1>{{ siteSetting()->site_title ?? 'My Company' }}</h1>
         <p>Email:
             {{ auth()->user()->user_type === 'company'
-                ? auth()->user()->company->support_email ?? 'N/A'
+                ? auth()->user()->company->company_email ?? 'N/A'
                 : siteSetting()->site_email ?? 'N/A' }}
             | Phone:
             {{ auth()->user()->user_type === 'company'
-                ? auth()->user()->company->support_phone_no ?? 'N/A'
+                ? auth()->user()->company->company_mobile ?? 'N/A'
                 : siteSetting()->site_phone_number ?? 'N/A' }}
         </p>
         <p>Invoice #: {{ $invoice->invoice_number }}</p>

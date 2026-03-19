@@ -16,8 +16,6 @@ class ProfileSettings extends BaseComponent
 
     public $company_name, $sub_domain, $company_house_number;
     public $company_mobile, $company_email, $business_type;
-    public $support_email;
-    public $support_phone_no;
     public  $registered_domain;
     public $company_logo, $old_company_logo;
 
@@ -54,8 +52,6 @@ class ProfileSettings extends BaseComponent
         $this->company_house_number  = $this->company->company_house_number;
         $this->company_email         = $this->company->company_email;
         $this->business_type         = $this->company->business_type;
-        $this->support_email         = $this->company->support_email;
-        $this->support_phone_no         = $this->company->support_phone_no;
 
         $this->registered_domain     = $this->company->registered_domain;
         $this->address     = $this->company->address;
@@ -240,8 +236,8 @@ class ProfileSettings extends BaseComponent
             ],
             'company_house_number' => 'required|string|max:255',
             'business_type' => 'nullable|string|max:255',
-            'support_email' => 'nullable|email|max:255',
-            'support_phone_no' => 'nullable|string|max:50',
+
+
             'registered_domain' => [
                 'nullable',
                 'string',
@@ -277,8 +273,6 @@ class ProfileSettings extends BaseComponent
             'company_name'          => $this->company_name,
             'company_house_number'  => $this->company_house_number,
             'business_type'         => $this->business_type,
-            'support_phone_no'         => $this->support_phone_no,
-            'support_email'         => $this->support_email,
 
             'registered_domain'     => $this->registered_domain,
             'company_logo'          => $company->company_logo,

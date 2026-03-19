@@ -49,30 +49,6 @@
                         </div>
 
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Support Email</label>
-                            <input type="email"
-                                   class="form-control shadow-sm"
-                                   wire:model="support_email"
-                                   placeholder="Enter Support Email">
-                            @error('support_email')
-                                <span class="text-danger small">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Support Phone Number</label>
-                            <input type="text"
-                                   class="form-control shadow-sm"
-                                   wire:model="support_phone_no"
-                                   placeholder="Enter Support Phone Number">
-                            @error('support_phone_no')
-                                <span class="text-danger small">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-
 
                         {{-- Business Type --}}
                         <div class="col-md-6 mb-2 mt-3">

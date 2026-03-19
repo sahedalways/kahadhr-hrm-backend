@@ -38,7 +38,7 @@ trait Exportable
         }
 
         // Excel / CSV export
-        // Excel / CSV export
+
         if (in_array($type, ['excel', 'csv'])) {
 
             $extraHeadings = [

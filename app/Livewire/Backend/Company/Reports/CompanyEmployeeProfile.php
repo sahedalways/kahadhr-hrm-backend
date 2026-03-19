@@ -138,25 +138,48 @@ class CompanyEmployeeProfile extends BaseComponent
 
     public function exportFile($type)
     {
-
-        $employees = Employee::with('profile')
-            ->where('company_id', $this->company_id)
+        $employees = Employee::with(['profile', 'documents'])->where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->where('is_active', $this->status == 'active' ? 1 : 0)
             ->whereIn('id', $this->selectedEmployees)
             ->get();
 
 
+        $shareCodeType = $this->documentTypes->firstWhere('name', 'Share Code');
 
-        $data = $employees->map(function ($emp) {
+        $data = $employees->map(function ($emp) use ($shareCodeType) {
 
             $row = [];
 
+            $latestShareDoc = null;
+            $shareCodeStatus = 'Not Verified';
+            $shareCodeColor = null;
+
+            if ($shareCodeType) {
+                $latestShareDoc = $emp->documents()
+                    ->where('doc_type_id', $shareCodeType->id)
+                    ->latest('created_at')
+                    ->first();
+
+                if ($latestShareDoc && $latestShareDoc->expires_at) {
+                    $expiresAt = \Carbon\Carbon::parse($latestShareDoc->expires_at);
+                    $daysLeft = now()->diffInDays($expiresAt, false);
+
+                    if ($daysLeft < 0) {
+                        $shareCodeStatus = 'Expired';
+                        $shareCodeColor = '#dc3545';
+                    } elseif ($daysLeft <= 60) {
+                        $shareCodeStatus = 'Expires Soon';
+                        $shareCodeColor = '#fd7e14';
+                    } else {
+                        $shareCodeStatus = 'Valid';
+                        $shareCodeColor = '#198754';
+                    }
+                }
+            }
+
             foreach ($this->selectedFields as $field) {
-
-
                 $value = 'N/A';
-
 
                 if ($field === 'departments') {
                     $departments = $emp->user
@@ -165,12 +188,10 @@ class CompanyEmployeeProfile extends BaseComponent
                     $value = $departments->pluck('name')->implode(', ') ?: 'N/A';
                 }
 
-
                 if ($field === 'teams') {
                     $teams = $emp->user ? $emp->user->teams : collect();
                     $value = $teams->pluck('name')->implode(', ') ?: 'N/A';
                 }
-
 
                 if (Schema::hasColumn('employees', $field)) {
                     $value = $emp->$field ?? 'N/A';
@@ -180,7 +201,6 @@ class CompanyEmployeeProfile extends BaseComponent
                     $value = $emp->profile->$field ?? 'N/A';
                 }
 
-
                 if ($field === 'is_active') {
                     $value = $emp->is_active ? 'Active' : 'Inactive';
                 }
@@ -189,8 +209,6 @@ class CompanyEmployeeProfile extends BaseComponent
                     $value = $emp->verified ? 'Verified' : 'Not Verified';
                 }
 
-
-                // Format dates
                 if (in_array($field, [
                     'date_of_birth',
                     'start_date',
@@ -203,7 +221,6 @@ class CompanyEmployeeProfile extends BaseComponent
                     $value = \Carbon\Carbon::parse($value)->format('d-m-Y');
                 }
 
-
                 if ($field === 'salary_type' && is_string($value)) {
                     $value = ucfirst($value);
                 }
@@ -212,35 +229,26 @@ class CompanyEmployeeProfile extends BaseComponent
                 if ($field === 'right_to_work_expiry_date') {
                     if ($emp->profile && $emp->profile->nationality === 'British') {
                         $value = 'Permanent';
-                    } elseif ($emp->latestShareDoc && $emp->latestShareDoc->expires_at) {
-                        $value = \Carbon\Carbon::parse($emp->latestShareDoc->expires_at)->format('d-m-Y');
                     } else {
-                        $value = 'Not Verified';
+                        $value = $shareCodeStatus === 'Not Verified' ? 'Not Verified' : \Carbon\Carbon::parse($latestShareDoc->expires_at)->format('d-m-Y');
                     }
                 }
 
 
+                if ($field === 'share_code_status') {
+                    $value = $shareCodeStatus;
+                }
+
                 $row[$field] = $value;
             }
 
-
-
-            $row['employee_name'] = isset($emp->full_name) ? ucfirst($emp->full_name) : 'N/A';
-
-
+            $row['employee_name'] = $emp->full_name ? ucfirst($emp->full_name) : 'N/A';
             $row['is_verified'] = $emp->user ? 'Verified' : 'Not Verified';
 
             return $row;
         });
 
-
-
-
-
-
-
         $this->dispatch('closemodal');
-
 
         $columns = collect($this->selectedFields)
             ->map(fn($field) => $this->profileFields[$field] ?? ucwords(str_replace('_', ' ', $field)))
@@ -250,7 +258,6 @@ class CompanyEmployeeProfile extends BaseComponent
 
         $keys = $this->selectedFields;
         array_unshift($keys, 'employee_name');
-
 
         return $this->export(
             $data,
@@ -264,7 +271,6 @@ class CompanyEmployeeProfile extends BaseComponent
             ]
         );
     }
-
 
 
 

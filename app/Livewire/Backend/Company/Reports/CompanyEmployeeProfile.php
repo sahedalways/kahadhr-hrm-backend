@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Company\Reports;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\DocumentType;
 use App\Models\Employee;
 use App\Traits\Exportable;
 use Illuminate\Support\Facades\Schema;
@@ -144,8 +145,13 @@ class CompanyEmployeeProfile extends BaseComponent
             ->whereIn('id', $this->selectedEmployees)
             ->get();
 
+        $documentTypes = DocumentType::query()
+            ->where('company_id', auth()->user()->company->id)
+            ->orderBy('name')
+            ->get();
 
-        $shareCodeType = $this->documentTypes->firstWhere('name', 'Share Code');
+
+        $shareCodeType = $documentTypes->firstWhere('name', 'Share Code');
 
         $data = $employees->map(function ($emp) use ($shareCodeType) {
 

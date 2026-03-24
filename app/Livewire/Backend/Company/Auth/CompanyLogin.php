@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
+
 
 class CompanyLogin extends BaseComponent
 {
@@ -239,12 +243,14 @@ class CompanyLogin extends BaseComponent
 
         $otpCookie = Cookie::get('company_otp_' . $user->id);
         if ($otpCookie) {
+            $this->trackLoginSession();
             Auth::loginUsingId($user->id, true);
             return redirect()->intended('dashboard/');
         }
 
 
         if (!$user->securitySetting->two_step_enabled) {
+            $this->trackLoginSession();
             Auth::loginUsingId($user->id, true);
             return redirect()->intended('dashboard/');
         }
@@ -316,6 +322,8 @@ class CompanyLogin extends BaseComponent
                 $cookieValue = Str::random(40);
                 Cookie::queue('company_otp_' . $this->userId, $cookieValue, 60 * 24 * 30);
             }
+
+            $this->trackLoginSession();
 
             $this->toast('OTP verified successfully!', 'success');
 
@@ -397,5 +405,32 @@ class CompanyLogin extends BaseComponent
         $this->showOtpModal = true;
         $this->code_sent = true;
         $this->otpCooldown = 120;
+    }
+
+
+
+    public function trackLoginSession()
+    {
+        $agent = new Agent();
+        $device = $agent->browser() . ' – ' . $agent->platform();
+
+        // Get IP and location
+        $ip = request()->ip();
+        $locationData = Location::get($ip);
+        $location = $locationData ? $locationData->countryName : 'Unknown';
+
+        DB::table('sessions')->updateOrInsert(
+            ['id' => session()->getId()],
+            [
+                'user_id' => $this->userId,
+                'ip_address' => $ip,
+                'user_agent' => request()->userAgent(),
+                'device' => $device,
+                'location' => $location,
+                'login_time' => now(),
+                'payload' => serialize(session()->all()),
+                'last_activity' => time(),
+            ]
+        );
     }
 }

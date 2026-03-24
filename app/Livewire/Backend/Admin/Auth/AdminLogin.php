@@ -6,6 +6,9 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Repositories\AuthRepository;
 use App\Services\API\VerificationService;
 use Illuminate\Support\Facades\Auth;
+use Jenssegers\Agent\Agent;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 
 class AdminLogin extends BaseComponent
 {
@@ -52,6 +55,7 @@ class AdminLogin extends BaseComponent
         $this->name    = $user->f_name . ' ' . $user->l_name;
 
         if (!$user->securitySetting->two_step_enabled) {
+            $this->trackLoginSession();
             Auth::loginUsingId($user->id, true);
             return redirect()->intended('dashboard/');
         }
@@ -120,6 +124,8 @@ class AdminLogin extends BaseComponent
 
 
             Auth::loginUsingId($this->userId, $this->rememberMe);
+
+            $this->trackLoginSession();
 
             // Clear OTP session
             $this->toast('OTP verified successfully!', 'success');
@@ -202,5 +208,36 @@ class AdminLogin extends BaseComponent
         $this->showOtpModal = true;
         $this->code_sent = true;
         $this->otpCooldown = 120;
+    }
+
+
+
+
+
+
+
+    public function trackLoginSession()
+    {
+        $agent = new Agent();
+        $device = $agent->browser() . ' – ' . $agent->platform();
+
+
+        $ip = request()->ip();
+        $locationData = Location::get($ip);
+        $location = $locationData ? $locationData->countryName : 'Unknown';
+
+        DB::table('sessions')->updateOrInsert(
+            ['id' => session()->getId()],
+            [
+                'user_id' => $this->userId,
+                'ip_address' => $ip,
+                'user_agent' => request()->userAgent(),
+                'device' => $device,
+                'location' => $location,
+                'login_time' => now(),
+                'payload' => serialize(session()->all()),
+                'last_activity' => time(),
+            ]
+        );
     }
 }

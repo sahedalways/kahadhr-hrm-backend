@@ -3,9 +3,10 @@
 namespace App\Livewire\Backend\Settings;
 
 use App\Livewire\Backend\Components\BaseComponent;
-use App\Models\SecuritySetting;
 use App\Services\UserService;
-use Illuminate\Support\Facades\Auth;
+
+
+
 
 class SecuritySettings extends BaseComponent
 {
@@ -14,10 +15,8 @@ class SecuritySettings extends BaseComponent
     public $new_password;
     public $confirm_new_password;
 
-    public $twoStepEnabled = false;
-    public $verificationMethod = 'mobile';
 
-    public SecuritySetting $securitySetting;
+
 
     protected $rules = [
         'old_password' => 'required',
@@ -42,48 +41,6 @@ class SecuritySettings extends BaseComponent
     }
 
 
-
-    public function mount()
-    {
-        $user = Auth::user();
-
-
-        $this->securitySetting = SecuritySetting::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'two_step_enabled' => true,
-                'verification_method' => 'mobile'
-            ]
-        );
-
-
-        $this->twoStepEnabled = $this->securitySetting->two_step_enabled;
-        $this->verificationMethod = $this->securitySetting->verification_method;
-    }
-
-
-
-    public function saveSettings()
-    {
-        $this->securitySetting->update([
-            'two_step_enabled' => $this->twoStepEnabled,
-            'verification_method' => $this->verificationMethod,
-        ]);
-
-        $this->toast('Security settings updated', 'success');
-    }
-
-    public function updatedTwoStepEnabled($value)
-    {
-
-        $this->saveSettings();
-    }
-
-    public function updatedVerificationMethod($value)
-    {
-
-        $this->saveSettings();
-    }
 
 
 

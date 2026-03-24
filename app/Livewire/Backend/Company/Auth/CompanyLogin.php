@@ -8,7 +8,9 @@ use App\Repositories\AuthRepository;
 use App\Services\API\VerificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CompanyLogin extends BaseComponent
 {
@@ -236,6 +238,13 @@ class CompanyLogin extends BaseComponent
         $this->verificationMethod === 'mobile';
 
 
+        $otpCookie = Cookie::get('company_otp_' . $user->id);
+        if ($otpCookie) {
+            Auth::loginUsingId($user->id, true);
+            return redirect()->intended('dashboard/');
+        }
+
+
         if ($userType === 'company') {
             $sent = $verificationService->sendPhoneOtp($phone, $this->company_name);
 
@@ -271,7 +280,6 @@ class CompanyLogin extends BaseComponent
                 'otp.*.digits'   => 'OTP must be 1 digit each.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Show toast manually for first error
             $this->toast(collect($e->errors())->flatten()->first(), 'error');
             return;
         }
@@ -281,15 +289,18 @@ class CompanyLogin extends BaseComponent
 
         try {
 
-            $verificationService->verifyOtp($this->phone_no, $otpString);
+            $emailOrPhone = $this->verificationMethod === 'email' ? $this->email : $this->phone_no;
+            $verificationService->verifyOtp($emailOrPhone, $otpString);
 
             $this->dispatch('closemodal');
+            Auth::loginUsingId($this->userId, true);
 
 
+            if ($this->rememberMe) {
+                $cookieValue = Str::random(40);
+                Cookie::queue('company_otp_' . $this->userId, $cookieValue, 60 * 24 * 30);
+            }
 
-            Auth::loginUsingId($this->userId, $this->rememberMe);
-
-            // Clear OTP session
             $this->toast('OTP verified successfully!', 'success');
 
             return redirect()->intended('dashboard/');

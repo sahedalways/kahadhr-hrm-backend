@@ -46,33 +46,45 @@ class AdminLogin extends BaseComponent
             return;
         }
 
-        // user type from DB
-        $userType = $user->user_type;
         $phone    = $user->phone_no;
         $this->phone_no    = $phone;
         $this->userId    = $user->id;
         $this->name    = $user->f_name . ' ' . $user->l_name;
 
+        if (!$user->securitySetting->two_step_enabled) {
+            Auth::loginUsingId($user->id, true);
+            return redirect()->intended('dashboard/');
+        }
 
-        if ($userType === 'superAdmin') {
 
-            $sent = $verificationService->sendPhoneOtp($phone, $this->name);
+        if ($user->securitySetting->verification_method === 'email') {
+            $sent = $verificationService->sendEmailOtp($this->email, $this->name);
+
+            if ($sent) {
+                $this->verificationMethod = 'email';
+                $this->toast('OTP sent to your email address', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
+        } else {
+            $sent = $verificationService->sendPhoneOtp($this->phone_no, $this->name);
+
 
 
             if ($sent) {
-
-                $this->showOtpModal = true;
-                $this->code_sent = true;
-                $this->startOtpCooldown();
+                $this->verificationMethod = 'mobile';
                 $this->toast('OTP sent to your phone number', 'success');
-
-
-                return;
             } else {
                 $this->toast("Failed to send OTP", 'error');
                 return;
             }
         }
+
+
+        $this->showOtpModal = true;
+        $this->code_sent = true;
+        $this->startOtpCooldown();
     }
 
 

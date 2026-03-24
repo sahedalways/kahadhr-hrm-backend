@@ -1,0 +1,100 @@
+.accordion-item {
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.accordion-button {
+    background: #fff;
+    font-weight: 600;
+    padding: 18px 20px;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+.accordion-button::after {
+    display: none;
+}
+
+.accordion-button .arrow {
+    margin-left: auto;
+    transition: transform 0.25s ease;
+    font-size: 18px;
+    color: #6c757d;
+}
+
+.accordion-button:not(.collapsed) .arrow {
+    transform: rotate(90deg);
+    color: #0d6efd;
+}
+
+.accordion-button:hover {
+    background: #f7f9fc;
+}
+
+.accordion-button:not(.collapsed) {
+    background: #f1f6ff;
+    color: #0d6efd;
+    box-shadow: inset 3px 0 0 #0d6efd;
+}
+
+.accordion-body {
+    background: #fff;
+    padding: 22px;
+}
+
+.accordion-collapse {
+    transition: all 0.25s ease;
+}
+
+.pro-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.pro-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.pro-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #dee2e6;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+/* Circle */
+.pro-slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Checked state */
+.pro-switch input:checked + .pro-slider {
+    background: #0d6efd;
+}
+
+.pro-switch input:checked + .pro-slider::before {
+    transform: translateX(22px);
+}
+
+/* Hover glow */
+.pro-switch:hover .pro-slider {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+}

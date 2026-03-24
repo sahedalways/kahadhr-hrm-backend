@@ -28,7 +28,7 @@ use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
 use App\Livewire\Backend\Company\Training\TrainingIndex;
 use App\Livewire\Backend\Settings\MailSettings;
-use App\Livewire\Backend\Settings\PasswordSettings;
+use App\Livewire\Backend\Settings\SecuritySettings;
 use Illuminate\Support\Facades\Route;
 
 
@@ -75,7 +75,7 @@ Route::domain('company.' . config('app.base_domain'))
 
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
-      Route::get('password', PasswordSettings::class)->name('password');
+      Route::get('security', SecuritySettings::class)->name('security');
       Route::get('profile', ProfileSettings::class)->name('profile');
       Route::get('mail', MailSettings::class)->name('mail');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');

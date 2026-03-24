@@ -93,4 +93,26 @@ class User extends Authenticatable
             ->withPivot('is_team_lead')
             ->withTimestamps();
     }
+
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+
+
+            if (in_array($user->user_type, ['superAdmin', 'company'])) {
+
+                SecuritySetting::create([
+                    'user_id' => $user->id,
+                    'two_step_enabled' => true,
+                    'verification_method' => 'mobile'
+                ]);
+            }
+        });
+    }
+
+    public function securitySetting()
+    {
+        return $this->hasOne(SecuritySetting::class, 'user_id', 'id');
+    }
 }

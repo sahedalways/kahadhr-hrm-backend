@@ -13,7 +13,7 @@ use App\Livewire\Backend\Admin\SupportTickets;
 use App\Livewire\Backend\ContactInfo;
 use App\Livewire\Backend\Settings\ChargeSettings;
 use App\Livewire\Backend\Settings\MailSettings;
-use App\Livewire\Backend\Settings\PasswordSettings;
+use App\Livewire\Backend\Settings\SecuritySettings;
 use App\Livewire\Backend\Settings\SiteSettings;
 use App\Livewire\Backend\Settings\SmsSettings;
 use App\Livewire\Backend\Settings\SocialSettings;
@@ -68,7 +68,7 @@ Route::domain(config('app.admin_subdomain') . '.' . config('app.base_domain'))->
     Route::get('site', SiteSettings::class)->name('site');
     Route::get('mail', MailSettings::class)->name('mail');
     Route::get('sms', SmsSettings::class)->name('sms');
-    Route::get('password', PasswordSettings::class)->name('password');
+    Route::get('security', SecuritySettings::class)->name('security');
     Route::get('social', SocialSettings::class)->name('social');
     Route::get('charge', ChargeSettings::class)->name('charge');
   });

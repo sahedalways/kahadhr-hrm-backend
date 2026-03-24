@@ -93,6 +93,7 @@ class Company extends Model
     protected static function booted()
     {
         static::created(function ($company) {
+
             $superAdminSettings = SiteSetting::query()
                 ->withoutGlobalScope('filterByUserType')
                 ->whereNull('company_id')

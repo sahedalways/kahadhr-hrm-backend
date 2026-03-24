@@ -119,73 +119,147 @@
         @if ($showOtpModal)
             <div class="modal fade show d-block"
                  tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered"> <!-- Centered -->
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
 
                         <!-- Modal Header -->
                         <div class="modal-header">
-                            <h5 class="modal-title">Enter OTP</h5>
+                            <h5 class="modal-title">Verification Centre</h5>
                         </div>
 
-                        <!-- Modal Body -->
-                        <form role="form"
-                              class="text-start"
-                              wire:submit.prevent="verifyOtp">
-                            <div class="modal-body">
 
-                                <!-- OTP Fields -->
-                                <div class="d-flex justify-content-between gap-2 mb-3">
-                                    @for ($i = 0; $i < 6; $i++)
-                                        <input type="text"
-                                               wire:model="otp.{{ $i }}"
-                                               class="form-control text-center otp-field"
-                                               maxlength="1"
-                                               placeholder="-"
-                                               inputmode="numeric"
-                                               autocomplete="one-time-code"
-                                               @if ($i === 0) autofocus @endif
-                                               oninput="handleOtpInput(this, {{ $i }})"
-                                               onkeydown="handleOtpBackspace(event, {{ $i }})">
-                                    @endfor
+                        @if (!$code_sent)
+                            <div class="text-center p-4">
+
+                                <!-- Header -->
+                                <p class="h6 text-muted mb-4">
+                                    Choose a verification method to receive your OTP
+                                </p>
+
+                                <!-- Dropdown with icon -->
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text bg-light text-secondary">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </span>
+                                    <select class="form-select"
+                                            wire:model="verificationMethod"
+                                            aria-label="Verification Method">
+                                        <option value=""
+                                                disabled
+                                                selected>Select Method</option>
+                                        <option value="mobile">Mobile OTP <i class="fas fa-mobile-alt"></i></option>
+                                        <option value="email">Email OTP <i class="fas fa-envelope"></i></option>
+                                    </select>
                                 </div>
 
 
-                                <!-- Countdown Polling -->
-                                @if ($otpCooldown > 0)
-                                    <div wire:poll.1000ms="tick"></div>
-                                @endif
-                            </div>
-
-                            <!-- Modal Footer -->
-                            <div class="modal-footer justify-content-between">
-
-                                <!-- Send/Resend OTP Button -->
-                                <button type="button"
-                                        class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                        wire:click.prevent.stop="login('{{ $updating_field }}')"
+                                <button class="btn btn-primary w-100 py-2"
+                                        wire:click="sendOtp"
                                         wire:loading.attr="disabled"
-                                        wire:target="login"
-                                        style="height: 38px; min-width: 120px;"
-                                        @if ($otpCooldown > 0) disabled @endif>
+                                        @if (!$verificationMethod) disabled @endif>
+
+
                                     <span wire:loading
-                                          wire:target="login">
+                                          wire:target="sendOtp">
                                         <i class="fas fa-spinner fa-spin me-2"></i> Sending...
                                     </span>
+
                                     <span wire:loading.remove
-                                          wire:target="login">
-                                        @if ($otpCooldown > 0)
-                                            Resend In
-                                            {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
-                                        @elseif($code_sent)
-                                            Resend OTP
-                                        @else
-                                            Send OTP
-                                        @endif
+                                          wire:target="sendOtp">
+                                        Send OTP
                                     </span>
                                 </button>
 
-                                <!-- Verify Button -->
-                                @if ($code_sent)
+
+                                <small class="d-block text-muted mt-2">
+                                    OTP will be sent to your selected method.
+                                </small>
+
+                            </div>
+                        @else
+                            <form role="form"
+                                  class="text-start"
+                                  wire:submit.prevent="verifyOtp">
+
+                                <div class="text-center mb-3">
+
+                                    <small class="text-muted">
+                                        OTP sent to
+                                        <strong>
+                                            @if ($verificationMethod === 'mobile')
+                                                {{ maskPhone($phone_no) }}
+                                            @else
+                                                {{ maskEmail($email) }}
+                                            @endif
+                                        </strong>
+                                    </small>
+                                    <div>
+                                        <a href="#"
+                                           class="small text-primary"
+                                           wire:click.prevent="changeMethod">
+                                            Change method
+                                        </a>
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="modal-body">
+
+                                    <!-- OTP Fields -->
+                                    <div class="d-flex justify-content-between gap-2 mb-3">
+                                        @for ($i = 0; $i < 6; $i++)
+                                            <input type="text"
+                                                   wire:model="otp.{{ $i }}"
+                                                   class="form-control text-center otp-field"
+                                                   maxlength="1"
+                                                   placeholder="-"
+                                                   inputmode="numeric"
+                                                   autocomplete="one-time-code"
+                                                   @if ($i === 0) autofocus @endif
+                                                   oninput="handleOtpInput(this, {{ $i }})"
+                                                   onkeydown="handleOtpBackspace(event, {{ $i }})">
+                                        @endfor
+                                    </div>
+
+
+
+                                    @if ($otpCooldown > 0)
+                                        <div wire:poll.1000ms="tick"></div>
+                                    @endif
+                                </div>
+
+                                <!-- Modal Footer -->
+                                <div class="modal-footer justify-content-between">
+
+
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                            wire:click.prevent.stop="login('{{ $updating_field }}')"
+                                            wire:loading.attr="disabled"
+                                            wire:target="login"
+                                            style="height: 38px; min-width: 120px;"
+                                            @if ($otpCooldown > 0) disabled @endif>
+                                        <span wire:loading
+                                              wire:target="login">
+                                            <i class="fas fa-spinner fa-spin me-2"></i> Sending...
+                                        </span>
+
+                                        <span wire:loading.remove
+                                              wire:target="sendOtp">
+                                            @if ($otpCooldown > 0)
+                                                Resend In
+                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
+                                            @elseif($code_sent)
+                                                Resend OTP
+                                            @else
+                                                Send OTP
+                                            @endif
+                                        </span>
+                                    </button>
+
+                                    <!-- Verify Button -->
                                     <div class="ms-auto d-flex gap-2">
                                         <button type="submit"
                                                 class="btn btn-success"
@@ -199,15 +273,20 @@
                                                   wire:target="verifyOtp">Verify</span>
                                         </button>
                                     </div>
-                                @endif
-                            </div>
-                        </form>
 
+                                </div>
+                            </form>
+
+
+
+                        @endif
                     </div>
                 </div>
+
+
             </div>
 
-            <!-- Dark + Blur Backdrop -->
+
             <div class="modal-backdrop-custom fade show"></div>
 
             <style>
@@ -219,16 +298,15 @@
                     width: 100%;
                     height: 100%;
                     background-color: rgba(0, 0, 0, 0.7);
-                    /* Darker */
+
                     backdrop-filter: blur(5px);
-                    /* Blur effect */
+
                     -webkit-backdrop-filter: blur(5px);
-                    /* Safari support */
+
                     z-index: 1040;
-                    /* Same as Bootstrap modal backdrop */
+
                 }
 
-                /* Optional: Ensure modal is perfectly centered on all screen sizes */
                 .modal-dialog {
                     display: flex;
                     align-items: center;

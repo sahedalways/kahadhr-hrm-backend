@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminLogin extends BaseComponent
 {
-    public $email, $phone_no, $userId, $password, $success = false;
+    public $email, $phone_no, $userId, $name, $password, $success = false;
     public $otp = [], $generatedOtp, $showOtpModal = false;
     public $updating_field;
     public $code_sent = false;
     public $otpCooldown = 0;
     public $rememberMe = false;
+    public $verificationMethod = 'mobile';
 
 
     protected $rules = [
@@ -50,11 +51,12 @@ class AdminLogin extends BaseComponent
         $phone    = $user->phone_no;
         $this->phone_no    = $phone;
         $this->userId    = $user->id;
+        $this->name    = $user->f_name . ' ' . $user->l_name;
 
 
         if ($userType === 'superAdmin') {
 
-            $sent = $verificationService->sendPhoneOtp($phone, $user->f_name . ' ' . $user->l_name);
+            $sent = $verificationService->sendPhoneOtp($phone, $this->name);
 
 
             if ($sent) {
@@ -150,5 +152,42 @@ class AdminLogin extends BaseComponent
                 return redirect()->route('super-admin.home');
             }
         }
+    }
+
+
+
+    public function changeMethod()
+    {
+        $this->code_sent = false;
+    }
+
+
+    public function sendOtp(VerificationService $verificationService)
+    {
+        if (!$this->verificationMethod) return;
+
+        if ($this->verificationMethod === 'email') {
+            $sent = $verificationService->sendEmailOtp($this->email, $this->name);
+
+            if ($sent) {
+                $this->toast('OTP sent to your email address', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
+        } else {
+            $sent = $verificationService->sendPhoneOtp($this->phone_no, $this->name);
+            if ($sent) {
+                $this->toast('OTP sent to your phone number', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
+        }
+
+        $this->startOtpCooldown();
+        $this->showOtpModal = true;
+        $this->code_sent = true;
+        $this->otpCooldown = 120;
     }
 }

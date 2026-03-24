@@ -253,4 +253,27 @@ if (!function_exists('todaysShiftForUser')) {
       return false;
     }
   }
+
+
+  function maskPhone($phone)
+  {
+    if (!$phone) return '';
+
+    $start = substr($phone, 0, 4);
+    $end   = substr($phone, -2);
+
+    return $start . str_repeat('*', strlen($phone) - 6) . $end;
+  }
+
+
+  function maskEmail($email)
+  {
+    if (!$email) return '';
+
+    [$name, $domain] = explode('@', $email);
+
+    $visible = substr($name, 0, 1);
+
+    return $visible . str_repeat('*', max(strlen($name) - 1, 1)) . '@' . $domain;
+  }
 }

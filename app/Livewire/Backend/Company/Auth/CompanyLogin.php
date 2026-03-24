@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CompanyLogin extends BaseComponent
 {
-    public $email = '', $phone_no, $userId, $password = "", $success = false;
+    public $email = '', $phone_no, $userId, $company_name, $password = "", $success = false;
     public $otp = [],  $showOtpModal = false;
     public $company;
     public $updating_field;
@@ -30,6 +30,8 @@ class CompanyLogin extends BaseComponent
     public $changePasswordOtp = [];
     public $newPassword;
     public $confirmPassword;
+
+    public $verificationMethod = 'mobile';
 
 
 
@@ -229,12 +231,13 @@ class CompanyLogin extends BaseComponent
         $userType = $user->user_type;
         $phone    = $user->phone_no;
         $this->phone_no    = $phone;
+        $this->company_name    = $user->company->company_name;
         $this->userId    = $user->id;
+        $this->verificationMethod === 'mobile';
 
 
         if ($userType === 'company') {
-            $sent = $verificationService->sendPhoneOtp($phone, $user->company->company_name);
-
+            $sent = $verificationService->sendPhoneOtp($phone, $this->company_name);
 
             if ($sent) {
 
@@ -331,5 +334,41 @@ class CompanyLogin extends BaseComponent
                 return redirect()->route('company.dashboard.index', ['company' => app('authUser')->company->sub_domain]);
             }
         }
+    }
+
+
+    public function changeMethod()
+    {
+        $this->code_sent = false;
+    }
+
+
+    public function sendOtp(VerificationService $verificationService)
+    {
+        if (!$this->verificationMethod) return;
+
+        if ($this->verificationMethod === 'email') {
+            $sent = $verificationService->sendEmailOtp($this->email, $this->company_name);
+
+            if ($sent) {
+                $this->toast('OTP sent to your email address', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
+        } else {
+            $sent = $verificationService->sendPhoneOtp($this->phone_no, $this->company_name);
+            if ($sent) {
+                $this->toast('OTP sent to your phone number', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
+                return;
+            }
+        }
+
+        $this->startOtpCooldown();
+        $this->showOtpModal = true;
+        $this->code_sent = true;
+        $this->otpCooldown = 120;
     }
 }

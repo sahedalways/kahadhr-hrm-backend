@@ -230,7 +230,6 @@ class CompanyLogin extends BaseComponent
             return;
         }
         // user type from DB
-        $userType = $user->user_type;
         $phone    = $user->phone_no;
         $this->phone_no    = $phone;
         $this->company_name    = $user->company->company_name;
@@ -245,23 +244,40 @@ class CompanyLogin extends BaseComponent
         }
 
 
-        if ($userType === 'company') {
-            $sent = $verificationService->sendPhoneOtp($phone, $this->company_name);
+        if (!$user->securitySetting->two_step_enabled) {
+            Auth::loginUsingId($user->id, true);
+            return redirect()->intended('dashboard/');
+        }
+
+
+        if ($user->securitySetting->verification_method === 'email') {
+            $sent = $verificationService->sendEmailOtp($this->email, $this->company_name);
 
             if ($sent) {
-
-                $this->showOtpModal = true;
-                $this->code_sent = true;
-                $this->startOtpCooldown();
-                $this->toast('OTP sent to your phone number', 'success');
-
-
+                $this->verificationMethod = 'email';
+                $this->toast('OTP sent to your email address', 'success');
+            } else {
+                $this->toast("Failed to send OTP", 'error');
                 return;
+            }
+        } else {
+            $sent = $verificationService->sendPhoneOtp($this->phone_no, $this->company_name);
+
+
+
+            if ($sent) {
+                $this->verificationMethod = 'mobile';
+                $this->toast('OTP sent to your phone number', 'success');
             } else {
                 $this->toast("Failed to send OTP", 'error');
                 return;
             }
         }
+
+
+        $this->showOtpModal = true;
+        $this->code_sent = true;
+        $this->startOtpCooldown();
     }
 
 

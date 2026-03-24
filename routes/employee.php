@@ -16,7 +16,7 @@ use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Employee\Settings\ProfileSettings;
 use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Employee\Training\TrainingIndexEmp;
-use App\Livewire\Backend\Settings\PasswordSettings;
+use App\Livewire\Backend\Settings\SecuritySettings;
 use Illuminate\Support\Facades\Route;
 
 
@@ -53,7 +53,7 @@ Route::domain('company.' . config('app.base_domain'))
 
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
-      Route::get('password', PasswordSettings::class)->name('password');
+      Route::get('security', SecuritySettings::class)->name('security');
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
     });
 

@@ -293,16 +293,16 @@
 
 
 
-                            <!-- Password Settings -->
+                            <!-- Security Settings -->
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('dashboard/settings/password') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('dashboard/settings/security') ? 'active' : '' }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
-                                   title="Password Settings"
+                                   title="Security Settings"
                                    data-bs-trigger="manual"
-                                   href="{{ route('super-admin.settings.password') }}">
+                                   href="{{ route('super-admin.settings.security') }}">
                                     <i class="fas fa-lock sidenav-mini-icon side-bar-inner"></i>
-                                    <span class="sidenav-normal side-bar-inner"> Password Settings </span>
+                                    <span class="sidenav-normal side-bar-inner"> Security Settings </span>
                                 </a>
                             </li>
                         </ul>

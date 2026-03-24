@@ -11,7 +11,7 @@ class AuthService
 
   public function loginAdmin(string $email, string $password)
   {
-    $user = User::where('email', $email)
+    $user = User::with('securitySetting')->where('email', $email)
       ->where('user_type', 'superAdmin')
       ->first();
 
@@ -31,7 +31,7 @@ class AuthService
   public function loginCompany(string $email, string $password)
   {
     // Find the user with the given email and user_type 'company'
-    $user = User::where('email', $email)
+    $user = User::with('securitySetting')->where('email', $email)
       ->where('user_type', 'company')
       ->first();
 

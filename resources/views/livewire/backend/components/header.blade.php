@@ -237,8 +237,8 @@
                                                 </li>
                                                 <li class="p-0">
                                                     <a class="dropdown-item"
-                                                       href="{{ route('company.dashboard.settings.password', ['company' => app('authUser')->company->sub_domain]) }}">
-                                                        <i class="fas fa-lock me-2"></i> Password Settings
+                                                       href="{{ route('company.dashboard.settings.security', ['company' => app('authUser')->company->sub_domain]) }}">
+                                                        <i class="fas fa-lock me-2"></i> Security Settings
                                                     </a>
                                                 </li>
                                             @elseif(in_array($userType, ['employee', 'manager']))
@@ -250,8 +250,8 @@
                                                 </li>
                                                 <li class="p-0 mt-1">
                                                     <a class="dropdown-item"
-                                                       href="{{ route('employee.dashboard.settings.password', ['company' => app('authUser')->employee->company->sub_domain]) }}">
-                                                        <i class="fas fa-lock me-2"></i> Password Settings
+                                                       href="{{ route('employee.dashboard.settings.security', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                                        <i class="fas fa-lock me-2"></i> Security Settings
                                                     </a>
                                                 </li>
                                             @endif

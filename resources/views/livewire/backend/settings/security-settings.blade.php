@@ -23,7 +23,7 @@
 
                 @if ($isPrivileged)
                     <h6 class="accordion-header">
-                        <button class="accordion-button custom-acc-btn"
+                        <button class="accordion-button collapsed"
                                 type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#collapsePassword">
@@ -40,14 +40,14 @@
                     </h6>
 
                     <div id="collapsePassword"
-                         class="accordion-collapse collapse show"
+                         class="accordion-collapse collapse"
                          data-bs-parent="#securityAccordion">
                     @else
                         <h6 class="px-3 pt-3 pb-2 mb-0 fw-semibold text-dark">
                             🔐 Change Password
                         </h6>
 
-                        <div class="accordion-collapse show">
+                        <div class="accordion-collapse">
                 @endif
 
 
@@ -141,8 +141,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- 🔒 Two-Step Security --}}
 
 
 

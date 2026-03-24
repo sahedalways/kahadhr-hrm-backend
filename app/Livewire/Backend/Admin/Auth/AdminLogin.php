@@ -99,8 +99,9 @@ class AdminLogin extends BaseComponent
         $otpString = implode('', $this->otp);
 
         try {
+            $emailOrPhone = $this->verificationMethod === 'email' ? $this->email : $this->phone_no;
 
-            $verificationService->verifyOtp($this->phone_no, $otpString);
+            $verificationService->verifyOtp($emailOrPhone, $otpString);
 
             $this->dispatch('closemodal');
 

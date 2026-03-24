@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
-
+use Illuminate\Validation\Rule;
 
 class UsersIndex extends BaseComponent
 {
@@ -473,29 +473,20 @@ class UsersIndex extends BaseComponent
 
         // Validation rules
         $rules = [
-            'email' => ['required', 'email', function ($attribute, $value, $fail) {
-                if (User::where('email', $value)->exists()) {
-                    $fail('This email is already used.');
-                } elseif (Company::where('company_email', $value)->exists()) {
-                    $fail('This email is already used.');
-                } elseif (Employee::where('email', $value)->exists()) {
-                    $fail('This email is already used.');
-                }
-            }],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('employees', 'email')->whereNull('deleted_at'),
+                Rule::unique('users', 'email'),
+                Rule::unique('companies', 'company_email'),
+            ],
 
             'phone_no' => [
                 'required',
                 'max:15',
-                function ($attribute, $value, $fail) {
-                    if (Employee::where('phone_no', $value)->exists()) {
-                        $fail('This phone number is already used.');
-                    }
-                    if (User::where('phone_no', $value)->exists()) {
-                        $fail('This phone number is already used.');
-                    }
-                }
+                Rule::unique('employees', 'phone_no')->whereNull('deleted_at'),
+                Rule::unique('users', 'phone_no')
             ],
-
 
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
@@ -602,7 +593,13 @@ class UsersIndex extends BaseComponent
 
             DB::rollBack();
 
-            logger()->error('Employee creation failed: ' . $e->getMessage());
+            logger()->error('Employee creation failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
 
             $this->toast('Something went wrong. Please try again.', 'error');
         }

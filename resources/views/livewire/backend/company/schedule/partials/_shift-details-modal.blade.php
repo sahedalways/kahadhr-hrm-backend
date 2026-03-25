@@ -1,13 +1,20 @@
-  <div class="modal fade" id="shiftDetailsModal-{{ $shift['id'] }}" aria-hidden="true" tabindex="-1" wire:ignore.self
-      data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade"
+       id="shiftDetailsModal-{{ $shift['id'] }}"
+       aria-hidden="true"
+       tabindex="-1"
+       wire:ignore.self
+       data-bs-backdrop="static"
+       data-bs-keyboard="false">
       <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content">
 
               <div class="modal-header bg-primary text-white">
                   <h5 class="modal-title text-white">{{ $content['title'] ?? '-' }}
                   </h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                      aria-label="Close"></button>
+                  <button type="button"
+                          class="btn-close btn-close-white"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"></button>
               </div>
 
               <div class="modal-body">
@@ -54,7 +61,7 @@
                                   <tr>
                                       <th>Title</th>
                                       <th>Type</th>
-                                      <th>Duration (hr)</th>
+                                      <th>Duration (hrs)</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -72,7 +79,9 @@
               </div>
 
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal">Close</button>
               </div>
 
           </div>

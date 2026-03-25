@@ -43,6 +43,8 @@ class Employee extends Model
         'billable_from',
         'is_billable',
         'deleted_at',
+        'working_hours_restriction',
+        'max_weekly_hours',
     ];
 
 

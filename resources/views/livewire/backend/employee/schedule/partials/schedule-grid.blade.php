@@ -233,7 +233,7 @@
                                             <tr>
                                                 <th>Title</th>
                                                 <th>Type</th>
-                                                <th>Duration (hr)</th>
+                                                <th>Duration (hrs)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -338,7 +338,7 @@
                                             <tr>
                                                 <th>Title</th>
                                                 <th>Type</th>
-                                                <th>Duration (hr)</th>
+                                                <th>Duration (hrs)</th>
                                             </tr>
                                         </thead>
                                         <tbody>

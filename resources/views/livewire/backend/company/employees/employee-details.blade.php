@@ -194,7 +194,7 @@
                                         <li>
                                             <a class="dropdown-item"
                                                href="#"
-                                               wire:click.prevent="toggleStatus({{ $employee->id }})"
+                                               wire:click.prevent="$dispatch('confirmChangeStatus', {{ $employee->id }})"
                                                wire:loading.attr="disabled"
                                                wire:target="toggleStatus">
 
@@ -259,11 +259,7 @@
             {{ $employee->is_active ? 'bg-success border border-white' : 'bg-secondary border border-white' }}"
                                                   style="transform: translate(25%, 25%); bottom: 12px;
             right: 8px ">
-                                                <a href="#"
-                                                   wire:click.prevent="toggleStatus({{ $employee->id }})"
-                                                   class="status-toggle tooltip-btn"
-                                                   data-tooltip="click to change status"
-                                                   aria-label="Toggle employee status">
+                                                <a>
 
                                                     <span
                                                           class="status-dot {{ $employee->is_active ? 'active' : 'inactive' }}"></span>
@@ -274,7 +270,7 @@
 
                                         <h6 class="mb-1 fw-bold">{{ $employee->full_name }}</h5>
 
-                                            <!-- Verified / Unverified Badge -->
+
                                             @if ($employee->user)
                                                 <span class="badge bg-success mb-2">Verified</span>
                                             @else
@@ -1696,6 +1692,44 @@
                                 @enderror
                             </div>
 
+
+
+
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">
+                                    Working Hours Restriction <span class="text-danger">*</span>
+                                </label>
+
+                                <select class="form-select border-light-subtle shadow-none"
+                                        wire:model.live="working_hours_restriction">
+                                    <option value="0">Opt-Out</option>
+                                    <option value="1">Opt-In</option>
+                                </select>
+                            </div>
+
+
+                            @if ($working_hours_restriction)
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-secondary">
+                                        Maximum Weekly Hours <span class="text-danger">*</span>
+                                    </label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control border-light-subtle shadow-none"
+                                           wire:model="max_weekly_hours"
+                                           placeholder="e.g. 20 or 24.5">
+
+                                    @error('max_weekly_hours')
+                                        <span class="text-danger x-small">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endif
+
+
+
                             <div class="col-12 mt-4 mb-1">
                                 <div class="d-flex align-items-center">
                                     <span class="fw-bold text-uppercase small text-primary letter-spacing-1">Residency
@@ -2478,6 +2512,13 @@
     Livewire.on('confirmDelete', employeeId => {
         if (confirm("Are you sure you want to delete this employee?")) {
             @this.call('handleDelation', employeeId);
+        }
+    });
+
+
+    Livewire.on('confirmChangeStatus', employeeId => {
+        if (confirm("Are you sure you want to change status?")) {
+            @this.call('toggleStatus', employeeId);
         }
     });
 </script>

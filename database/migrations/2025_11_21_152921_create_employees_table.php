@@ -34,6 +34,9 @@ return new class extends Migration
                 ->default('unavailable');
             $table->date('date_of_birth');
 
+            $table->boolean('working_hours_restriction')->default(false);
+            $table->decimal('max_weekly_hours', 5, 2)->nullable();
+
             $table->string('job_title')->nullable();
             $table->foreignId('department_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('set null');

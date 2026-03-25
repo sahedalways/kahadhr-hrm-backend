@@ -139,6 +139,9 @@ class EmployeeDetails extends BaseComponent
     public $address;
     public $relationship;
 
+    public $working_hours_restriction = false;
+    public $max_weekly_hours;
+
 
 
     public function updatedCountrySearch($value)
@@ -852,6 +855,8 @@ class EmployeeDetails extends BaseComponent
         $this->contract_hours = '';
         $this->start_date = '';
         $this->end_date = '';
+        $this->working_hours_restriction = false;
+        $this->max_weekly_hours = null;
         $this->is_active = 1;
 
 
@@ -901,6 +906,8 @@ class EmployeeDetails extends BaseComponent
         $this->f_name = $this->employee->f_name;
         $this->l_name = $this->employee->l_name;
         $this->title = $this->employee->title;
+        $this->max_weekly_hours = $this->employee->max_weekly_hours;
+        $this->working_hours_restriction = $this->employee->working_hours_restriction;
         $this->nationality = $this->employee->nationality;
         $this->date_of_birth = $this->employee->date_of_birth;
         $this->share_code = $this->employee->share_code ?? null;
@@ -1103,6 +1110,8 @@ class EmployeeDetails extends BaseComponent
             'passport_expiry_date' => 'required|date',
             'employment_status' => 'required|in:part-time,full-time',
             'contract_hours' => 'required|numeric|min:0',
+            'working_hours_restriction' => 'required|boolean',
+            'max_weekly_hours' => 'nullable|numeric|min:0',
         ];
 
 
@@ -1111,6 +1120,13 @@ class EmployeeDetails extends BaseComponent
             $rules['share_code'] = 'nullable|string|max:20';
         } else {
             $this->share_code = null;
+        }
+
+
+        if ($this->working_hours_restriction) {
+            $rules['max_weekly_hours'] = 'required|numeric|min:0';
+        } else {
+            $this->max_weekly_hours = null;
         }
 
 
@@ -1141,6 +1157,8 @@ class EmployeeDetails extends BaseComponent
             'passport_expiry_date'     => 'Passport Expiry Date',
             'employment_status'        => 'Employment Status',
             'share_code'               => 'Share Code',
+            'working_hours_restriction' => 'Working Hours Restriction',
+            'max_weekly_hours' => 'Maximum Weekly Hours',
         ];
 
         $customRules = [];
@@ -1177,6 +1195,8 @@ class EmployeeDetails extends BaseComponent
             'employment_status' =>  $this->employment_status ?? null,
             'is_active' => $this->is_active,
             'start_date' => $this->start_date == '' ? null : $this->start_date,
+            'working_hours_restriction' => $this->working_hours_restriction,
+            'max_weekly_hours' => $this->max_weekly_hours,
         ]);
 
 

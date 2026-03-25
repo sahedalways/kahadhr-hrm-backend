@@ -145,6 +145,11 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+
+
+
+
     public function addEmployeeToMultipleShift($shiftIndex, $employeeId)
     {
         $selected = $this->multipleShifts[$shiftIndex]['employees'] ?? [];
@@ -370,25 +375,7 @@ class ScheduleIndex extends BaseComponent
     }
 
 
-    public function getAvailableShiftEmployeesProperty()
-    {
 
-        $query = Employee::where('company_id', $this->company_id)
-            ->whereNotNull('user_id')
-            ->whereNotIn('id', $this->newShift['employees']);
-
-        // Apply search filter
-        if ($this->employeeSearch) {
-            $search = '%' . $this->employeeSearch . '%';
-            $query->where(function ($q) use ($search) {
-                $q->where('f_name', 'like', $search)
-                    ->orWhere('l_name', 'like', $search)
-                    ->orWhereRaw("CONCAT(f_name, ' ', l_name) like ?", [$search]);
-            });
-        }
-
-        return $query->orderBy('f_name')->get();
-    }
 
 
 
@@ -534,8 +521,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
-
     protected function loadShiftEmployees()
     {
         $query = Employee::where('company_id', $this->company_id)
@@ -664,11 +649,29 @@ class ScheduleIndex extends BaseComponent
 
         $employeesOnLeave = [];
         foreach ($this->newShift['employees'] as $emp) {
-            $empId   = is_array($emp) ? $emp['id'] : $emp;
-            $empName = is_array($emp) ? $emp['full_name'] : optional(Employee::find($empId))->full_name;
 
-            if (hasLeave($empId, $this->selectedDate)) {
-                $employeesOnLeave[] = $empName;
+            $empId = is_array($emp) ? $emp['id'] : $emp;
+
+            $employee = Employee::find($empId);
+
+            if (!$employee || !$employee->working_hours_restriction) continue;
+
+            $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
+
+            $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $this->selectedDate);
+
+            $newShiftMinutes = $this->getShiftWorkingMinutes(
+                $this->newShift['start_time'],
+                $this->newShift['end_time'],
+                $this->newBreaks ?? []
+            );
+
+            if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
+
+                $name = $employee->full_name;
+
+                $this->toast("Weekly limit exceeded for $name", 'error');
+                return;
             }
         }
 
@@ -953,19 +956,35 @@ class ScheduleIndex extends BaseComponent
 
 
 
-        $dateEmployeeMap = [];
+
 
         foreach ($this->multipleShifts as $shift) {
-            $date = $shift['date'];
-            foreach ($shift['employees'] as $employee) {
-                $employeeId = is_array($employee) ? $employee['id'] : $employee;
 
-                if (isset($dateEmployeeMap[$date][$employeeId])) {
+            foreach ($shift['employees'] as $emp) {
 
-                    $this->toast("Employee '{$employee['full_name']}' is assigned multiple times on $date", 'info');
+                $empId = is_array($emp) ? $emp['id'] : $emp;
+
+                $employee = Employee::find($empId);
+
+                if (!$employee || !$employee->working_hours_restriction) continue;
+
+                $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
+
+                $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $shift['date']);
+
+                $newShiftMinutes = $this->getShiftWorkingMinutes(
+                    $shift['start_time'],
+                    $shift['end_time'],
+                    $this->multipleShiftNewBreaks ?? []
+                );
+
+                if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
+
+                    $name = $employee->full_name;
+
+                    $this->toast("Weekly limit exceeded for $name", 'error');
                     return;
                 }
-                $dateEmployeeMap[$date][$employeeId] = true;
             }
         }
 
@@ -1187,18 +1206,17 @@ class ScheduleIndex extends BaseComponent
             $this->newShift['start_time'] = '09:00';
             $this->newShift['end_time'] = '17:00';
 
-            $this->newShift['total_hours']  = '08:00';
+            $this->newShift['total_hours'] = '08:00';
             $this->originalShiftTotalTime = $this->newShift['total_hours'];
 
-
-            [$hours, $minutes] = explode(':', '08:00');
+            [$hours, $minutes] = explode(':', $this->newShift['total_hours']);
             $totalMinutes = ($hours * 60) + $minutes;
 
-            if (!empty($this->totalBreakMinutes)) {
-                $totalMinutes -= $this->totalBreakMinutes;
-                $totalMinutes = max(0, $totalMinutes);
-            }
 
+            if (!empty($this->paidBreaksDuration)) {
+                [$paidHours, $paidMinutes] = explode(':', $this->paidBreaksDuration);
+                $totalMinutes += ($paidHours * 60) + $paidMinutes;
+            }
 
             $newHours = floor($totalMinutes / 60);
             $newMinutes = $totalMinutes % 60;
@@ -1211,31 +1229,26 @@ class ScheduleIndex extends BaseComponent
 
     public function toggleMultiAllDayForShift($shiftIndex, $value)
     {
-        // Update the all_day flag
+
         $this->multipleShifts[$shiftIndex]['all_day'] = $value;
 
         if ($value) {
-            // Set default times for All Day
+
             $this->multipleShifts[$shiftIndex]['start_time'] = '09:00';
             $this->multipleShifts[$shiftIndex]['end_time'] = '17:00';
             $this->multipleShifts[$shiftIndex]['total_hours'] = '08:00';
 
-            // Store original total hours for this shift
+
             $this->originalMultiShiftTotalTime[$shiftIndex] = $this->multipleShifts[$shiftIndex]['total_hours'];
 
-            // Convert total_hours to minutes
+
             [$hours, $minutes] = explode(':', $this->multipleShifts[$shiftIndex]['total_hours']);
             $totalMinutes = ($hours * 60) + $minutes;
 
-            // Subtract valid paid breaks only
-            $totalBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
 
-            if ($totalBreakMinutes > 0) {
-                $totalMinutes -= $totalBreakMinutes;
-                $totalMinutes = max(0, $totalMinutes);
-            }
+            $paidBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
+            $totalMinutes += $paidBreakMinutes;
 
-            // Convert back to HH:MM format
             $newHours = floor($totalMinutes / 60);
             $newMinutes = $totalMinutes % 60;
 
@@ -1416,13 +1429,8 @@ class ScheduleIndex extends BaseComponent
         [$hours, $minutes] = explode(':', $originalHours);
         $totalMinutes = ($hours * 60) + $minutes;
 
-
-        $totalBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
-
-        if ($totalBreakMinutes > 0) {
-            $totalMinutes -= $totalBreakMinutes;
-            $totalMinutes = max(0, $totalMinutes);
-        }
+        $paidBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
+        $totalMinutes += $paidBreakMinutes;
 
         $newHours = floor($totalMinutes / 60);
         $newMinutes = $totalMinutes % 60;
@@ -1479,7 +1487,6 @@ class ScheduleIndex extends BaseComponent
 
     public function confirmBreaksAndSave()
     {
-
         $this->totalBreakMinutes = 0;
         $paidCount = 0;
         $unpaidCount = 0;
@@ -1490,12 +1497,10 @@ class ScheduleIndex extends BaseComponent
             if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
 
                 $duration = (float) $break['duration'];
-                $hours = floor($duration);
-                $minutes = ($duration - $hours) * 100;
-                $breakMinutes = $hours * 60 + $minutes;
+                $breakMinutes = (int) round($duration * 60);
 
                 if (strtolower($break['type']) == 'paid') {
-                    $this->totalBreakMinutes += $breakMinutes; // now safe
+                    $this->totalBreakMinutes += $breakMinutes;
                     $paidCount++;
                     $paidMinutes += $breakMinutes;
                 } elseif (strtolower($break['type']) == 'unpaid') {
@@ -1510,14 +1515,12 @@ class ScheduleIndex extends BaseComponent
         $this->paidBreaksDuration = sprintf('%02d:%02d', floor($paidMinutes / 60), $paidMinutes % 60);
         $this->unpaidBreaksDuration = sprintf('%02d:%02d', floor($unpaidMinutes / 60), $unpaidMinutes % 60);
 
-
         if ($this->originalShiftTotalTime) {
             [$shiftHours, $shiftMinutes] = explode(':', $this->originalShiftTotalTime);
             $shiftTotalMinutes = ($shiftHours * 60) + $shiftMinutes;
 
-
-            $shiftTotalMinutes -= $paidMinutes;
-            $shiftTotalMinutes = max(0, $shiftTotalMinutes);
+            // ADD paid break minutes to working hours
+            $shiftTotalMinutes += $paidMinutes;
 
             $newHours = floor($shiftTotalMinutes / 60);
             $newMinutes = $shiftTotalMinutes % 60;
@@ -1527,7 +1530,6 @@ class ScheduleIndex extends BaseComponent
 
         $this->dispatch('closemodal');
     }
-
 
     public function getNextOccurrence($currentDate)
     {
@@ -2030,6 +2032,75 @@ class ScheduleIndex extends BaseComponent
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, $filename);
+    }
+
+
+
+    private function getShiftWorkingMinutes($startTime, $endTime, $breaks): int
+    {
+        $start = Carbon::createFromFormat('H:i', $startTime);
+        $end   = Carbon::createFromFormat('H:i', $endTime);
+
+        if ($end->lt($start)) {
+            $end->addDay();
+        }
+
+        $totalMinutes = $end->diffInMinutes($start);
+
+        $paidBreakMinutes = 0;
+
+        foreach ($breaks as $break) {
+            if (
+                !empty($break['duration']) &&
+                strtolower($break['type'] ?? '') === 'paid'
+            ) {
+                $duration = (float) $break['duration'];
+
+                $hours = floor($duration);
+                $minutes = ($duration - $hours) * 100;
+
+                $paidBreakMinutes += ($hours * 60) + $minutes;
+            }
+        }
+
+        return $totalMinutes + $paidBreakMinutes;
+    }
+
+
+
+    private function getEmployeeWeeklyMinutes($employeeId, $date): int
+    {
+        $weekStart = Carbon::parse($date)->startOfWeek();
+        $weekEnd   = Carbon::parse($date)->endOfWeek();
+
+        $shiftDates = ShiftDate::whereBetween('date', [$weekStart, $weekEnd])
+            ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+            ->with('breaks')
+            ->get();
+
+        $totalMinutes = 0;
+
+        foreach ($shiftDates as $sd) {
+
+            [$h, $m] = explode(':', $sd->total_hours ?? '00:00');
+            $shiftMinutes = ($h * 60) + $m;
+
+
+            foreach ($sd->breaks as $b) {
+                if (strtolower($b->type) === 'paid') {
+                    $duration = (float) $b->duration;
+
+                    $hours = floor($duration);
+                    $minutes = ($duration - $hours) * 100;
+
+                    $shiftMinutes += ($hours * 60) + $minutes;
+                }
+            }
+
+            $totalMinutes += $shiftMinutes;
+        }
+
+        return $totalMinutes;
     }
 
 

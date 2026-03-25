@@ -338,26 +338,52 @@
                                                 <ul class="dropdown-schedule-celll d-none"
                                                     wire:ignore.self>
                                                     <li>
-                                                        <button class="dropdown-item"
+                                                        <button class="dropdown-item d-flex align-items-center"
                                                                 type="button"
-                                                                wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
-                                                            <i class="fas fa-edit fa-fw me-1"></i> Edit
+                                                                wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                                wire:loading.attr="disabled">
+
+
+                                                            <i class="fas fa-edit fa-fw me-1"
+                                                               wire:loading.remove></i>
+                                                            Edit
+
+
+                                                            <span wire:loading
+                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item"
+                                                        <button class="dropdown-item d-flex align-items-center"
                                                                 type="button"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
-                                                            <i class="fas fa-eye fa-fw me-1"></i> View
+                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                                                wire:loading.attr="disabled">
+
+
+                                                            <i class="fas fa-eye fa-fw me-1"
+                                                               wire:loading.remove></i>
+                                                            View
+
+
+                                                            <span wire:loading
+                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <button class="dropdown-item text-danger"
+                                                        <button class="dropdown-item text-danger d-flex align-items-center"
                                                                 type="button"
                                                                 wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
-                                                            <i class="fas fa-trash-alt fa-fw me-1"></i> Delete
+                                                                onclick="if(!confirm('Are you sure?')) event.stopImmediatePropagation()"
+                                                                wire:loading.attr="disabled">
+
+
+                                                            <i class="fas fa-trash-alt fa-fw me-1"
+                                                               wire:loading.remove></i>
+                                                            Delete
+
+                                                            <span wire:loading
+                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>
                                                 </ul>
@@ -458,7 +484,7 @@
                                                                             <tr>
                                                                                 <th>Title</th>
                                                                                 <th>Type</th>
-                                                                                <th>Duration (hr)</th>
+                                                                                <th>Duration (hrs)</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
@@ -525,13 +551,22 @@
                     <h6 class="mb-0 fw-semibold">
                         {{ \Carbon\Carbon::parse($selectedDate)->format('l, M d, Y') }}
                     </h6>
-
                     <button type="button"
                             wire:click="closeAddShiftPanel"
-                            class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 28px; height: 28px; padding: 0;">
+                            class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-relative"
+                            style="width: 28px; height: 28px; padding: 0;"
+                            wire:loading.attr="disabled"
+                            wire:target="closeAddShiftPanel">
+
+
                         <i class="fas fa-times"
-                           style="font-size: 14px; color: #000;"></i>
+                           style="font-size: 14px; color: #000;"
+                           wire:loading.remove
+                           wire:target="closeAddShiftPanel"></i>
+
+                        <span wire:loading
+                              wire:target="closeAddShiftPanel"
+                              class="spinner-border spinner-border-sm text-dark"></span>
                     </button>
                 </div>
 

@@ -21,7 +21,7 @@ class SendDocumentNotifications extends Command
 
         foreach ($companies as $setting) {
             $companyId = $setting->company_id;
-            $notificationType = $setting->notification_type; // system, email, both
+            $notificationType = $setting->notification_type;
 
             $employees = Employee::with(['documents', 'user', 'company'])
                 ->where('company_id', $companyId)

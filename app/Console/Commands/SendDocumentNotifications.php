@@ -4,8 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Employee;
-use App\Models\CompanyDocument;
-use App\Models\DocumentType;
 use App\Models\CompanyDocumentSetting;
 use App\Models\Notification;
 use App\Events\NotificationEvent;

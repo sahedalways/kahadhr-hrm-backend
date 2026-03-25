@@ -981,7 +981,6 @@
                     <div class="tab-pane fade {{ $isShiftTempTab ? 'show active' : '' }}"
                          id="shift-templates">
                         <div class="mb-4">
-
                             @if (count($templates) > 0)
                                 <p class="text-dark-50 small">
                                     Select a pre-defined template to quickly populate your shift details.
@@ -1098,6 +1097,18 @@
                                 </div>
                             @endforelse
                         </div>
+
+                        @if ($loaded >= $perPage)
+                            <div class="text-center mt-3">
+                                <button wire:click="loadMore"
+                                        wire:loading.attr="disabled"
+                                        class="btn btn-outline-primary"
+                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                                    <span wire:loading.remove>Load More</span>
+                                    <span wire:loading>Loading...</span>
+                                </button>
+                            </div>
+                        @endif
                     </div>
 
 

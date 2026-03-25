@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 
 class ScheduleIndex extends BaseComponent
 {
+
+    public $perPage = 1;
+    public $loaded = 0;
     public $startDate;
     public $endDate;
     public $currentDate;
@@ -204,7 +207,23 @@ class ScheduleIndex extends BaseComponent
     {
         $this->templates = ShiftTemplates::where('company_id', $this->company_id)
             ->orderBy('created_at', 'desc')
+            ->take($this->perPage)
             ->get();
+
+        $this->loaded = count($this->templates);
+    }
+
+
+
+    public function loadMore()
+    {
+        $this->perPage += 10;
+        $this->templates = ShiftTemplates::where('company_id', $this->company_id)
+            ->orderBy('created_at', 'desc')
+            ->take($this->perPage)
+            ->get();
+
+        $this->loaded = count($this->templates);
     }
 
 
@@ -1600,10 +1619,7 @@ class ScheduleIndex extends BaseComponent
         if ($template) {
             $template->delete();
 
-
-            $this->templates = ShiftTemplates::where('company_id', $this->company_id)
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $this->loadTemplates();
 
 
             $this->toast('Template deleted successfully.', 'success');

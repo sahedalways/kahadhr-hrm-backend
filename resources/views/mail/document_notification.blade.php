@@ -74,7 +74,7 @@
         <div class="email-body">
             <h2>Document Notification</h2>
             <p>Hello {{ $employee->full_name }},</p>
-            <p>{{ $message }}</p>
+            <p>{{ $messageText }}</p>
 
             <div class="document-info">
                 <p><strong>Document Type:</strong> {{ $documentType->name }}</p>

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\DocumentNotificationMail;
 use App\Models\Employee;
 use App\Models\DocumentType;
 use App\Models\EmailSetting;
@@ -56,15 +57,9 @@ class EmployeeDocumentNotificationJob implements ShouldQueue
 
             configureSmtp($gateway);
 
-            Mail::send('mail.document_notification', [
-                'employee' => $emp,
-                'documentType' => $docType,
-                'company' => $company,
-                'message' => $this->message,
-            ], function ($m) use ($emp) {
-                $m->to($emp->user->email)
-                    ->subject('Document Notification');
-            });
+            Mail::to($emp->user->email)->send(
+                new DocumentNotificationMail($emp, $docType, $company, $this->message)
+            );
 
             Log::info("Document notification email sent to {$emp->user->email}");
         } catch (\Exception $e) {

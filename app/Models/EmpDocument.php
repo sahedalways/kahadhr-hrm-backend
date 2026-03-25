@@ -15,6 +15,7 @@ class EmpDocument extends Model
         'file_path',
         'expires_at',
         'comment',
+        'last_notified_at',
     ];
 
     public function documentType()

@@ -361,7 +361,8 @@
                                                                     $notificationType = 'expired';
                                                                 } elseif (
                                                                     now()->diffInDays($latestExpiresAt, false) > 0 &&
-                                                                    now()->diffInDays($latestExpiresAt, false) <= 60
+                                                                    now()->diffInDays($latestExpiresAt, false) <=
+                                                                        $expiryDays
                                                                 ) {
                                                                     $showTypeNotify = true;
                                                                     $notificationType = 'soon';

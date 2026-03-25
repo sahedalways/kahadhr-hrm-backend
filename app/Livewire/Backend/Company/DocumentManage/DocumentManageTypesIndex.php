@@ -4,8 +4,8 @@ namespace App\Livewire\Backend\Company\DocumentManage;
 
 use App\Events\NotificationEvent;
 use App\Jobs\EmployeeDocumentNotificationJob;
+use App\Jobs\EmployeeDocumentUploadedJob;
 use App\Livewire\Backend\Components\BaseComponent;
-use App\Models\CompanyDocument;
 use App\Models\CompanyDocumentSetting;
 use App\Models\DocumentType;
 use App\Models\EmailSetting;
@@ -62,9 +62,6 @@ class DocumentManageTypesIndex extends BaseComponent
 
     public function mount()
     {
-        $this->emailConfigured = EmailSetting::where('company_id', $this->company_id)->exists();
-
-
         $this->employees = Employee::where('company_id', auth()->user()->company->id)
             ->whereNotNull('user_id')
             ->orderBy('f_name')
@@ -77,9 +74,12 @@ class DocumentManageTypesIndex extends BaseComponent
             ->unique('name')
             ->values();
 
-        $this->loadDocumentSettings();
+
 
         $this->company_id = auth()->user()->company->id;
+
+        $this->emailConfigured = EmailSetting::where('company_id', $this->company_id)->exists();
+        $this->loadDocumentSettings();
         $this->loaded = collect();
 
         $this->modalTitle = '';
@@ -181,7 +181,8 @@ class DocumentManageTypesIndex extends BaseComponent
 
     public function notifyEmployee($typeId, $employeeId, $type)
     {
-        $docType = DocumentType::findOrFail($typeId);
+        $docType = DocumentType::with('documents')->findOrFail($typeId);
+
         $companyId = $this->company_id;
         $emp = Employee::with('user')->find($employeeId);
 
@@ -222,6 +223,10 @@ class DocumentManageTypesIndex extends BaseComponent
         }
 
         EmployeeDocumentNotificationJob::dispatch($employeeId, $docType->id, $type, $message);
+
+
+        $docType->documents->last_notified_at = now();
+        $docType->documents->save();
 
         $this->toast('Employee notified successfully', 'success');
     }
@@ -368,8 +373,6 @@ class DocumentManageTypesIndex extends BaseComponent
 
 
 
-
-
     public function save()
     {
         $this->validate([
@@ -402,7 +405,7 @@ class DocumentManageTypesIndex extends BaseComponent
 
 
 
-        EmpDocument::create([
+        $doc =  EmpDocument::create([
             'doc_type_id' => $this->doc_type_id,
             'comment'      => 'Share Code File',
             'expires_at' => $this->expires_at,
@@ -432,6 +435,10 @@ class DocumentManageTypesIndex extends BaseComponent
         }
 
 
+
+        if ($this->send_email) {
+            EmployeeDocumentUploadedJob::dispatch($doc);
+        }
 
         $this->toast('Document uploaded successfully!', 'success');
         $this->dispatch('closemodal');

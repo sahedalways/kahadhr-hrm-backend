@@ -35,3 +35,5 @@ Schedule::command('sharecode:expire')->daily();
 Schedule::command('backup:run')->dailyAt('02:00');
 
 Schedule::command('sessions:clear-old')->dailyAt('02:00');
+
+Schedule::command('notify:documents')->dailyAt('09:00');

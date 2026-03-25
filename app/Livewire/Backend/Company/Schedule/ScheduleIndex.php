@@ -86,6 +86,9 @@ class ScheduleIndex extends BaseComponent
     public $conflictData      = [];
     public $dragSource = [];
 
+    public $editingShiftDateId = null;
+    public $editingEmployeeId = null;
+
 
     public $newShift = [
         'title' => '',
@@ -562,6 +565,8 @@ class ScheduleIndex extends BaseComponent
     public function closeAddShiftPanel()
     {
         $this->showAddShiftPanel = false;
+        $this->editingShiftDateId = null;
+        $this->editingEmployeeId = null;
         $this->reset('newShift');
     }
 
@@ -1679,58 +1684,7 @@ class ScheduleIndex extends BaseComponent
 
 
 
-    public function editOneEmpShift($dateId, $empId)
-    {
-        $this->isClickMultipleShift =  false;
-        $this->isEditableShift =  true;
-        $this->resetFields();
 
-
-
-        $shiftDate = ShiftDate::findOrFail($dateId);
-
-        $this->selectedDate = Carbon::parse($shiftDate->date)->format('Y-m-d');
-
-
-        $this->newShift = [
-            'title'       => $shiftDate->shift->title       ?? '',
-            'job'         => $shiftDate->shift->job         ?? '',
-            'start_time' => Carbon::parse($shiftDate->start_time)->format('H:i'),
-            'end_time'   => Carbon::parse($shiftDate->end_time)->format('H:i'),
-            'total_hours' => $shiftDate->total_hours,
-            'color'       => $shiftDate->shift->color       ?? '#000000',
-            'address'     => $shiftDate->shift->address     ?? '',
-            'note'        => $shiftDate->shift->note        ?? '',
-            'all_day'     => $shiftDate->shift->all_day     ?? false,
-            'employees'   => [(int) $empId],
-        ];
-
-
-        if ($shiftDate->breaks->isNotEmpty()) {
-            $this->newBreaks = $shiftDate->breaks
-                ->map(fn($b) => [
-                    'name'     => $b->title,
-                    'type'     => $b->type,
-                    'duration' => (float) $b->duration,
-                ])
-                ->toArray();
-
-            $this->showAddBreakForm = true;
-
-            $this->recalculateBreakSummary();
-        } else {
-            $this->showAddBreakForm = false;
-            $this->newBreaks = [];
-            $this->paidBreaksCount = 0;
-            $this->unpaidBreaksCount = 0;
-            $this->paidBreaksDuration = '00:00';
-            $this->unpaidBreaksDuration = '00:00';
-        }
-
-
-
-        $this->dispatch('shift-panel-opened');
-    }
 
 
 
@@ -2118,6 +2072,190 @@ class ScheduleIndex extends BaseComponent
                     $hours = floor($duration);
                     $minutes = ($duration - $hours) * 100;
 
+                    $shiftMinutes += ($hours * 60) + $minutes;
+                }
+            }
+
+            $totalMinutes += $shiftMinutes;
+        }
+
+        return $totalMinutes;
+    }
+
+
+
+    public function editOneEmpShift($dateId, $empId)
+    {
+        $this->isClickMultipleShift = false;
+        $this->isEditableShift = true;
+        $this->resetFields();
+
+        $shiftDate = ShiftDate::findOrFail($dateId);
+
+        $this->editingShiftDateId = $dateId;
+        $this->editingEmployeeId = $empId;
+
+        $this->selectedDate = Carbon::parse($shiftDate->date)->format('Y-m-d');
+
+
+        $this->newShift = [
+            'title'       => $shiftDate->shift->title ?? '',
+            'job'         => $shiftDate->shift->job ?? '',
+            'start_time'  => Carbon::parse($shiftDate->start_time)->format('H:i'),
+            'end_time'    => Carbon::parse($shiftDate->end_time)->format('H:i'),
+            'total_hours' => $shiftDate->total_hours,
+            'color'       => $shiftDate->shift->color ?? '#000000',
+            'address'     => $shiftDate->shift->address ?? '',
+            'note'        => $shiftDate->shift->note ?? '',
+            'all_day'     => $shiftDate->shift->all_day ?? false,
+            'employees'   => [(int) $empId],
+        ];
+
+
+        if ($shiftDate->breaks->isNotEmpty()) {
+            $this->newBreaks = $shiftDate->breaks
+                ->map(fn($b) => [
+                    'name'     => $b->title,
+                    'type'     => $b->type,
+                    'duration' => (float) $b->duration,
+                ])
+                ->toArray();
+
+            $this->showAddBreakForm = true;
+            $this->recalculateBreakSummary();
+        } else {
+            $this->showAddBreakForm = false;
+            $this->newBreaks = [];
+            $this->paidBreaksCount = 0;
+            $this->unpaidBreaksCount = 0;
+            $this->paidBreaksDuration = '00:00';
+            $this->unpaidBreaksDuration = '00:00';
+        }
+
+        $this->dispatch('shift-panel-opened');
+    }
+
+
+
+    public function updateShift()
+    {
+        // Validation - আগের publishShift এর মতোই
+        $this->validate([
+            'selectedDate' => ['required', 'date'],
+            'newShift.title' => 'required|string',
+            'newShift.start_time' => 'required|date_format:H:i',
+            'newShift.end_time' => 'required|date_format:H:i|after:newShift.start_time',
+            'newShift.employees' => 'required|array|min:1',
+            'newShift.address' => 'nullable|string|max:255',
+            'newShift.note' => 'nullable|string|max:500',
+            'newShift.job' => 'required|string|max:100',
+            'newBreaks' => 'nullable|array',
+        ]);
+
+
+        $employeeId = $this->newShift['employees'][0];
+        $employee = Employee::find($employeeId);
+
+        if ($employee && $employee->working_hours_restriction) {
+            $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
+
+
+            $usedMinutes = $this->getEmployeeWeeklyMinutesExcludingShift(
+                $employeeId,
+                $this->selectedDate,
+                $this->editingShiftDateId
+            );
+
+
+            $newShiftMinutes = $this->getShiftWorkingMinutes(
+                $this->newShift['start_time'],
+                $this->newShift['end_time'],
+                $this->newBreaks ?? []
+            );
+
+
+            if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
+                $this->toast("Weekly limit of {$employee->max_weekly_hours} hours for {$employee->full_name} will be exceeded", 'error');
+                return;
+            }
+        }
+
+
+        $shiftDate = ShiftDate::findOrFail($this->editingShiftDateId);
+
+
+        $shiftDate->update([
+            'date' => $this->selectedDate,
+            'start_time' => $this->newShift['start_time'],
+            'end_time' => $this->newShift['end_time'],
+            'total_hours' => $this->newShift['total_hours'],
+        ]);
+
+        $shiftDate->shift->update([
+            'title' => $this->newShift['title'],
+            'job' => $this->newShift['job'],
+            'color' => $this->newShift['color'],
+            'address' => $this->newShift['address'],
+            'note' => $this->newShift['note'],
+        ]);
+
+
+        $shiftDate->employees()->sync($this->newShift['employees']);
+
+
+        $shiftDate->breaks()->delete();
+
+
+        if (!empty($this->newBreaks)) {
+            foreach ($this->newBreaks as $break) {
+                if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                    $shiftDate->breaks()->create([
+                        'title' => $break['name'],
+                        'type' => $break['type'],
+                        'duration' => $break['duration'],
+                    ]);
+                }
+            }
+        }
+
+
+        $this->isEditableShift = false;
+        $this->editingShiftDateId = null;
+        $this->editingEmployeeId = null;
+        $this->closeAddShiftPanel();
+        $this->cancelRepeatShift();
+        $this->loadShifts();
+        $this->dispatch('refreshSchedule');
+        $this->toast('Shift Updated Successfully!', 'success');
+    }
+
+
+    private function getEmployeeWeeklyMinutesExcludingShift($employeeId, $date, $excludeShiftDateId = null): int
+    {
+        $weekStart = Carbon::parse($date)->startOfWeek();
+        $weekEnd   = Carbon::parse($date)->endOfWeek();
+
+        $shiftDates = ShiftDate::whereBetween('date', [$weekStart, $weekEnd])
+            ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+            ->with('breaks')
+            ->get();
+
+
+        if ($excludeShiftDateId) {
+            $shiftDates = $shiftDates->filter(fn($sd) => $sd->id != $excludeShiftDateId);
+        }
+
+        $totalMinutes = 0;
+
+        foreach ($shiftDates as $sd) {
+            [$h, $m] = explode(':', $sd->total_hours ?? '00:00');
+            $shiftMinutes = ($h * 60) + $m;
+
+            foreach ($sd->breaks as $b) {
+                if (strtolower($b->type) === 'paid') {
+                    $duration = (float) $b->duration;
+                    $hours = floor($duration);
+                    $minutes = ($duration - $hours) * 100;
                     $shiftMinutes += ($hours * 60) + $minutes;
                 }
             }

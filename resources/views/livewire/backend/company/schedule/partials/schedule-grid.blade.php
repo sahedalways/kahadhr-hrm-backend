@@ -1121,26 +1121,30 @@
                 @if ($isShiftTempTab == false)
                     <div class="shift-panel-footer d-flex align-items-center px-4 py-3 border-top bg-white">
                         <!-- Normal state -->
-                        <button class="btn btn-primary"
-                                wire:click="publishShift"
-                                wire:loading.attr="disabled"
-                                wire:target="publishShift">
 
-                            <!-- Normal content -->
+
+                        <button class="btn btn-primary"
+                                wire:click="{{ $isEditableShift ? 'updateShift' : 'publishShift' }}"
+                                wire:loading.attr="disabled"
+                                wire:target="{{ $isEditableShift ? 'updateShift' : 'publishShift' }}">
+
+
                             <span wire:loading.remove
-                                  wire:target="publishShift">
-                                <i class="fas fa-upload me-2"></i> Publish
+                                  wire:target="{{ $isEditableShift ? 'updateShift' : 'publishShift' }}">
+                                <i class="fas fa-upload me-2"></i>
+                                {{ $isEditableShift ? 'Update Shift' : 'Publish Shift' }}
                             </span>
 
-                            <!-- Loading content -->
+
                             <span wire:loading
-                                  wire:target="publishShift">
+                                  wire:target="{{ $isEditableShift ? 'updateShift' : 'publishShift' }}">
                                 <span class="spinner-border spinner-border-sm me-2"
                                       role="status"
                                       aria-hidden="true"></span>
                                 Publishing...
                             </span>
                         </button>
+
 
 
 

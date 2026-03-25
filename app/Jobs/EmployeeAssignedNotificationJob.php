@@ -25,17 +25,14 @@ class EmployeeAssignedNotificationJob implements ShouldQueue
 
   public function handle(): void
   {
+
+
     $document = CompanyDocument::with('employee', 'company')->find($this->documentId);
 
 
     $employee = $document->employee;
     $company = $document->company;
 
-    Log::info("Document loaded successfully", [
-      'document_id' => $document->id,
-      'employee_id' => $employee->id,
-      'company_id' => $company->id
-    ]);
 
     try {
       $gateway = EmailSetting::where('company_id', $company->id)->first();

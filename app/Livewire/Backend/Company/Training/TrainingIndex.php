@@ -233,7 +233,7 @@ class TrainingIndex extends BaseComponent
             $gateway = EmailSetting::where('company_id', $this->company_id)->first();
 
             if (! $gateway) {
-                $this->toast('SMTP gateway not found for this company!', 'error');
+                $this->toast('Email API not found for this company!', 'error');
 
                 return;
             }
@@ -467,7 +467,7 @@ class TrainingIndex extends BaseComponent
         $gateway = EmailSetting::where('company_id', $this->company_id)->first();
 
         if (! $gateway) {
-            $this->toast('SMTP gateway not found for this company!', 'error');
+            $this->toast('Email API not found for this company!', 'error');
 
             return;
         }

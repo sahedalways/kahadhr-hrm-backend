@@ -114,6 +114,13 @@ class Company extends Model
             ]);
 
 
+            CompanyDocumentSetting::create([
+                'company_id' => $company->id,
+                'doc_expiry_days' => 60,
+                'notification_frequency' => 7,
+                'notification_type' => 'system',
+            ]);
+
 
             $defaultTypes = [
                 'Passport',

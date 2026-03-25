@@ -60,6 +60,24 @@ class MailSettings extends BaseComponent
         $service->saveMailSettings($mailSettings, $companyId);
 
 
+        // Update .env
+        if ($companyId == null) {
+            EnvUpdater::set([
+                'MAIL_MAILER'       => $this->mail_mailer,
+                'MAIL_HOST'         => $this->mail_host,
+                'MAIL_PORT'         => $this->mail_port,
+                'MAIL_USERNAME'     => $this->mail_username ?? 'null',
+                'MAIL_PASSWORD'     => $this->mail_password ?? 'null',
+                'MAIL_ENCRYPTION'   => $this->mail_encryption ?? 'null',
+                'MAIL_FROM_ADDRESS' => $this->mail_from_address,
+                'MAIL_FROM_NAME'    => $this->mail_from_name ?? '${APP_NAME}',
+            ]);
+
+            // Clear and reload config cache
+            Artisan::call('config:clear');
+        }
+
+
 
         $this->toast('Mail settings updated successfully!', 'success');
     }

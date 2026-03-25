@@ -30,6 +30,7 @@ class InvoiceEmailJob implements ShouldQueue
         $company = $invoice?->company;
 
 
+
         $subject = "Invoice {$invoice->invoice_number} – Payment Successful";
 
         try {

@@ -21,6 +21,8 @@ class DocumentTypesIndex extends BaseComponent
     public $lastId = null;
     public $hasMore = true;
 
+
+
     protected $listeners = ['deleteDocumentType', 'sortUpdated' => 'handleSort'];
 
     public function mount()

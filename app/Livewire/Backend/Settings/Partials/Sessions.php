@@ -21,7 +21,7 @@ class Sessions extends BaseComponent
         $sessions = DB::table('sessions')
             ->where('user_id', auth()->id())
             ->orderBy('last_activity', 'desc')
-            ->paginate(10);
+            ->paginate(15);
 
 
         $sessions->getCollection()->transform(function ($s) {

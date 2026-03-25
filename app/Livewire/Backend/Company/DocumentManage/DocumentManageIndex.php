@@ -4,6 +4,7 @@ namespace App\Livewire\Backend\Company\DocumentManage;
 
 use App\Events\NotificationEvent;
 use App\Jobs\EmployeeAssignedNotificationJob;
+use App\Jobs\EmployeeAssignedNotificationJob as JobsEmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\EmailSetting;
@@ -106,8 +107,8 @@ class DocumentManageIndex extends BaseComponent
         if ($this->send_email) {
             $gateway = EmailSetting::where('company_id', $this->company_id)->first();
 
-            if (! $gateway) {
-                $this->toast('SMTP gateway not found for this company!', 'error');
+            if (!$gateway) {
+                $this->toast('Email API not found for this company!', 'error');
 
                 return;
             }

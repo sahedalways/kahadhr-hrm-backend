@@ -31,6 +31,16 @@
             </button>
         </div>
 
+
+
+        <div class="col-auto">
+            <button class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#notificationSettingsModal">
+                <i class="fa fa-bell me-1"></i> Notification Settings
+            </button>
+        </div>
+
         <div class="col-auto">
             <a data-bs-toggle="modal"
                data-bs-target="#add"
@@ -911,7 +921,113 @@
 
 
 
+    <div wire:ignore.self
+         class="modal fade"
+         id="notificationSettingsModal"
+         tabindex="-1"
+         data-bs-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Document Notification Settings</h6>
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
 
+                <div class="modal-body">
+                    <form wire:submit.prevent="saveNotificationSettings">
+                        {{-- Expiry Notification Time --}}
+                        <div class="mb-3">
+                            <label class="form-label">Expiry Notification Time <span
+                                      class="text-danger">*</span></label>
+                            <select class="form-select"
+                                    wire:model="expiryDays"
+                                    required>
+                                <option value="7">7 Days</option>
+                                <option value="30">30 Days</option>
+                                <option value="60">60 Days</option>
+                                <option value="90">90 Days</option>
+                            </select>
+
+                            @error('expiryDays')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        {{-- Notification Frequency --}}
+                        <div class="mb-3">
+                            <label class="form-label">Notification Frequency <span
+                                      class="text-danger">*</span></label>
+                            <select class="form-select"
+                                    wire:model="frequencyDays"
+                                    required>
+                                <option value="1">Every 1 Day</option>
+                                <option value="2">Every 2 Days</option>
+                                <option value="3">Every 3 Days</option>
+                                <option value="5">Every 5 Days</option>
+                                <option value="7">Every 7 Days</option>
+                            </select>
+
+                            @error('frequencyDays')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        {{-- Notification Type --}}
+                        <div class="mb-3">
+                            <label class="form-label">Notification Type <span class="text-danger">*</span></label>
+                            <select class="form-select"
+                                    wire:model="notificationType"
+                                    required>
+                                <option value="system">System Notification</option>
+                                <option value="email">Email Notification</option>
+                                <option value="both">System & Email Notification</option>
+                            </select>
+
+                            @if ($notificationType == 'email' || $notificationType == 'both')
+                                @if (!$emailConfigured)
+                                    <div class="small text-danger mt-1">
+                                        ⚠️ Email notification is not configured yet.
+                                        Please set up your email gateway from
+                                        <a href="{{ route('company.dashboard.settings.mail', ['company' => app('authUser')->company->sub_domain]) }}"
+                                           class="text-decoration-underline fw-semibold">
+                                            Settings → Mail Settings
+                                        </a>
+                                    </div>
+                                @endif
+                            @endif
+
+                            @error('notificationType')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                    wire:loading.attr="disabled">Cancel</button>
+
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    wire:loading.attr="disabled"
+                                    wire:target="saveNotificationSettings">
+                                <span wire:loading
+                                      wire:target="saveNotificationSettings"
+                                      class="spinner-border spinner-border-sm me-2"
+                                      role="status"
+                                      aria-hidden="true"></span>
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

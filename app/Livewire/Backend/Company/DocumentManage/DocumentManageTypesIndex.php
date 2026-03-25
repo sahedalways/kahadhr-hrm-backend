@@ -3,8 +3,10 @@
 namespace App\Livewire\Backend\Company\DocumentManage;
 
 use App\Events\NotificationEvent;
+use App\Jobs\EmployeeDocumentNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
+use App\Models\CompanyDocumentSetting;
 use App\Models\DocumentType;
 use App\Models\EmailSetting;
 use App\Models\EmpDocument;
@@ -37,6 +39,7 @@ class DocumentManageTypesIndex extends BaseComponent
     public $modalDocument;
 
     public $modalTitle;
+    public $docSettings;
 
     public $shareCodeFile;
     public $shareCodeEmpId;
@@ -46,6 +49,10 @@ class DocumentManageTypesIndex extends BaseComponent
     public $filterUsers = [];
 
     public bool $selectAllUsers = false;
+    public $expiryDays = 60;
+    public $frequencyDays = 5;
+    public $notificationType = 'system';
+    public $emailConfigured = false;
 
     protected $listeners = [
         'sortUpdated' => 'handleSort'
@@ -55,6 +62,9 @@ class DocumentManageTypesIndex extends BaseComponent
 
     public function mount()
     {
+        $this->emailConfigured = EmailSetting::where('company_id', $this->company_id)->exists();
+
+
         $this->employees = Employee::where('company_id', auth()->user()->company->id)
             ->whereNotNull('user_id')
             ->orderBy('f_name')
@@ -67,14 +77,68 @@ class DocumentManageTypesIndex extends BaseComponent
             ->unique('name')
             ->values();
 
-
-
+        $this->loadDocumentSettings();
 
         $this->company_id = auth()->user()->company->id;
         $this->loaded = collect();
 
         $this->modalTitle = '';
         $this->loadMore();
+    }
+
+    public function loadDocumentSettings()
+    {
+        $this->docSettings = CompanyDocumentSetting::where('company_id', $this->company_id)->first();
+
+        if (!$this->docSettings) {
+            $this->docSettings  = (object)[
+                'notification_type' => 'system',
+                'doc_expiry_days' => 60,
+                'notification_frequency' => 5,
+            ];
+        }
+
+
+
+        if ($this->docSettings) {
+            $this->expiryDays = $this->docSettings->doc_expiry_days;
+            $this->frequencyDays = $this->docSettings->notification_frequency;
+            $this->notificationType = $this->docSettings->notification_type;
+        }
+    }
+
+
+    public function saveNotificationSettings()
+    {
+        $this->validate([
+            'expiryDays' => 'required|in:7,30,60,90',
+            'frequencyDays' => 'required|in:1,2,3,5,7',
+            'notificationType' => 'required|in:system,email,both',
+        ]);
+
+        if (($this->notificationType == 'email' || $this->notificationType == 'both') && !$this->emailConfigured) {
+            $this->toast('Email API not found for this company!', 'error');
+
+            return;
+        }
+
+
+        CompanyDocumentSetting::updateOrCreate(
+            ['company_id' => $this->company_id],
+            [
+                'doc_expiry_days' => $this->expiryDays,
+                'notification_frequency' => $this->frequencyDays,
+                'notification_type' => $this->notificationType
+            ]
+        );
+
+
+
+        $this->toast('Notification settings saved.', 'success');
+        $this->loadDocumentSettings();
+        $this->dispatch('closemodal');
+
+        $this->resetLoaded();
     }
 
 
@@ -118,32 +182,46 @@ class DocumentManageTypesIndex extends BaseComponent
     public function notifyEmployee($typeId, $employeeId, $type)
     {
         $docType = DocumentType::findOrFail($typeId);
+        $companyId = $this->company_id;
+        $emp = Employee::with('user')->find($employeeId);
 
-        $companyId = auth()->user()->company->id;
-        $emp    = Employee::with('user')->find($employeeId);
+        if (!$emp || !$emp->user) {
+            $this->toast('Employee or user not found!', 'error');
+            return;
+        }
 
 
         if ($type === 'expired') {
             $message = "{$docType->name} expired. Please upload a new one.";
-        }
-
-        if ($type === 'soon') {
+        } elseif ($type === 'soon') {
             $message = "{$docType->name} expiring soon. Please update it.";
+        } else {
+            $message = "{$docType->name} notification.";
         }
 
 
-        $notification = Notification::create([
-            'company_id'     => $companyId,
-            'user_id'        => $emp->user->id,
-            'type'           => 'document_expired',
-            'notifiable_id'  => $docType->id,
-            'data'           => [
-                'message'          => $message,
-            ],
-        ]);
+        if ($this->docSettings->notification_type === 'system' || $this->docSettings->notification_type === 'both') {
+            $notification = Notification::create([
+                'company_id'    => $companyId,
+                'user_id'       => $emp->user->id,
+                'type'          => 'document_expired',
+                'notifiable_id' => $docType->id,
+                'data'          => ['message' => $message],
+            ]);
 
-        event(new NotificationEvent($notification));
+            event(new NotificationEvent($notification));
+        }
 
+
+        if (($this->docSettings->notification_type === 'email' || $this->docSettings->notification_type === 'both')
+            && !$this->emailConfigured
+        ) {
+            $this->toast('Email API not found for this company!', 'error');
+
+            return;
+        }
+
+        EmployeeDocumentNotificationJob::dispatch($employeeId, $docType->id, $type, $message);
 
         $this->toast('Employee notified successfully', 'success');
     }
@@ -306,7 +384,7 @@ class DocumentManageTypesIndex extends BaseComponent
             $gateway = EmailSetting::where('company_id', $this->company_id)->first();
 
             if (! $gateway) {
-                $this->toast('SMTP gateway not found for this company!', 'error');
+                $this->toast('Email API not found for this company!', 'error');
 
                 return;
             }

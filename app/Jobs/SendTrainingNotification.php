@@ -28,7 +28,7 @@ class SendTrainingNotification implements ShouldQueue
     public function handle()
     {
         try {
-            $gateway = EmailSetting::where('company_id ', $this->user->company_id)->first(); // example
+            $gateway = EmailSetting::where('company_id ', $this->user->company_id)->first();
             configureSmtp($gateway);
 
 

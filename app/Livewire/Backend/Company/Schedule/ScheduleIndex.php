@@ -1694,8 +1694,11 @@ class ScheduleIndex extends BaseComponent
                 ])
                 ->toArray();
 
+            $this->showAddBreakForm = true;
+
             $this->recalculateBreakSummary();
         } else {
+            $this->showAddBreakForm = false;
             $this->newBreaks = [];
             $this->paidBreaksCount = 0;
             $this->unpaidBreaksCount = 0;

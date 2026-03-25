@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\EmailSetting;
+use App\Models\Employee;
 use App\Models\User;
 use App\Models\Training;
 use Illuminate\Bus\Queueable;
@@ -17,38 +18,36 @@ class SendTrainingNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $user;
-    protected $training;
+    protected int $userId;
+    protected int $trainingId;
 
-    public function __construct(User $user, Training $training)
+    public function __construct(int $userId, int $trainingId)
     {
-        $this->user = $user;
-        $this->training = $training;
+        $this->userId = $userId;
+        $this->trainingId = $trainingId;
     }
+
     public function handle()
     {
+        $user = Employee::find($this->userId);
+        $training = Training::find($this->trainingId);
+
+        if (!$user || !$training) return;
+
         try {
-            $gateway = EmailSetting::where('company_id ', $this->user->company_id)->first();
+            $gateway = EmailSetting::where('company_id', $user->company_id)->first();
             configureSmtp($gateway);
 
-
             Mail::send('mail.training_notification', [
-                'training' => $this->training,
-                'user' => $this->user,
+                'training' => $training,
+                'user' => $user,
                 'isReminder' => false,
-            ], function ($message) {
-                $message->to($this->user->email, $this->user->full_name)
-                    ->subject('New Training Assigned: ' . $this->training->course_name);
+            ], function ($message) use ($user, $training) {
+                $message->to($user->email, $user->full_name)
+                    ->subject('New Training Assigned: ' . $training->course_name);
             });
         } catch (\Exception $e) {
-
-            Log::error("Training Notification email failed for user {$this->user->email}: " . $e->getMessage());
+            Log::error("Training Notification email failed for user {$user->email}: " . $e->getMessage());
         }
-    }
-
-
-    public function failed(\Exception $exception)
-    {
-        Log::error("Training Notification job failed for user {$this->user->email}: " . $exception->getMessage());
     }
 }

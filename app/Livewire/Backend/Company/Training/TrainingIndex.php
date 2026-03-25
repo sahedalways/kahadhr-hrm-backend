@@ -125,6 +125,7 @@ class TrainingIndex extends BaseComponent
         $this->instruction_text = null;
         $this->require_proof = false;
         $this->emailGatewayMissing = false;
+        $this->send_email = false;
         $this->selectedEmployees = [];
 
         $this->resetErrorBag();
@@ -232,7 +233,7 @@ class TrainingIndex extends BaseComponent
         if ($this->send_email) {
             $gateway = EmailSetting::where('company_id', $this->company_id)->first();
 
-            if (! $gateway) {
+            if (!$gateway) {
                 $this->toast('Email API not found for this company!', 'error');
 
                 return;
@@ -277,10 +278,7 @@ class TrainingIndex extends BaseComponent
 
 
             if ($this->send_email) {
-                $user = User::find($emp['id']);
-                if ($user && $user->email) {
-                    SendTrainingNotification::dispatch($user, $training);
-                }
+                SendTrainingNotification::dispatch($emp['id'], $training->id);
             }
 
 

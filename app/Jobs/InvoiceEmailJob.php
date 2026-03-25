@@ -29,10 +29,6 @@ class InvoiceEmailJob implements ShouldQueue
         $invoice = Invoice::with('company')->find($this->invoiceId);
         $company = $invoice?->company;
 
-        if (!$invoice || !$company) {
-            \Log::error("Invoice #{$this->invoiceId} or Company #{$this->companyId} not found");
-            return;
-        }
 
         $subject = "Invoice {$invoice->invoice_number} – Payment Successful";
 

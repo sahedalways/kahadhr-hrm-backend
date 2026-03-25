@@ -11,6 +11,11 @@ trait FilterByUserType
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
 
+            if (app()->runningInConsole() && !auth()->check()) {
+                return;
+            }
+
+
             $user = auth()->check() ? app('authUser') : null;
 
             if (!$user) {

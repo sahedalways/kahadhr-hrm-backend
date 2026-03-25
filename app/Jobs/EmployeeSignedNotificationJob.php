@@ -32,16 +32,9 @@ class EmployeeSignedNotificationJob implements ShouldQueue
   public function handle(): void
   {
     $document = CompanyDocument::with('employee', 'company')->find($this->documentId);
-    if (!$document) {
-      \Log::error("Document #{$this->documentId} not found.");
-      return;
-    }
 
     $company = $document->company;
-    if (!$company) {
-      \Log::error("Company not found for Document #{$this->documentId}.");
-      return;
-    }
+
 
 
     try {

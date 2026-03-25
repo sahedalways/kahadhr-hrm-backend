@@ -30,10 +30,7 @@ class PaymentStatusEmailJob implements ShouldQueue
     {
         $company = Company::find($this->companyId);
 
-        if (! $company) {
-            \Log::error("Company #{$this->companyId} not found for payment email.");
-            return;
-        }
+
 
         $subject = match ($this->type) {
             'subscription_suspended' => 'Subscription Suspended – Action Required',

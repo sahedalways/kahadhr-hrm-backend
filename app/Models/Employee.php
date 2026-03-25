@@ -145,6 +145,12 @@ class Employee extends Model
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
+            if (app()->runningInConsole() && !auth()->check()) {
+                return;
+            }
+
+
+
             $user = auth()->check() ? auth()->user() : null;
 
             if (!$user) {

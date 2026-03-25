@@ -57,7 +57,7 @@
                                 <br>
                                 <small class="text-muted">
                                     IP: {{ $session->ip_address ?? 'Unknown IP' }} • Login:
-                                    {{ $session->login_time ? \Carbon\Carbon::parse($session->login_time)->format('d M, Y h:i A') : 'Unknown' }}
+                                    {{ $session->login_time ?? 'Unknown' }}
                                 </small>
                             </div>
 
@@ -83,6 +83,9 @@
                         </li>
                     @endforeach
                 </ul>
+
+
+
             @endif
 
         </div>

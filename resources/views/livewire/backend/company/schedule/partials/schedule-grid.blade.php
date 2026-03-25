@@ -854,20 +854,18 @@
                                 </div>
 
                                 <!-- Input + Color -->
+
                                 <div class="col-12 col-md-9">
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
 
-                                        <!-- Job input -->
+
+
+
+                                        <!-- Job input second -->
                                         <input type="text"
-                                               class="form-control form-control-sm"
+                                               class="form-control form-control-sm order-md-2 flex-grow-1"
                                                wire:model.defer="newShift.job"
                                                placeholder="Enter job…">
-
-                                        <!-- Color picker -->
-                                        <input type="color"
-                                               wire:model="newShift.color"
-                                               class="form-control form-control-color border-0 p-0"
-                                               style="width: 38px; height: 31px;">
 
                                     </div>
 
@@ -877,6 +875,38 @@
                                     @enderror
                                 </div>
                             </div>
+
+
+
+                            <div class="row align-items-md-center g-2 mb-3 shift-form-row">
+                                <!-- Label -->
+                                <div class="col-12 col-md-3">
+                                    <label class="fw-semibold mb-1 mb-md-0">
+                                        Shift Color <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+
+                                <!-- Input + Color -->
+
+                                <div class="col-12 col-md-9">
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+
+
+                                        <div class="order-md-1">
+                                            <input type="color"
+                                                   wire:model="newShift.color"
+                                                   class="form-control form-control-color border-0 p-0"
+                                                   style="width: 38px; height: 31px;">
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
 
 
                             {{-- EMPLOYEES --}}

@@ -29,6 +29,7 @@ class ScheduleIndex extends BaseComponent
     public $hoveredDate;
     public $showAddShiftPanel = false;
     public $selectedDate;
+    public $endRepeatDate;
 
     public $hoveredCell;
     public $totalBreakMinutes = 0;

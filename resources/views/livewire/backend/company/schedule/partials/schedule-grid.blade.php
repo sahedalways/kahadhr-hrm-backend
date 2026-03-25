@@ -969,18 +969,36 @@
                                         {{-- Delete Icon --}}
                                         <button class="btn btn-sm btn-danger position-absolute top-0 end-0 d-flex justify-content-center align-items-center"
                                                 wire:click="deleteTemplate({{ $template->id }})"
+                                                wire:loading.attr="disabled"
+                                                wire:target="deleteTemplate({{ $template->id }})"
                                                 style="border-radius: 50%; width: 28px; height: 28px; padding: 0;">
+
+                                            {{-- Normal icon --}}
                                             <i class="fas fa-trash-alt"
+                                               wire:loading.remove
+                                               wire:target="deleteTemplate({{ $template->id }})"
                                                style="font-size: 0.8rem;"></i>
+
+                                            {{-- Loading spinner --}}
+                                            <span wire:loading
+                                                  wire:target="deleteTemplate({{ $template->id }})"
+                                                  class="spinner-border spinner-border-sm"
+                                                  role="status"
+                                                  aria-hidden="true">
+                                            </span>
+
                                         </button>
 
                                         <div class="card-body d-flex flex-column p-4">
 
                                             <div class="mb-3">
-                                                <h5 class="fw-bold mb-2 text-white">{{ $template->title }}</h5>
+                                                <h5 class="fw-bold mb-2 text-white">
+                                                    {{ strlen($template->title) > 10 ? substr($template->title, 0, 10) . '...' : $template->title }}
+                                                </h5>
                                                 <span class="badge"
-                                                      style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;">
-                                                    {{ $template->job ?? 'Standard Shift' }}
+                                                      style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;"
+                                                      title="{{ $template->job ?? 'Standard Shift' }}">
+                                                    {{ \Illuminate\Support\Str::limit($template->job ?? 'Standard Shift', 10, '...') }}
                                                 </span>
                                             </div>
 
@@ -1002,7 +1020,10 @@
                                                     <div class="d-flex align-items-start mb-2">
                                                         <i class="fas fa-map-marker-alt text-warning me-3 mt-1"
                                                            style="width: 16px;"></i>
-                                                        <span class="small">{{ $template->address }}</span>
+                                                        <span class="small"
+                                                              title="{{ $template->address }}">
+                                                            {{ \Illuminate\Support\Str::limit($template->address, 10, '...') }}
+                                                        </span>
                                                     </div>
                                                 @endif
 
@@ -1019,8 +1040,22 @@
                                             <div class="mt-4">
                                                 <button class="btn btn-light w-100 py-2 fw-bold shadow-sm"
                                                         wire:click="applyTemplate({{ $template->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="applyTemplate({{ $template->id }})"
                                                         style="border-radius: 8px; font-size: 0.9rem;">
-                                                    <i class="fas fa-plus-circle me-2"></i> Use Template
+
+
+                                                    <span wire:loading.remove
+                                                          wire:target="applyTemplate({{ $template->id }})">
+                                                        <i class="fas fa-plus-circle me-2"></i> Use Template
+                                                    </span>
+
+                                                    <span wire:loading
+                                                          wire:target="applyTemplate({{ $template->id }})">
+                                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                                        Applying...
+                                                    </span>
+
                                                 </button>
                                             </div>
 

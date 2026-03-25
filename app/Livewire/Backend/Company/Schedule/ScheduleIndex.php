@@ -680,11 +680,15 @@ class ScheduleIndex extends BaseComponent
 
             $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $this->selectedDate);
 
+
+
             $newShiftMinutes = $this->getShiftWorkingMinutes(
                 $this->newShift['start_time'],
                 $this->newShift['end_time'],
                 $this->newBreaks ?? []
             );
+
+
 
             if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
 
@@ -2066,6 +2070,7 @@ class ScheduleIndex extends BaseComponent
         }
 
         $totalMinutes = $end->diffInMinutes($start);
+        $totalMinutes = abs($totalMinutes);
 
         $paidBreakMinutes = 0;
 
@@ -2077,7 +2082,7 @@ class ScheduleIndex extends BaseComponent
                 $duration = (float) $break['duration'];
 
                 $hours = floor($duration);
-                $minutes = ($duration - $hours) * 100;
+                $minutes = ($duration - $hours) * 60;
 
                 $paidBreakMinutes += ($hours * 60) + $minutes;
             }

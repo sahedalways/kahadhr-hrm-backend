@@ -1703,8 +1703,8 @@
 
                                 <select class="form-select border-light-subtle shadow-none"
                                         wire:model.live="working_hours_restriction">
-                                    <option value="0">Opt-Out</option>
-                                    <option value="1">Opt-In</option>
+                                    <option value="0">Non-Restricted</option>
+                                    <option value="1">Restricted</option>
                                 </select>
                             </div>
 
@@ -2046,7 +2046,8 @@
                                           class="text-danger">*</span></label>
                                 <input type="date"
                                        class="form-control border-light-subtle shadow-none"
-                                       wire:model="passport_expiry_date">
+                                       wire:model="passport_expiry_date"
+                                       min="{{ now()->addDay()->format('Y-m-d') }}">
 
                                 @error('passport_expiry_date')
                                     <span class="text-danger x-small">{{ $message }}</span>

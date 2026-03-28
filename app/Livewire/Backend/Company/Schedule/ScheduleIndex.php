@@ -720,7 +720,10 @@ class ScheduleIndex extends BaseComponent
         $currentDate = $this->selectedDate;
         $count = 0;
 
+
+
         if ($this->isSavedRepeatShift) {
+
             while (true) {
                 $dates[] = $currentDate;
                 $count++;
@@ -732,9 +735,68 @@ class ScheduleIndex extends BaseComponent
                     break;
                 }
 
+
                 $currentDate = $this->getNextOccurrence($currentDate);
             }
+
+
+
+
+            $weeklyTotals = [];
+
+            foreach ($dates as $date) {
+
+                $dateObj = Carbon::parse($date);
+
+
+                $weekStart = $dateObj->copy()->startOfWeek()->format('Y-m-d');
+                $weekEnd   = $dateObj->copy()->endOfWeek()->format('Y-m-d');
+
+
+                [$h, $m] = explode(':', $this->newShift['total_hours']);
+                $shiftMinutes = ($h * 60) + $m;
+
+                if (!isset($weeklyTotals[$weekStart])) {
+                    $weeklyTotals[$weekStart] = 0;
+                }
+
+
+                $weeklyTotals[$weekStart] += $shiftMinutes;
+            }
+
+
+
+            foreach ($this->newShift['employees'] as $emp) {
+
+                $empId = is_array($emp) ? $emp['id'] : $emp;
+                $employee = Employee::find($empId);
+
+                if (!$employee || !$employee->working_hours_restriction) continue;
+
+                $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
+
+                foreach ($weeklyTotals as $weekStart => $totalMinutes) {
+
+
+                    $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $weekStart);
+
+                    if (($usedMinutes + $totalMinutes) > $weeklyLimitMinutes) {
+
+                        $weekEnd = Carbon::parse($weekStart)->endOfWeek()->format('Y-m-d');
+
+                        $this->toast(
+                            "Weekly limit exceeded for {$employee->full_name} ({$weekStart} to {$weekEnd})",
+                            'error'
+                        );
+
+                        return;
+                    }
+                }
+            }
         }
+
+
+
 
 
         if (!$this->isSavedRepeatShift) {

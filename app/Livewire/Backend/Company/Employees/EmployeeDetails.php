@@ -1089,7 +1089,7 @@ class EmployeeDetails extends BaseComponent
         $rules = [
             'f_name' => 'required|string|max:255',
             'l_name' => 'required|string|max:255',
-            'title' => 'required|in:Mr,Mrs',
+            'title' => 'required|in:Mr,Mrs,Ms',
             'job_title' => 'required|string|max:255',
             'house_no' => 'required|string|max:255',
             'street' => 'required|string|max:255',

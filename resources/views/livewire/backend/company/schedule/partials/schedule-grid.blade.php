@@ -341,33 +341,32 @@
                                                         <button class="dropdown-item d-flex align-items-center"
                                                                 type="button"
                                                                 wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                wire:loading.attr="disabled">
-
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
 
                                                             <i class="fas fa-edit fa-fw me-1"
-                                                               wire:loading.remove></i>
+                                                               wire:loading.remove
+                                                               wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"></i>
+
                                                             Edit
 
-
                                                             <span wire:loading
+                                                                  wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
                                                                   class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>
+
+
+
+
                                                     <li>
                                                         <button class="dropdown-item d-flex align-items-center"
                                                                 type="button"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                                                wire:loading.attr="disabled">
+                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
 
-
-                                                            <i class="fas fa-eye fa-fw me-1"
-                                                               wire:loading.remove></i>
+                                                            <i class="fas fa-eye fa-fw me-1"></i>
                                                             View
-
-
-                                                            <span wire:loading
-                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>
                                                     <li>
@@ -375,14 +374,17 @@
                                                                 type="button"
                                                                 wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
                                                                 onclick="if(!confirm('Are you sure?')) event.stopImmediatePropagation()"
-                                                                wire:loading.attr="disabled">
-
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})">
 
                                                             <i class="fas fa-trash-alt fa-fw me-1"
-                                                               wire:loading.remove></i>
+                                                               wire:loading.remove
+                                                               wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"></i>
+
                                                             Delete
 
                                                             <span wire:loading
+                                                                  wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
                                                                   class="spinner-border spinner-border-sm ms-auto"></span>
                                                         </button>
                                                     </li>

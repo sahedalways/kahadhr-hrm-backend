@@ -619,15 +619,15 @@
 
                                         <!-- Date input -->
                                         <div class="input-group input-group-sm w-100 w-md-auto"
-                                             style="max-width: 200px;">
-                                            <input type="text"
-                                                   class="form-control"
-                                                   id="shiftDate"
-                                                   placeholder="Select dates">
+                                             style="max-width: 160px;">
+                                            <input class="form-control no-calendar-icon"
+                                                   type="text"
+                                                   id="datepicker"
+                                                   wire:ignore>
 
                                             <span class="input-group-text bg-white"
                                                   style="cursor: pointer;"
-                                                  onclick="document.getElementById('shiftDate')._flatpickr.open()">
+                                                  onclick="document.getElementById('shiftDate').showPicker()">
                                                 <i class="far fa-calendar-alt text-muted"></i>
                                             </span>
                                         </div>
@@ -946,22 +946,6 @@
                                     <textarea wire:model.defer="newShift.note"
                                               class="form-control form-control-sm"
                                               rows="3"
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
-                                               
                                               placeholder="Add a note…"></textarea>
 
                                     @error('newShift.note')
@@ -1233,3 +1217,14 @@
             .forEach(el => el.classList.remove('active-z'));
     });
 </script>
+
+
+
+@push('js')
+    <script>
+        flatpickr("#datepicker", {
+            mode: "multiple",
+            dateFormat: "Y-m-d"
+        });
+    </script>
+@endpush

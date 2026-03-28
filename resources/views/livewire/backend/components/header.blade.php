@@ -28,6 +28,10 @@
                    id="current_user_id"
                    value="{{ auth()->id() }}">
 
+            <input type="hidden"
+                   id="current_user_type"
+                   value="{{ $userType }}">
+
             <!-- RIGHT SIDE ICON + PROFILE -->
             <div class="d-flex align-items-center gap-3 position-relative w-100">
 
@@ -422,29 +426,33 @@
 
 
 <script>
-    const isRunning = document.getElementById('isRunning').value;
+    const userType = document.getElementById('current_user_type').value;
 
-    const timeDisplay = document.getElementById('headerTimer');
-    let updatedSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;
+    if (userType == 'employee') {
+        const isRunning = document.getElementById('isRunning').value;
 
-    if (isRunning == 1) {
-        function startCountdownTime() {
-            let hours = Math.floor(updatedSeconds / 3600);
-            let minutes = Math.floor((updatedSeconds % 3600) / 60);
-            let seconds = updatedSeconds % 60;
+        const timeDisplay = document.getElementById('headerTimer');
+        let updatedSeconds = parseInt(document.getElementById('headerInitialSeconds').value) || 0;
 
-            timeDisplay.textContent =
-                String(hours).padStart(2, '0') + ':' +
-                String(minutes).padStart(2, '0') + ':' +
-                String(seconds).padStart(2, '0');
+        if (isRunning == 1) {
+            function startCountdownTime() {
+                let hours = Math.floor(updatedSeconds / 3600);
+                let minutes = Math.floor((updatedSeconds % 3600) / 60);
+                let seconds = updatedSeconds % 60;
+
+                timeDisplay.textContent =
+                    String(hours).padStart(2, '0') + ':' +
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
 
 
-            updatedSeconds++;
+                updatedSeconds++;
+            }
+
+
+            setInterval(startCountdownTime, 1000);
+
         }
-
-
-        setInterval(startCountdownTime, 1000);
-
     }
 </script>
 

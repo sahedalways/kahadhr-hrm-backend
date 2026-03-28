@@ -619,16 +619,15 @@
 
                                         <!-- Date input -->
                                         <div class="input-group input-group-sm w-100 w-md-auto"
-                                             style="max-width: 160px;">
-                                            <input type="date"
-                                                   class="form-control no-calendar-icon"
-                                                   wire:model.live="selectedDate"
+                                             style="max-width: 200px;">
+                                            <input type="text"
+                                                   class="form-control"
                                                    id="shiftDate"
-                                                   wire:change="dateChanged">
+                                                   placeholder="Select dates">
 
                                             <span class="input-group-text bg-white"
                                                   style="cursor: pointer;"
-                                                  onclick="document.getElementById('shiftDate').showPicker()">
+                                                  onclick="document.getElementById('shiftDate')._flatpickr.open()">
                                                 <i class="far fa-calendar-alt text-muted"></i>
                                             </span>
                                         </div>
@@ -1232,5 +1231,24 @@
 
         document.querySelectorAll('.shift-block')
             .forEach(el => el.classList.remove('active-z'));
+    });
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("#shiftDate", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr) {
+                console.log(dateStr);
+
+                Livewire.dispatch('setDates', {
+                    dates: dateStr
+                });
+            }
+        });
     });
 </script>

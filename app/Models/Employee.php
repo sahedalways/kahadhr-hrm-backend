@@ -167,6 +167,11 @@ class Employee extends Model
             }
         });
 
+
+        static::addGlobalScope('isActive', function (Builder $builder) {
+            $builder->where('is_active', true);
+        });
+
         static::updating(function ($employee) {
 
             if ($employee->user && $employee->user->user_type === 'employee') {

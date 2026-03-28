@@ -79,7 +79,7 @@ class CompanyEmployeeProfile extends BaseComponent
     /** 🔹 Load employees by status */
     public function loadEmployees()
     {
-        $this->employees = Employee::where('company_id', $this->company_id)
+        $this->employees = Employee::withoutGlobalScope('isActive')->where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->whereHas('user', function ($q) {
                 $q->where('is_active', $this->status == 'former' ? 0 : 1);
@@ -139,7 +139,7 @@ class CompanyEmployeeProfile extends BaseComponent
 
     public function exportFile($type)
     {
-        $employees = Employee::with(['profile', 'documents'])->where('company_id', $this->company_id)
+        $employees = Employee::withoutGlobalScope('isActive')->with(['profile', 'documents'])->where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->where('is_active', $this->status == 'active' ? 1 : 0)
             ->whereIn('id', $this->selectedEmployees)

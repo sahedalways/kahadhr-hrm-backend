@@ -48,7 +48,7 @@ class CompanyLeaves extends BaseComponent
     /** 🔹 Load employees by status */
     public function loadEmployees()
     {
-        $this->employees = Employee::where('company_id', $this->company_id)
+        $this->employees = Employee::withoutGlobalScope('isActive')->where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->whereHas('user', function ($q) {
                 $q->where('is_active', $this->status == 'former' ? 0 : 1);
@@ -123,7 +123,7 @@ class CompanyLeaves extends BaseComponent
             ->whereBetween('start_date', [$from, $to]);
 
         if ($this->employeeType == 'selected' && !empty($this->selectedEmployees)) {
-            $userIds = Employee::whereIn('id', $this->selectedEmployees)->pluck('user_id');
+            $userIds = Employee::withoutGlobalScope('isActive')->whereIn('id', $this->selectedEmployees)->pluck('user_id');
             $query->whereIn('user_id', $userIds);
         }
 

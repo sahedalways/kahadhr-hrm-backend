@@ -617,9 +617,10 @@ class UsersIndex extends BaseComponent
     {
         if (!$this->hasMore) return;
 
-        $query = Employee::with([
-            'user.teams.department',
-        ]);
+        $query = Employee::withoutGlobalScope('isActive')
+            ->with([
+                'user.teams.department',
+            ]);
 
         if ($this->search && $this->search != '') {
             $searchTerm = '%' . $this->search . '%';

@@ -47,7 +47,7 @@ class CompanyTimesheet extends BaseComponent
     /** 🔹 Load employees by status */
     public function loadEmployees()
     {
-        $this->employees = Employee::where('company_id', $this->company_id)
+        $this->employees = Employee::withoutGlobalScope('isActive')->where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->whereHas('user', function ($q) {
                 $q->where('is_active', $this->status == 'former' ? 0 : 1);
@@ -127,7 +127,7 @@ class CompanyTimesheet extends BaseComponent
             ->where('company_id', $this->company_id)
             ->whereBetween('clock_in', [$from, $to])
             ->when(!empty($this->selectedEmployees), function ($q) {
-                $q->whereIn('user_id', Employee::whereIn('id', $this->selectedEmployees)->pluck('user_id'));
+                $q->whereIn('user_id', Employee::withoutGlobalScope('isActive')->whereIn('id', $this->selectedEmployees)->pluck('user_id'));
             })
             ->when(!empty($this->attendanceNature), function ($q) {
                 $q->where(function ($sub) {

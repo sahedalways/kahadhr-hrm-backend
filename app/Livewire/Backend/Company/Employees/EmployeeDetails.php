@@ -530,7 +530,7 @@ class EmployeeDetails extends BaseComponent
             ->get();
 
 
-        $this->employee = Employee::with(
+        $this->employee = Employee::withoutGlobalScope('isActive')->with(
             'documents',
             'documents.documentType',
             'profile',
@@ -894,7 +894,7 @@ class EmployeeDetails extends BaseComponent
         $this->resetInputFields();
         $this->editMode = true;
 
-        $this->employee = Employee::with('user', 'profile', 'customFieldValues')->find($id);
+        $this->employee = Employee::withoutGlobalScope('isActive')->with('user', 'profile', 'customFieldValues')->find($id);
 
         if (!$this->employee) {
             $this->toast('Employee not found!', 'error');
@@ -967,7 +967,7 @@ class EmployeeDetails extends BaseComponent
     public function sendVerificationLink($employeeId)
     {
         // Find the employee
-        $employee = Employee::find($employeeId);
+        $employee = Employee::withoutGlobalScope('isActive')->find($employeeId);
 
         if (!$employee) {
             $this->toast('Employee not found!', 'error');
@@ -1006,7 +1006,7 @@ class EmployeeDetails extends BaseComponent
     /* Toggle status active/former */
     public function toggleStatus($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::withoutGlobalScope('isActive')->find($id);
 
         if (!$employee) {
             $this->toast('Employee not found!', 'error');
@@ -1023,7 +1023,7 @@ class EmployeeDetails extends BaseComponent
     /* Assign A-Admin */
     public function assignAAdmin($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::withoutGlobalScope('isActive')->find($id);
         if (!$employee) {
             $this->toast('Employee not found!', 'error');
             return;
@@ -1418,7 +1418,7 @@ class EmployeeDetails extends BaseComponent
 
     public function handleDelation($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::withoutGlobalScope('isActive')->find($id);
 
         if (!$employee) {
             $this->redirect(
@@ -1467,7 +1467,7 @@ class EmployeeDetails extends BaseComponent
         $docType = DocumentType::findOrFail($typeId);
 
         $companyId = auth()->user()->company->id;
-        $emp    = Employee::with('user')->find($employeeId);
+        $emp    = Employee::withoutGlobalScope('isActive')->with('user')->find($employeeId);
 
 
         if ($type === 'expired') {

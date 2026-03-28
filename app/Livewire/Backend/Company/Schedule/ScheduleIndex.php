@@ -1535,8 +1535,21 @@ class ScheduleIndex extends BaseComponent
         foreach ($this->newBreaks as $break) {
             if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
 
-                $duration = (float) $break['duration'];
-                $breakMinutes = (int) round($duration * 60);
+                $durationStr = $break['duration'];
+                $parts = explode('.', $durationStr);
+
+                $hours = (int) $parts[0];
+                $minutes = isset($parts[1]) ? (int) substr($parts[1], 0, 2) : 0;
+
+
+                $breakMinutes = ($hours * 60) + $minutes;
+
+
+                if ($minutes >= 60) {
+                    $hours += floor($minutes / 60);
+                    $minutes = $minutes % 60;
+                    $breakMinutes = ($hours * 60) + $minutes;
+                }
 
                 if (strtolower($break['type']) == 'paid') {
                     $this->totalBreakMinutes += $breakMinutes;
@@ -1558,7 +1571,6 @@ class ScheduleIndex extends BaseComponent
             [$shiftHours, $shiftMinutes] = explode(':', $this->originalShiftTotalTime);
             $shiftTotalMinutes = ($shiftHours * 60) + $shiftMinutes;
 
-            // ADD paid break minutes to working hours
             $shiftTotalMinutes += $paidMinutes;
 
             $newHours = floor($shiftTotalMinutes / 60);
@@ -1569,6 +1581,7 @@ class ScheduleIndex extends BaseComponent
 
         $this->dispatch('closemodal');
     }
+
 
     public function getNextOccurrence($currentDate)
     {
@@ -1693,11 +1706,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
-
-
-
-
     private function recalculateBreakSummary()
     {
         $paid = collect($this->newBreaks)->where('type', 'Paid');
@@ -1706,18 +1714,42 @@ class ScheduleIndex extends BaseComponent
         $this->paidBreaksCount   = $paid->count();
         $this->unpaidBreaksCount = $unpaid->count();
 
-        $this->paidBreaksDuration   = $this->hoursToTime($paid->sum('duration'));
-        $this->unpaidBreaksDuration = $this->hoursToTime($unpaid->sum('duration'));
+
+        $paidTotalMinutes = $paid->sum(function ($break) {
+            return $this->decimalFormatToMinutes($break['duration']);
+        });
+
+        $unpaidTotalMinutes = $unpaid->sum(function ($break) {
+            return $this->decimalFormatToMinutes($break['duration']);
+        });
+
+        $this->paidBreaksDuration = $this->minutesToTime($paidTotalMinutes);
+        $this->unpaidBreaksDuration = $this->minutesToTime($unpaidTotalMinutes);
     }
 
-    private function hoursToTime($hours)
+
+    private function decimalFormatToMinutes($decimalFormat)
     {
-        $h = floor($hours);
-        $m = round(($hours - $h) * 60);
-        return sprintf('%02d:%02d', $h, $m);
+        if (empty($decimalFormat) && $decimalFormat !== 0) {
+            return 0;
+        }
+
+        $durationStr = (string) $decimalFormat;
+        $parts = explode('.', $durationStr);
+
+        $hours = (int) $parts[0];
+        $minutes = isset($parts[1]) ? (int) substr($parts[1], 0, 2) : 0;
+
+        return ($hours * 60) + $minutes;
     }
 
 
+    private function minutesToTime($totalMinutes)
+    {
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
 
 
 
@@ -2129,7 +2161,7 @@ class ScheduleIndex extends BaseComponent
                 ->map(fn($b) => [
                     'name'     => $b->title,
                     'type'     => $b->type,
-                    'duration' => (float) $b->duration,
+                    'duration' => $b->duration,
                 ])
                 ->toArray();
 

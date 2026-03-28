@@ -1233,22 +1233,3 @@
             .forEach(el => el.classList.remove('active-z'));
     });
 </script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        flatpickr("#shiftDate", {
-            mode: "multiple",
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr) {
-                console.log(dateStr);
-
-                Livewire.dispatch('setDates', {
-                    dates: dateStr
-                });
-            }
-        });
-    });
-</script>

@@ -49,7 +49,7 @@
                     <i class="fas fa-users fa-lg"></i>
                 </div>
                 <div>
-                    <div class="unique-summary-value fw-bold fs-4 text-dark">{{ count($this->employees) ?? 0 }}</div>
+                    <div class="unique-summary-value fw-bold fs-4 text-dark">{{ $summary['users'] ?? 0 }}</div>
                     <div class="unique-summary-label text-muted small text-uppercase fw-semibold">Active Employees</div>
                 </div>
             </div>

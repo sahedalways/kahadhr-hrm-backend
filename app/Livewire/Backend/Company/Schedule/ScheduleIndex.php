@@ -1104,52 +1104,10 @@ class ScheduleIndex extends BaseComponent
 
 
 
-    private function calcCalendarSummary()
-    {
-        $totalShifts = 0;
-        $totalHours = 0;
-
-        foreach ($this->calendarShifts as $date => $shifts) {
-            foreach ($shifts as $shift) {
-                $totalShifts++;
 
 
-                if (isset($shift['total_hours'])) {
-                    $hours = $this->convertTimeToDecimal($shift['total_hours']);
-                    $totalHours += $hours;
-                }
-            }
-        }
-
-        return [
-            'shifts' => $totalShifts,
-            'hours' => $this->convertDecimalToTime($totalHours),
-        ];
-    }
 
 
-    private function convertTimeToDecimal($timeString)
-    {
-        if (empty($timeString)) {
-            return 0;
-        }
-
-        $parts = explode(':', $timeString);
-        $hours = (int)$parts[0];
-        $minutes = (int)$parts[1];
-        $seconds = isset($parts[2]) ? (int)$parts[2] : 0;
-
-        return $hours + ($minutes / 60) + ($seconds / 3600);
-    }
-
-
-    private function convertDecimalToTime($decimalHours)
-    {
-        $hours = floor($decimalHours);
-        $minutes = round(($decimalHours - $hours) * 60);
-
-        return sprintf('%02d:%02d', $hours, $minutes);
-    }
 
 
 
@@ -1164,11 +1122,10 @@ class ScheduleIndex extends BaseComponent
 
 
         $this->setEveryOptions();
-        $this->startDate = Carbon::today();
-        $this->endDate = Carbon::today()->copy()->addDays(6);
+        $this->startDate = Carbon::today()->startOfWeek(Carbon::MONDAY);
+        $this->endDate = $this->startDate->copy()->endOfWeek(Carbon::SUNDAY);
         $this->currentDate = Carbon::today();
         $this->loadShifts();
-
 
 
         $this->calcCalendarSummary();
@@ -1901,6 +1858,47 @@ class ScheduleIndex extends BaseComponent
 
 
 
+
+    private function calcCalendarSummary(): array
+    {
+        $totalMinutes = 0;
+        $shiftCount   = 0;
+        $userIds      = [];
+
+        $period = Carbon::parse($this->startDate)->daysUntil($this->endDate);
+
+        foreach ($period as $day) {
+            $dateKey = $day->format('Y-m-d');
+            if (empty($this->calendarShifts[$dateKey])) {
+                continue;
+            }
+
+            foreach ($this->calendarShifts[$dateKey] as $row) {
+                $shiftCount++;
+
+
+                [$h, $m] = explode(':', $row['total_hours'] ?? '00:00');
+                $totalMinutes += ((int)$h * 60) + (int)$m;
+
+
+                foreach ($row['employees'] ?? [] as $emp) {
+                    $userIds[$emp['id'] ?? $emp] = true;
+                }
+            }
+        }
+
+        $hours = sprintf('%02d:%02d', intdiv($totalMinutes, 60), $totalMinutes % 60);
+
+        return [
+            'shifts' => $shiftCount,
+            'hours'  => $hours,
+            'users'  => count($userIds),
+        ];
+    }
+
+
+
+
     public function handleDrag(string $fromDate, int $fromEmpId, int $shiftDateId)
     {
         $this->dragSource = [
@@ -1997,6 +1995,7 @@ class ScheduleIndex extends BaseComponent
             }
             $weeks = array_chunk($dates, 7);
         }
+
         $calendarShiftsByEmployee = [];
 
         foreach ($calendarShifts as $dateKey => $shifts) {

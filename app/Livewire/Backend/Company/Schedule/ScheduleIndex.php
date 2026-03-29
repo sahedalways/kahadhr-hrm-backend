@@ -2018,28 +2018,22 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
     private function calcCalendarSummary(): array
     {
         $totalMinutes = 0;
         $shiftCount   = 0;
         $userIds      = [];
 
-        $period = Carbon::parse($this->startDate)->daysUntil($this->endDate);
+        foreach ($this->calendarShifts as $dateKey => $shifts) {
+            foreach ($shifts as $row) {
 
-        foreach ($period as $day) {
-            $dateKey = $day->format('Y-m-d');
-            if (empty($this->calendarShifts[$dateKey])) {
-                continue;
-            }
-
-            foreach ($this->calendarShifts[$dateKey] as $row) {
-                $shiftCount++;
+                $employeeCount = count($row['employees'] ?? []);
+                $shiftCount += $employeeCount;
 
 
                 [$h, $m] = explode(':', $row['total_hours'] ?? '00:00');
-                $totalMinutes += ((int)$h * 60) + (int)$m;
-
+                $shiftMinutes = ((int)$h * 60) + (int)$m;
+                $totalMinutes += ($shiftMinutes * $employeeCount);
 
                 foreach ($row['employees'] ?? [] as $emp) {
                     $userIds[$emp['id'] ?? $emp] = true;
@@ -2055,8 +2049,6 @@ class ScheduleIndex extends BaseComponent
             'users'  => count($userIds),
         ];
     }
-
-
 
 
     public function handleDrag(string $fromDate, int $fromEmpId, int $shiftDateId)

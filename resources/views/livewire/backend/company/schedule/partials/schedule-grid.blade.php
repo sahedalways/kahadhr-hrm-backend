@@ -614,7 +614,7 @@
                                 </div>
 
                                 <!-- Input + Switch -->
-                                <div class="col-12 col-md-8">
+                                <div class="col-12 col-md-9">
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
                                         <div class="input-group input-group-sm"
                                              style="max-width: 260px;"
@@ -623,18 +623,18 @@
                                                  flatpickr($refs.datepicker, {
                                                      dateFormat: 'Y-m-d',
                                                      mode: 'multiple',
-                                                     // selectedDates empty thakle defaultDate pathanor dorker nei
+                                             
                                                      defaultDate: selectedDates.length > 0 ? selectedDates : null,
                                              
                                                      allowInput: false,
                                                      disableMobile: true,
                                              
-                                                     // Initial focus bondho korar jonno nichei line-ti important
+                                             
                                                      nextArrow: '<i class=\'fas fa-chevron-right\'></i>',
                                                      prevArrow: '<i class=\'fas fa-chevron-left\'></i>',
                                              
                                                      onReady: function(selectedDates, dateStr, instance) {
-                                                         // Jodi kono date select kora na thake, tobe 'today' highlight class remove kora
+                                             
                                                          if (selectedDates.length === 0) {
                                                              instance.calendarContainer.querySelectorAll('.today').forEach(el => {
                                                                  el.classList.remove('today');
@@ -660,13 +660,13 @@
                                                    wire:ignore>
                                             <span class="input-group-text bg-white"
                                                   style="cursor: pointer;"
-                                                  @click="$refs.datepicker.flatpickr.open()">
+                                                  @click="$refs.datepicker._flatpickr.open()">
                                                 <i class="far fa-calendar-alt text-muted"></i>
                                             </span>
                                         </div>
 
                                         <!-- All day switch -->
-                                        <div class="form-check form-switch ms-md-auto">
+                                        <div class="form-check form-switch ms-md-auto col-md-auto">
                                             <input class="form-check-input"
                                                    type="checkbox"
                                                    wire:model="newShift.all_day"

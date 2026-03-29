@@ -482,8 +482,6 @@ class ScheduleIndex extends BaseComponent
         $uniqueDates = array_unique($this->selectedDates);
         $this->hasMultipleDates = count($uniqueDates) > 1;
 
-        $this->updateSelectedDateDisplay();
-
 
         if ($this->hasMultipleDates && $this->isSavedRepeatShift) {
             $this->isSavedRepeatShift = false;
@@ -494,29 +492,7 @@ class ScheduleIndex extends BaseComponent
 
 
 
-    private function updateSelectedDateDisplay()
-    {
-        if (empty($this->selectedDates)) {
-            $this->selectedDateDisplay = '';
-            return;
-        }
 
-        $uniqueDates = array_unique($this->selectedDates);
-        $formattedDates = [];
-
-        foreach ($uniqueDates as $date) {
-            $formattedDates[] = Carbon::parse($date)->format('M d, Y');
-        }
-
-        if (count($formattedDates) === 1) {
-            $this->selectedDateDisplay = $formattedDates[0];
-        } elseif (count($formattedDates) === 2) {
-            $this->selectedDateDisplay = $formattedDates[0] . ' and ' . $formattedDates[1];
-        } else {
-            $remaining = count($formattedDates) - 2;
-            $this->selectedDateDisplay = $formattedDates[0] . ', ' . $formattedDates[1] . ' +' . $remaining . ' more';
-        }
-    }
 
 
     private function cleanSelectedDates()
@@ -526,7 +502,7 @@ class ScheduleIndex extends BaseComponent
             if (is_string($item)) {
                 $cleaned[] = $item;
             } elseif (is_array($item)) {
-                // If it's an array, extract string values
+
                 foreach ($item as $subItem) {
                     if (is_string($subItem)) {
                         $cleaned[] = $subItem;
@@ -540,15 +516,6 @@ class ScheduleIndex extends BaseComponent
         $this->selectedDates = array_values($this->selectedDates);
     }
 
-    public function resetDatePicker()
-    {
-        $this->selectedDates = [];
-        $this->selectedDateDisplay = '';
-        $this->selectedDate = null;
-
-
-        $this->dispatch('clear-flatpickr');
-    }
 
 
 
@@ -558,6 +525,8 @@ class ScheduleIndex extends BaseComponent
 
         $this->updateSelectedDates($date);
         $this->resetFields();
+
+        $this->selectedDateDisplay = $this->selectedDates[0] ?? '';
 
         $this->isClickMultipleShift =  false;
 
@@ -575,6 +544,8 @@ class ScheduleIndex extends BaseComponent
         $this->updateSelectedDates($date);
         $this->newShift['employees'][] = (int) $employeeId;
         $this->selectedEmployees[] = $employeeId;
+
+        $this->selectedDateDisplay = $this->selectedDates[0] ?? '';
 
         $this->isClickMultipleShift =  false;
         $this->skipConflictCheck = false;
@@ -602,7 +573,6 @@ class ScheduleIndex extends BaseComponent
         $this->isShiftTempTab = false;
         $this->hasMultipleDates = false;
         $this->showAddUserPanel = false;
-        $this->selectedDateDisplay = '';
         $this->resetErrorBag();
         $this->resetValidation();
     }
@@ -2549,7 +2519,11 @@ class ScheduleIndex extends BaseComponent
         $this->editingShiftDateId = $dateId;
         $this->editingEmployeeId = $empId;
 
-        $this->selectedDate = Carbon::parse($shiftDate->date)->format('Y-m-d');
+        $formattedDate = Carbon::parse($shiftDate->date)->format('Y-m-d');
+        $this->selectedDate = $formattedDate;
+        $this->selectedDates = [$formattedDate];
+
+        $this->selectedDateDisplay = $formattedDate;
 
 
         $this->newShift = [

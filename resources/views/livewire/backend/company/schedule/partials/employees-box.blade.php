@@ -9,7 +9,17 @@
              style="min-height: 50px; background-color: #f9f9f9;">
             @foreach ($this->selectedShiftEmployees as $employee)
                 @php
-                    $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                    $isOnLeave = false;
+                    if (!empty($this->selectedDates)) {
+                        foreach ($this->selectedDates as $date) {
+                            if (hasLeave($employee->id, $date)) {
+                                $isOnLeave = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                    }
                 @endphp
 
                 <div class="d-flex align-items-center {{ $isOnLeave ? 'bg-secondary' : 'bg-primary' }} text-white rounded-pill px-2 py-1"

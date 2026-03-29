@@ -642,8 +642,29 @@
                                                              selectedDateDisplay = dateStr;
                                                          }
                                                      },
-                                                     onChange: function(selectedDates, dateStr, instance) {
-                                                         const formattedDates = selectedDates.map(d => instance.formatDate(d, 'Y-m-d'));
+                                                     onChange: function(selectedDatesArr, dateStr, instance) {
+                                             
+                                             
+                                                         if (selectedDatesArr.length === 0) {
+                                                             if (selectedDates && selectedDates.length > 0) {
+                                                                 instance.setDate(selectedDates, false);
+                                                             } else {
+                                             
+                                                                 const today = instance.formatDate(new Date(), 'Y-m-d');
+                                                                 instance.setDate([today], false);
+                                             
+                                                                 selectedDates = [today];
+                                                                 selectedDateDisplay = today;
+                                             
+                                                                 @this.set('selectedDates', [today]);
+                                                                 @this.set('selectedDateDisplay', today);
+                                                                 @this.set('selectedDate', today);
+                                                             }
+                                                             return;
+                                                         }
+                                             
+                                             
+                                                         const formattedDates = selectedDatesArr.map(d => instance.formatDate(d, 'Y-m-d'));
                                              
                                                          selectedDates = formattedDates;
                                                          selectedDateDisplay = dateStr;
@@ -1023,40 +1044,37 @@
 
                         <div class="row g-3">
                             @forelse($templates as $template)
-                                <div class="col-12 col-md-6">
-                                    <div class="card border-0 shadow-lg position-relative text-white"
-                                         style="background-color: #001f3f; width: 100%; min-height: 280px; border-radius: 12px;">
+                                <div class="col-12 col-md-6 d-flex">
+                                    <div class="card border-0 shadow-lg position-relative text-white w-100 d-flex flex-column"
+                                         style="background-color: #001f3f; border-radius: 12px; min-height: 280px;">
 
                                         {{-- Delete Icon --}}
                                         <button class="btn btn-sm btn-danger position-absolute top-0 end-0 d-flex justify-content-center align-items-center"
                                                 wire:click="deleteTemplate({{ $template->id }})"
                                                 wire:loading.attr="disabled"
                                                 wire:target="deleteTemplate({{ $template->id }})"
-                                                style="border-radius: 50%; width: 28px; height: 28px; padding: 0;">
+                                                style="border-radius: 50%; width: 28px; height: 28px; padding: 0; z-index: 1;">
 
-                                            {{-- Normal icon --}}
                                             <i class="fas fa-trash-alt"
                                                wire:loading.remove
                                                wire:target="deleteTemplate({{ $template->id }})"
                                                style="font-size: 0.8rem;"></i>
 
-                                            {{-- Loading spinner --}}
                                             <span wire:loading
                                                   wire:target="deleteTemplate({{ $template->id }})"
                                                   class="spinner-border spinner-border-sm"
                                                   role="status"
                                                   aria-hidden="true">
                                             </span>
-
                                         </button>
 
-                                        <div class="card-body d-flex flex-column p-4">
+                                        <div class="card-body d-flex flex-column p-4 h-100">
 
                                             <div class="mb-3">
                                                 <h5 class="fw-bold mb-2 text-white">
                                                     {{ strlen($template->title) > 10 ? substr($template->title, 0, 10) . '...' : $template->title }}
                                                 </h5>
-                                                <span class="badge"
+                                                <span class="badge d-inline-block"
                                                       style="background-color: #e7f1ff; color: #0056b3; font-size: 0.75rem;"
                                                       title="{{ $template->job ?? 'Standard Shift' }}">
                                                     {{ \Illuminate\Support\Str::limit($template->job ?? 'Standard Shift', 10, '...') }}
@@ -1081,7 +1099,7 @@
                                                     <div class="d-flex align-items-start mb-2">
                                                         <i class="fas fa-map-marker-alt text-warning me-3 mt-1"
                                                            style="width: 16px;"></i>
-                                                        <span class="small"
+                                                        <span class="small text-break"
                                                               title="{{ $template->address }}">
                                                             {{ \Illuminate\Support\Str::limit($template->address, 10, '...') }}
                                                         </span>
@@ -1093,7 +1111,30 @@
                                                        style="width: 16px;"></i>
                                                     <span class="small"
                                                           style="font-size: 0.8rem;">
-                                                        {{ $template->created_at->format('d M Y') }}
+                                                        @if ($template->dates)
+                                                            @php
+                                                                $dates = json_decode($template->dates, true);
+                                                                $dateCount = count($dates);
+                                                                $formattedDates = array_map(function ($date) {
+                                                                    return \Carbon\Carbon::parse($date)->format(
+                                                                        'M j, Y',
+                                                                    );
+                                                                }, $dates);
+                                                            @endphp
+
+                                                            @if ($dateCount == 1)
+                                                                {{ $formattedDates[0] }}
+                                                            @elseif($dateCount == 2)
+                                                                {{ $formattedDates[0] }} & {{ $formattedDates[1] }}
+                                                            @else
+                                                                {{ $formattedDates[0] }}, {{ $formattedDates[1] }}
+                                                                <span class="badge bg-secondary rounded-pill ms-1">
+                                                                    +{{ $dateCount - 2 }} more
+                                                                </span>
+                                                            @endif
+                                                        @else
+                                                            {{ \Carbon\Carbon::parse($template->created_at)->format('M j, Y') }}
+                                                        @endif
                                                     </span>
                                                 </div>
                                             </div>
@@ -1105,7 +1146,6 @@
                                                         wire:target="applyTemplate({{ $template->id }})"
                                                         style="border-radius: 8px; font-size: 0.9rem;">
 
-
                                                     <span wire:loading.remove
                                                           wire:target="applyTemplate({{ $template->id }})">
                                                         <i class="fas fa-plus-circle me-2"></i> Use Template
@@ -1116,7 +1156,6 @@
                                                         <span class="spinner-border spinner-border-sm me-2"></span>
                                                         Applying...
                                                     </span>
-
                                                 </button>
                                             </div>
 

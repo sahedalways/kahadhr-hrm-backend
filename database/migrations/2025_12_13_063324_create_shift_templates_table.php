@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('shift_templates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->json('dates')->nullable();
+            $table->json('breaks')->nullable();
+            $table->boolean('is_multi_date')->default(false);
             $table->string('title');
             $table->string('job')->nullable();
             $table->string('color', 50)->nullable();

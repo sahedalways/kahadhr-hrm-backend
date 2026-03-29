@@ -245,17 +245,15 @@ class ScheduleIndex extends BaseComponent
 
     public function applyTemplate($id)
     {
-
         $template = ShiftTemplates::find($id);
 
         if ($template) {
             $this->newShift = [
                 'title'       => $template->title,
                 'job'         => $template->job ?? '',
-                'start_time'  => \Carbon\Carbon::parse($template->start_time)->format('H:i'),
-                'end_time'    => \Carbon\Carbon::parse($template->end_time)->format('H:i'),
-
-                'total_hours' => $this->calculateTotalHours(),
+                'start_time'  => Carbon::parse($template->start_time)->format('H:i'),
+                'end_time'    => Carbon::parse($template->end_time)->format('H:i'),
+                'total_hours' => $template->total_hours ?? $this->calculateTotalHours(),
                 'color'       => $template->color ?? '#000000',
                 'address'     => $template->address ?? '',
                 'note'        => $template->note ?? '',
@@ -263,6 +261,35 @@ class ScheduleIndex extends BaseComponent
                 'employees'   => $template->employees ?? [],
             ];
 
+            if ($template->dates) {
+                $dates = json_decode($template->dates, true);
+                if (is_array($dates) && count($dates) > 0) {
+                    $this->selectedDates = $dates;
+                    $this->selectedDateDisplay = implode(', ', $dates);
+                    $this->hasMultipleDates = count($dates) > 1;
+                    $this->selectedDate = $dates[0];
+
+
+                    if (!$this->hasMultipleDates) {
+                        $this->selectedDate = $dates[0];
+                    }
+                }
+            } elseif ($template->created_at) {
+
+                $this->selectedDates = [$template->created_at->format('Y-m-d')];
+                $this->selectedDateDisplay = $template->created_at->format('Y-m-d');
+                $this->hasMultipleDates = false;
+                $this->selectedDate = $template->created_at->format('Y-m-d');
+            }
+
+
+            if ($template->breaks) {
+                $this->newBreaks = json_decode($template->breaks, true);
+                if (!empty($this->newBreaks)) {
+                    $this->showAddBreakForm = true;
+                    $this->confirmBreaksAndSave();
+                }
+            }
 
             $this->isShiftTempTab = false;
         }
@@ -295,32 +322,60 @@ class ScheduleIndex extends BaseComponent
 
     public function saveAsTemplate()
     {
+        // Clean and process dates
+        $this->cleanSelectedDates();
+        $datesToProcess = !empty($this->selectedDates) ? array_unique($this->selectedDates) : [$this->selectedDate];
+
+        if (empty($datesToProcess)) {
+            $this->toast('Please select at least one date for the template', 'error');
+            return;
+        }
+
         $this->validate([
-            'selectedDate'        => 'required|date',
             'newShift.title'      => 'required|string|max:255',
-            'newShift.job'      => 'required|string|max:255',
+            'newShift.job'        => 'required|string|max:255',
             'newShift.start_time' => 'required|date_format:H:i',
             'newShift.end_time'   => 'required|date_format:H:i|after:newShift.start_time',
         ], [
-            'selectedDate.required' => 'Please select a date for the template.',
-            'selectedDate.date'     => 'Selected date must be a valid date.',
+            'newShift.title.required' => 'Shift title is required.',
+            'newShift.job.required'   => 'Job title is required.',
+            'newShift.start_time.required' => 'Start time is required.',
+            'newShift.end_time.required'   => 'End time is required.',
         ]);
 
-        ShiftTemplates::create([
-            'company_id' => $this->company_id,
-            'title'      => $this->newShift['title'],
-            'job'        => $this->newShift['job'],
-            'color'      => $this->newShift['color'],
-            'address'    => $this->newShift['address'],
-            'note'       => $this->newShift['note'],
-            'start_time' => $this->newShift['start_time'],
-            'end_time'   => $this->newShift['end_time'],
-            'created_at' => $this->selectedDate,
+
+        $isMultiDate = count($datesToProcess) > 1;
+
+        $template = ShiftTemplates::create([
+            'company_id'  => $this->company_id,
+            'title'       => $this->newShift['title'],
+            'job'         => $this->newShift['job'],
+            'color'       => $this->newShift['color'],
+            'address'     => $this->newShift['address'],
+            'note'        => $this->newShift['note'],
+            'start_time'  => $this->newShift['start_time'],
+            'end_time'    => $this->newShift['end_time'],
+            'all_day'     => $this->newShift['all_day'] ?? false,
+            'total_hours' => $this->newShift['total_hours'],
+            'dates'       => json_encode($datesToProcess),
+            'is_multi_date' => $isMultiDate,
         ]);
 
-        $this->toast('Template saved successfully!', 'success');
+        // Save breaks if any
+        if (!empty($this->newBreaks)) {
+            $template->update([
+                'breaks' => json_encode($this->newBreaks),
+            ]);
+        }
+
+        $dateCount = count($datesToProcess);
+        $this->toast("Template saved successfully for {$dateCount} date(s)!", 'success');
+
+        // Reset after save
+        $this->selectedDates = [];
+        $this->selectedDateDisplay = '';
+        $this->hasMultipleDates = false;
     }
-
 
 
 

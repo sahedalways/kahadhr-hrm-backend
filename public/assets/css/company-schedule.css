@@ -654,3 +654,36 @@ body {
     max-width: 100%;
     overflow-x: hidden !important;
 }
+
+span.flatpickr-day.today,
+.flatpickr-calendar .flatpickr-day.today {
+    background: rgb(255, 255, 255) !important;
+    border-color: transparent !important;
+    color: #212529 !important;
+}
+
+span.flatpickr-day.today:hover,
+.flatpickr-calendar .flatpickr-day.today:hover {
+    background: #b8dcff !important;
+    color: #393939 !important;
+    border-color: none !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected:focus {
+    background: #007bff !important;
+    border-color: #007bff !important;
+    color: #fff !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected.today {
+    background: #57a8ff !important;
+    color: #fff !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected.today:hover {
+    background: #007bff !important;
+    border-color: #007bff !important;
+    color: #fff !important;
+}

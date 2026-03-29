@@ -545,7 +545,7 @@
         <div class="shift-panel-overlay"
              wire:click="closeAddShiftPanel">
             <div class="shift-panel"
-                 wire:click.stop>
+                 @click.stop>
 
                 {{-- HEADER --}}
                 <div
@@ -616,26 +616,54 @@
                                 <!-- Input + Switch -->
                                 <div class="col-12 col-md-8">
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
-
-                                        <!-- Date input -->
-                                        <div class="input-group input-group-sm w-100 w-md-auto"
-                                             style="max-width: 160px;">
-                                            <input class="form-control no-calendar-icon"
+                                        <div class="input-group input-group-sm"
+                                             style="max-width: 260px;"
+                                             x-data="{ selectedDates: @entangle('selectedDates') }"
+                                             x-init="() => {
+                                                 flatpickr($refs.datepicker, {
+                                                     dateFormat: 'Y-m-d',
+                                                     mode: 'multiple',
+                                                     // selectedDates empty thakle defaultDate pathanor dorker nei
+                                                     defaultDate: selectedDates.length > 0 ? selectedDates : null,
+                                             
+                                                     allowInput: false,
+                                                     disableMobile: true,
+                                             
+                                                     // Initial focus bondho korar jonno nichei line-ti important
+                                                     nextArrow: '<i class=\'fas fa-chevron-right\'></i>',
+                                                     prevArrow: '<i class=\'fas fa-chevron-left\'></i>',
+                                             
+                                                     onReady: function(selectedDates, dateStr, instance) {
+                                                         // Jodi kono date select kora na thake, tobe 'today' highlight class remove kora
+                                                         if (selectedDates.length === 0) {
+                                                             instance.calendarContainer.querySelectorAll('.today').forEach(el => {
+                                                                 el.classList.remove('today');
+                                                             });
+                                                         }
+                                                     },
+                                             
+                                                     onChange: function(selectedDates, dateStr, instance) {
+                                                         @this.set('selectedDates', selectedDates.map(d => d.toISOString().split('T')[0]));
+                                                         @this.set('selectedDateDisplay', dateStr);
+                                                         if (selectedDates.length > 0) {
+                                                             @this.set('selectedDate', selectedDates[0].toISOString().split('T')[0]);
+                                                         }
+                                                     }
+                                                 })
+                                             }">
+                                            <input class="form-control"
                                                    type="text"
-                                                   id="datepicker"
+                                                   x-ref="datepicker"
+                                                   x-model="selectedDateDisplay"
+                                                   readonly
+                                                   style="background-color: #fff; cursor: pointer;"
                                                    wire:ignore>
-
                                             <span class="input-group-text bg-white"
                                                   style="cursor: pointer;"
-                                                  onclick="document.getElementById('shiftDate').showPicker()">
+                                                  @click="$refs.datepicker.flatpickr.open()">
                                                 <i class="far fa-calendar-alt text-muted"></i>
                                             </span>
                                         </div>
-
-                                        <!-- Error -->
-                                        @error('selectedDate')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                        @enderror
 
                                         <!-- All day switch -->
                                         <div class="form-check form-switch ms-md-auto">
@@ -643,11 +671,8 @@
                                                    type="checkbox"
                                                    wire:model="newShift.all_day"
                                                    wire:change="toggleOnAllDay($event.target.checked)">
-                                            <label class="form-check-label small text-muted ms-1">
-                                                All day
-                                            </label>
+                                            <label class="form-check-label small text-muted ms-1">All day</label>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -1217,14 +1242,3 @@
             .forEach(el => el.classList.remove('active-z'));
     });
 </script>
-
-
-
-@push('js')
-    <script>
-        flatpickr("#datepicker", {
-            mode: "multiple",
-            dateFormat: "Y-m-d"
-        });
-    </script>
-@endpush

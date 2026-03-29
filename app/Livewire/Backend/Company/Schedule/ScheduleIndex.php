@@ -700,9 +700,10 @@ class ScheduleIndex extends BaseComponent
         $this->selectedDates = [];
         $this->selectedDateDisplay = '';
         $this->hasMultipleDates = false;
-
+        $this->selectedDate = null;
 
         $this->reset('newShift');
+        $this->dispatch('reset-flatpickr');
     }
 
 

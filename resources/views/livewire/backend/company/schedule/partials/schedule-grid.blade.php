@@ -632,37 +632,31 @@
                                                      disableMobile: true,
                                                      nextArrow: '<i class=\'fas fa-chevron-right\'></i>',
                                                      prevArrow: '<i class=\'fas fa-chevron-left\'></i>',
-                                                     onReady: function(selectedDates, dateStr, instance) {
-                                                         if (selectedDates.length === 0) {
+                                                     onReady: function(selectedDatesArr, dateStr, instance) {
+                                                         if (selectedDatesArr.length === 0) {
                                                              instance.calendarContainer.querySelectorAll('.today')
                                                                  .forEach(el => el.classList.remove('today'));
                                                          }
                                              
-                                                         if (selectedDates.length > 0) {
+                                                         if (selectedDatesArr.length > 0) {
                                                              selectedDateDisplay = dateStr;
                                                          }
                                                      },
                                                      onChange: function(selectedDatesArr, dateStr, instance) {
-                                             
-                                             
                                                          if (selectedDatesArr.length === 0) {
                                                              if (selectedDates && selectedDates.length > 0) {
                                                                  instance.setDate(selectedDates, false);
                                                              } else {
+                                                                 // Don't auto-set today's date
+                                                                 selectedDates = [];
+                                                                 selectedDateDisplay = '';
                                              
-                                                                 const today = instance.formatDate(new Date(), 'Y-m-d');
-                                                                 instance.setDate([today], false);
-                                             
-                                                                 selectedDates = [today];
-                                                                 selectedDateDisplay = today;
-                                             
-                                                                 @this.set('selectedDates', [today]);
-                                                                 @this.set('selectedDateDisplay', today);
-                                                                 @this.set('selectedDate', today);
+                                                                 @this.set('selectedDates', []);
+                                                                 @this.set('selectedDateDisplay', '');
+                                                                 @this.set('selectedDate', null);
                                                              }
                                                              return;
                                                          }
-                                             
                                              
                                                          const formattedDates = selectedDatesArr.map(d => instance.formatDate(d, 'Y-m-d'));
                                              
@@ -676,22 +670,34 @@
                                                      }
                                                  });
                                              
-                                             
+                                                 // Watch for changes from Livewire
                                                  $watch('selectedDates', (value) => {
-                                                     if (fp && value && value.length > 0) {
-                                                         fp.setDate(value, false);
-                                                     } else if (fp && (!value || value.length === 0)) {
+                                                     if (fp) {
+                                                         if (value && value.length > 0) {
+                                                             fp.setDate(value, false);
+                                                         } else {
+                                                             fp.clear();
+                                                             // Don't set any default date
+                                                         }
+                                                     }
+                                                 });
+                                             
+                                                 // Listen for reset event
+                                                 window.addEventListener('reset-flatpickr', () => {
+                                                     if (fp) {
                                                          fp.clear();
                                                      }
+                                                     selectedDates = [];
+                                                     selectedDateDisplay = '';
                                                  });
-                                             
-                                             
-                                                 $watch('selectedDateDisplay', (value) => {
-                                                     if (fp && value && value.length > 0) {
-                                             
-                                                     }
-                                                 });
-                                             }">
+                                             }"
+                                             @reset-flatpickr.window="
+                 if (fp) {
+                     fp.clear();
+                 }
+                 selectedDates = [];
+                 selectedDateDisplay = '';
+             ">
                                             <input class="form-control"
                                                    type="text"
                                                    x-ref="datepicker"

@@ -1123,38 +1123,51 @@ class ScheduleIndex extends BaseComponent
 
         $this->validate($rules, $messages);
 
-
         foreach ($this->multipleShifts as $index => $shift) {
-            $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
-
-
             if (!$this->skipConflictCheck) {
-                $conflicts = $this->getConflicts(
-                    $shift['date'],
-                    $employeeIds
-                );
+                $allConflicts = [];
+                foreach ($this->multipleShifts as $index => $shift) {
+                    $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
+                    $conflicts = $this->getConflicts($shift['date'], $employeeIds);
 
-                if ($conflicts->isNotEmpty()) {
-                    $this->conflictData = $conflicts;
+                    if ($conflicts->isNotEmpty()) {
+
+                        if (!isset($allConflicts[$shift['date']])) {
+                            $allConflicts[$shift['date']] = $conflicts;
+                        } else {
+
+                            $allConflicts[$shift['date']] = $allConflicts[$shift['date']]->merge($conflicts);
+                        }
+                    }
+                }
+
+                if (!empty($allConflicts)) {
+                    $this->conflictData = $allConflicts;
                     $this->dispatch('show-conflict-modal');
                     return;
                 }
             }
 
 
-            $alreadyAssigned = DB::table('shift_employees')
-                ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
-                ->where('shift_dates.date', $shift['date'])
-                ->whereIn('shift_employees.employee_id', $employeeIds)
-                ->pluck('shift_employees.employee_id')
-                ->toArray();
+            if (!$this->skipConflictCheck) {
+                foreach ($this->multipleShifts as $shift) {
+                    $employeeIds = collect($shift['employees'])->pluck('id')->toArray();
 
-            if ($alreadyAssigned) {
-                $names = Employee::whereIn('id', $alreadyAssigned)
-                    ->pluck('f_name')
-                    ->implode(', ');
-                $this->toast("Employees already assigned on {$shift['date']}: {$names}", 'error');
-                return;
+                    $alreadyAssigned = DB::table('shift_employees')
+                        ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                        ->where('shift_dates.date', $shift['date'])
+                        ->whereIn('shift_employees.employee_id', $employeeIds)
+                        ->pluck('shift_employees.employee_id')
+                        ->toArray();
+
+                    if ($alreadyAssigned) {
+                        $names = Employee::whereIn('id', $alreadyAssigned)
+                            ->pluck('f_name')
+                            ->implode(', ');
+                        $this->toast("Employees already assigned on {$shift['date']}: {$names}", 'error');
+                        return;
+                    }
+                }
             }
 
 

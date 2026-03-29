@@ -618,9 +618,13 @@
                                     <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
                                         <div class="input-group input-group-sm"
                                              style="max-width: 260px;"
-                                             x-data="{ selectedDates: @entangle('selectedDates') }"
+                                             x-data="{
+                                                 selectedDates: @entangle('selectedDates'),
+                                                 selectedDateDisplay: @entangle('selectedDateDisplay'),
+                                                 fp: null
+                                             }"
                                              x-init="() => {
-                                                 const fp = flatpickr($refs.datepicker, {
+                                                 fp = flatpickr($refs.datepicker, {
                                                      dateFormat: 'Y-m-d',
                                                      mode: 'multiple',
                                                      defaultDate: selectedDates.length > 0 ? selectedDates : null,
@@ -633,19 +637,37 @@
                                                              instance.calendarContainer.querySelectorAll('.today')
                                                                  .forEach(el => el.classList.remove('today'));
                                                          }
+                                             
+                                                         if (selectedDates.length > 0) {
+                                                             selectedDateDisplay = dateStr;
+                                                         }
                                                      },
                                                      onChange: function(selectedDates, dateStr, instance) {
                                                          const formattedDates = selectedDates.map(d => instance.formatDate(d, 'Y-m-d'));
                                              
-                                             
                                                          selectedDates = formattedDates;
+                                                         selectedDateDisplay = dateStr;
+                                             
                                                          @this.set('selectedDates', formattedDates);
                                                          @this.set('selectedDateDisplay', dateStr);
-                                             
                                                          @this.set('selectedDate', formattedDates[0] ?? null);
-                                             
-                                             
                                                          @this.call('updateSelectedDates', formattedDates);
+                                                     }
+                                                 });
+                                             
+                                             
+                                                 $watch('selectedDates', (value) => {
+                                                     if (fp && value && value.length > 0) {
+                                                         fp.setDate(value, false);
+                                                     } else if (fp && (!value || value.length === 0)) {
+                                                         fp.clear();
+                                                     }
+                                                 });
+                                             
+                                             
+                                                 $watch('selectedDateDisplay', (value) => {
+                                                     if (fp && value && value.length > 0) {
+                                             
                                                      }
                                                  });
                                              }">

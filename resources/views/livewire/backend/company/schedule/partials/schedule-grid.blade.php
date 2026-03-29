@@ -550,9 +550,9 @@
                 {{-- HEADER --}}
                 <div
                      class="shift-panel-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
-                    <h6 class="mb-0 fw-semibold">
-                        {{ \Carbon\Carbon::parse($selectedDate)->format('l, M d, Y') }}
-                    </h6>
+
+                    @include('livewire.backend.company.schedule.partials._selected-date-range')
+
                     <button type="button"
                             wire:click="closeAddShiftPanel"
                             class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center position-relative"
@@ -620,44 +620,44 @@
                                              style="max-width: 260px;"
                                              x-data="{ selectedDates: @entangle('selectedDates') }"
                                              x-init="() => {
-                                                 flatpickr($refs.datepicker, {
+                                                 const fp = flatpickr($refs.datepicker, {
                                                      dateFormat: 'Y-m-d',
                                                      mode: 'multiple',
-                                             
                                                      defaultDate: selectedDates.length > 0 ? selectedDates : null,
-                                             
                                                      allowInput: false,
                                                      disableMobile: true,
-                                             
-                                             
                                                      nextArrow: '<i class=\'fas fa-chevron-right\'></i>',
                                                      prevArrow: '<i class=\'fas fa-chevron-left\'></i>',
-                                             
                                                      onReady: function(selectedDates, dateStr, instance) {
-                                             
                                                          if (selectedDates.length === 0) {
-                                                             instance.calendarContainer.querySelectorAll('.today').forEach(el => {
-                                                                 el.classList.remove('today');
-                                                             });
+                                                             instance.calendarContainer.querySelectorAll('.today')
+                                                                 .forEach(el => el.classList.remove('today'));
                                                          }
                                                      },
-                                             
                                                      onChange: function(selectedDates, dateStr, instance) {
-                                                         @this.set('selectedDates', selectedDates.map(d => d.toISOString().split('T')[0]));
+                                                         const formattedDates = selectedDates.map(d => instance.formatDate(d, 'Y-m-d'));
+                                             
+                                             
+                                                         selectedDates = formattedDates;
+                                                         @this.set('selectedDates', formattedDates);
                                                          @this.set('selectedDateDisplay', dateStr);
-                                                         if (selectedDates.length > 0) {
-                                                             @this.set('selectedDate', selectedDates[0].toISOString().split('T')[0]);
-                                                         }
+                                             
+                                                         @this.set('selectedDate', formattedDates[0] ?? null);
+                                             
+                                             
+                                                         @this.call('updateSelectedDates', formattedDates);
                                                      }
-                                                 })
+                                                 });
                                              }">
                                             <input class="form-control"
                                                    type="text"
                                                    x-ref="datepicker"
                                                    x-model="selectedDateDisplay"
+                                                   placeholder="Select date"
                                                    readonly
-                                                   style="background-color: #fff; cursor: pointer;"
-                                                   wire:ignore>
+                                                   style="background-color: #e9ecef; cursor: pointer;"
+                                                   wire:ignore
+                                                   onkeydown="return false;">
                                             <span class="input-group-text bg-white"
                                                   style="cursor: pointer;"
                                                   @click="$refs.datepicker._flatpickr.open()">
@@ -708,7 +708,7 @@
                                                @if ($newShift['all_day']) readonly @endif>
 
                                         <!-- Total hours -->
-                                        <span class="small fw-semibold ms-md-auto"
+                                        <span class="small fw-semibold ms-md-auto col-md-auto"
                                               style="color:#000;">
                                             {{ $newShift['total_hours'] ?? '08:00' }} hrs
                                         </span>

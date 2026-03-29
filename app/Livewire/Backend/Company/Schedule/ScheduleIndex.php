@@ -1348,10 +1348,19 @@ class ScheduleIndex extends BaseComponent
     public function getDisplayDateRangeProperty()
     {
         if ($this->viewMode === 'weekly') {
-            return $this->startDate->format('M d') . ' - ' . $this->endDate->format('M d');
+
+            if ($this->startDate->format('Y') !== $this->endDate->format('Y')) {
+                return $this->startDate->format('M d, Y') . ' - ' . $this->endDate->format('M d, Y');
+            } elseif ($this->startDate->format('m') !== $this->endDate->format('m')) {
+                return $this->startDate->format('M d') . ' - ' . $this->endDate->format('M d, Y');
+            } else {
+                return $this->startDate->format('M d') . ' - ' . $this->endDate->format('d, Y');
+            }
         } elseif ($this->viewMode === 'monthly') {
             return $this->startDate->format('F Y');
         }
+
+        return '';
     }
 
 

@@ -1,9 +1,14 @@
       <div class="pt-4 bg-white">
-          <div class="schedule-sidebar p-2 border-end"  style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
+          <div class="schedule-sidebar p-2 border-end"
+               style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
 
               <div class="input-group mb-3">
-                  <input type="text" class="form-control form-control-sm" placeholder="Search employees..."
-                      aria-label="Search" wire:model="search" wire:keyup="set('search', $event.target.value)">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         placeholder="Search employees..."
+                         aria-label="Search"
+                         wire:model="search"
+                         wire:keyup="set('search', $event.target.value)">
               </div>
 
               <hr class="my-2">
@@ -20,12 +25,13 @@
                   @else
                       @foreach ($employees as $employee)
                           <div class="d-flex align-items-center py-4 px-2 employee-row border rounded mb-2"
-                              title="{{ $employee['f_name'] }} {{ $employee['l_name'] }}">
+                               style="cursor: default;"
+                               title="{{ $employee['f_name'] }} {{ $employee['l_name'] }}">
 
                               <div class="position-relative me-3">
                                   <img src="{{ $employee['avatar_url'] ?? asset('assets/img/default-avatar.png') }}"
-                                      alt="{{ $employee['f_name'] . ' ' . $employee['l_name'] }}"
-                                      class="rounded-circle employee-avatar">
+                                       alt="{{ $employee['f_name'] . ' ' . $employee['l_name'] }}"
+                                       class="rounded-circle employee-avatar">
                               </div>
 
                               <div class="d-flex flex-column">

@@ -842,18 +842,23 @@ class ScheduleIndex extends BaseComponent
         }
 
         // Check for already assigned employees
-        foreach ($datesToProcess as $date) {
-            $alreadyAssigned = DB::table('shift_employees')
-                ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
-                ->where('shift_dates.date', $date)
-                ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
-                ->pluck('shift_employees.employee_id')
-                ->toArray();
+        if (!$this->skipConflictCheck) {
+            foreach ($datesToProcess as $date) {
+                $alreadyAssigned = DB::table('shift_employees')
+                    ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                    ->where('shift_dates.date', $date)
+                    ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
+                    ->pluck('shift_employees.employee_id')
+                    ->toArray();
 
-            if ($alreadyAssigned) {
-                $names = Employee::whereIn('id', $alreadyAssigned)->pluck('f_name')->implode(', ');
-                $this->toast("Employees already assigned on $date: $names", 'error');
-                return;
+                if ($alreadyAssigned) {
+                    $names = Employee::whereIn('id', $alreadyAssigned)->pluck('f_name')->implode(', ');
+                    $this->toast("Employees already assigned on $date: $names", 'error');
+
+                    $this->closeAddShiftPanel();
+                    $this->dispatch('refreshSchedule');
+                    return;
+                }
             }
         }
 
@@ -931,363 +936,27 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
-
-    // public function publishShift()
-    // {
-
-    //     // Validation
-    //     $this->validate([
-    //         'selectedDate' => ['required', 'date'],
-    //         'newShift.title' => 'required|string',
-    //         'newShift.start_time' => 'required|date_format:H:i',
-    //         'newShift.end_time' => 'required|date_format:H:i|after:newShift.start_time',
-    //         'newShift.employees' => 'required|array|min:1',
-
-    //         // New fields
-    //         'newShift.address' => 'nullable|string|max:255',
-    //         'newShift.note' => 'nullable|string|max:500',
-    //         'newShift.job' => 'required|string|max:100',
-    //         'newBreaks' => 'nullable|array',
-    //     ], [
-    //         'selectedDate.required' => 'Please select a date for the shift.',
-    //         'selectedDate.date' => 'The selected date is not valid.',
-
-    //         'newShift.title.required' => 'Shift title is required.',
-
-    //         'newShift.start_time.required' => 'Start time is required.',
-    //         'newShift.start_time.date_format' => 'Start time must be a valid time.',
-    //         'newShift.end_time.required' => 'End time is required.',
-    //         'newShift.end_time.date_format' => 'End time must be a valid time.',
-    //         'newShift.end_time.after' => 'End time must be after the start time.',
-
-    //         'newShift.employees.required' => 'Please select at least one employee for this shift.',
-    //         'newShift.employees.array' => 'Employee selection must be valid.',
-
-    //         'newShift.address.string' => 'Address must be a valid text.',
-    //         'newShift.address.max' => 'Address cannot exceed 255 characters.',
-
-    //         'newShift.note.string' => 'Note must be a valid text.',
-    //         'newShift.note.max' => 'Note cannot exceed 500 characters.',
-
-
-
-    //         'newShift.job.required' => 'Shift job title is required.',
-    //         'newShift.job.string' => 'Job must be a valid text.',
-    //         'newShift.job.max' => 'Job cannot exceed 100 characters.',
-    //     ]);
-
-
-    //     $datesToProcess = !empty($this->selectedDates) ? $this->selectedDates : [$this->selectedDate];
-
-    //     if (empty($datesToProcess) || (count($datesToProcess) == 1 && empty($datesToProcess[0]))) {
-    //         $this->toast('Please select at least one date for the shift', 'error');
-    //         return;
-    //     }
-
-
-
-    //     $employeesOnLeave = [];
-    //     foreach ($this->newShift['employees'] as $emp) {
-
-    //         $empId = is_array($emp) ? $emp['id'] : $emp;
-
-    //         $employee = Employee::find($empId);
-
-    //         if (!$employee || !$employee->working_hours_restriction) continue;
-
-    //         $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
-
-    //         $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $this->selectedDate);
-
-
-
-    //         $newShiftMinutes = $this->getShiftWorkingMinutes(
-    //             $this->newShift['start_time'],
-    //             $this->newShift['end_time'],
-    //             $this->newBreaks ?? []
-    //         );
-
-
-
-    //         if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
-
-    //             $name = $employee->full_name;
-
-    //             $this->toast("Weekly limit exceeded for $name", 'error');
-    //             return;
-    //         }
-    //     }
-
-    //     if ($employeesOnLeave) {
-    //         $display = implode(', ', array_slice($employeesOnLeave, 0, 3));
-    //         if (count($employeesOnLeave) > 3) $display .= ' ...';
-
-
-    //         $this->toast("Employees on leave: $display", 'error');
-    //         return;
-    //     }
-
-
-
-
-    //     $dates = [];
-    //     $currentDate = $this->selectedDate;
-    //     $count = 0;
-
-
-
-    //     if ($this->isSavedRepeatShift) {
-
-    //         while (true) {
-    //             $dates[] = $currentDate;
-    //             $count++;
-
-    //             if ($this->endRepeat === 'After' && $count >= $this->occurrences) {
-    //                 break;
-    //             }
-    //             if ($this->endRepeat === 'On' && \Carbon\Carbon::parse($currentDate) >= \Carbon\Carbon::parse($this->endRepeatDate)) {
-    //                 break;
-    //             }
-
-
-    //             $currentDate = $this->getNextOccurrence($currentDate);
-    //         }
-
-
-
-
-    //         $weeklyTotals = [];
-
-    //         foreach ($dates as $date) {
-
-    //             $dateObj = Carbon::parse($date);
-
-
-    //             $weekStart = $dateObj->copy()->startOfWeek()->format('Y-m-d');
-    //             $weekEnd   = $dateObj->copy()->endOfWeek()->format('Y-m-d');
-
-
-    //             [$h, $m] = explode(':', $this->newShift['total_hours']);
-    //             $shiftMinutes = ($h * 60) + $m;
-
-    //             if (!isset($weeklyTotals[$weekStart])) {
-    //                 $weeklyTotals[$weekStart] = 0;
-    //             }
-
-
-    //             $weeklyTotals[$weekStart] += $shiftMinutes;
-    //         }
-
-
-
-    //         foreach ($this->newShift['employees'] as $emp) {
-
-    //             $empId = is_array($emp) ? $emp['id'] : $emp;
-    //             $employee = Employee::find($empId);
-
-    //             if (!$employee || !$employee->working_hours_restriction) continue;
-
-    //             $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
-
-    //             foreach ($weeklyTotals as $weekStart => $totalMinutes) {
-
-
-    //                 $usedMinutes = $this->getEmployeeWeeklyMinutes($empId, $weekStart);
-
-    //                 if (($usedMinutes + $totalMinutes) > $weeklyLimitMinutes) {
-
-    //                     $weekEnd = Carbon::parse($weekStart)->endOfWeek()->format('Y-m-d');
-
-    //                     $this->toast(
-    //                         "Weekly limit exceeded for {$employee->full_name} ({$weekStart} to {$weekEnd})",
-    //                         'error'
-    //                     );
-
-    //                     return;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-
-
-
-
-    //     if (!$this->isSavedRepeatShift) {
-
-    //         if (!$this->skipConflictCheck) {
-    //             $conflicts = $this->getConflicts(
-    //                 $this->selectedDate,
-    //                 $this->newShift['employees']
-    //             );
-
-
-
-    //             if ($conflicts->isNotEmpty()) {
-    //                 $this->conflictData = $conflicts;
-
-    //                 $this->dispatch('show-conflict-modal');
-    //                 return;
-    //             }
-    //         }
-
-
-    //         $employeesAlreadyAssigned = DB::table('shift_employees')
-    //             ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
-    //             ->where('shift_dates.date', $this->selectedDate)
-    //             ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
-    //             ->pluck('shift_employees.employee_id')
-    //             ->toArray();
-
-    //         if ($employeesAlreadyAssigned) {
-    //             $names = Employee::whereIn('id', $employeesAlreadyAssigned)
-    //                 ->pluck('f_name')
-    //                 ->implode(', ');
-    //             $this->toast("Employees already assigned on {$this->selectedDate}: {$names}", 'error');
-    //             return;
-    //         }
-
-
-
-
-
-    //         $shift = Shift::create([
-    //             'company_id' => $this->company_id,
-    //             'title' => $this->newShift['title'],
-    //             'job' => $this->newShift['job'],
-    //             'color' => $this->newShift['color'],
-    //             'address' => $this->newShift['address'],
-    //             'note' => $this->newShift['note'],
-    //         ]);
-
-
-
-    //         $shiftDate = $shift->dates()->create([
-    //             'date' => $currentDate,
-    //             'start_time' => $this->newShift['start_time'],
-    //             'end_time' => $this->newShift['end_time'],
-    //             'total_hours' => $this->newShift['total_hours'],
-    //         ]);
-
-    //         $shiftDate->employees()->attach($this->newShift['employees']);
-
-    //         if (!empty($this->newBreaks)) {
-    //             foreach ($this->newBreaks as $break) {
-    //                 if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-    //                     $shiftDate->breaks()->create([
-    //                         'title' => $break['name'],
-    //                         'type' => $break['type'],
-    //                         'duration' => $break['duration'],
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-    //     } else {
-
-    //         foreach ($dates as $date) {
-
-    //             if (!$this->skipConflictCheck) {
-    //                 $conflicts = $this->getConflicts(
-    //                     $date,
-    //                     $this->newShift['employees']
-    //                 );
-
-
-    //                 if ($conflicts->isNotEmpty()) {
-    //                     $this->conflictData = $conflicts;
-    //                     $this->dispatch('show-conflict-modal');
-    //                     return;
-    //                 }
-    //             }
-    //         }
-
-    //         foreach ($dates as $date) {
-    //             $already = DB::table('shift_employees')
-    //                 ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
-    //                 ->where('shift_dates.date', $date)
-    //                 ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
-    //                 ->pluck('shift_employees.employee_id')
-    //                 ->toArray();
-
-    //             if ($already) {
-    //                 $names = Employee::whereIn('id', $already)->pluck('f_name')->implode(', ');
-    //                 $this->toast("Employees already assigned on {$date}: {$names}", 'error');
-    //                 return;
-    //             }
-    //         }
-
-
-
-
-
-
-    //         $shift = Shift::create([
-    //             'company_id' => $this->company_id,
-    //             'title' => $this->newShift['title'],
-    //             'job' => $this->newShift['job'],
-    //             'color' => $this->newShift['color'],
-    //             'address' => $this->newShift['address'],
-    //             'note' => $this->newShift['note'],
-    //         ]);
-
-
-
-    //         foreach ($dates as $date) {
-    //             $shiftDate = $shift->dates()->create([
-    //                 'date' => $date,
-    //                 'start_time' => $this->newShift['start_time'],
-    //                 'end_time' => $this->newShift['end_time'],
-    //                 'total_hours' => $this->newShift['total_hours'],
-    //             ]);
-
-    //             $shiftDate->employees()->attach($this->newShift['employees']);
-
-    //             if (!empty($this->newBreaks)) {
-    //                 foreach ($this->newBreaks as $break) {
-    //                     if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-    //                         $shiftDate->breaks()->create([
-    //                             'title' => $break['name'],
-    //                             'type' => $break['type'],
-    //                             'duration' => $break['duration'],
-    //                         ]);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-
-    //     $this->isEditableShift =  false;
-    //     $this->closeAddShiftPanel();
-    //     $this->cancelRepeatShift();
-    //     $this->loadShifts();
-    //     $this->dispatch('refreshSchedule');
-    //     $this->toast('Shift has been published successfully!', 'success');
-    // }
-
-
-
-
     public function confirmOverwrite()
     {
         $empIdsToReplace = $this->isClickMultipleShift
             ? collect($this->multipleShifts)->pluck('employees')->flatten(1)->pluck('id')->unique()->toArray()
             : $this->newShift['employees'];
 
-        foreach ($this->conflictData as $shift) {
-            foreach ($shift->dates as $date) {
-                if (Carbon::parse($date->date)->format('Y-m-d') !== $this->selectedDate) {
-                    continue;
-                }
+
+        foreach ($this->conflictData as $date => $shifts) {
+            foreach ($shifts as $shift) {
+
+                $shiftDate = $shift->dates->firstWhere('date', $date);
+
+                if ($shiftDate) {
+
+                    $shiftDate->employees()->detach($empIdsToReplace);
 
 
-                $date->employees()->detach($empIdsToReplace);
-
-
-                if ($date->employees()->doesntExist()) {
-                    $date->breaks()->delete();
-                    $date->delete();
+                    if ($shiftDate->employees()->doesntExist()) {
+                        $shiftDate->breaks()->delete();
+                        $shiftDate->delete();
+                    }
                 }
             }
         }
@@ -1300,8 +969,9 @@ class ScheduleIndex extends BaseComponent
             $this->publishShift();
         }
 
-        /* 3. Clean-up */
+        // Clean-up
         $this->skipConflictCheck = false;
+        $this->conflictData = [];
         $this->dispatch('hide-conflict-modal');
     }
 
@@ -2567,9 +2237,22 @@ class ScheduleIndex extends BaseComponent
 
     public function updateShift()
     {
-        // Validation - আগের publishShift এর মতোই
+        $this->cleanSelectedDates();
+
+
+        if ($this->isSavedRepeatShift) {
+            $baseDate = !empty($this->selectedDates) ? $this->selectedDates[0] : $this->selectedDate;
+            $datesToProcess = $this->generateRepeatedDates($baseDate);
+        } else {
+            $datesToProcess = !empty($this->selectedDates) ? array_unique($this->selectedDates) : [$this->selectedDate];
+        }
+
+        if (empty($datesToProcess)) {
+            $this->toast('Please select at least one date for the shift', 'error');
+            return;
+        }
+
         $this->validate([
-            'selectedDate' => ['required', 'date'],
             'newShift.title' => 'required|string',
             'newShift.start_time' => 'required|date_format:H:i',
             'newShift.end_time' => 'required|date_format:H:i|after:newShift.start_time',
@@ -2580,81 +2263,239 @@ class ScheduleIndex extends BaseComponent
             'newBreaks' => 'nullable|array',
         ]);
 
+        // Check for employees on leave
+        $employeesOnLeave = [];
+        foreach ($this->newShift['employees'] as $emp) {
+            $empId = is_array($emp) ? $emp['id'] : $emp;
 
-        $employeeId = $this->newShift['employees'][0];
-        $employee = Employee::find($employeeId);
+            foreach ($datesToProcess as $date) {
+                if (hasLeave($empId, $date)) {
+                    $employee = Employee::find($empId);
+                    $employeesOnLeave[] = $employee->full_name . " ($date)";
+                }
+            }
+        }
 
-        if ($employee && $employee->working_hours_restriction) {
-            $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
-
-
-            $usedMinutes = $this->getEmployeeWeeklyMinutesExcludingShift(
-                $employeeId,
-                $this->selectedDate,
-                $this->editingShiftDateId
-            );
-
-
-            $newShiftMinutes = $this->getShiftWorkingMinutes(
-                $this->newShift['start_time'],
-                $this->newShift['end_time'],
-                $this->newBreaks ?? []
-            );
+        if ($employeesOnLeave) {
+            $display = implode(', ', array_slice($employeesOnLeave, 0, 3));
+            if (count($employeesOnLeave) > 3) $display .= ' ...';
+            $this->toast("Employees on leave: $display", 'error');
+            return;
+        }
 
 
-            if ($usedMinutes + $newShiftMinutes > $weeklyLimitMinutes) {
-                $this->toast("Weekly limit of {$employee->max_weekly_hours} hours for {$employee->full_name} will be exceeded", 'error');
+        foreach ($this->newShift['employees'] as $empId) {
+            $employeeId = is_array($empId) ? $empId['id'] : $empId;
+            $employee = Employee::find($employeeId);
+
+            if ($employee && $employee->working_hours_restriction) {
+                $weeklyLimitMinutes = ($employee->max_weekly_hours ?? 0) * 60;
+
+                $weeklyMinutes = [];
+                foreach ($datesToProcess as $date) {
+                    $weekKey = Carbon::parse($date)->startOfWeek()->format('Y-m-d');
+                    if (!isset($weeklyMinutes[$weekKey])) {
+                        $weeklyMinutes[$weekKey] = 0;
+                    }
+                    $weeklyMinutes[$weekKey] += $this->getShiftWorkingMinutes(
+                        $this->newShift['start_time'],
+                        $this->newShift['end_time'],
+                        $this->newBreaks ?? []
+                    );
+                }
+
+                foreach ($weeklyMinutes as $weekStart => $newMinutes) {
+                    $usedMinutes = $this->getEmployeeWeeklyMinutesExcludingShift(
+                        $employeeId,
+                        $weekStart,
+                        $this->editingShiftDateId
+                    );
+
+                    if ($usedMinutes + $newMinutes > $weeklyLimitMinutes) {
+                        $weekEnd = Carbon::parse($weekStart)->endOfWeek()->format('Y-m-d');
+                        $this->toast("Weekly limit of {$employee->max_weekly_hours} hours for {$employee->full_name} ($weekStart to $weekEnd) will be exceeded", 'error');
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Check for conflicts (only if not skipped)
+        if (!$this->skipConflictCheck) {
+            $allConflicts = [];
+            foreach ($datesToProcess as $date) {
+
+                if ($date == $this->selectedDate && $this->editingShiftDateId) {
+                    continue;
+                }
+                $conflicts = $this->getConflicts($date, $this->newShift['employees']);
+                if ($conflicts->isNotEmpty()) {
+                    $allConflicts[$date] = $conflicts;
+                }
+            }
+
+            if (!empty($allConflicts)) {
+                $this->conflictData = $allConflicts;
+                $this->dispatch('show-conflict-modal');
+
                 return;
             }
         }
 
 
-        $shiftDate = ShiftDate::findOrFail($this->editingShiftDateId);
+        $originalShiftDate = ShiftDate::findOrFail($this->editingShiftDateId);
+        $originalDate = $originalShiftDate->date;
+        $shiftId = $originalShiftDate->shift_id;
 
 
-        $shiftDate->update([
-            'date' => $this->selectedDate,
-            'start_time' => $this->newShift['start_time'],
-            'end_time' => $this->newShift['end_time'],
-            'total_hours' => $this->newShift['total_hours'],
-        ]);
+        foreach ($datesToProcess as $date) {
 
-        $shiftDate->shift->update([
-            'title' => $this->newShift['title'],
-            'job' => $this->newShift['job'],
-            'color' => $this->newShift['color'],
-            'address' => $this->newShift['address'],
-            'note' => $this->newShift['note'],
-        ]);
+            if ($date == $originalDate) {
+                continue;
+            }
 
+            $alreadyAssigned = DB::table('shift_employees')
+                ->join('shift_dates', 'shift_dates.id', '=', 'shift_employees.shift_date_id')
+                ->where('shift_dates.date', $date)
+                ->whereIn('shift_employees.employee_id', $this->newShift['employees'])
+                ->pluck('shift_employees.employee_id')
+                ->toArray();
 
-        $shiftDate->employees()->sync($this->newShift['employees']);
+            if ($alreadyAssigned) {
+                $names = Employee::whereIn('id', $alreadyAssigned)->pluck('f_name')->implode(', ');
+                $this->toast("Employees already assigned on $date: $names", 'error');
 
+                $this->closeAddShiftPanel();
 
-        $shiftDate->breaks()->delete();
-
-
-        if (!empty($this->newBreaks)) {
-            foreach ($this->newBreaks as $break) {
-                if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-                    $shiftDate->breaks()->create([
-                        'title' => $break['name'],
-                        'type' => $break['type'],
-                        'duration' => $break['duration'],
-                    ]);
-                }
+                $this->dispatch('refreshSchedule');
+                return;
             }
         }
 
+
+        if (count($datesToProcess) > 1 || $datesToProcess[0] != $originalDate || $this->isSavedRepeatShift) {
+
+            if (!in_array($originalDate, $datesToProcess)) {
+                $originalShiftDate->employees()->detach();
+                $originalShiftDate->breaks()->delete();
+                $originalShiftDate->delete();
+            } else {
+
+                $datesToProcess = array_filter($datesToProcess, function ($date) use ($originalDate) {
+                    return $date != $originalDate;
+                });
+            }
+
+
+            $shift = Shift::find($shiftId);
+            $shift->update([
+                'title' => $this->newShift['title'],
+                'job' => $this->newShift['job'],
+                'color' => $this->newShift['color'],
+                'address' => $this->newShift['address'],
+                'note' => $this->newShift['note'],
+            ]);
+
+
+            foreach ($datesToProcess as $date) {
+                $existingShiftDate = ShiftDate::where('shift_id', $shiftId)
+                    ->where('date', $date)
+                    ->first();
+
+                if ($existingShiftDate) {
+
+                    $existingShiftDate->update([
+                        'start_time' => $this->newShift['start_time'],
+                        'end_time' => $this->newShift['end_time'],
+                        'total_hours' => $this->newShift['total_hours'],
+                    ]);
+                    $existingShiftDate->employees()->sync($this->newShift['employees']);
+
+                    $existingShiftDate->breaks()->delete();
+                    if (!empty($this->newBreaks)) {
+                        foreach ($this->newBreaks as $break) {
+                            if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                                $existingShiftDate->breaks()->create([
+                                    'title' => $break['name'],
+                                    'type' => $break['type'],
+                                    'duration' => $break['duration'],
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+
+                    $shiftDate = ShiftDate::create([
+                        'shift_id' => $shiftId,
+                        'date' => $date,
+                        'start_time' => $this->newShift['start_time'],
+                        'end_time' => $this->newShift['end_time'],
+                        'total_hours' => $this->newShift['total_hours'],
+                    ]);
+
+                    $shiftDate->employees()->attach($this->newShift['employees']);
+
+                    if (!empty($this->newBreaks)) {
+                        foreach ($this->newBreaks as $break) {
+                            if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                                $shiftDate->breaks()->create([
+                                    'title' => $break['name'],
+                                    'type' => $break['type'],
+                                    'duration' => $break['duration'],
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+
+            $shiftDate = $originalShiftDate;
+
+            $shiftDate->update([
+                'date' => $this->selectedDate,
+                'start_time' => $this->newShift['start_time'],
+                'end_time' => $this->newShift['end_time'],
+                'total_hours' => $this->newShift['total_hours'],
+            ]);
+
+            $shiftDate->shift->update([
+                'title' => $this->newShift['title'],
+                'job' => $this->newShift['job'],
+                'color' => $this->newShift['color'],
+                'address' => $this->newShift['address'],
+                'note' => $this->newShift['note'],
+            ]);
+
+            $shiftDate->employees()->sync($this->newShift['employees']);
+
+            $shiftDate->breaks()->delete();
+
+            if (!empty($this->newBreaks)) {
+                foreach ($this->newBreaks as $break) {
+                    if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
+                        $shiftDate->breaks()->create([
+                            'title' => $break['name'],
+                            'type' => $break['type'],
+                            'duration' => $break['duration'],
+                        ]);
+                    }
+                }
+            }
+        }
 
         $this->isEditableShift = false;
         $this->editingShiftDateId = null;
         $this->editingEmployeeId = null;
         $this->closeAddShiftPanel();
         $this->cancelRepeatShift();
+        $this->selectedDates = [];
+        $this->hasMultipleDates = false;
+        $this->isSavedRepeatShift = false;
+        $this->skipConflictCheck = false;
         $this->loadShifts();
         $this->dispatch('refreshSchedule');
-        $this->toast('Shift Updated Successfully!', 'success');
+        $this->toast('Shift Updated Successfully for ' . count($datesToProcess) . ' date(s)!', 'success');
     }
 
 

@@ -19,20 +19,23 @@
         <!-- Right Side (All Buttons) -->
         <div class="d-flex gap-2 align-items-center">
 
-            <button class="btn btn-outline-primary btn-sm"
-                    wire:click="loadWeeklyTemplates"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loadWeekTemplateModal"
-                    title="Load weekly template">
-                <i class="fas fa-download me-1"></i> Import Week
-            </button>
+            @if ($viewMode === 'weekly')
+                <button class="btn btn-outline-primary btn-sm"
+                        wire:click="loadWeeklyTemplates"
+                        data-bs-toggle="modal"
+                        data-bs-target="#loadWeekTemplateModal"
+                        title="Load weekly template">
+                    <i class="fas fa-download me-1"></i> Import Week
+                </button>
 
-            <button class="btn btn-outline-success btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#saveWeekTemplateModal"
-                    title="Save current week as template">
-                <i class="fas fa-save me-1"></i> Save Week
-            </button>
+                <button class="btn btn-outline-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#saveWeekTemplateModal"
+                        title="Save current week as template">
+                    <i class="fas fa-save me-1"></i> Save Week
+                </button>
+            @endif
+
 
             <div class="dropdown">
                 <button class="btn btn-primary btn-sm dropdown-toggle"

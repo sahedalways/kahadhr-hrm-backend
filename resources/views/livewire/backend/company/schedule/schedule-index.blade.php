@@ -11,39 +11,58 @@
 
 <div class="schedule-app {{ $viewMode === 'weekly' ? 'min-width-weekly' : '' }}">
 
-    <div class="d-flex justify-content-between align-items-center ms-3 mt-2">
+    <div class="d-flex justify-content-between align-items-center ms-3 mt-2 mb-2">
+
 
         <h5 class="fw-bold mb-0">Schedule</h5>
 
+        <!-- Right Side (All Buttons) -->
+        <div class="d-flex gap-2 align-items-center">
 
-        <div class="dropdown mb-0">
-            <button class="btn btn-primary dropdown-toggle"
-                    type="button"
-                    id="downloadDropdown"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                <i class="fas fa-download me-1"></i> Download
+            <button class="btn btn-outline-primary btn-sm"
+                    wire:click="loadWeeklyTemplates"
+                    data-bs-toggle="modal"
+                    data-bs-target="#loadWeekTemplateModal"
+                    title="Load weekly template">
+                <i class="fas fa-download me-1"></i> Import Week
             </button>
-            <ul class="dropdown-menu"
-                aria-labelledby="downloadDropdown">
-                <li>
-                    <a class="dropdown-item"
-                       href="#"
-                       wire:click.prevent="downloadSchedulePDF">
-                        <i class="fas fa-file-pdf me-1"></i> PDF
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item"
-                       href="#"
-                       id="downloadScheduleImg">
-                        <i class="fas fa-image me-1"></i> Image
-                    </a>
-                </li>
-            </ul>
+
+            <button class="btn btn-outline-success btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#saveWeekTemplateModal"
+                    title="Save current week as template">
+                <i class="fas fa-save me-1"></i> Save Week
+            </button>
+
+            <div class="dropdown">
+                <button class="btn btn-primary btn-sm dropdown-toggle"
+                        type="button"
+                        id="downloadDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fas fa-download me-1"></i> Download
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end"
+                    aria-labelledby="downloadDropdown">
+                    <li>
+                        <a class="dropdown-item"
+                           href="#"
+                           wire:click.prevent="downloadSchedulePDF">
+                            <i class="fas fa-file-pdf me-1"></i> PDF
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                           href="#"
+                           id="downloadScheduleImg">
+                            <i class="fas fa-image me-1"></i> Image
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
         </div>
     </div>
-
     <div class="shadow-sm overflow-y-auto">
 
         <div class=" p-0 position-relative">
@@ -70,6 +89,9 @@
             min-width: max-content;
         }
     </style>
+
+    @include('livewire.backend.company.schedule.partials.save-week-template-modal')
+    @include('livewire.backend.company.schedule.partials.load-week-template-modal')
 </div>
 
 

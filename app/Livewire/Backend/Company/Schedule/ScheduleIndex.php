@@ -9,6 +9,7 @@ use App\Models\Shift;
 use App\Models\ShiftBreak;
 use App\Models\ShiftDate;
 use App\Models\ShiftTemplates;
+use App\Models\WeeklyTemplate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -92,6 +93,253 @@ class ScheduleIndex extends BaseComponent
     public $selectedDates = [];
     public $selectedDateDisplay = '';
     public $hasMultipleDates = false;
+
+
+    public $weeklyTemplates = [];
+    public $showSaveWeekTemplateModal = false;
+    public $showLoadWeekTemplateModal = false;
+    public $newTemplateName = '';
+    public $newTemplateDescription = '';
+    public $selectedTemplateId = null;
+
+
+    public function saveWeekAsTemplate()
+    {
+        $this->validate([
+            'newTemplateName' => 'required|string|max:255',
+        ]);
+
+
+        $weekData = [];
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        foreach ($this->employees as $employee) {
+            $employeeData = [
+                'id' => $employee->id,
+                'name' => $employee->full_name,
+                'shifts' => []
+            ];
+
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $dateKey = $date->format('Y-m-d');
+                $shiftContent = $this->getCellContent($employee->id, $dateKey);
+
+                if ($shiftContent && $shiftContent['type'] === 'Shift') {
+                    $timeRange = $shiftContent['time'] ?? null;
+
+                    $startTime = null;
+                    $endTime = null;
+
+                    if ($timeRange) {
+                        [$start, $end] = explode(' - ', $timeRange);
+
+                        $startTime = Carbon::createFromFormat('g:i A', trim($start))->format('H:i');
+                        $endTime   = Carbon::createFromFormat('g:i A', trim($end))->format('H:i');
+                    }
+
+
+                    $employeeData['shifts'][] = [
+                        'date' => $dateKey,
+                        'day_of_week' => $date->format('l'),
+                        'shift_id' => $shiftContent['id'],
+                        'title' => $shiftContent['title'],
+                        'start_time' => $startTime,
+                        'end_time'   => $endTime,
+                        'total_hours'   => $shiftContent['total_hours'] ?? null,
+                        'color' => $shiftContent['color'],
+                        'address' => $shiftContent['shift']['address'] ?? null,
+                        'note' => $shiftContent['shift']['note'] ?? null,
+                        'breaks' => $shiftContent['breaks'] ?? [],
+                    ];
+                }
+            }
+
+            if (!empty($employeeData['shifts'])) {
+                $weekData['employees'][] = $employeeData;
+            }
+        }
+
+        $weekData['week_days'] = $this->weekDays;
+        $weekData['start_date'] = $startDate->format('Y-m-d');
+        $weekData['end_date'] = $endDate->format('Y-m-d');
+
+        WeeklyTemplate::create([
+            'company_id' => $this->company_id,
+            'name' => $this->newTemplateName,
+            'description' => $this->newTemplateDescription,
+            'template_data' => $weekData,
+        ]);
+
+        $this->toast('Weekly template saved successfully!', 'success');
+        $this->showSaveWeekTemplateModal = false;
+        $this->newTemplateName = '';
+        $this->dispatch('closemodal');
+        $this->newTemplateDescription = '';
+        $this->loadWeeklyTemplates();
+    }
+
+
+
+
+    public function hasCurrentWeekShifts()
+    {
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        $shiftCount = ShiftDate::whereBetween('date', [$startDate, $endDate])
+            ->whereHas('shift', function ($q) {
+                $q->where('company_id', $this->company_id);
+            })
+            ->count();
+
+        return $shiftCount > 0;
+    }
+
+
+    public function getCurrentWeekShiftCount()
+    {
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        return ShiftDate::whereBetween('date', [$startDate, $endDate])
+            ->whereHas('shift', function ($q) {
+                $q->where('company_id', $this->company_id);
+            })
+            ->count();
+    }
+
+
+    public function confirmApplyWeeklyTemplate($templateId)
+    {
+        $template = WeeklyTemplate::findOrFail($templateId);
+        $shiftCount = $this->getCurrentWeekShiftCount();
+
+        if ($shiftCount > 0) {
+            $this->dispatch('show-confirm-template-modal', [
+                'templateId' => $templateId,
+                'templateName' => $template->name,
+                'shiftCount' => $shiftCount,
+                'dateRange' => $this->displayDateRange
+            ]);
+        } else {
+            $this->applyWeeklyTemplate($templateId);
+        }
+    }
+
+
+
+
+    public function loadWeeklyTemplates()
+    {
+        $this->weeklyTemplates = WeeklyTemplate::where('company_id', $this->company_id)
+            ->orderBy('created_at', 'desc')
+            ->take($this->perPage)
+            ->get();
+
+        $this->loaded = count($this->weeklyTemplates);
+    }
+
+
+    public function applyWeeklyTemplate($templateId)
+    {
+        $template = WeeklyTemplate::findOrFail($templateId);
+        $weekData = $template->template_data;
+
+
+        $this->clearCurrentWeekShifts();
+
+
+        foreach ($weekData['employees'] ?? [] as $employeeData) {
+            foreach ($employeeData['shifts'] ?? [] as $shiftData) {
+
+                $targetDate = $this->getTargetDateForDay($shiftData['day_of_week']);
+
+                if ($targetDate) {
+                    $this->createShiftFromTemplate($employeeData['id'], $targetDate, $shiftData);
+                }
+            }
+        }
+
+        $this->loadShifts();
+        $this->showLoadWeekTemplateModal = false;
+        $this->toast('Weekly template applied successfully!', 'success');
+    }
+
+
+    private function clearCurrentWeekShifts()
+    {
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        $shiftDates = ShiftDate::whereBetween('date', [$startDate, $endDate])
+            ->whereHas('shift', function ($q) {
+                $q->where('company_id', $this->company_id);
+            })
+            ->get();
+
+        foreach ($shiftDates as $shiftDate) {
+            $shiftDate->employees()->detach();
+            $shiftDate->breaks()->delete();
+            $shiftDate->delete();
+        }
+
+
+        Shift::whereDoesntHave('dates')->delete();
+    }
+
+
+    private function getTargetDateForDay($dayOfWeek)
+    {
+        $startDate = Carbon::parse($this->startDate);
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $targetDayIndex = array_search($dayOfWeek, $days);
+        $currentDayIndex = $startDate->dayOfWeekIso - 1;
+
+        $diff = $targetDayIndex - $currentDayIndex;
+        return $startDate->copy()->addDays($diff)->format('Y-m-d');
+    }
+
+
+    private function createShiftFromTemplate($employeeId, $date, $shiftData)
+    {
+
+        $shift = Shift::firstOrCreate([
+            'company_id' => $this->company_id,
+            'title' => $shiftData['title'],
+            'job' => $shiftData['job'] ?? '',
+            'color' => $shiftData['color'],
+            'address' => $shiftData['address'] ?? '',
+            'note' => $shiftData['note'] ?? '',
+        ]);
+
+
+        $shiftDate = $shift->dates()->create([
+            'date' => $date,
+            'start_time' => $shiftData['start_time'] ?? '09:00',
+            'end_time' => $shiftData['end_time'] ?? '17:00',
+            'total_hours' => $shiftData['total_hours'] ?? '08:00',
+        ]);
+
+
+        $shiftDate->employees()->attach($employeeId);
+
+        foreach ($shiftData['breaks'] ?? [] as $break) {
+            $shiftDate->breaks()->create([
+                'title' => $break['title'],
+                'type' => $break['type'],
+                'duration' => $break['duration'],
+            ]);
+        }
+    }
+
+
+    public function deleteWeeklyTemplate($id)
+    {
+        WeeklyTemplate::findOrFail($id)->delete();
+        $this->loadWeeklyTemplates();
+        $this->toast('Template deleted successfully!', 'success');
+    }
 
 
 
@@ -222,10 +470,17 @@ class ScheduleIndex extends BaseComponent
     }
 
 
+    public function loadMoreWeeklyTemplates()
+    {
+        $this->perPage += 4;
+        $this->loadWeeklyTemplates();
+    }
+
+
 
     public function loadMore()
     {
-        $this->perPage += 10;
+        $this->perPage += 4;
         $this->templates = ShiftTemplates::where('company_id', $this->company_id)
             ->orderBy('created_at', 'desc')
             ->take($this->perPage)
@@ -1980,6 +2235,7 @@ class ScheduleIndex extends BaseComponent
                             Carbon::parse($shiftDate['end_time'])->format('g:i A'),
 
                         'employees' => $shiftDate['employees'] ?? [],
+                        'total_hours' => $shiftDate['total_hours'] ?? [],
                         'shift' => [
                             'address' => $shiftDate['shift']['address'] ?? '-',
                             'note'    => $shiftDate['shift']['note'] ?? '-',
@@ -2024,7 +2280,23 @@ class ScheduleIndex extends BaseComponent
         $shiftCount   = 0;
         $userIds      = [];
 
+
+        $start = $this->startDate instanceof Carbon
+            ? $this->startDate
+            : Carbon::parse($this->startDate);
+        $end = $this->endDate instanceof Carbon
+            ? $this->endDate
+            : Carbon::parse($this->endDate);
+
         foreach ($this->calendarShifts as $dateKey => $shifts) {
+
+            $date = Carbon::parse($dateKey);
+
+
+            if ($date->lt($start) || $date->gt($end)) {
+                continue;
+            }
+
             foreach ($shifts as $row) {
 
                 $employeeCount = count($row['employees'] ?? []);

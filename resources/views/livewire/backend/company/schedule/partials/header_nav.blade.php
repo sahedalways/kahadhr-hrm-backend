@@ -1,39 +1,50 @@
 <div class=" bg-white d-flex justify-content-between align-items-center py-2">
     <div class="d-flex align-items-center gap-3">
 
-        <div class="dropdown me-1" >
-            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
+
+
+        <div class="dropdown me-1">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
                 {{ $viewMode === 'weekly' ? 'Week' : 'Month' }}
             </button>
-            <ul class="dropdown-menu" >
+            <ul class="dropdown-menu">
                 <li>
-                    <a class="dropdown-item @if ($viewMode === 'weekly') active @endif" href="#"
-                        wire:click="setViewMode('weekly')">Week</a>
+                    <a class="dropdown-item @if ($viewMode === 'weekly') active @endif"
+                       href="#"
+                       wire:click="setViewMode('weekly')">Week</a>
                 </li>
                 <li>
-                    <a class="dropdown-item @if ($viewMode === 'monthly') active @endif" href="#"
-                        wire:click="setViewMode('monthly')">Month</a>
+                    <a class="dropdown-item @if ($viewMode === 'monthly') active @endif"
+                       href="#"
+                       wire:click="setViewMode('monthly')">Month</a>
                 </li>
             </ul>
         </div>
 
         <div class="d-flex align-items-center border rounded p-2 flex-wrap justify-content-center gap-2">
 
-            <button wire:click="goToPrevious" class="btn btn-sm btn-link text-dark p-0 me-2">
+            <button wire:click="goToPrevious"
+                    class="btn btn-sm btn-link text-dark p-0 me-2">
                 <i class="fas fa-chevron-left"></i>
             </button>
 
             <span class="fw-bold text-nowrap">{{ $this->displayDateRange }}</span>
 
-            <button wire:click="goToNext" class="btn btn-sm btn-link text-dark p-0 ms-2">
+            <button wire:click="goToNext"
+                    class="btn btn-sm btn-link text-dark p-0 ms-2">
                 <i class="fas fa-chevron-right"></i>
             </button>
 
 
 
-            <button class="btn btn-sm btn-outline-primary ms-3" title="Add multiple shift" data-bs-toggle="modal"
-                data-bs-target="#customAddMultipleShiftModal" wire:click="clickMultipleShiftModal">
+            <button class="btn btn-sm btn-outline-primary ms-3"
+                    title="Add multiple shift"
+                    data-bs-toggle="modal"
+                    data-bs-target="#customAddMultipleShiftModal"
+                    wire:click="clickMultipleShiftModal">
                 <i class="fas fa-layer-group me-1"></i>
                 Add Multiple Shift
             </button>

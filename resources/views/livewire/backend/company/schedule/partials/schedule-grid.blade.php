@@ -294,11 +294,19 @@
                                            style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
                                         <input type="text"
                                                class="form-control form-control-sm ps-5"
-                                               placeholder="Search by name or role..."
+                                               placeholder="Search by name..."
                                                aria-label="Search employees"
                                                wire:model.live="search"
                                                wire:keyup.debounce.300ms="set('search', $event.target.value)"
                                                style="border-radius: 20px; background-color: #f8f9fa; border: 1px solid #e9ecef;">
+
+                                        <div wire:loading
+                                             wire:target="search"
+                                             class="text-center py-3">
+                                            <div class="spinner-border spinner-border-sm text-primary"
+                                                 role="status"></div>
+                                            <span class="ms-2 text-muted">Searching...</span>
+                                        </div>
 
                                         @if ($search)
                                             <button wire:click="set('search', '')"
@@ -337,7 +345,8 @@
                                      class="rounded-circle me-2"
                                      style="width: 32px; height: 32px; object-fit: cover;">
                                 <div>
-                                    <div class="fw-semibold">{{ $employee['f_name'] }} {{ $employee['l_name'] }}
+                                    <div class="fw-semibold">
+                                        {{ \Illuminate\Support\Str::limit($employee['f_name'] . ' ' . $employee['l_name'], 30, '...') }}
                                     </div>
                                     <small class="text-muted">{{ ucfirst($employee['role'] ?? 'Employee') }}</small>
                                 </div>

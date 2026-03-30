@@ -2400,8 +2400,6 @@ class ScheduleIndex extends BaseComponent
         $calendarShifts = $this->calendarShifts;
         $viewMode = $this->viewMode;
 
-
-
         $weeks = [];
 
         if ($viewMode === 'monthly') {
@@ -2430,24 +2428,33 @@ class ScheduleIndex extends BaseComponent
             }
         }
 
+        $employeesWithShifts = $employees->filter(function ($employee) use ($calendarShiftsByEmployee) {
+            return isset($calendarShiftsByEmployee[$employee->id]) && !empty($calendarShiftsByEmployee[$employee->id]);
+        });
+
+
+        $startDate = Carbon::parse($this->startDate ?? now())->format('Y-m-d');
+        $endDate = Carbon::parse($this->endDate ?? now())->format('Y-m-d');
+
         $pdf = Pdf::loadView('livewire.backend.company.schedule.schedule-pdf', [
-            'employees' => $employees,
+            'employees' => $employeesWithShifts,
             'weekDays' => $weekDays,
             'calendarShifts' => $calendarShiftsByEmployee,
             'viewMode' => $viewMode,
-            'weeks' => $weeks
+            'weeks' => $weeks,
+            'startDate' => $startDate,
+            'endDate' => $endDate
         ])->setPaper('a4', 'landscape');
 
-        $startDate = Carbon::parse($this->startDate ?? now())->format('d F');
-        $endDate   = Carbon::parse($this->endDate ?? now())->format('d F');
+        $startDateFormatted = Carbon::parse($startDate)->format('d F Y');
+        $endDateFormatted = Carbon::parse($endDate)->format('d F Y');
 
-        $filename = 'schedule_all_employees_' . "_{$startDate}_to_{$endDate}.pdf";
+        $filename = 'schedule_all_employees_' . "_{$startDateFormatted}_to_{$endDateFormatted}.pdf";
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, $filename);
     }
-
 
 
     private function getShiftWorkingMinutes($startTime, $endTime, $breaks): int

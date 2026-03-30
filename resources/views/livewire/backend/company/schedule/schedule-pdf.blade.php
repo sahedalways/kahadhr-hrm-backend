@@ -1,107 +1,156 @@
+<?php
+// Set headers at the very beginning
+header('Content-Type: text/html; charset=utf-8');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Schedule PDF</title>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language"
+          content="en">
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif;
-            font-size: 12px;
+            font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif;
+            font-size: 10px;
+            color: #333;
         }
 
         table {
-            border-collapse: collapse;
             width: 100%;
-            margin-bottom: 20px;
-            page-break-inside: auto;
-            /* allow table to break across pages */
+            border-collapse: collapse;
+            table-layout: fixed;
         }
 
         th,
         td {
-            border: 1px solid #333;
-            padding: 4px;
+            border: 1px solid #e0e0e0;
+            padding: 8px;
             text-align: center;
-            page-break-inside: avoid;
-            /* keep cell content together */
-            page-break-after: auto;
+            vertical-align: top;
         }
 
-        th {
-            background-color: #f0f0f0;
+        .emp-column {
+            width: 120px;
+            text-align: left;
+            background-color: #f9f9f9;
+            font-weight: bold;
         }
 
-        .shift-block {
+        thead th {
+            background-color: #f1f4f9;
+            color: #3366ff;
+            padding: 10px 5px;
+        }
+
+        .shift-box {
+            background-color: #000;
             color: #fff;
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-size: 10px;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 8px;
             margin-bottom: 2px;
-            display: inline-block;
-            page-break-inside: avoid;
-            /* keep shift together */
+            text-align: left;
         }
 
-        h3 {
-            margin-bottom: 10px;
+        .shift-title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
         }
 
-        /* Removed page-break-after: always */
+        /* Ensure proper character rendering */
+        .utf8-safe {
+            unicode-bidi: embed;
+            direction: ltr;
+        }
+
+        .schedule-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .schedule-header h2 {
+            margin-bottom: 5px;
+            color: #3366ff;
+        }
+
+        .schedule-header .date-range {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
 <body>
-    @foreach ($employees as $employee)
-        <h3>Schedule for {{ $employee->full_name }}</h3>
+    <div class="schedule-header">
+        <h2>Employee Schedule</h2>
+        <div class="date-range">
+            <strong>Schedule Period:</strong>
+            {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }}
+            to
+            {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}
+        </div>
+    </div>
 
-        @php
-            $displayDates = $viewMode === 'weekly' ? $weekDays : [];
-            if ($viewMode !== 'weekly') {
-                foreach ($weeks as $week) {
-                    foreach ($week as $day) {
-                        $displayDates[] = [
-                            'full_date' => $day->format('Y-m-d'),
-                            'day' => $day->format('D'),
-                            'date' => $day->format('d/m'),
-                        ];
-                    }
-                }
-            }
-
-            $empShifts = $calendarShifts[$employee->id] ?? [];
-        @endphp
-
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th class="emp-column">EMPLOYEES</th>
+                @foreach ($weekDays as $day)
+                    <th>
+                        {{ $day['day'] ?? '' }}<br>
+                        <span style="font-weight: normal; color: #666;">{{ $day['date'] ?? '' }}</span>
+                    </th>
+                @endforeach
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($employees as $employee)
                 <tr>
-                    @foreach ($displayDates as $day)
-                        <th>{{ $day['day'] }}<br>{{ $day['date'] }}</th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    @foreach ($displayDates as $day)
+                    <td class="emp-column utf8-safe">
+                        {{ $employee->full_name ?? 'N/A' }}<br>
+                        <small style="font-weight: normal; color: #888;">Employee</small>
+                    </td>
+
+                    @foreach ($weekDays as $day)
                         @php
-                            $dateKey = $day['full_date'];
-                            $shifts = $empShifts[$dateKey] ?? [];
+                            $dateKey = $day['full_date'] ?? '';
+                            $shifts = isset($calendarShifts[$employee->id][$dateKey])
+                                ? $calendarShifts[$employee->id][$dateKey]
+                                : [];
                         @endphp
-                        <td>
-                            @foreach ($shifts as $shift)
-                                <div class="shift-block"
-                                     style="background-color: {{ $shift['shift']['color'] ?? '#6c757d' }}">
-                                    {{ $shift['shift']['title'] }}<br>
-                                    {{ \Carbon\Carbon::parse($shift['start_time'])->format('g:i A') }} -
-                                    {{ \Carbon\Carbon::parse($shift['end_time'])->format('g:i A') }}
-                                </div>
-                            @endforeach
+                        <td class="utf8-safe">
+                            @if (!empty($shifts))
+                                @foreach ($shifts as $shift)
+                                    @php
+                                        $shiftTitle = isset($shift['shift']['title'])
+                                            ? htmlspecialchars($shift['shift']['title'], ENT_QUOTES, 'UTF-8')
+                                            : 'Shift';
+                                        $startTime = isset($shift['start_time'])
+                                            ? \Carbon\Carbon::parse($shift['start_time'])->format('g:i A')
+                                            : '';
+                                        $endTime = isset($shift['end_time'])
+                                            ? \Carbon\Carbon::parse($shift['end_time'])->format('g:i A')
+                                            : '';
+                                    @endphp
+                                    <div class="shift-box">
+                                        <span class="shift-title">{{ $shiftTitle }}</span>
+                                        @if ($startTime && $endTime)
+                                            {{ $startTime }} - {{ $endTime }}
+                                        @endif
+                                    </div>
+                                @endforeach
+                            @endif
                         </td>
                     @endforeach
                 </tr>
-            </tbody>
-        </table>
-    @endforeach
+            @endforeach
+        </tbody>
+    </table>
 </body>
 
 </html>

@@ -2170,9 +2170,13 @@ class ScheduleIndex extends BaseComponent
 
     public function loadShifts()
     {
+        $startDate = $this->startDate instanceof Carbon ? $this->startDate : Carbon::parse($this->startDate);
+        $endDate = $this->endDate instanceof Carbon ? $this->endDate : Carbon::parse($this->endDate);
+
         $this->calendarShifts = ShiftDate::whereHas('shift', function ($q) {
             $q->where('company_id', $this->company_id);
         })
+            ->whereBetween('date', [$startDate, $endDate])
             ->with([
                 'shift:id,title,color,address,note',
                 'employees:id,f_name,l_name',

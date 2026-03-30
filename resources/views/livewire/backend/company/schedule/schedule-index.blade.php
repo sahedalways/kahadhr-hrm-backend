@@ -76,10 +76,20 @@
                 @if ($viewMode === 'weekly')
                     @include('livewire.backend.company.schedule.partials.sidebar')
                 @endif
+                @if ($isLoading)
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"
+                             role="status">
+                            <span class="visually-hidden">Loading shifts...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading schedule data...</p>
+                    </div>
+                @else
+                    <div class="w-100">
+                        @include('livewire.backend.company.schedule.partials.schedule-grid')
+                    </div>
+                @endif
 
-                <div class="w-100">
-                    @include('livewire.backend.company.schedule.partials.schedule-grid')
-                </div>
             </div>
         </div>
 
@@ -124,6 +134,50 @@
             link.download = 'schedule.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('livewire:init', function() {
+
+        Livewire.on('start-loading-shifts', () => {
+
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'shifts-loading-overlay';
+            loadingOverlay.innerHTML = `
+            <div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                 style="background: rgba(0,0,0,0.5); z-index: 9999;">
+                <div class="bg-white p-4 rounded shadow text-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div>Loading shifts...</div>
+                </div>
+            </div>
+        `;
+            document.body.appendChild(loadingOverlay);
+        });
+
+
+        Livewire.on('shifts-loaded', () => {
+            const overlay = document.getElementById('shifts-loading-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        });
+
+
+        Livewire.hook('commit', ({
+            component,
+            commit,
+            respond,
+            fail
+        }) => {
+            if (component.name === 'backend.company.schedule.schedule-index') {
+
+            }
         });
     });
 </script>

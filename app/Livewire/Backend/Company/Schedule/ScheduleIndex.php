@@ -103,7 +103,9 @@ class ScheduleIndex extends BaseComponent
     public $selectedTemplateId = null;
 
 
-
+    public $isLoading = true;
+    public $loadedShifts = [];
+    public $loadedEmployees = [];
 
 
     public function saveWeekAsTemplate()
@@ -912,24 +914,6 @@ class ScheduleIndex extends BaseComponent
     }
 
 
-    protected function loadEmployees()
-    {
-        $query = Employee::where('company_id', $this->company_id)
-            ->whereNotNull('user_id');
-
-        if (!empty($this->employeeSearch)) {
-            $query->where(function ($q) {
-                $q->where('f_name', 'like', '%' . $this->employeeSearch . '%')
-                    ->orWhere('l_name', 'like', '%' . $this->employeeSearch . '%');
-            });
-        }
-
-        $this->employees = $query->orderBy('f_name')->get();
-    }
-
-
-
-
 
 
     protected function loadShiftEmployees()
@@ -1486,8 +1470,6 @@ class ScheduleIndex extends BaseComponent
 
     public function mount()
     {
-
-
         $this->company_id = auth()->user()->company->id;
         $this->loadEmployees();
         $this->shiftEmployees = $this->employees;
@@ -1498,14 +1480,127 @@ class ScheduleIndex extends BaseComponent
         $this->startDate = Carbon::today()->startOfWeek(Carbon::MONDAY);
         $this->endDate = $this->startDate->copy()->endOfWeek(Carbon::SUNDAY);
         $this->currentDate = Carbon::today();
-        $this->loadShifts();
 
-
-        $this->calcCalendarSummary();
+        $this->loadShiftsAsync();
 
         $this->selectedDates = [];
         $this->selectedDateDisplay = '';
         $this->selectedDate = null;
+    }
+
+
+
+
+    public function loadShiftsAsync()
+    {
+        $this->isLoading = true;
+
+
+        $this->dispatch('start-loading-shifts');
+
+
+        $startDate = $this->startDate instanceof Carbon ? $this->startDate : Carbon::parse($this->startDate);
+        $endDate = $this->endDate instanceof Carbon ? $this->endDate : Carbon::parse($this->endDate);
+
+
+        $shifts = ShiftDate::whereHas('shift', function ($q) {
+            $q->where('company_id', $this->company_id);
+        })
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with([
+                'shift:id,title,color,address,note',
+                'employees:id,f_name,l_name',
+                'breaks:id,shift_date_id,title,type,duration'
+            ])
+            ->get();
+
+
+        $this->loadedShifts = $shifts->map(function ($shiftDate) {
+            return [
+                'id' => $shiftDate->id,
+                'date' => $shiftDate->date,
+                'start_time' => $shiftDate->start_time,
+                'end_time' => $shiftDate->end_time,
+                'total_hours' => $shiftDate->total_hours,
+                'shift' => [
+                    'title' => $shiftDate->shift->title ?? null,
+                    'color' => $shiftDate->shift->color ?? '#6c757d',
+                    'address' => $shiftDate->shift->address ?? null,
+                    'note' => $shiftDate->shift->note ?? null,
+                ],
+                'employees' => $shiftDate->employees->map(function ($emp) {
+                    return [
+                        'id' => $emp->id,
+                        'name' => $emp->f_name . ' ' . $emp->l_name,
+                    ];
+                })->values(),
+                'breaks' => $shiftDate->breaks->map(function ($b) {
+                    return [
+                        'title' => $b->title,
+                        'type' => $b->type,
+                        'duration' => $b->duration,
+                    ];
+                })->values(),
+            ];
+        })->groupBy('date')
+            ->map(function ($group) {
+                return $group->values();
+            })
+            ->toArray();
+
+        $this->calendarShifts = $this->loadedShifts;
+        $this->isLoading = false;
+
+        $this->dispatch('shifts-loaded');
+    }
+
+
+    public function loadShifts()
+    {
+        if (!$this->isLoading) {
+            $this->loadShiftsAsync();
+        }
+    }
+
+    protected function loadEmployees()
+    {
+        $this->employees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name')
+            ->get(['id', 'f_name', 'l_name', 'role']);
+    }
+
+    // getCellContent মেথড আপডেট করুন
+    public function getCellContent($employeeId, $date)
+    {
+        if (empty($this->calendarShifts[$date])) {
+            return null;
+        }
+
+        foreach ($this->calendarShifts[$date] as $shiftDate) {
+            foreach ($shiftDate['employees'] as $employee) {
+                if ($employee['id'] == $employeeId) {
+                    return [
+                        'type' => 'Shift',
+                        'id' => $shiftDate['id'],
+                        'title' => $shiftDate['shift']['title'],
+                        'color' => $shiftDate['shift']['color'],
+                        'time' => Carbon::parse($shiftDate['start_time'])->format('g:i A')
+                            . ' - ' .
+                            Carbon::parse($shiftDate['end_time'])->format('g:i A'),
+                        'employees' => $shiftDate['employees'],
+                        'total_hours' => $shiftDate['total_hours'],
+                        'shift' => [
+                            'address' => $shiftDate['shift']['address'] ?? '-',
+                            'note' => $shiftDate['shift']['note'] ?? '-',
+                        ],
+                        'breaks' => $shiftDate['breaks'],
+                    ];
+                }
+            }
+        }
+
+        return null;
     }
 
 
@@ -2171,92 +2266,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-    public function loadShifts()
-    {
-        $startDate = $this->startDate instanceof Carbon ? $this->startDate : Carbon::parse($this->startDate);
-        $endDate = $this->endDate instanceof Carbon ? $this->endDate : Carbon::parse($this->endDate);
-
-        $this->calendarShifts = ShiftDate::whereHas('shift', function ($q) {
-            $q->where('company_id', $this->company_id);
-        })
-            ->whereBetween('date', [$startDate, $endDate])
-            ->with([
-                'shift:id,title,color,address,note',
-                'employees:id,f_name,l_name',
-                'breaks:id,shift_date_id,title,type,duration'
-            ])
-            ->get()
-            ->map(function ($shiftDate) {
-                return [
-                    'id' => $shiftDate->id,
-                    'date' => $shiftDate->date,
-                    'start_time' => $shiftDate->start_time,
-                    'end_time' => $shiftDate->end_time,
-                    'total_hours'  => $shiftDate->total_hours,
-                    'shift' => [
-                        'title' => $shiftDate->shift->title ?? null,
-                        'color' => $shiftDate->shift->color ?? '#6c757d',
-                        'address' => $shiftDate->shift->address ?? null,
-                        'note' => $shiftDate->shift->note ?? null,
-                    ],
-                    'employees' => $shiftDate->employees->map(function ($emp) {
-                        return [
-                            'id' => $emp->id,
-                            'name' => $emp->f_name . ' ' . $emp->l_name,
-                        ];
-                    })->toArray(),
-                    'breaks' => $shiftDate->breaks->map(function ($b) {
-                        return [
-                            'title' => $b->title,
-                            'type' => $b->type,
-                            'duration' => $b->duration,
-                        ];
-                    })->toArray(),
-                ];
-            })
-            ->groupBy('date')
-            ->toArray();
-    }
-
-
-
-
-    public function getCellContent($employeeId, $date)
-    {
-
-        if (empty($this->calendarShifts[$date])) {
-            return null;
-        }
-
-        foreach ($this->calendarShifts[$date] as $shiftDate) {
-            foreach ($shiftDate['employees'] as $employee) {
-                if ($employee['id'] == $employeeId) {
-                    return [
-                        'type'  => 'Shift',
-                        'id'    => $shiftDate['id'],
-                        'title' => $shiftDate['shift']['title'],
-                        'color' => $shiftDate['shift']['color'],
-                        'time'  =>
-                        Carbon::parse($shiftDate['start_time'])->format('g:i A')
-                            . ' - ' .
-                            Carbon::parse($shiftDate['end_time'])->format('g:i A'),
-
-                        'employees' => $shiftDate['employees'] ?? [],
-                        'total_hours' => $shiftDate['total_hours'] ?? [],
-                        'shift' => [
-                            'address' => $shiftDate['shift']['address'] ?? '-',
-                            'note'    => $shiftDate['shift']['note'] ?? '-',
-                        ],
-                        'breaks'    => $shiftDate['breaks'] ?? [],
-                    ];
-                }
-            }
-        }
-
-        return null;
-    }
-
-
 
     public function dateChanged()
     {
@@ -2279,9 +2288,7 @@ class ScheduleIndex extends BaseComponent
     }
 
 
-
-
-    private function calcCalendarSummary(): array
+    public function calcCalendarSummary(): array
     {
         $totalMinutes = 0;
         $shiftCount   = 0;
@@ -2676,7 +2683,6 @@ class ScheduleIndex extends BaseComponent
             }
         }
 
-        // Check for conflicts (only if not skipped)
         if (!$this->skipConflictCheck) {
             $allConflicts = [];
             foreach ($datesToProcess as $date) {
@@ -2903,6 +2909,7 @@ class ScheduleIndex extends BaseComponent
             'viewMode' => $this->viewMode,
             'employees' => $this->employees,
             'displayDateRange' => $this->displayDateRange,
+            'isLoading' => $this->isLoading,
             'availableMultipleShiftEmployees' => $this->availableMultipleShiftEmployees,
 
             'conflictData' => $this->conflictData ?? collect(),

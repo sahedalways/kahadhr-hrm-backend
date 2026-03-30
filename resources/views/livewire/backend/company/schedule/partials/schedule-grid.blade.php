@@ -7,21 +7,7 @@
     </div>
     <div class="table-responsive">
         <table class="table table-bordered schedule-table m-0">
-            @if ($viewMode === 'weekly')
-                <thead>
-                    <tr class="text-center">
-                        @foreach ($weekDays as $day)
-                            <th class="{{ $day['highlight'] ? 'bg-primary-light text-primary border-bottom-0' : 'bg-light border-bottom-0' }}"
-                                style="width: {{ $viewMode === 'weekly' ? '14.28%' : '3.2%' }}">
-                                @if ($viewMode === 'weekly')
-                                    <div class="fw-bold">{{ $day['day'] }}</div>
-                                    <div class="small">{{ $day['date'] }}</div>
-                                @endif
-                            </th>
-                        @endforeach
-                    </tr>
-                </thead>
-            @endif
+
 
             <tbody>
                 @if ($viewMode === 'monthly')
@@ -286,256 +272,350 @@
                         </table>
                     </div>
                 @else
-                    @foreach ($employees as $employee)
-                        <tr>
+                    <thead>
+                        <tr class="text-center">
+                            <th class="bg-light border-bottom-0 align-middle"
+                                style="width: 280px; min-width: 280px; vertical-align: top;">
+                                <div class="d-flex flex-column gap-2">
+                                    {{-- Header Title --}}
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="fw-bold text-dark">
+                                            <i class="fas fa-users me-2 text-primary"></i>Employees
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill"
+                                              id="employeeCount">
+                                            {{ count($employees) }}
+                                        </span>
+                                    </div>
 
+                                    {{-- Search Input --}}
+                                    <div class="position-relative">
+                                        <i class="fas fa-search position-absolute text-muted"
+                                           style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
+                                        <input type="text"
+                                               class="form-control form-control-sm ps-5"
+                                               placeholder="Search by name or role..."
+                                               aria-label="Search employees"
+                                               wire:model.live="search"
+                                               wire:keyup.debounce.300ms="set('search', $event.target.value)"
+                                               style="border-radius: 20px; background-color: #f8f9fa; border: 1px solid #e9ecef;">
+
+                                        @if ($search)
+                                            <button wire:click="set('search', '')"
+                                                    class="btn btn-link btn-sm position-absolute text-muted"
+                                                    style="right: 8px; top: 50%; transform: translateY(-50%); padding: 0; text-decoration: none;">
+                                                <i class="fas fa-times-circle"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+
+
+                                </div>
+                            </th>
                             @foreach ($weekDays as $day)
+                                <th class="{{ $day['highlight'] ? 'bg-primary-light text-primary border-bottom-0' : 'bg-light border-bottom-0' }}"
+                                    style="width: 14.28%">
+                                    <div class="fw-bold">{{ $day['day'] }}</div>
+                                    <div class="small">{{ $day['date'] }}</div>
+                                </th>
+                            @endforeach
+                        </tr>
+                    </thead>
+            <tbody>
+
+
+                @forelse ($employees as $employee)
+                    <tr x-data="employeeScroll()"
+                        @scroll.debounce.100ms="handleScroll"
+                        x-init="init()">
+
+                        <td class="align-middle"
+                            style="background-color: #f8f9fa; width: 120px; min-width: 120px;">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ $employee['avatar_url'] ?? asset('assets/img/default-avatar.png') }}"
+                                     alt="{{ $employee['f_name'] . ' ' . $employee['l_name'] }}"
+                                     class="rounded-circle me-2"
+                                     style="width: 32px; height: 32px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-semibold">{{ $employee['f_name'] }} {{ $employee['l_name'] }}
+                                    </div>
+                                    <small class="text-muted">{{ ucfirst($employee['role'] ?? 'Employee') }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        {{-- Schedule Cells for each day --}}
+                        @foreach ($weekDays as $day)
+                            @php
+                                $content = $this->getCellContent($employee['id'], $day['full_date']);
+                                $hoverKey = $employee['id'] . '_' . $day['full_date'];
+                            @endphp
+                            <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
+                                style="position: relative; vertical-align: middle;"
+                                wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
+                                wire:mouseleave="$set('hoveredCell', null)"
+                                x-data="{ dragging: false }"
+                                x-on:drop.prevent="if ($el.querySelector('.user-select-none')) return; $wire.handleDrop('{{ $day['full_date'] }}', {{ $employee['id'] }})"
+                                x-on:dragover.prevent="dragging = true"
+                                x-on:dragleave="dragging = false"
+                                :class="{ 'bg-light': dragging }">
+
+
                                 @php
-                                    $content = $this->getCellContent($employee['id'], $day['full_date']);
-                                    $hoverKey = $employee['id'] . '_' . $day['full_date'];
+                                    $onLeave = hasLeave($employee['id'], $day['full_date']);
                                 @endphp
-                                <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
-                                    style="position: relative;"
-                                    wire:mouseenter="$set('hoveredCell', '{{ $hoverKey }}')"
-                                    wire:mouseleave="$set('hoveredCell', null)"
-                                    x-data="{ dragging: false }"
-                                    x-on:drop.prevent="if ($el.querySelector('.user-select-none')) return; $wire.handleDrop('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                    x-on:dragover.prevent="dragging = true"
-                                    x-on:dragleave="dragging = false"
-                                    :class="{ 'bg-light': dragging }">
 
-
-                                    @php
-                                        $onLeave = hasLeave($employee['id'], $day['full_date']);
-                                    @endphp
-
-                                    @if ($onLeave)
-                                        {{-- Leave cell --}}
-                                        <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
-                                             style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px;
-                pointer-events: none; ">
-                                            <span class="text-danger small fw-bold px-2">Unavailable</span>
+                                @if ($onLeave)
+                                    {{-- Leave cell --}}
+                                    <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
+                                         style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px;
+            pointer-events: none; min-height: 80px;">
+                                        <span class="text-danger small fw-bold px-2">Unavailable</span>
+                                    </div>
+                                @elseif ($content && $content['type'] === 'Shift')
+                                    <div class="shift-block text-white rounded position-relative shadow-sm p-2"
+                                         style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer; transition: all .25s ease-in-out; min-height: 70px;"
+                                         draggable="true"
+                                         x-on:dragstart="$wire.handleDrag('{{ $day['full_date'] }}', {{ $employee['id'] }}, {{ $content['id'] }})">
+                                        <div class="small fw-bold text-truncate"
+                                             style="max-width: 100%;">
+                                            {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
                                         </div>
-                                    @elseif ($content && $content['type'] === 'Shift')
-                                        <div class="shift-block text-white rounded position-relative shadow-sm p-3"
-                                             style="background-color: {{ $content['color'] ?? '#6c757d' }}; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: all .25s ease-in-out;"
-                                             draggable="true"
-                                             x-on:dragstart="$wire.handleDrag('{{ $day['full_date'] }}', {{ $employee['id'] }}, {{ $content['id'] }})">
-                                            <div class="small fw-bold text-truncate"
-                                                 style="max-width: 100%;">
-                                                {{ \Illuminate\Support\Str::limit($content['title'], 15) }}
-                                            </div>
-                                            <div class="smaller opacity-75">{{ $content['time'] }}</div>
+                                        <div class="smaller opacity-75">{{ $content['time'] }}</div>
 
-                                            {{-- Single trigger + menu --}}
-                                            <div class="shift-dropdown position-absolute"
-                                                 style="top: 0; right: 6px;">
-                                                <button type="button"
-                                                        class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
-                                                    <i class="fa-solid fa-bars"></i>
-                                                </button>
+                                        {{-- Single trigger + menu --}}
+                                        <div class="shift-dropdown position-absolute"
+                                             style="top: 2px; right: 6px;">
+                                            <button type="button"
+                                                    class="btn btn-xs btn-link text-white p-0 shift-menu-btn">
+                                                <i class="fa-solid fa-bars"></i>
+                                            </button>
 
-                                                <ul class="dropdown-schedule-celll d-none"
-                                                    wire:ignore.self>
-                                                    <li>
-                                                        <button class="dropdown-item d-flex align-items-center"
-                                                                type="button"
-                                                                wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                wire:loading.attr="disabled"
-                                                                wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
+                                            <ul class="dropdown-schedule-celll d-none"
+                                                wire:ignore.self>
+                                                <li>
+                                                    <button class="dropdown-item d-flex align-items-center"
+                                                            type="button"
+                                                            wire:click="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})">
 
-                                                            <i class="fas fa-edit fa-fw me-1"
-                                                               wire:loading.remove
-                                                               wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"></i>
+                                                        <i class="fas fa-edit fa-fw me-1"
+                                                           wire:loading.remove
+                                                           wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"></i>
 
-                                                            Edit
+                                                        Edit
 
-                                                            <span wire:loading
-                                                                  wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
-                                                        </button>
-                                                    </li>
+                                                        <span wire:loading
+                                                              wire:target="editOneEmpShift({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                              class="spinner-border spinner-border-sm ms-auto"></span>
+                                                    </button>
+                                                </li>
 
 
 
 
-                                                    <li>
-                                                        <button class="dropdown-item d-flex align-items-center"
-                                                                type="button"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
+                                                <li>
+                                                    <button class="dropdown-item d-flex align-items-center"
+                                                            type="button"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}">
 
-                                                            <i class="fas fa-eye fa-fw me-1"></i>
-                                                            View
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button class="dropdown-item text-danger d-flex align-items-center"
-                                                                type="button"
-                                                                wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                onclick="if(!confirm('Are you sure?')) event.stopImmediatePropagation()"
-                                                                wire:loading.attr="disabled"
-                                                                wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})">
+                                                        <i class="fas fa-eye fa-fw me-1"></i>
+                                                        View
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item text-danger d-flex align-items-center"
+                                                            type="button"
+                                                            wire:click="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                            onclick="if(!confirm('Are you sure?')) event.stopImmediatePropagation()"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})">
 
-                                                            <i class="fas fa-trash-alt fa-fw me-1"
-                                                               wire:loading.remove
-                                                               wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"></i>
+                                                        <i class="fas fa-trash-alt fa-fw me-1"
+                                                           wire:loading.remove
+                                                           wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"></i>
 
-                                                            Delete
+                                                        Delete
 
-                                                            <span wire:loading
-                                                                  wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
-                                                                  class="spinner-border spinner-border-sm ms-auto"></span>
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            {{-- Modal --}}
-
+                                                        <span wire:loading
+                                                              wire:target="deleteShiftOneEmp({{ $content['id'] }}, {{ $employee['id'] }})"
+                                                              class="spinner-border spinner-border-sm ms-auto"></span>
+                                                    </button>
+                                                </li>
+                                            </ul>
                                         </div>
 
-                                        <div class="modal fade"
-                                             id="shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
-                                             tabindex="-1"
-                                             aria-hidden="true"
-                                             wire:ignore.self
-                                             data-bs-backdrop="static"
-                                             data-bs-keyboard="false">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
-                                                    <!-- Header -->
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title text-white mb-0">
-                                                            <i class="fas fa-calendar-check me-2"></i>
-                                                            {{ $content['title'] ?? 'Shift Details' }}
-                                                        </h5>
-                                                        <button type="button"
-                                                                class="btn-close btn-close-white"
-                                                                data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                    </div>
+                                        {{-- Modal --}}
 
-                                                    <!-- Body -->
-                                                    <div class="modal-body">
-                                                        <!-- Time & Address row -->
-                                                        <div class="row mb-3">
-                                                            <div class="col-sm-6">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i class="fas fa-clock text-primary me-2"></i>
-                                                                    <strong>Time:</strong>
-                                                                    <span
-                                                                          class="ms-1">{{ $content['time'] ?? '-' }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i
-                                                                       class="fas fa-map-marker-alt text-primary me-2"></i>
-                                                                    <strong>Address:</strong>
-                                                                    <span
-                                                                          class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
-                                                                </div>
+                                    </div>
+
+                                    <div class="modal fade"
+                                         id="shiftDetailsModal-{{ $employee['id'] }}-{{ \Str::slug($content['title']) }}"
+                                         tabindex="-1"
+                                         aria-hidden="true"
+                                         wire:ignore.self
+                                         data-bs-backdrop="static"
+                                         data-bs-keyboard="false">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <!-- Header -->
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white mb-0">
+                                                        <i class="fas fa-calendar-check me-2"></i>
+                                                        {{ $content['title'] ?? 'Shift Details' }}
+                                                    </h5>
+                                                    <button type="button"
+                                                            class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+
+                                                <!-- Body -->
+                                                <div class="modal-body">
+                                                    <!-- Time & Address row -->
+                                                    <div class="row mb-3">
+                                                        <div class="col-sm-6">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                                <strong>Time:</strong>
+                                                                <span
+                                                                      class="ms-1">{{ $content['time'] ?? '-' }}</span>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Employees -->
-                                                        @if (!empty($content['employees']))
-                                                            @php
-                                                                $employees = collect($content['employees'])
-                                                                    ->pluck('name')
-                                                                    ->toArray();
-                                                                $showLimit = 5;
-                                                                $moreCount = count($employees) - $showLimit;
-                                                            @endphp
-                                                            <div class="d-flex align-items-center mb-3">
-                                                                <i class="fas fa-users text-success me-2"></i>
-                                                                <strong>Employees:</strong>
-                                                                <span class="ms-1">
-                                                                    {{ implode(', ', array_slice($employees, 0, $showLimit)) }}
-                                                                    @if ($moreCount > 0)
-                                                                        <span class="text-muted">+{{ $moreCount }}
-                                                                            more</span>
-                                                                    @endif
-                                                                </span>
+                                                        <div class="col-sm-6">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                                                <strong>Address:</strong>
+                                                                <span
+                                                                      class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
                                                             </div>
-                                                        @endif
+                                                        </div>
+                                                    </div>
 
-                                                        <!-- Note -->
-                                                        @if (!empty($content['shift']['note']))
-                                                            <div class="d-flex align-items-start mb-3">
-                                                                <i class="fas fa-sticky-note text-info me-2 mt-1"></i>
-                                                                <div>
-                                                                    <strong>Note:</strong>
-                                                                    <p class="mb-0">
-                                                                        {{ $content['shift']['note'] }}</p>
-                                                                </div>
+                                                    <!-- Employees -->
+                                                    @if (!empty($content['employees']))
+                                                        @php
+                                                            $employeesList = collect($content['employees'])
+                                                                ->pluck('name')
+                                                                ->toArray();
+                                                            $showLimit = 5;
+                                                            $moreCount = count($employeesList) - $showLimit;
+                                                        @endphp
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <i class="fas fa-users text-success me-2"></i>
+                                                            <strong>Employees:</strong>
+                                                            <span class="ms-1">
+                                                                {{ implode(', ', array_slice($employeesList, 0, $showLimit)) }}
+                                                                @if ($moreCount > 0)
+                                                                    <span class="text-muted">+{{ $moreCount }}
+                                                                        more</span>
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    @endif
+
+                                                    <!-- Note -->
+                                                    @if (!empty($content['shift']['note']))
+                                                        <div class="d-flex align-items-start mb-3">
+                                                            <i class="fas fa-sticky-note text-info me-2 mt-1"></i>
+                                                            <div>
+                                                                <strong>Note:</strong>
+                                                                <p class="mb-0">
+                                                                    {{ $content['shift']['note'] }}</p>
                                                             </div>
-                                                        @endif
+                                                        </div>
+                                                    @endif
 
-                                                        <!-- Breaks -->
-                                                        @if (!empty($content['breaks']))
-                                                            <div class="mb-0">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <i class="fas fa-coffee text-warning me-2"></i>
-                                                                    <strong>Breaks:</strong>
-                                                                </div>
-                                                                <div class="table-responsive">
-                                                                    <table class="table table-sm table-bordered mb-0">
-                                                                        <thead class="table-light">
+                                                    <!-- Breaks -->
+                                                    @if (!empty($content['breaks']))
+                                                        <div class="mb-0">
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <i class="fas fa-coffee text-warning me-2"></i>
+                                                                <strong>Breaks:</strong>
+                                                            </div>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm table-bordered mb-0">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th>Title</th>
+                                                                            <th>Type</th>
+                                                                            <th>Duration (hrs)</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($content['breaks'] as $break)
                                                                             <tr>
-                                                                                <th>Title</th>
-                                                                                <th>Type</th>
-                                                                                <th>Duration (hrs)</th>
+                                                                                <td>{{ $break['title'] }}</td>
+                                                                                <td>
+                                                                                    <span
+                                                                                          class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
+                                                                                        {{ $break['type'] }}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td>{{ $break['duration'] }}
+                                                                                </td>
                                                                             </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            @foreach ($content['breaks'] as $break)
-                                                                                <tr>
-                                                                                    <td>{{ $break['title'] }}</td>
-                                                                                    <td>
-                                                                                        <span
-                                                                                              class="badge bg-{{ $break['type'] === 'Paid' ? 'success' : 'secondary' }}">
-                                                                                            {{ $break['type'] }}
-                                                                                        </span>
-                                                                                    </td>
-                                                                                    <td>{{ $break['duration'] }}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            @endforeach
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
-                                                        @endif
-                                                    </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
 
-                                                    <!-- Footer -->
-                                                    <div class="modal-footer">
-                                                        <button type="button"
-                                                                class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">
-                                                            <i class="fas fa-times me-1"></i> Close
-                                                        </button>
-                                                    </div>
+                                                <!-- Footer -->
+                                                <div class="modal-footer">
+                                                    <button type="button"
+                                                            class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="fas fa-times me-1"></i> Close
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    @else
-                                        <button wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
-                                                class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
-                                                style="width: 28px; height: 28px; top: 50%; left: 50%;
+                                    </div>
+                                @else
+                                    <button wire:click="openAddShiftPanel('{{ $day['full_date'] }}', {{ $employee['id'] }})"
+                                            class="btn btn-sm btn-primary add-shift-btn position-absolute tooltip-btn"
+                                            style="width: 28px; height: 28px; top: 50%; left: 50%;
                    transform: translate(-50%, -50%); padding: 0; z-index: 20; border-radius: 50%;"
-                                                data-tooltip="Add Shift">
-                                            +
-                                        </button>
-                                    @endif
+                                            data-tooltip="Add Shift">
+                                        +
+                                    </button>
+                                @endif
 
-                                </td>
-                            @endforeach
-                        </tr>
-                    @endforeach
+                            </td>
+                        @endforeach
+                    </tr>
+
+                @empty
+                    <tr>
+                        <td colspan="{{ count($weekDays) + 1 }}">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                <div>No employees found.</div>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+
+                @if ($hasMoreEmployees)
+                    <tr id="employee-list-scroll-trigger"
+                        wire:key="scroll-trigger">
+                        <td colspan="{{ count($weekDays) + 1 }}"
+                            class="py-2 text-start">
+                            <div class="text-muted small">
+                                <i class="fas fa-arrow-down me-1"></i> Scroll for more employees
+                            </div>
+                        </td>
+                    </tr>
                 @endif
+
+
+            </tbody>
+            @endif
             </tbody>
         </table>
     </div>
@@ -1308,4 +1388,82 @@
         document.querySelectorAll('.shift-block')
             .forEach(el => el.classList.remove('active-z'));
     });
+</script>
+
+
+
+
+<script>
+    function employeeScroll() {
+        return {
+            loading: false,
+            hasMore: @json($hasMoreEmployees ?? false),
+            page: 1,
+
+            init() {
+                this.hasMore = @json($hasMoreEmployees ?? false);
+                console.log('init called, hasMore:', this.hasMore);
+                this.setupScrollObserver();
+            },
+
+            setupScrollObserver() {
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !this.loading && this.hasMore) {
+
+                            this.loadMore();
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px 100px 0px'
+                });
+
+
+                const target = document.querySelector('#employee-list-scroll-trigger');
+                if (target) {
+                    console.log('Observer attached to trigger');
+                    observer.observe(target);
+                } else {
+                    console.log('Trigger element not found');
+                }
+            },
+
+            async handleScroll(event) {
+                const element = event.target;
+                const scrollTop = element.scrollTop;
+                const scrollHeight = element.scrollHeight;
+                const clientHeight = element.clientHeight;
+
+
+                if (scrollTop + clientHeight >= scrollHeight - 100) {
+                    if (!this.loading && this.hasMore) {
+
+                        await this.loadMore();
+                    }
+                }
+            },
+
+            async loadMore() {
+                if (this.loading || !this.hasMore) {
+
+                    return;
+                }
+
+
+                this.loading = true;
+
+                try {
+                    await @this.call('loadMoreEmployees');
+                    this.hasMore = @json($hasMoreEmployees ?? false);
+
+                } catch (error) {
+                    console.error('Error loading employees:', error);
+                } finally {
+                    this.loading = false;
+                }
+            }
+        }
+    }
 </script>

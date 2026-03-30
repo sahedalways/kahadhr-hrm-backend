@@ -73,9 +73,7 @@
 
 
             <div class="d-flex all-schedule-info">
-                @if ($viewMode === 'weekly')
-                    @include('livewire.backend.company.schedule.partials.sidebar')
-                @endif
+
                 @if ($isLoading)
                     <div class="text-center py-5">
                         <div class="spinner-border text-primary"

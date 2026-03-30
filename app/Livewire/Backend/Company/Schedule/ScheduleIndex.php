@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\DB;
 class ScheduleIndex extends BaseComponent
 {
 
+    public $perPageEmployees = 10;
+
+    public $hasMoreEmployees = true;
     public $perPage = 4;
     public $loaded = 0;
     public $startDate;
@@ -1461,13 +1464,6 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
-
-
-
-
-
-
     public function mount()
     {
         $this->company_id = auth()->user()->company->id;
@@ -1562,15 +1558,55 @@ class ScheduleIndex extends BaseComponent
         }
     }
 
+
+
+
+    public function loadMoreEmployees()
+    {
+        if (!$this->hasMoreEmployees) {
+            return;
+        }
+
+        $moreEmployees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name')
+            ->skip($this->loadedEmployees)
+            ->take($this->perPageEmployees)
+            ->get(['id', 'f_name', 'l_name', 'role']);
+
+        $this->employees = $this->employees->concat($moreEmployees);
+        $this->loadedEmployees = count($this->employees);
+
+
+        $totalEmployees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->count();
+
+        $this->hasMoreEmployees = $this->loadedEmployees < $totalEmployees;
+    }
+
+
+
+
     protected function loadEmployees()
     {
         $this->employees = Employee::where('company_id', $this->company_id)
             ->whereNotNull('user_id')
             ->orderBy('f_name')
+            ->take($this->perPageEmployees)
             ->get(['id', 'f_name', 'l_name', 'role']);
+
+        $this->loadedEmployees = count($this->employees);
+
+
+        $totalEmployees = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id')
+            ->count();
+
+        $this->hasMoreEmployees = $this->loadedEmployees < $totalEmployees;
     }
 
-    // getCellContent মেথড আপডেট করুন
+
     public function getCellContent($employeeId, $date)
     {
         if (empty($this->calendarShifts[$date])) {
@@ -1608,17 +1644,31 @@ class ScheduleIndex extends BaseComponent
 
     public function updatedSearch()
     {
-        $this->employees = Employee::where('company_id', $this->company_id)
-            ->whereNotNull('user_id')
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('f_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('l_name', 'like', '%' . $this->search . '%')
-                        ->orWhereRaw("CONCAT(f_name, ' ', l_name) like ?", ['%' . $this->search . '%']);
-                });
-            })
-            ->orderBy('f_name')
-            ->get();
+        $query = Employee::where('company_id', $this->company_id)
+            ->whereNotNull('user_id');
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->search . '%')
+                    ->orWhereRaw("CONCAT(f_name, ' ', l_name) like ?", ['%' . $this->search . '%']);
+            });
+        }
+
+        $this->employees = $query->orderBy('f_name')
+            ->take($this->perPageEmployees)
+            ->get(['id', 'f_name', 'l_name', 'role']);
+
+        $this->loadedEmployees = count($this->employees);
+
+        if (!$this->search) {
+            $totalEmployees = Employee::where('company_id', $this->company_id)
+                ->whereNotNull('user_id')
+                ->count();
+            $this->hasMoreEmployees = $this->loadedEmployees < $totalEmployees;
+        } else {
+            $this->hasMoreEmployees = false;
+        }
     }
 
 

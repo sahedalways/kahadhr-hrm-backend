@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('shift_dates', function (Blueprint $table) {
             $table->id();
+            $table->index('date');
             $table->foreignId('shift_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->time('start_time');

@@ -103,6 +103,9 @@ class ScheduleIndex extends BaseComponent
     public $selectedTemplateId = null;
 
 
+
+
+
     public function saveWeekAsTemplate()
     {
         $this->validate([

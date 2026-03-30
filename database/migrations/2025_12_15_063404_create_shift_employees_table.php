@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('shift_employees', function (Blueprint $table) {
             $table->id();
+            $table->index('shift_date_id');
             $table->foreignId('shift_date_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('employee_id')->nullable()->constrained()->onDelete('cascade');
             $table->unique(['shift_date_id', 'employee_id'], 'unique_shift_date_employee');

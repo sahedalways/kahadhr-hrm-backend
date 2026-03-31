@@ -82,9 +82,7 @@
                                 </div>
 
                                 <div class="col-3">
-                                    <label class="form-label small text-secondary mb-1">
-                                        Type
-                                    </label>
+
 
                                     <label class="form-label small text-secondary mb-1">
                                         Type
@@ -117,17 +115,10 @@
 
                                 </div>
                                 <div class="col-3">
-                                    {{-- <label class="form-label small text-secondary mb-1 text-center">
+                                    <label class="form-label small text-secondary mb-1">
                                         Duration
                                     </label>
-                                    <select class="form-select form-select-sm text-center custom-duration-dropdown"
-                                        wire:model.live="newBreaks.{{ $index }}.duration">
 
-                                        @for ($i = 0; $i <= 23; $i += 0.05)
-                                            <option value="{{ number_format($i, 2) }}">{{ number_format($i, 2) }}
-                                            </option>
-                                        @endfor
-                                    </select> --}}
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
                                                 data-bs-toggle="dropdown">
@@ -136,15 +127,36 @@
 
 
                                         <div class="dropdown-menu p-2"
-                                             style="max-height:200px; overflow-y:auto;">
-                                            @for ($i = 0; $i <= 23; $i += 0.05)
-                                                <button type="button"
-                                                        class="dropdown-item text-center"
-                                                        wire:click="$set('newBreaks.{{ $index }}.duration', '{{ number_format($i, 2) }}')">
-                                                    {{ number_format($i, 2) }}
-                                                </button>
+                                             style="max-height:200px; overflow-y:auto; scrollbar-width: thin;">
+                                            @for ($i = 0; $i <= 23; $i += 0.25)
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="button"
+                                                            class="dropdown-item text-center py-1"
+                                                            style="width: 60px; transition: background 0.2s;"
+                                                            wire:click="$set('newBreaks.{{ $index }}.duration', '{{ number_format($i, 2) }}')">
+                                                        {{ number_format($i, 2) }}
+                                                    </button>
+                                                </div>
                                             @endfor
                                         </div>
+
+                                        <style>
+                                            .dropdown-menu::-webkit-scrollbar {
+                                                width: 6px;
+                                            }
+
+                                            .dropdown-menu::-webkit-scrollbar-thumb {
+                                                background-color: rgba(0, 0, 0, 0.3);
+                                                border-radius: 3px;
+                                            }
+
+                                            .dropdown-item:hover {
+                                                background-color: #0d6efd !important;
+
+                                                color: #fff !important;
+                                                cursor: pointer;
+                                            }
+                                        </style>
                                     </div>
 
                                 </div>

@@ -190,9 +190,11 @@
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Time Sheet</h6>
                     <button type="button"
-                            class="btn btn-light rounded-pill"
+                            class="btn btn-light rounded-circle p-1"
+                            style="width: 30px; height: 30px;"
                             onclick="closeAllModals()">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times"
+                           style="font-size: 14px;"></i>
                     </button>
                 </div>
 

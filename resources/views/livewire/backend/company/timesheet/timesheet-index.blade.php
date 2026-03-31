@@ -466,7 +466,7 @@
                 <div class="modal-body px-4 py-3">
                     @if ($selectedAttendance)
                         @php
-                            $hours = $this->getShiftHours($selectedAttendance);
+                            $hours = getShiftHours($selectedAttendance);
                         @endphp
 
                         {{-- Employee Info --}}
@@ -663,10 +663,42 @@
                             <div class="col-4">
                                 <div class="border rounded-3 p-2">
                                     <small class="text-muted d-block">Break Hours</small>
-                                    <span class="fw-bold">{{ $hours['break_hours'] }}</span>
+                                    <span class="fw-bold">{{ $hours['total_break_hours'] }}</span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Break Hours Breakdown -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3 bg-light">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="p-2">
+                                                <small class="text-success d-block mb-1">
+                                                    <i class="fas fa-coffee me-1"></i>Paid Breaks
+                                                </small>
+                                                <span
+                                                      class="h5 mb-0 fw-bold text-success">{{ $hours['paid_break_hours'] }}</span>
+                                                <small class="text-muted d-block mt-1">Rest breaks</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-2">
+                                                <small class="text-warning d-block mb-1">
+                                                    <i class="fas fa-utensils me-1"></i>Unpaid Breaks
+                                                </small>
+                                                <span
+                                                      class="h5 mb-0 fw-bold text-warning">{{ $hours['unpaid_break_hours'] }}</span>
+                                                <small class="text-muted d-block mt-1">Meal breaks</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
 
                         {{-- Location --}}

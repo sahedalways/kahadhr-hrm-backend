@@ -295,57 +295,8 @@ class TimesheetIndex extends BaseComponent
     }
 
 
-    public function getShiftHours($attendance)
-    {
-        $clockIn = $attendance->clock_in instanceof Carbon ? $attendance->clock_in : Carbon::parse($attendance->clock_in);
-        $clockOut = $attendance->clock_out instanceof Carbon ? $attendance->clock_out : Carbon::parse($attendance->clock_out);
 
-        if (!$clockIn) {
-            return [
-                'shift_hours'  => '8h 0m',
-                'worked_hours' => '---',
-                'break_hours'  => '0h 0m'
-            ];
-        }
 
-        $date = $clockIn->format('Y-m-d');
-        $employeeId = $attendance->user->employee->id;
-
-        $shiftDate = ShiftDate::where('date', $date)
-            ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
-            ->with('breaks')
-            ->first();
-
-        $breakMinutes = 0;
-        if ($shiftDate) {
-            foreach ($shiftDate->breaks as $b) {
-                $duration = $b->duration ?? 0;
-                $hoursPart = floor($duration);
-                $minutesPart = round(($duration - $hoursPart) * 100);
-                $breakMinutes += $hoursPart * 60 + $minutesPart;
-            }
-        }
-
-        if (!$clockOut) {
-            return [
-                'shift_hours'  => '8h 0m',
-                'worked_hours' => '0h 0m',
-                'break_hours'  => sprintf('%dh %dm', intdiv($breakMinutes, 60), $breakMinutes % 60)
-            ];
-        }
-
-        if ($clockOut->lessThan($clockIn)) {
-            $clockOut->addDay();
-        }
-
-        $workedMinutes = $clockIn->diffInMinutes($clockOut);
-
-        return [
-            'shift_hours'  => '8h 0m',
-            'worked_hours' => sprintf('%dh %dm', intdiv($workedMinutes, 60), $workedMinutes % 60),
-            'break_hours'  => sprintf('%dh %dm', intdiv($breakMinutes, 60), $breakMinutes % 60)
-        ];
-    }
     protected function loadEmployees()
     {
         $query = Employee::where('company_id', $this->company_id)

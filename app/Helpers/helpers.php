@@ -277,3 +277,149 @@ if (!function_exists('todaysShiftForUser')) {
     return $visible . str_repeat('*', max(strlen($name) - 1, 1)) . '@' . $domain;
   }
 }
+
+
+
+
+
+if (!function_exists('parseTimeToMinutes')) {
+  function parseTimeToMinutes($time): int
+  {
+    if (empty($time)) {
+      return 0;
+    }
+
+    $time = trim($time);
+
+    if (preg_match('/^(\d{1,2}):(\d{2})$/', $time, $matches)) {
+      return (int)$matches[1] * 60 + (int)$matches[2];
+    }
+
+
+    if (is_numeric($time)) {
+      $val = (float)$time;
+      $hours = floor($val);
+
+      $fraction = $val - $hours;
+      $minutes = round($fraction * 100);
+
+      return (int)($hours * 60 + $minutes);
+    }
+
+    $minutes = 0;
+
+    if (preg_match('/(\d+)\s*h/i', $time, $matches)) {
+      $minutes += (int)$matches[1] * 60;
+    }
+
+    if (preg_match('/(\d+)\s*m/i', $time, $matches)) {
+      $minutes += (int)$matches[1];
+    }
+
+    return $minutes;
+  }
+}
+if (!function_exists('getShiftHours')) {
+  function getShiftHours($attendance): array
+  {
+    $clockIn = $attendance->clock_in instanceof Carbon
+      ? $attendance->clock_in
+      : ($attendance->clock_in ? Carbon::parse($attendance->clock_in) : null);
+
+    $clockOut = $attendance->clock_out instanceof Carbon
+      ? $attendance->clock_out
+      : ($attendance->clock_out ? Carbon::parse($attendance->clock_out) : null);
+
+    if (!$clockIn) {
+      return [
+        'shift_hours'           => '0h 0m',
+        'worked_hours'          => '---',
+        'total_break_hours'     => '0h 0m',
+        'paid_break_hours'      => '0h 0m',
+        'unpaid_break_hours'    => '0h 0m',
+        'actual_worked_hours'   => '---'
+      ];
+    }
+
+    $date = $clockIn->format('Y-m-d');
+    $employeeId = $attendance->user->employee->id;
+
+    $shiftDate = ShiftDate::where('date', $date)
+      ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+      ->first();
+
+    $shiftHoursFormatted = '0h 0m';
+    $shiftTotalMinutes = 0;
+
+    if ($shiftDate && $shiftDate->total_hours) {
+      $shiftTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
+      $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
+    } else {
+      $shiftTotalMinutes = 480;
+      $shiftHoursFormatted = '8h 0m';
+    }
+
+    $paidBreakMinutes = 0;
+    $unpaidBreakMinutes = 0;
+    $totalBreakMinutes = 0;
+
+    if ($shiftDate && method_exists($shiftDate, 'breaks') && $shiftDate->breaks) {
+      foreach ($shiftDate->breaks as $break) {
+        if ($break->duration) {
+          $breakMinutes = parseTimeToMinutes($break->duration); // ✅ fixed
+
+          if (isset($break->type) && strtolower($break->type) === 'unpaid') {
+            $unpaidBreakMinutes += $breakMinutes;
+          } else {
+            $paidBreakMinutes += $breakMinutes;
+          }
+
+          $totalBreakMinutes += $breakMinutes;
+        }
+      }
+    }
+
+    if (!$clockOut) {
+      return [
+        'shift_hours'           => $shiftHoursFormatted,
+        'worked_hours'          => '0h 0m',
+        'total_break_hours'     => formatMinutesToHours($totalBreakMinutes), // ✅
+        'paid_break_hours'      => formatMinutesToHours($paidBreakMinutes),
+        'unpaid_break_hours'    => formatMinutesToHours($unpaidBreakMinutes),
+        'actual_worked_hours'   => '0h 0m'
+      ];
+    }
+
+    if ($clockOut->lessThan($clockIn)) {
+      $clockOut->addDay();
+    }
+
+    $totalWorkedMinutes = (int) round($clockIn->diffInRealMinutes($clockOut));
+
+    $actualWorkedMinutes = $totalWorkedMinutes - $unpaidBreakMinutes;
+
+    if ($actualWorkedMinutes < 0) {
+      $actualWorkedMinutes = 0;
+    }
+
+    return [
+      'shift_hours'           => $shiftHoursFormatted,
+      'worked_hours'          => formatMinutesToHours($totalWorkedMinutes),
+      'total_break_hours'     => formatMinutesToHours($totalBreakMinutes),
+      'paid_break_hours'      => formatMinutesToHours($paidBreakMinutes),
+      'unpaid_break_hours'    => formatMinutesToHours($unpaidBreakMinutes),
+      'actual_worked_hours'   => formatMinutesToHours($actualWorkedMinutes)
+    ];
+  }
+}
+
+
+
+if (!function_exists('formatMinutesToHours')) {
+  function formatMinutesToHours(int $minutes): string
+  {
+    $hours = intdiv($minutes, 60);
+    $mins = $minutes % 60;
+    return sprintf('%dh %dm', $hours, $mins);
+  }
+}

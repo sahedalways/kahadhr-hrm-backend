@@ -35,6 +35,8 @@
     <link id="pagestyle"
           href="{{ asset('assets/css/newdashboard.css') }}"
           rel="stylesheet" />
+    <link href="{{ asset('assets/css/header.css') }}"
+          rel="stylesheet" />
     <link href="{{ asset('assets/css/style.css') }}"
           rel="stylesheet" />
     <link href="{{ asset('assets/js/plugins/toastr.min.css') }}"

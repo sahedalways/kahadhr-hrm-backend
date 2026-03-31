@@ -127,6 +127,12 @@
                             </p>
 
                         </div>
+
+                        <div id="locationErrorMsg"
+                             class="mt-2 small text-warning"
+                             style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i> Location required for Clock In/Out
+                        </div>
                     </div>
                     <div
                          style="

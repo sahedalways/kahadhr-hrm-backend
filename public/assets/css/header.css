@@ -1,0 +1,57 @@
+.btn-clock-action {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-clock-action:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+}
+
+.btn-clock-action:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-clock-action .icon-circle {
+    background: #ffffff;
+    color: var(--bs-primary);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-clock-action:hover .icon-circle {
+    background: var(--bs-primary);
+    color: #ffffff;
+}
+
+.btn-clock-action i {
+    animation: pulse-smooth 1.8s infinite;
+}
+
+@keyframes pulse-smooth {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}

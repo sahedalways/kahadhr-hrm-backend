@@ -5,6 +5,9 @@
 
 @endphp
 
+
+
+
 <div class="position-relative">
 
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl z-index-sticky
@@ -94,6 +97,24 @@
                 @if ($showBanner)
                     <div class="status-banner text-center text-white py-1 mx-auto d-md-block d-none">
                         {!! $bannerText !!}
+                    </div>
+                @endif
+
+
+                <!-- CLOCK ICON -->
+                @if (auth()->user()->user_type == 'employee')
+                    <div class="d-flex align-items-center">
+                        <button onclick="checkTodaysShift()"
+                                class="btn-clock-action d-flex align-items-center gap-2 px-3 py-2 border-0 shadow-sm"
+                                title="Clock In / Out">
+                            <div class="icon-circle">
+                                <i class="fa-regular fa-clock fs-5"></i>
+                            </div>
+                            <span class="fw-bold text-uppercase d-none d-md-inline"
+                                  style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                Clock Action
+                            </span>
+                        </button>
                     </div>
                 @endif
 
@@ -302,13 +323,7 @@
                     @endphp
 
 
-                    <!-- CLOCK ICON -->
-                    @if (auth()->user()->user_type == 'employee')
-                        <span class="d-flex cursor-pointer text-white"
-                              onclick="checkTodaysShift()">
-                            <i class="fa-regular fa-clock fs-4"></i>
-                        </span>
-                    @endif
+
 
 
                 </div>

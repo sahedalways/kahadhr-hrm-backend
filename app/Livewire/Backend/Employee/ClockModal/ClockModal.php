@@ -58,6 +58,13 @@ class ClockModal extends BaseComponent
 
     public function clockIn()
     {
+        if (!$this->clockInLatitude || !$this->clockInLongitude) {
+            $this->toast("Location access required. Please enable location and try again.", 'error');
+            return;
+        }
+
+
+
         $shiftStart = $this->shiftStartTime;
         $grace = config('attendance.grace_minutes');
 
@@ -151,6 +158,12 @@ class ClockModal extends BaseComponent
 
     public function clockOut()
     {
+        if (!$this->clockOutLatitude && !$this->clockOutLongitude) {
+            $this->toast("Location access required. Please enable location and try again.", 'error');
+            return;
+        }
+
+
         $attendance = Attendance::where('user_id', Auth::id())
             ->latest()
             ->first();

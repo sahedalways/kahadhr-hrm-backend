@@ -1,15 +1,54 @@
 <div class="container-fluid py-4">
     <div class="row g-4">
         <!-- Back to Employees List -->
-        <div class="text-end mb-2">
-            <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
-               style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
-               href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}">
-                <i class="fa-solid fa-arrow-left me-2"></i>
-                Back to Employees
-            </a>
-        </div>
+        <div class="col-12 mb-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle"
+                         style="width: 48px; height: 48px; background: linear-gradient(135deg, #0dcaf0, #0b9ed0); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-weight: 600; font-size: 1.2rem;">
+                            {{ strtoupper(substr($employee->f_name, 0, 1) . substr($employee->l_name, 0, 1)) }}
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0"
+                            style="font-size: 1.5rem; color: #1a2c3e; letter-spacing: -0.3px;">
+                            {{ $employee->full_name }}
+                        </h2>
+                        <div class="d-flex gap-2 mt-1">
+                            <span class="badge"
+                                  style="background: #e9ecef; color: #495057; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                <i class="fas fa-briefcase me-1"
+                                   style="font-size: 0.7rem;"></i> {{ ucfirst($employee->role) }}
+                            </span>
+                            @if ($employee->is_active)
+                                <span class="badge"
+                                      style="background: #d1fae5; color: #065f46; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                    <i class="fas fa-circle me-1"
+                                       style="font-size: 0.5rem; color: #10b981;"></i> Active
+                                </span>
+                            @else
+                                <span class="badge"
+                                      style="background: #fee2e2; color: #991b1b; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                    <i class="fas fa-circle me-1"
+                                       style="font-size: 0.5rem; color: #dc2626;"></i> Inactive
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Move button to the right using ms-auto -->
+                <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center ms-auto"
+                   style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem; border-radius: 8px;"
+                   href="{{ route('company.dashboard.employees.index', ['company' => app('authUser')->company->sub_domain]) }}">
+                    <i class="fa-solid fa-arrow-left me-2"></i>
+                    Back to Employees
+                </a>
+
+            </div>
+        </div>
 
         <!-- Sidebar -->
         <div class="col-lg-3">

@@ -179,3 +179,26 @@
         });
     });
 </script>
+
+
+<script>
+    document.addEventListener('livewire:navigating', () => {
+
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            const dropdown = bootstrap.Dropdown.getInstance(menu.parentElement);
+            if (dropdown) dropdown.hide();
+        });
+    });
+
+    document.addEventListener('livewire:load', function() {
+
+        Livewire.hook('message.processed', () => {
+            document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(trigger => {
+                if (!trigger.hasAttribute('data-bs-toggle-processed')) {
+                    trigger.setAttribute('data-bs-toggle-processed', 'true');
+                    new bootstrap.Dropdown(trigger);
+                }
+            });
+        });
+    });
+</script>

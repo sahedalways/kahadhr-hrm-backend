@@ -1,7 +1,3 @@
-@php
-    $summary = $this->calcCalendarSummary();
-@endphp
-
 <div class="unique-summary-wrapper mt-auto border-top bg-white py-4 px-3 rounded-bottom">
 
     <div class="d-flex align-items-center mb-3 px-1">

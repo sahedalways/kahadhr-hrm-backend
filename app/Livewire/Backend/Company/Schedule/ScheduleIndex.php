@@ -1543,6 +1543,7 @@ class ScheduleIndex extends BaseComponent
         $this->isLoading = false;
 
         $this->dispatch('shifts-loaded');
+        $this->dispatch('refresh-summary');
     }
 
 
@@ -1664,8 +1665,10 @@ class ScheduleIndex extends BaseComponent
         } else {
             $this->hasMoreEmployees = false;
         }
-    }
 
+
+        $this->dispatch('refresh-summary');
+    }
 
 
 
@@ -2339,7 +2342,6 @@ class ScheduleIndex extends BaseComponent
         $shiftCount   = 0;
         $userIds      = [];
 
-
         $start = $this->startDate instanceof Carbon
             ? $this->startDate
             : Carbon::parse($this->startDate);
@@ -2347,10 +2349,10 @@ class ScheduleIndex extends BaseComponent
             ? $this->endDate
             : Carbon::parse($this->endDate);
 
+        $filteredEmployeeIds = $this->employees->pluck('id')->toArray();
+
         foreach ($this->calendarShifts as $dateKey => $shifts) {
-
             $date = Carbon::parse($dateKey);
-
 
             if ($date->lt($start) || $date->gt($end)) {
                 continue;
@@ -2358,16 +2360,22 @@ class ScheduleIndex extends BaseComponent
 
             foreach ($shifts as $row) {
 
-                $employeeCount = count($row['employees'] ?? []);
-                $shiftCount += $employeeCount;
+                $filteredEmployees = $row['employees']->filter(function ($emp) use ($filteredEmployeeIds) {
+                    return in_array($emp['id'], $filteredEmployeeIds);
+                });
 
+                $employeeCount = $filteredEmployees->count();
 
-                [$h, $m] = explode(':', $row['total_hours'] ?? '00:00');
-                $shiftMinutes = ((int)$h * 60) + (int)$m;
-                $totalMinutes += ($shiftMinutes * $employeeCount);
+                if ($employeeCount > 0) {
+                    $shiftCount += $employeeCount;
 
-                foreach ($row['employees'] ?? [] as $emp) {
-                    $userIds[$emp['id'] ?? $emp] = true;
+                    [$h, $m] = explode(':', $row['total_hours'] ?? '00:00');
+                    $shiftMinutes = ((int)$h * 60) + (int)$m;
+                    $totalMinutes += ($shiftMinutes * $employeeCount);
+
+                    foreach ($filteredEmployees as $emp) {
+                        $userIds[$emp['id']] = true;
+                    }
                 }
             }
         }
@@ -2380,7 +2388,6 @@ class ScheduleIndex extends BaseComponent
             'users'  => count($userIds),
         ];
     }
-
 
     public function handleDrag(string $fromDate, int $fromEmpId, int $shiftDateId)
     {
@@ -2948,6 +2955,8 @@ class ScheduleIndex extends BaseComponent
     {
         $this->loadShifts();
 
+        $summary = $this->calcCalendarSummary();
+
 
         return view('livewire.backend.company.schedule.schedule-index', [
             'weekDays' => $this->weekDays,
@@ -2955,8 +2964,8 @@ class ScheduleIndex extends BaseComponent
             'employees' => $this->employees,
             'displayDateRange' => $this->displayDateRange,
             'isLoading' => $this->isLoading,
+            'summary' => $summary,
             'availableMultipleShiftEmployees' => $this->availableMultipleShiftEmployees,
-
             'conflictData' => $this->conflictData ?? collect(),
         ]);
     }

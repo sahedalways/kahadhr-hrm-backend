@@ -37,6 +37,15 @@ class ClockModal extends BaseComponent
     public $userTimezone = 'UTC';
     public $previousAttendances = [];
 
+    public $clockInLatitude = null;
+    public $clockInLongitude = null;
+    public $clockInAccuracy = null;
+    public $clockOutLatitude = null;
+    public $clockOutLongitude = null;
+    public $clockOutAccuracy = null;
+
+
+
 
     protected $listeners = [
         'setLocation' => 'setLocation',
@@ -80,6 +89,9 @@ class ClockModal extends BaseComponent
             'clock_in' => $ukTime,
             'clock_in_location' => $this->clockInLocation,
             'is_manual' => false,
+            'clock_in_latitude' => $this->clockInLatitude,
+            'clock_in_longitude' => $this->clockInLongitude,
+            'clock_in_accuracy' => $this->clockInAccuracy,
             'needs_approval' => $needsApproval,
             'status' => $needsApproval ? 'pending' : 'approved',
         ]);
@@ -104,7 +116,10 @@ class ClockModal extends BaseComponent
                 'type' => 'late_clock_in',
 
                 'data' => [
-                    'message' => $message
+                    'message' => $message,
+                    'latitude' => $this->clockInLatitude,
+                    'longitude' => $this->clockInLongitude,
+                    'accuracy' => $this->clockInAccuracy,
 
                 ],
             ]);
@@ -188,6 +203,9 @@ class ClockModal extends BaseComponent
             'clock_out' => $ukTime,
             'clock_out_location' => $this->clockOutLocation,
             'needs_approval' => $needsApproval,
+            'clock_out_latitude' => $this->clockOutLatitude,
+            'clock_out_longitude' => $this->clockOutLongitude,
+            'clock_out_accuracy' => $this->clockOutAccuracy,
             'status' => $needsApproval ? 'pending' : 'approved',
         ]);
 
@@ -208,7 +226,10 @@ class ClockModal extends BaseComponent
                 'type' => 'late_clock_out',
 
                 'data' => [
-                    'message' => $message
+                    'message' => $message,
+                    'latitude' => $this->clockOutLatitude,
+                    'longitude' => $this->clockOutLongitude,
+                    'accuracy' => $this->clockOutAccuracy,
 
                 ],
             ]);
@@ -234,14 +255,19 @@ class ClockModal extends BaseComponent
     }
 
 
-    public function setLocation($location)
+    public function setLocation($address = null, $latitude = null, $longitude = null, $accuracy = null)
     {
+        $this->clockInLocation = $address ?? '';
+        $this->clockInLatitude = $latitude;
+        $this->clockInLongitude = $longitude;
+        $this->clockInAccuracy = $accuracy;
 
-        $this->clockInLocation = $location;
-        $this->clockOutLocation = $location;
+
+        $this->clockOutLocation = $address ?? '';
+        $this->clockOutLatitude = $latitude;
+        $this->clockOutLongitude = $longitude;
+        $this->clockOutAccuracy = $accuracy;
     }
-
-
 
     public function updatedClockInReason($value)
     {
@@ -410,7 +436,7 @@ class ClockModal extends BaseComponent
                 $statusLabel = 'Todays Worked';
             }
         } else {
-            // No attendance today → Clock In button shows 15 min before shift start
+
             if ($now->greaterThanOrEqualTo($shiftStartMinusGrace) && $now->lessThanOrEqualTo($shiftEnd)) {
                 $showClockInButton = true;
             }
@@ -418,12 +444,7 @@ class ClockModal extends BaseComponent
             $statusLabel = 'Not Started';
         }
 
-        // $this->dispatch(
-        //     'attendance-status-updated',
-        //     showClockIn: $showClockInButton,
-        //     showClockOut: $showClockOutButton,
-        //     status: $statusLabel
-        // )->to('backend.components.header');
+
 
 
         return view('livewire.backend.employee.clock-modal.clock-modal', [

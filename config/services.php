@@ -46,4 +46,8 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
+    'locationiq' => [
+        'api_key' => env('LOCATIONIQ_API_KEY'),
+    ],
+
 ];

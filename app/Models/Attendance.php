@@ -17,7 +17,13 @@ class Attendance extends Model
         'clock_out_location',
         'is_manual',
         'needs_approval',
-        'status'
+        'status',
+        'clock_in_latitude',
+        'clock_in_longitude',
+        'clock_in_accuracy',
+        'clock_out_latitude',
+        'clock_out_longitude',
+        'clock_out_accuracy',
     ];
 
     public function user()

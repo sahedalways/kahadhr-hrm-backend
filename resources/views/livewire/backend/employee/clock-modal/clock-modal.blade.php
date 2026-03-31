@@ -1,4 +1,8 @@
-<div wire:ignore.self class="modal fade" id="AppClockModal" tabindex="-1" aria-hidden="true">
+<div wire:ignore.self
+     class="modal fade"
+     id="AppClockModal"
+     tabindex="-1"
+     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content app-clock-card-refined">
 
@@ -9,18 +13,22 @@
                         <div class="app-clock-time-display mb-4">
 
 
-                            <p id="elapsedLabel" class="fs-5 fw-bold text-white mb-1">
+                            <p id="elapsedLabel"
+                               class="fs-5 fw-bold text-white mb-1">
                                 {{ $statusLabel }}
                             </p>
 
 
                             <!-- ELAPSED TIME -->
-                            <h1 id="elapsedTime" class="display-3 fw-bolder mb-1" wire:ignore>
+                            <h1 id="elapsedTime"
+                                class="display-3 fw-bolder mb-1"
+                                wire:ignore>
                                 {{ $elapsedTime ?? '00:00:00' }}
                             </h1>
 
 
-                            <p class="fs-6 app-clock-date-text" wire:ignore>Getting date ...</p>
+                            <p class="fs-6 app-clock-date-text"
+                               wire:ignore>Getting date ...</p>
 
                         </div>
 
@@ -32,22 +40,29 @@
 
                         @if ($showClockInReason)
                             <div class="mb-2">
-                                <input type="text" class="form-control" placeholder="Enter reason for late"
-                                    wire:model.defer="clockInReason">
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Enter reason for late"
+                                       wire:model.defer="clockInReason">
                                 @error('clockInReason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                         @endif
                         @if ($showClockInButton)
-                            <button type="button" wire:click="clockIn" wire:loading.attr="disabled"
-                                wire:target="clockIn" class="btn btn-app-clock-in btn-lg">
+                            <button type="button"
+                                    wire:click="clockIn"
+                                    wire:loading.attr="disabled"
+                                    wire:target="clockIn"
+                                    class="btn btn-app-clock-in btn-lg">
 
-                                <span wire:loading.remove wire:target="clockIn">
+                                <span wire:loading.remove
+                                      wire:target="clockIn">
                                     <i class="bi bi-box-arrow-in-right me-2"></i> CLOCK IN
                                 </span>
 
-                                <span wire:loading wire:target="clockIn">
+                                <span wire:loading
+                                      wire:target="clockIn">
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                     Processing...
                                 </span>
@@ -57,8 +72,10 @@
 
                         @if ($showClockOutReason)
                             <div class="mb-2">
-                                <input type="text" class="form-control" placeholder="Enter reason"
-                                    wire:model.defer="clockOutReason">
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Enter reason"
+                                       wire:model.defer="clockOutReason">
                                 @error('clockOutReason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -67,16 +84,21 @@
 
 
                         @if ($showClockOutButton)
-                            <button type="button" onclick="confirmClockOut()" wire:loading.attr="disabled"
-                                wire:target="clockOut" class="btn btn-app-clock-out btn-lg">
+                            <button type="button"
+                                    onclick="confirmClockOut()"
+                                    wire:loading.attr="disabled"
+                                    wire:target="clockOut"
+                                    class="btn btn-app-clock-out btn-lg">
 
                                 <!-- Normal Text -->
-                                <span wire:loading.remove wire:target="clockOut">
+                                <span wire:loading.remove
+                                      wire:target="clockOut">
                                     <i class="bi bi-box-arrow-left me-2"></i> CLOCK OUT
                                 </span>
 
                                 <!-- Loading State -->
-                                <span wire:loading wire:target="clockOut">
+                                <span wire:loading
+                                      wire:target="clockOut">
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                     Processing...
                                 </span>
@@ -84,10 +106,11 @@
                         @endif
 
                     </div>
-                    <input type="hidden" id="initialElapsedSeconds"
-                        value="{{ $elapsedTime
-                            ? explode(':', $elapsedTime)[0] * 3600 + explode(':', $elapsedTime)[1] * 60 + explode(':', $elapsedTime)[2]
-                            : 0 }}">
+                    <input type="hidden"
+                           id="initialElapsedSeconds"
+                           value="{{ $elapsedTime
+                               ? explode(':', $elapsedTime)[0] * 3600 + explode(':', $elapsedTime)[1] * 60 + explode(':', $elapsedTime)[2]
+                               : 0 }}">
 
 
 
@@ -98,13 +121,15 @@
                         </small>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <p id="userLocation" class="mb-0 fs-6 fw-bold text-white" wire:ignore>Detecting location...
+                            <p id="userLocation"
+                               class="mb-0 fs-6 fw-bold text-white"
+                               wire:ignore>Detecting location...
                             </p>
 
                         </div>
                     </div>
                     <div
-                        style="
+                         style="
     margin-top: 1.5rem;
     padding: 1.25rem;
     background-color: #121212;
@@ -140,7 +165,7 @@
                                 @endphp
 
                                 <div
-                                    style="
+                                     style="
                 margin-bottom: 0.75rem;
                 padding: 0.75rem 1rem;
                 background-color: #1c1c1c;
@@ -160,7 +185,7 @@
                             @endforeach
                         @else
                             <div
-                                style="
+                                 style="
             padding: 1rem;
             text-align: center;
             color: #888;
@@ -214,61 +239,141 @@
             return;
         }
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            updateLocation(position.coords.latitude, position.coords.longitude);
-        });
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        };
 
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                    console.log(`Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`);
+                    console.log(`Accuracy: ±${position.coords.accuracy} meters`);
 
+                    if (position.coords.accuracy > 100) {
+                        document.getElementById("userLocation").textContent =
+                            "Location accuracy is low, please enable GPS or move to open area";
+                        return;
+                    }
+
+                    updateLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    let errorMsg = "Unable to get location";
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = "Location permission denied. Please enable location services.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = "Location information unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = "Location request timed out.";
+                            break;
+                    }
+                    document.getElementById("userLocation").textContent = errorMsg;
+                },
+                options
+        );
+
+        // Update location every 30 seconds
         setInterval(() => {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                updateLocation(position.coords.latitude, position.coords.longitude);
-            });
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                        updateLocation(position.coords.latitude, position.coords.longitude, position.coords
+                            .accuracy);
+                    },
+                    null,
+                    options
+            );
         }, 30000);
     }
 
-    async function updateLocation(lat, lon) {
-        let url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    async function updateLocation(lat, lon, accuracy) {
+        const accuracyText = accuracy ? ` (accuracy: ±${Math.round(accuracy)}m)` : '';
+        let locationText = `${lat.toFixed(6)}, ${lon.toFixed(6)}${accuracyText}`;
 
         try {
-            let response = await fetch(url);
-            let data = await response.json();
-            let loc = data.address;
+            const LOCATIONIQ_API_KEY = '{{ config('services.locationiq.api_key') }}';
 
-            let fullLocation = `
-            ${loc.house_number ?? ""} ${loc.road ?? ""}
-            ${loc.suburb ?? ""} ${loc.city ?? loc.town ?? loc.village ?? ""}
-            ${loc.state ?? ""} ${loc.postcode ?? ""} ${loc.country ?? ""}
-        `;
-            let fullLocationSingleLine = fullLocation.replace(/\s+/g, ' ').trim();
-
-            document.getElementById("userLocation").textContent = fullLocationSingleLine;
+            if (LOCATIONIQ_API_KEY && LOCATIONIQ_API_KEY !== '') {
+                let url =
+                    `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_API_KEY}&lat=${lat}&lon=${lon}&format=json&zoom=18&addressdetails=1`;
 
 
-            Livewire.dispatch('setLocation', fullLocationSingleLine);
+                let response = await fetch(url);
+                let data = await response.json();
+
+
+                if (data && data.address) {
+                    let houseNumber = data.address.house_number || '';
+                    let road = data.address.road || data.address.street || '';
+                    let suburb = data.address.suburb || data.address.neighbourhood || '';
+                    let city = data.address.city || data.address.town || data.address.village || '';
+                    let postcode = data.address.postcode || '';
+
+                    let preciseLocation = [houseNumber, road, suburb, city, postcode]
+                        .filter(part => part && part.trim() !== '')
+                        .join(', ');
+
+                    if (preciseLocation) {
+                        locationText = preciseLocation;
+
+                    } else if (data.display_name) {
+                        locationText = data.display_name.split(',')[0];
+
+                    }
+                } else if (data && data.error) {
+                    console.error("LocationIQ Error:", data.error);
+                    locationText = `Location: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                }
+            } else {
+                console.log("No API key found, using coordinates only");
+                locationText = `Location: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            }
+        } catch (error) {
+            console.error("Reverse geocoding error:", error);
+            locationText = `Coordinates: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        }
+
+        document.getElementById("userLocation").textContent = locationText;
+
+        // Dispatch Livewire events
+        if (typeof Livewire !== 'undefined') {
+            Livewire.dispatch('setLocation', {
+                address: locationText,
+                latitude: lat,
+                longitude: lon,
+                accuracy: accuracy
+            });
+
             let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             Livewire.dispatch('setUserTimezone', timezone);
-
-        } catch (error) {
-            document.getElementById("userLocation").textContent = "Unable to get location";
         }
     }
 
-    getDeepLocation();
+    // Initialize modal event listener when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalEl = document.getElementById('AppClockModal');
 
+        if (modalEl) {
+            modalEl.addEventListener('shown.bs.modal', () => {
+                if (!navigator.geolocation) {
+                    document.getElementById("userLocation").textContent = "Location not supported";
+                    return;
+                }
 
+                navigator.geolocation.getCurrentPosition((position) => {
+                    updateLocation(position.coords.latitude, position.coords.longitude, position
+                        .coords.accuracy);
+                });
 
-    const modalEl = document.getElementById('AppClockModal');
-    modalEl.addEventListener('shown.bs.modal', () => {
-        if (!navigator.geolocation) {
-            document.getElementById("userLocation").textContent = "Location not supported";
-            return;
+                if (typeof Livewire !== 'undefined') {
+                    Livewire.dispatch('resetReasons');
+                }
+            });
         }
-
-        navigator.geolocation.getCurrentPosition((position) => {
-            updateLocation(position.coords.latitude, position.coords.longitude);
-        });
-
-        Livewire.dispatch('resetReasons');
     });
 </script>
 

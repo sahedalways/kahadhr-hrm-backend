@@ -129,16 +129,6 @@ class CompanyTimesheet extends BaseComponent
             ->when(!empty($this->selectedEmployees), function ($q) {
                 $q->whereIn('user_id', Employee::withoutGlobalScope('isActive')->whereIn('id', $this->selectedEmployees)->pluck('user_id'));
             })
-            ->when(!empty($this->attendanceNature), function ($q) {
-                $q->where(function ($sub) {
-                    if (in_array('auto', $this->attendanceNature)) {
-                        $sub->orWhere('is_manual', 0);
-                    }
-                    if (in_array('manual', $this->attendanceNature)) {
-                        $sub->orWhere('is_manual', 1);
-                    }
-                });
-            })
             ->orderBy('clock_in')
             ->get();
 
@@ -146,54 +136,76 @@ class CompanyTimesheet extends BaseComponent
             $clockIn = Carbon::parse($att->clock_in);
             $clockOut = $att->clock_out ? Carbon::parse($att->clock_out) : null;
 
+            // Worked Hours Calculation
             $workedMinutes = $clockOut ? $clockIn->diffInMinutes($clockOut) : 0;
+            $workedHoursFormatted = str_pad(floor($workedMinutes / 60), 2, '0', STR_PAD_LEFT) . ":" . str_pad($workedMinutes % 60, 2, '0', STR_PAD_LEFT);
 
-            $totalBreakMinutes = 0;
+            $shiftTotalHours = '00:00';
+            $paidBreakFormatted = 'N/A';
+            $unpaidBreakFormatted = 'N/A';
 
             if ($att->user && $att->user->employee) {
                 $employee = $att->user->employee;
-
-                $clockIn = Carbon::parse($att->clock_in);
                 $attendanceDate = $clockIn->format('Y-m-d');
 
-
-                $shiftDates = ShiftDate::whereDate('date', $attendanceDate)
+                // Fetch shift with its related breaks
+                $shiftDate = ShiftDate::whereDate('date', $attendanceDate)
                     ->whereHas('employees', function ($q) use ($employee) {
                         $q->where('employee_id', $employee->id);
                     })
-                    ->with(['breaks' => function ($q) {
+                    ->with('breaks')
+                    ->first();
 
-                        $q->whereNotNull('shift_date_id');
-                    }])
-                    ->get();
+                if ($shiftDate) {
+                    $shiftTotalHours = $shiftDate->total_hours ?? '00:00';
 
-                foreach ($shiftDates as $shiftDate) {
-                    if ($shiftDate->breaks->isNotEmpty()) {
-                        $totalBreakMinutes += $shiftDate->breaks->sum('duration') * 60;
+
+                    $paidMinutes = $shiftDate->breaks->where('type', 'Paid')->sum(function ($break) {
+                        $parts = explode('.', $break->duration);
+
+                        $hours = (int) ($parts[0] ?? 0);
+                        $minutes = (int) ($parts[1] ?? 0);
+
+                        return ($hours * 60) + $minutes;
+                    });
+
+
+                    $unpaidMinutes = $shiftDate->breaks->where('type', 'Unpaid')->sum(function ($break) {
+                        $parts = explode('.', $break->duration);
+
+                        $hours = (int) ($parts[0] ?? 0);
+                        $minutes = (int) ($parts[1] ?? 0);
+
+                        return ($hours * 60) + $minutes;
+                    });
+
+
+                    if ($paidMinutes > 0) {
+                        $paidBreakFormatted =
+                            str_pad(floor($paidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
+                            str_pad($paidMinutes % 60, 2, '0', STR_PAD_LEFT);
+                    }
+
+
+                    if ($unpaidMinutes > 0) {
+                        $unpaidBreakFormatted =
+                            str_pad(floor($unpaidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
+                            str_pad($unpaidMinutes % 60, 2, '0', STR_PAD_LEFT);
                     }
                 }
             }
 
-
-
-            $actualWorkedMinutes = max($workedMinutes - $totalBreakMinutes, 0);
-            $hours = floor($actualWorkedMinutes / 60);
-            $minutes = $actualWorkedMinutes % 60;
-
-
-            $breakHours = floor($totalBreakMinutes / 60);
-            $breakMinutes = $totalBreakMinutes % 60;
-            $breakHoursFormatted = "{$breakHours}:" . str_pad($breakMinutes, 2, '0', STR_PAD_LEFT);
-
             return [
-                'employee' => $att->user->employee->full_name ?? '',
-                'date' => $clockIn->format('d-m-Y'),
-                'clock_in' => $clockIn->format('h:i A'),
-                'clock_out' => $clockOut ? $clockOut->format('h:i A') : '---',
-                'worked_hours' => "{$hours}:" . str_pad($minutes, 2, '0', STR_PAD_LEFT),
-                'break_hours' => $breakHoursFormatted,
-                'nature' => $att->is_manual ? 'Manual' : 'Automatic',
-                'status' => ucfirst($att->status),
+                'employee'     => $att->user->employee->full_name ?? '',
+                'date'         => $clockIn->format('d-m-Y'),
+                'clock_in'     => $clockIn->format('h:i A'),
+                'clock_out'    => $clockOut ? $clockOut->format('h:i A') : '---',
+                'worked_hours' => $workedHoursFormatted,
+                'shift_total'  => $shiftTotalHours,
+                'paid_break'   => $paidBreakFormatted,
+                'unpaid_break' => $unpaidBreakFormatted,
+                'nature'       => $att->is_manual ? 'Manual' : 'Automatic',
+                'status'       => ucfirst($att->status),
             ];
         });
 
@@ -212,9 +224,11 @@ class CompanyTimesheet extends BaseComponent
                     'Clock In',
                     'Clock Out',
                     'Worked Hours',
-                    'Break',
-                    'Attendance Nature',
-                    'Status',
+                    'Shift Total',
+                    'Paid Break',
+                    'Unpaid Break',
+                    'Nature',
+                    'Status'
                 ],
                 'keys' => [
                     'employee',
@@ -222,14 +236,15 @@ class CompanyTimesheet extends BaseComponent
                     'clock_in',
                     'clock_out',
                     'worked_hours',
-                    'break_hours',
+                    'shift_total',
+                    'paid_break',
+                    'unpaid_break',
                     'nature',
-                    'status',
+                    'status'
                 ],
             ]
         );
     }
-
 
 
 

@@ -100,138 +100,138 @@
                              style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
 
                             <!-- Title -->
-                            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
-                                <i class="fas fa-user-circle me-3 text-info"></i>
+                            <h5 class="fw-bold text-dark d-flex align-items-center mb-4">
+                                <i class="fas fa-user-circle me-3 text-info"
+                                   style="font-size: 1.7rem;"></i>
                                 Employee Overview
-                                </h4>
+                            </h5>
+                            <!-- Menu Button -->
+                            <div class="dropdown"
+                                 wire:ignore.self>
+                                <button class="btn btn-sm btn-light border-0 px-md-3 px-2"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        wire:loading.attr="disabled"
+                                        wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
 
-                                <!-- Menu Button -->
-                                <div class="dropdown"
-                                     wire:ignore.self>
-                                    <button class="btn btn-sm btn-light border-0 px-md-3 px-2"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            wire:loading.attr="disabled"
-                                            wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                    <!-- Normal Icon -->
+                                    <span wire:loading.remove
+                                          wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                        <i class="fas fa-ellipsis-v text-muted"></i>
+                                    </span>
 
-                                        <!-- Normal Icon -->
-                                        <span wire:loading.remove
-                                              wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
-                                            <i class="fas fa-ellipsis-v text-muted"></i>
-                                        </span>
+                                    <!-- Loading Icon -->
+                                    <span wire:loading
+                                          wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
+                                        <span class="spinner-border spinner-border-sm text-muted"></span>
+                                    </span>
 
-                                        <!-- Loading Icon -->
-                                        <span wire:loading
-                                              wire:target="sendVerificationLink, sendPasswordResetLink, toggleStatus">
-                                            <span class="spinner-border spinner-border-sm text-muted"></span>
-                                        </span>
-
-                                    </button>
+                                </button>
 
 
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="#"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editProfile"
+                                           wire:click="editProfile({{ $employee->id }})">
+                                            <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
+                                        </a>
+                                    </li>
+                                    @if (!$employee->verified && !$employee->user)
                                         <li>
                                             <a class="dropdown-item"
                                                href="#"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#editProfile"
-                                               wire:click="editProfile({{ $employee->id }})">
-                                                <i class="fas fa-edit me-2 text-muted"></i> Edit Profile
-                                            </a>
-                                        </li>
-                                        @if (!$employee->verified && !$employee->user)
-                                            <li>
-                                                <a class="dropdown-item"
-                                                   href="#"
-                                                   wire:click.prevent="sendVerificationLink({{ $employee->id }})"
-                                                   wire:loading.attr="disabled"
-                                                   wire:target="sendVerificationLink({{ $employee->id }})">
-
-                                                    <i class="fas fa-envelope me-2 text-muted"></i>
-
-                                                    <span wire:loading.remove
-                                                          wire:target="sendVerificationLink({{ $employee->id }})">
-                                                        Send Verification Link
-                                                    </span>
-
-
-
-                                                    <span wire:loading
-                                                          wire:target="sendVerificationLink({{ $employee->id }})">
-                                                        <span class="spinner-border spinner-border-sm me-2"></span>
-                                                        Sending...
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        @endif
-
-
-                                        @if ($employee->user)
-                                            <li>
-                                                <a class="dropdown-item"
-                                                   href="#"
-                                                   wire:click.prevent="sendPasswordResetLink({{ $employee->id }})"
-                                                   wire:loading.attr="disabled"
-                                                   wire:target="sendPasswordResetLink({{ $employee->id }})">
-
-                                                    <i class="fas fa-user-lock me-2 text-muted"></i>
-
-                                                    <span wire:loading.remove
-                                                          wire:target="sendPasswordResetLink({{ $employee->id }})">
-                                                        Password Reset Link
-                                                    </span>
-
-                                                    <span wire:loading
-                                                          wire:target="sendPasswordResetLink({{ $employee->id }})">
-                                                        <span class="spinner-border spinner-border-sm me-2"></span>
-                                                        Sending...
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        @endif
-
-                                        <li>
-                                            <a class="dropdown-item"
-                                               href="#"
-                                               wire:click.prevent="$dispatch('confirmChangeStatus', {{ $employee->id }})"
+                                               wire:click.prevent="sendVerificationLink({{ $employee->id }})"
                                                wire:loading.attr="disabled"
-                                               wire:target="toggleStatus">
+                                               wire:target="sendVerificationLink({{ $employee->id }})">
+
+                                                <i class="fas fa-envelope me-2 text-muted"></i>
 
                                                 <span wire:loading.remove
-                                                      wire:target="toggleStatus">
-                                                    @if ($employee->is_active == 1)
-                                                        <i class="fas fa-user-minus me-2 text-muted"></i> Change to
-                                                        Former
-                                                    @else
-                                                        <i class="fas fa-user-check me-2 text-muted"></i> Change to
-                                                        Active
-                                                    @endif
+                                                      wire:target="sendVerificationLink({{ $employee->id }})">
+                                                    Send Verification Link
+                                                </span>
+
+
+
+                                                <span wire:loading
+                                                      wire:target="sendVerificationLink({{ $employee->id }})">
+                                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                                    Sending...
+                                                </span>
+                                            </a>
+                                        </li>
+                                    @endif
+
+
+                                    @if ($employee->user)
+                                        <li>
+                                            <a class="dropdown-item"
+                                               href="#"
+                                               wire:click.prevent="sendPasswordResetLink({{ $employee->id }})"
+                                               wire:loading.attr="disabled"
+                                               wire:target="sendPasswordResetLink({{ $employee->id }})">
+
+                                                <i class="fas fa-user-lock me-2 text-muted"></i>
+
+                                                <span wire:loading.remove
+                                                      wire:target="sendPasswordResetLink({{ $employee->id }})">
+                                                    Password Reset Link
                                                 </span>
 
                                                 <span wire:loading
-                                                      wire:target="toggleStatus">
+                                                      wire:target="sendPasswordResetLink({{ $employee->id }})">
                                                     <span class="spinner-border spinner-border-sm me-2"></span>
-                                                    Updating...
+                                                    Sending...
                                                 </span>
                                             </a>
                                         </li>
+                                    @endif
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="#"
+                                           wire:click.prevent="$dispatch('confirmChangeStatus', {{ $employee->id }})"
+                                           wire:loading.attr="disabled"
+                                           wire:target="toggleStatus">
+
+                                            <span wire:loading.remove
+                                                  wire:target="toggleStatus">
+                                                @if ($employee->is_active == 1)
+                                                    <i class="fas fa-user-minus me-2 text-muted"></i> Change to
+                                                    Former
+                                                @else
+                                                    <i class="fas fa-user-check me-2 text-muted"></i> Change to
+                                                    Active
+                                                @endif
+                                            </span>
+
+                                            <span wire:loading
+                                                  wire:target="toggleStatus">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                Updating...
+                                            </span>
+                                        </a>
+                                    </li>
 
 
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
 
-                                        <li>
-                                            <a class="dropdown-item text-danger"
-                                               href="#"
-                                               wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
-                                                <i class="fas fa-trash me-2"></i> Remove Employee
-                                            </a>
-                                        </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger"
+                                           href="#"
+                                           wire:click.prevent="$dispatch('confirmDelete', {{ $employee->id }})">
+                                            <i class="fas fa-trash me-2"></i> Remove Employee
+                                        </a>
+                                    </li>
 
-                                    </ul>
-                                </div>
+                                </ul>
+                            </div>
 
                         </div>
 
@@ -545,8 +545,9 @@
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start mb-4">
                                 {{-- Left : Title --}}
-                                <h5 class="fw-bold text-dark mb-0">
-                                    Emergency contacts
+                                <h5 class="fw-bold text-dark d-flex align-items-center mb-4">
+                                    <i class="fas fa-phone-alt me-3 text-info"></i>
+                                    Emergency Contacts
                                 </h5>
 
 
@@ -887,13 +888,14 @@
 
 
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold text-dark mb-0">
-                            <i class="fas fa-id-card-alt text-dark me-2"></i>Employee Profile Summary
-                            </h4>
-                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-                                Last Updated:
-                                {{ $profile && $profile->updated_at ? $profile->updated_at->format('d M, Y') : 'N/A' }}
-                            </span>
+                        <h5 class="fw-bold text-dark d-flex align-items-center mb-0">
+                            <i class="fas fa-id-card-alt me-3 text-info"></i>
+                            Employee Profile Summary
+                        </h5>
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                            Last Updated:
+                            {{ $profile && $profile->updated_at ? $profile->updated_at->format('d M, Y') : 'N/A' }}
+                        </span>
                     </div>
 
                     <div class="row g-4">
@@ -1039,6 +1041,38 @@
                                             <span
                                                   class="badge bg-soft-primary text-primary border border-primary border-opacity-25">{{ ucfirst($emp->employment_status ?? 'N/A') }}</span>
                                         </div>
+
+                                        <div class="col-sm-6 mt-2">
+                                            <label class="text-muted small d-block">Annual Salary</label>
+                                            <span class="fw-bold text-dark">
+                                                £{{ !empty($emp->annual_salary) ? number_format($emp->annual_salary, 2) : '0.00' }}
+                                            </span>
+                                        </div>
+
+                                        <div class="col-sm-6 mt-2">
+                                            <label class="text-muted small d-block">Hourly Salary</label>
+                                            <span class="fw-bold text-dark">
+                                                £{{ !empty($emp->hourly_salary) ? number_format($emp->hourly_salary, 2) : '0.00' }}
+                                            </span>
+                                        </div>
+
+
+                                        <div class="col-sm-6 mt-2">
+                                            <label class="text-muted small d-block">Working Hours Restriction</label>
+                                            <span class="fw-bold text-dark">
+                                                {{ $emp->working_hours_restriction ? 'Restricted' : 'Non-Restricted' }}
+                                            </span>
+                                        </div>
+
+                                        @if (!empty($emp->max_weekly_hours))
+                                            <div class="col-sm-6 mt-2">
+                                                <label class="text-muted small d-block">Maximum Weekly Hours</label>
+                                                <span class="fw-bold text-dark">
+                                                    {{ $emp->max_weekly_hours }} Hours
+                                                </span>
+                                            </div>
+                                        @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -1057,13 +1091,17 @@
                                                     <i class="fas fa-home me-2"></i>Current Address
                                                 </h6>
 
-
-
                                                 <span class="text-muted small">
-                                                    {{ $profile->city ?? 'N/A' }},
-                                                    {{ $profile->state ?? 'N/A' }},
-                                                    {{ $profile->postcode ?? 'N/A' }},
-                                                    {{ $profile->country ?? 'N/A' }}
+                                                    @php
+                                                        $addressParts = array_filter([
+                                                            $profile->city,
+                                                            $profile->state,
+                                                            $profile->postcode,
+                                                            $profile->country,
+                                                        ]);
+                                                    @endphp
+
+                                                    {{ count($addressParts) ? implode(', ', $addressParts) : 'N/A' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -1727,6 +1765,43 @@
                                     @enderror
                                 </div>
                             @endif
+
+                            <!-- 14. Annual Salary -->
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label small fw-semibold text-secondary">
+                                    Annual Salary (£)
+                                </label>
+                                <input type="number"
+                                       step="0.01"
+                                       min="0"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="annual_salary"
+                                       placeholder="e.g. 50000">
+
+                                @error('annual_salary')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- 15. Hourly Salary -->
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label small fw-semibold text-secondary">
+                                    Hourly Salary (£)
+                                </label>
+                                <input type="number"
+                                       step="0.01"
+                                       min="0"
+                                       class="form-control border-light-subtle shadow-none"
+                                       wire:model="hourly_salary"
+                                       placeholder="e.g. 25">
+
+                                @error('hourly_salary')
+                                    <span class="text-danger x-small">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+
+
 
 
 

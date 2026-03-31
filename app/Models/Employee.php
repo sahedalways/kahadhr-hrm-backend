@@ -45,6 +45,8 @@ class Employee extends Model
         'deleted_at',
         'working_hours_restriction',
         'max_weekly_hours',
+        'annual_salary',
+        'hourly_salary',
     ];
 
 

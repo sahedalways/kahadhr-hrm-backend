@@ -70,6 +70,8 @@ class EmployeeDetails extends BaseComponent
     public $new_email;
     public $new_mobile;
     public $verification_code;
+    public $annual_salary;
+    public $hourly_salary;
 
     public $genderOptions = ['male', 'female', 'other'];
 
@@ -846,6 +848,8 @@ class EmployeeDetails extends BaseComponent
         $this->f_name = '';
         $this->l_name = '';
         $this->email = '';
+        $this->annual_salary = '';
+        $this->hourly_salary = '';
         $this->phone_no = '';
         $this->job_title = '';
         $this->title = '';
@@ -905,6 +909,8 @@ class EmployeeDetails extends BaseComponent
         // Load all relevant fields
         $this->f_name = $this->employee->f_name;
         $this->l_name = $this->employee->l_name;
+        $this->annual_salary = $this->employee->annual_salary;
+        $this->hourly_salary = $this->employee->hourly_salary;
         $this->title = $this->employee->title;
         $this->max_weekly_hours = $this->employee->max_weekly_hours;
         $this->working_hours_restriction = $this->employee->working_hours_restriction;
@@ -1110,6 +1116,8 @@ class EmployeeDetails extends BaseComponent
             'passport_expiry_date' => 'required|date',
             'employment_status' => 'required|in:part-time,full-time',
             'contract_hours' => 'required|numeric|min:0',
+            'hourly_salary' => 'nullable|numeric|min:0',
+            'annual_salary' => 'nullable|numeric|min:0',
             'working_hours_restriction' => 'required|boolean',
             'max_weekly_hours' => 'nullable|numeric|min:0',
         ];
@@ -1137,6 +1145,8 @@ class EmployeeDetails extends BaseComponent
             'l_name'                   => 'Last Name',
             'title'                    => 'Title',
             'job_title'                => 'Job Title',
+            'hourly_salary'                => 'Hourly Salary',
+            'annual_salary'                => 'Annual Salary',
             'contract_hours'           => 'Contract Hours (Weekly)',
             'start_date'               => 'Employment Start Date',
             'house_no'                 => 'House Number',
@@ -1187,6 +1197,8 @@ class EmployeeDetails extends BaseComponent
             'title' => $this->title,
             'street' => $this->street,
             'house_no' => $this->house_no,
+            'hourly_salary' => $this->hourly_salary,
+            'annual_salary' => $this->annual_salary,
 
             'nationality' => $this->nationality,
             'date_of_birth' => $this->date_of_birth == '' ? null : $this->date_of_birth,

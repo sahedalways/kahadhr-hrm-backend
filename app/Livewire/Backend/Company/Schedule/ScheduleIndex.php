@@ -585,7 +585,7 @@ class ScheduleIndex extends BaseComponent
 
     public function saveAsTemplate()
     {
-        // Clean and process dates
+
         $this->cleanSelectedDates();
         $datesToProcess = !empty($this->selectedDates) ? array_unique($this->selectedDates) : [$this->selectedDate];
 
@@ -633,11 +633,6 @@ class ScheduleIndex extends BaseComponent
 
         $dateCount = count($datesToProcess);
         $this->toast("Template saved successfully for {$dateCount} date(s)!", 'success');
-
-        // Reset after save
-        $this->selectedDates = [];
-        $this->selectedDateDisplay = '';
-        $this->hasMultipleDates = false;
     }
 
 

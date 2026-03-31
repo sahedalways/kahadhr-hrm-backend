@@ -1029,7 +1029,7 @@ class ScheduleIndex extends BaseComponent
             'selectedDate' => ['required', 'date'],
             'newShift.title' => 'required|string',
             'newShift.start_time' => 'required|date_format:H:i',
-            'newShift.end_time' => 'required|date_format:H:i|after:newShift.start_time',
+            'newShift.end_time'   => 'required|date_format:H:i',
             'newShift.employees' => 'required|array|min:1',
 
             // New fields

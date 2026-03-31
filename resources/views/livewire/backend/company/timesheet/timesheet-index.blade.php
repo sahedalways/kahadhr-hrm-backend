@@ -191,7 +191,7 @@
                     <h6 class="modal-title fw-600">Time Sheet</h6>
                     <button type="button"
                             class="btn btn-light rounded-pill"
-                            data-bs-dismiss="modal">
+                            onclick="closeAllModals()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -781,8 +781,7 @@
                     </h5>
                     <button type="button"
                             class="btn btn-light rounded-pill"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
+                            onclick="closeAllModals()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -817,8 +816,13 @@
                                style="min-width: 25px;"></i>
                             <div class="fw-normal text-dark flex-grow-1">
                                 <div><strong>Time:</strong>
-                                    {{ \Carbon\Carbon::parse($requestDetails->start_date)->format('h:i A') }}</div>
-                                <div><strong>Location:</strong> {{ $requestDetails->clock_in_location }}</div>
+                                    {{ \Carbon\Carbon::parse($requestDetails->time)->format('h:i A') }}</div>
+                                @if ($requestDetails->type === 'late_clock_in')
+                                    <div><strong>Location:</strong> {{ $requestDetails->clock_in_location }}</div>
+                                @else
+                                    <div><strong>Location:</strong> {{ $requestDetails->clock_out_location }}</div>
+                                @endif
+
                             </div>
                         </div>
 
@@ -946,8 +950,7 @@
                     <h6 class="modal-title fw-600">Submit Manual Attendance</h6>
                     <button type="button"
                             class="btn btn-light rounded-pill"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
+                            onclick="closeAllModals()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1150,4 +1153,21 @@
             var myModal = new bootstrap.Modal(document.getElementById('moreAttendanceDetailModal'));
             myModal.show();
         });
+    </script>
+
+
+    <script>
+        function closeAllModals() {
+            document.querySelectorAll('.modal.show').forEach(modalEl => {
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+
+
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style = '';
+        }
     </script>

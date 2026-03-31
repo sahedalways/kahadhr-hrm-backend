@@ -73,6 +73,10 @@ class UsersIndex extends BaseComponent
     public $addMethod = 'manual';
     public $documentTypes;
 
+
+    public $selectedEmployees = [];
+
+    public $selectAllUsers = false;
     protected $listeners = ['deleteEmployee', 'sortUpdated' => 'handleSort', 'openModal', 'tick'];
 
     public $customField = [
@@ -368,6 +372,8 @@ class UsersIndex extends BaseComponent
             ->where('company_id', auth()->user()->company->id)
             ->orderBy('name')
             ->get();
+
+        $this->loadEmployees();
     }
 
 
@@ -424,6 +430,18 @@ class UsersIndex extends BaseComponent
     }
 
 
+    public function loadEmployees()
+    {
+        $this->employees = Employee::where('company_id', auth()->user()->company->id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name')
+            ->get();
+
+
+
+        $this->selectedEmployees = [];
+        $this->selectAllUsers = false;
+    }
 
 
 

@@ -587,6 +587,8 @@
                 </div>
 
                 <div class="modal-body">
+                    @include('livewire.backend.components.employee-dropdown')
+
                     <div class="mb-3">
                         <label class="form-label">Field Label</label>
                         <input type="text"

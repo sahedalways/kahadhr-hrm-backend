@@ -305,118 +305,134 @@
                     {{-- ================= WEEKLY VIEW ================= --}}
                 @else
                     <div class="d-flex">
-
-
-                        <div class="mt-n3">
-                            <div class="schedule-sidebar p-2 border-end"
-                                 style="width: clamp(250px, 18vw, 280px); flex-shrink: 0;">
-                                <input type="text"
-                                       class="form-control form-control-sm mb-3"
-                                       placeholder="Search employees..."
-                                       wire:model.live="employeeSearch">
-
-                                <h6 class="fw-bold text-muted text-uppercase mb-2">Employees</h6>
-
-                                <div class="employee-list ">
-                                    @if ($employees->isEmpty())
-                                        <div class="text-center text-muted py-4">
-                                            <i class="fas fa-user-slash fa-2x mb-2"></i>
-                                            <div>No employees found.</div>
-                                        </div>
-                                    @else
-                                        @foreach ($employees as $emp)
-                                            {{-- single loop --}}
-                                            <div class="d-flex align-items-center py-4 px-2 employee-row shadow-sm rounded mb-2"
-                                                 title="{{ $emp->full_name }}">
-
-                                                {{-- avatar (optional) --}}
-                                                <div class="position-relative me-3">
-                                                    <img src="{{ $emp->avatar_url ?? asset('assets/img/default-avatar.png') }}"
-                                                         alt="{{ $emp->full_name }}"
-                                                         class="rounded-circle employee-avatar">
-                                                </div>
-
-                                                <div class="d-flex flex-column">
-                                                    <span class="fw-semibold">{{ $emp->full_name }}</span>
-                                                    <small
-                                                           class="text-muted">{{ ucfirst($emp->role ?? 'Employee') }}</small>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
                         {{-- grid --}}
                         <div class="flex-grow-1 mt-4 table-responsive">
                             <table class="table table-bordered schedule-table m-0">
                                 <thead>
                                     <tr class="text-center">
+                                        {{-- Employee Header Column --}}
+                                        <th class="bg-light border-bottom-0 align-middle"
+                                            style="width: 280px; min-width: 280px;">
+                                            <div class="d-flex flex-column gap-2">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="fw-bold text-dark">
+                                                        <i class="fas fa-users me-2 text-primary"></i>Employees
+                                                    </div>
+                                                    <span class="badge bg-primary rounded-pill">
+                                                        {{ $employees->count() }}
+                                                    </span>
+                                                </div>
+
+                                                {{-- Search Input --}}
+                                                <div class="position-relative">
+                                                    <i class="fas fa-search position-absolute text-muted"
+                                                       style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px;"></i>
+                                                    <input type="text"
+                                                           class="form-control form-control-sm ps-5"
+                                                           placeholder="Search by name..."
+                                                           wire:model.live="employeeSearch"
+                                                           style="border-radius: 20px; background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                                                </div>
+                                            </div>
+                                        </th>
+
+                                        {{-- Date Headers --}}
                                         @foreach ($weekDays as $day)
-                                            <th
-                                                class="{{ $day['highlight'] ? 'bg-primary-light text-primary' : 'bg-light' }}">
+                                            <th class="{{ $day['highlight'] ? 'bg-primary-light text-primary border-bottom-0' : 'bg-light border-bottom-0' }}"
+                                                style="width: 14.28%">
                                                 <div class="fw-bold">{{ $day['day'] }}</div>
-                                                <small>{{ $day['date'] }}</small>
+                                                <div class="small">{{ $day['date'] }}</div>
                                             </th>
                                         @endforeach
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($employees as $emp)
+                                    @if ($employees->isEmpty())
                                         <tr>
-                                            @foreach ($weekDays as $day)
-                                                @php
-                                                    $dateKey = $day['full_date'];
-
-                                                    // Conditions
-                                                    $onLeave = hasLeave($emp->id, $dateKey);
-
-                                                    $empAttendance = collect(
-                                                        $this->attendanceCalendar[$dateKey] ?? [],
-                                                    )->where('user_id', $emp->user_id);
-
-                                                    $hasShift = in_array($emp->id, $this->shiftMap[$dateKey] ?? []);
-
-                                                    $isPastDate = Carbon::parse($dateKey)->lt(today()); // strictly past
-                                                    $isToday = Carbon::parse($dateKey)->isToday();
-                                                @endphp
-
-                                                <td
-                                                    class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}">
-
-                                                    {{-- Leave --}}
-                                                    @if ($onLeave)
-                                                        <div class="unavailable-box">
-                                                            Unavailable
-                                                        </div>
-
-                                                        {{-- Attendance exists --}}
-                                                    @elseif ($empAttendance->isNotEmpty())
-                                                        @foreach ($empAttendance as $att)
-                                                            @include(
-                                                                'livewire.backend.company.timesheet.partials._attendance-block',
-                                                                ['att' => $att]
-                                                            )
-                                                        @endforeach
-
-                                                        {{-- Absent: Shift exists + past date + no attendance --}}
-                                                    @elseif ($hasShift && ($isPastDate || $isToday))
-                                                        <div
-                                                             class="absent-badge d-flex justify-content-center align-items-center py-1">
-                                                            <span
-                                                                  class="badge bg-danger d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill shadow-sm">
-                                                                <i class="fas fa-user-times"></i>
-                                                                Absent
-                                                            </span>
-                                                        </div>
-                                                    @endif
-
-                                                </td>
-                                            @endforeach
+                                            <td colspan="{{ count($weekDays) + 1 }}">
+                                                <div class="text-center text-muted py-4">
+                                                    <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                                    <div>No employees found.</div>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    @endforeach
+                                    @else
+                                        @foreach ($employees as $emp)
+                                            <tr>
+                                                {{-- Employee Info Column --}}
+                                                <td class="align-middle"
+                                                    style="background-color: #f8f9fa; width: 280px; min-width: 280px;">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ $emp->avatar_url ?? asset('assets/img/default-avatar.png') }}"
+                                                             alt="{{ $emp->full_name }}"
+                                                             class="rounded-circle me-2"
+                                                             style="width: 38px; height: 38px; object-fit: cover;">
+                                                        <div>
+                                                            <div class="fw-semibold">
+                                                                {{ \Illuminate\Support\Str::limit($emp->full_name, 30, '...') }}
+                                                            </div>
+                                                            <small
+                                                                   class="text-muted">{{ ucfirst($emp->role ?? 'Employee') }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                {{-- Schedule Cells for each day --}}
+                                                @foreach ($weekDays as $day)
+                                                    @php
+                                                        $dateKey = $day['full_date'];
+
+                                                        // Conditions
+                                                        $onLeave = hasLeave($emp->id, $dateKey);
+
+                                                        $empAttendance = collect(
+                                                            $this->attendanceCalendar[$dateKey] ?? [],
+                                                        )->where('user_id', $emp->user_id);
+
+                                                        $hasShift = in_array($emp->id, $this->shiftMap[$dateKey] ?? []);
+
+                                                        $isPastDate = Carbon::parse($dateKey)->lt(today());
+                                                        $isToday = Carbon::parse($dateKey)->isToday();
+                                                    @endphp
+
+                                                    <td class="schedule-cell {{ $day['highlight'] ? 'bg-primary-light-cell' : '' }}"
+                                                        style="position: relative; vertical-align: middle;">
+
+                                                        {{-- Leave --}}
+                                                        @if ($onLeave)
+                                                            <div class="d-flex align-items-center justify-content-center h-100 user-select-none"
+                                                                 style="background-color: #f8d7da; opacity: 0.7; border-radius: 4px; min-height: 70px;">
+                                                                <span
+                                                                      class="text-danger small fw-bold px-2">Unavailable</span>
+                                                            </div>
+
+                                                            {{-- Attendance exists --}}
+                                                        @elseif ($empAttendance->isNotEmpty())
+                                                            @foreach ($empAttendance as $att)
+                                                                @include(
+                                                                    'livewire.backend.company.timesheet.partials._attendance-block',
+                                                                    ['att' => $att]
+                                                                )
+                                                            @endforeach
+
+                                                            {{-- Absent: Shift exists + past date + no attendance --}}
+                                                        @elseif ($hasShift && ($isPastDate || $isToday))
+                                                            <div
+                                                                 class="d-flex justify-content-center align-items-center py-1">
+                                                                <span
+                                                                      class="badge bg-danger d-inline-flex align-items-center gap-1 px-3 py-2 rounded-pill shadow-sm">
+                                                                    <i class="fas fa-user-times"></i>
+                                                                    Absent
+                                                                </span>
+                                                            </div>
+                                                        @endif
+
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

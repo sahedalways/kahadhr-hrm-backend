@@ -10,6 +10,7 @@ use App\Livewire\Backend\Employee\Documents\AssignedDocuments;
 use App\Livewire\Backend\Employee\Documents\ManageDocuments;
 use App\Livewire\Backend\Employee\Leaves\LeavesIndexEmp;
 use App\Livewire\Backend\Employee\Onboarding\OnboardingIndex;
+use App\Livewire\Backend\Employee\Policy\CompanyPolicyIndex;
 use App\Livewire\Backend\Employee\Reports\ExpensesIndex;
 use App\Livewire\Backend\Employee\Reports\PayslipIndex;
 use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
@@ -49,6 +50,10 @@ Route::domain('company.' . config('app.base_domain'))
   ->group(function () {
     // Dashboard home
     Route::get('/', Dashboard::class)->name('index');
+
+
+
+    Route::get('policies', CompanyPolicyIndex::class)->name('policies');
 
 
     // Settings routes

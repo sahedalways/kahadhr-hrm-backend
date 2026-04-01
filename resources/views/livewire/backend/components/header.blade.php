@@ -296,6 +296,13 @@
                                         </a>
                                     </li>
                                     <hr class="dropdown-divider">
+                                @elseif(auth()->check() && auth()->user()->user_type === 'employee')
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center py-2"
+                                           href="{{ route('employee.dashboard.policies', ['company' => app('authUser')->employee->company->sub_domain]) }}">
+                                            <i class="fas fa-file-alt me-2"></i> Company Policy
+                                        </a>
+                                    </li>
                                 @endif
 
 

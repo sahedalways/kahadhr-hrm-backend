@@ -86,6 +86,16 @@ class UsersIndex extends BaseComponent
         'required' => false,
     ];
 
+    public $customFieldsList = [];
+    public $editingField = [
+        'id' => null,
+        'label' => '',
+        'type' => 'text',
+        'options' => '',
+        'required' => false,
+    ];
+    public $fieldToDelete = null;
+
 
     public $genderOptions = ['male', 'female', 'other'];
 
@@ -374,6 +384,7 @@ class UsersIndex extends BaseComponent
             ->get();
 
         $this->loadEmployees();
+        $this->loadCustomFieldsForManagement();
     }
 
 
@@ -448,18 +459,17 @@ class UsersIndex extends BaseComponent
 
     public function saveCustomField()
     {
-        $rules = [
+        $this->validate([
             'customField.label' => 'required|string|max:255',
             'customField.type' => 'required|in:text,number,date,textarea,select',
             'customField.options' => 'nullable|required_if:customField.type,select',
             'customField.required' => 'boolean',
-        ];
 
-        $this->validate($rules);
+            'selectedEmployees' => 'nullable|array',
+            'selectedEmployees.*' => 'exists:employees,id',
+        ]);
 
-
-
-        CustomEmployeeProfileField::create([
+        $field = CustomEmployeeProfileField::create([
             'company_id' => auth()->user()->company->id,
             'name'       => $this->customField['label'],
             'key'        => Str::slug($this->customField['label'], '_'),
@@ -470,14 +480,18 @@ class UsersIndex extends BaseComponent
             'required'   => $this->customField['required'],
         ]);
 
-        $this->reset('customField');
+
+        if (!empty($this->selectedEmployees)) {
+            $field->employees()->sync($this->selectedEmployees);
+        }
+
+        $this->reset(['customField', 'selectedEmployees']);
 
         $this->dispatch('closemodal');
         $this->resetInputFields();
         $this->resetLoaded();
         $this->toast('Custom field added successfully', 'success');
     }
-
 
 
 
@@ -605,6 +619,7 @@ class UsersIndex extends BaseComponent
             $this->dispatch('closemodal');
             $this->resetInputFields();
             $this->resetLoaded();
+            $this->loadCustomFieldsForManagement();
 
             $this->toast('Employee added successfully!', 'success');
         } catch (\Throwable $e) {
@@ -824,6 +839,140 @@ class UsersIndex extends BaseComponent
             ]
         );
     }
+
+
+    public function loadCustomFieldsForManagement()
+    {
+        $this->customFieldsList = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->withCount('employees')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+
+    public function editCustomField($id)
+    {
+        $field = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+            ->findOrFail($id);
+
+        $this->editingField = [
+            'id' => $field->id,
+            'label' => $field->name,
+            'type' => $field->type,
+            'options' => is_array($field->options) ? implode(', ', $field->options) : $field->options,
+            'required' => (bool) $field->required,
+        ];
+    }
+
+
+
+    /**
+     * Update custom field
+     */
+    public function updateCustomField()
+    {
+        $rules = [
+            'editingField.label' => 'required|string|max:255',
+            'editingField.type' => 'required|in:text,number,date,textarea,select',
+            'editingField.options' => 'nullable|required_if:editingField.type,select',
+            'editingField.required' => 'boolean',
+        ];
+
+        $this->validate($rules, [], [
+            'editingField.label' => 'Field Label',
+            'editingField.type' => 'Field Type',
+            'editingField.options' => 'Options',
+        ]);
+
+        try {
+            $field = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+                ->findOrFail($this->editingField['id']);
+
+            $field->update([
+                'name' => $this->editingField['label'],
+                'type' => $this->editingField['type'],
+                'options' => $this->editingField['type'] === 'select'
+                    ? array_map('trim', explode(',', $this->editingField['options']))
+                    : null,
+                'required' => $this->editingField['required'],
+            ]);
+
+            $this->reset(['editingField']);
+            $this->loadCustomFieldsForManagement();
+
+            $this->dispatch('closemodal');
+            $this->toast('Custom field updated successfully!', 'success');
+        } catch (\Exception $e) {
+            $this->toast('Failed to update custom field: ' . $e->getMessage(), 'error');
+        }
+    }
+
+    /**
+     * Confirm delete custom field
+     */
+    public function confirmDeleteCustomField($id)
+    {
+        $this->fieldToDelete = $id;
+    }
+
+    /**
+     * Delete custom field
+     */
+    public function deleteCustomField()
+    {
+        if (!$this->fieldToDelete) {
+            $this->toast('No field selected for deletion.', 'error');
+            return;
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $field = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
+                ->findOrFail($this->fieldToDelete);
+
+
+            $deletedValuesCount = $field->employeeValues()->delete();
+
+
+            $field->delete();
+
+            DB::commit();
+
+            $this->fieldToDelete = null;
+            $this->loadCustomFieldsForManagement();
+
+            $this->dispatch('closemodal');
+
+            $message = 'Custom field deleted successfully!';
+            if ($deletedValuesCount > 0) {
+                $message .= " ({$deletedValuesCount} employee record(s) removed)";
+            }
+
+            $this->toast($message, 'success');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->toast('Failed to delete custom field: ' . $e->getMessage(), 'error');
+        }
+    }
+
+    /**
+     * Reset editing field
+     */
+    public function resetEditingField()
+    {
+        $this->editingField = [
+            'id' => null,
+            'label' => '',
+            'type' => 'text',
+            'options' => '',
+            'required' => false,
+        ];
+    }
+
+
+
+
 
 
 

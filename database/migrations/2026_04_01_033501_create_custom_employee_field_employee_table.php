@@ -11,12 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_employee_profile_fields', function (Blueprint $table) {
+        Schema::create('custom_employee_field_employee', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('field_id')
+                ->constrained('custom_employee_profile_fields')
+                ->cascadeOnDelete();
+
             $table->foreignId('employee_id')
-                ->nullable()
                 ->constrained()
-                ->cascadeOnDelete()
-                ->after('company_id');
+                ->cascadeOnDelete();
+
+            $table->unique(['field_id', 'employee_id']);
         });
     }
 
@@ -25,9 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_employee_profile_fields', function (Blueprint $table) {
-            $table->dropForeign(['employee_id']);
-            $table->dropColumn('employee_id');
-        });
+        Schema::dropIfExists('custom_employee_field_employee');
     }
 };

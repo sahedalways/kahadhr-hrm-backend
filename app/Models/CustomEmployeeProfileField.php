@@ -35,4 +35,16 @@ class CustomEmployeeProfileField extends Model
     {
         return $this->hasMany(CustomEmployeeProfileFieldValue::class, 'field_id');
     }
+
+
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class, 'custom_employee_field_employee', 'field_id', 'employee_id');
+    }
+
+
+    public function employeeValues()
+    {
+        return $this->hasMany(CustomEmployeeProfileFieldValue::class, 'field_id');
+    }
 }

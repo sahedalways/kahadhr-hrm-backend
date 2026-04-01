@@ -51,7 +51,7 @@
        }"
        @click.away="closeDropdown()">
 
-      <label class="form-label fw-bold text-secondary">Select Employees</label>
+      <label class="form-label fw-bold text-secondary">Select Employees <span class="text-danger">*</span></label>
 
       <div class="position-relative">
           <!-- Dropdown Button -->
@@ -108,5 +108,9 @@
           </div>
       </div>
 
-
+      @error('selectedEmployees')
+          <div class="text-danger mt-1 text-sm">
+              {{ $message }}
+          </div>
+      @enderror
   </div>

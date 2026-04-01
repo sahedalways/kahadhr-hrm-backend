@@ -36,14 +36,19 @@
         @endif
 
 
-        <div class="col-auto">
+        <div class="col-auto d-flex gap-2">
             <button class="btn btn-sm btn-outline-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#customFieldModal">
-                <i class="fa fa-sliders-h me-1"></i> Custom Fields
+                <i class="fa fa-sliders-h me-1"></i> Add Custom Fields
+            </button>
+
+            <button class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#manageCustomFieldsModal">
+                <i class="fa fa-sliders-h me-1"></i> Manage Custom Fields
             </button>
         </div>
-
         <div class="col-auto">
             <a data-bs-toggle="modal"
                data-bs-target="#add"
@@ -590,15 +595,20 @@
                     @include('livewire.backend.components.employee-dropdown')
 
                     <div class="mb-3">
-                        <label class="form-label">Field Label</label>
+                        <label class="form-label">Field Label <span class="text-danger">*</span></label>
                         <input type="text"
                                class="form-control"
                                wire:model="customField.label"
                                placeholder="e.g. Emergency Contact Name">
+
+                        @error('customField.label')
+                            <div class="text-danger mt-1"
+                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Field Type</label>
+                        <label class="form-label">Field Type <span class="text-danger">*</span></label>
                         <select class="form-select"
                                 wire:model="customField.type">
                             <option value="text">Text</option>
@@ -607,7 +617,13 @@
                             <option value="textarea">Textarea</option>
                             <option value="select">Dropdown</option>
                         </select>
+
+                        @error('customField.type')
+                            <div class="text-danger mt-1"
+                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                        @enderror
                     </div>
+
 
                     @if ($customField['type'] === 'select')
                         <div class="mb-3">
@@ -660,6 +676,229 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
+
+    <!-- Custom Fields Management Modal -->
+    <div wire:ignore.self
+         class="modal fade"
+         id="manageCustomFieldsModal"
+         tabindex="-1"
+         data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Manage Custom Fields</h6>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (count($customFieldsList) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Field Label</th>
+                                        <th>Field Type</th>
+                                        <th>Required</th>
+                                        <th>Assigned Employees</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($customFieldsList as $index => $field)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>
+                                                <strong>{{ $field->name }}</strong>
+                                                <br>
+                                                <small class="text-muted">Key: {{ $field->key }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    {{ ucfirst($field->type) }}
+                                                </span>
+                                                @if ($field->type === 'select' && $field->options)
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        Options: {{ implode(', ', $field->options) }}
+                                                    </small>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @if ($field->required)
+                                                    <span class="badge bg-danger">Required</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Optional</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary">
+                                                    {{ $field->employees_count ?? $field->employees()->count() }}
+                                                    Employees
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm"
+                                                     role="group">
+                                                    <button type="button"
+                                                            class="btn btn-outline-primary"
+                                                            wire:click="editCustomField({{ $field->id }})"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editCustomFieldModal">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger"
+                                                            wire:click="confirmDeleteCustomField({{ $field->id }})"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteCustomFieldModal">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="fas fa-sliders-h fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No custom fields created yet.</p>
+                            <button class="btn btn-primary btn-sm"
+                                    data-bs-dismiss="modal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#customFieldModal">
+                                <i class="fas fa-plus me-1"></i> Create Your First Custom Field
+                            </button>
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                            data-bs-toggle="modal"
+                            data-bs-target="#customFieldModal">
+                        <i class="fas fa-plus me-1"></i> Add New Field
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Custom Field Modal -->
+    <div wire:ignore.self
+         class="modal fade"
+         id="editCustomFieldModal"
+         tabindex="-1"
+         data-bs-backdrop="static">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Edit Custom Field</h6>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Field Label <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control"
+                               wire:model="editingField.label"
+                               placeholder="e.g. Emergency Contact Name">
+                        @error('editingField.label')
+                            <div class="text-danger mt-1"
+                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Field Type <span class="text-danger">*</span></label>
+                        <select class="form-select"
+                                wire:model="editingField.type">
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="textarea">Textarea</option>
+                            <option value="select">Dropdown</option>
+                        </select>
+                        @error('editingField.type')
+                            <div class="text-danger mt-1"
+                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    @if ($editingField['type'] === 'select')
+                        <div class="mb-3">
+                            <label class="form-label">Options (comma separated)</label>
+                            <input type="text"
+                                   class="form-control"
+                                   wire:model="editingField.options"
+                                   placeholder="A+, B+, O+">
+                            @error('editingField.options')
+                                <div class="text-danger mt-1"
+                                     style="font-size: 0.875rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    @endif
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="editRequiredField"
+                               wire:model="editingField.required">
+                        <label class="form-check-label"
+                               for="editRequiredField">
+                            Required Field
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            wire:click="updateCustomField"
+                            wire:loading.attr="disabled">
+                        <span wire:loading
+                              wire:target="updateCustomField">
+                            <i class="fas fa-spinner fa-spin me-2"></i> Updating...
+                        </span>
+                        <span wire:loading.remove
+                              wire:target="updateCustomField">
+                            Update Field
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <x-delete-confirmation-modal id="deleteCustomFieldModal"
+                                 title="Confirm Delete"
+                                 message="Are you sure you want to delete this custom field?"
+                                 warning="This action cannot be undone!"
+                                 :show-data-count="true"
+                                 data-count-message="This will delete :count employee record(s) associated with this field!"
+                                 wire-method="deleteCustomField" />
+
 
 
 </div>

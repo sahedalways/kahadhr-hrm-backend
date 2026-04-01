@@ -7,7 +7,6 @@ use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
-use App\Models\LeaveSetting;
 use App\Models\LeaveType;
 use App\Models\Notification;
 use Carbon\Carbon;
@@ -40,6 +39,12 @@ class LeavesIndex extends BaseComponent
 
     protected $listeners = ['showLeaveRequestInfo'];
 
+    public $selectedYear;
+    public $yearlyLeaves = [];
+    public $selectedEmployeeForYear;
+
+
+
 
 
 
@@ -58,8 +63,33 @@ class LeavesIndex extends BaseComponent
             $this->viewRequestInfo($this->openLeaveId);
         }
 
+        $this->loadMonthlyLeaveData();
 
-        // Get all employees of the company
+
+        $this->leaveTypes = LeaveType::all();
+
+
+        $this->selectedYear = now()->year;
+        $this->selectedEmployeeForYear = null;
+    }
+
+
+    public function changeYear($direction)
+    {
+        if ($direction === 'prev') {
+            $this->selectedYear--;
+        } elseif ($direction === 'next') {
+            $this->selectedYear++;
+        }
+
+        if ($this->selectedEmployeeForYear) {
+            $this->loadYearlyLeaveData($this->selectedEmployeeForYear);
+        }
+    }
+
+    public function loadMonthlyLeaveData()
+    {
+
         $this->employees = Employee::with('leaves')->where('company_id', $this->company->id)
             ->whereNotNull('user_id')
             ->orderBy('f_name')
@@ -91,8 +121,31 @@ class LeavesIndex extends BaseComponent
             $emp->leaves = $approvedLeaves->where('user_id', $emp->user_id);
             return $emp;
         });
+    }
 
-        $this->leaveTypes = LeaveType::all();
+
+    public function loadYearlyLeaveData($employeeId)
+    {
+        $this->selectedEmployeeForYear = $employeeId;
+
+
+        $this->yearlyLeaves = LeaveRequest::where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->where(function ($query) {
+                $query->whereYear('start_date', $this->selectedYear)
+                    ->orWhereYear('end_date', $this->selectedYear);
+            })
+            ->with('leaveType')
+            ->get()
+            ->map(function ($leave) {
+                return [
+                    'start' => $leave->start_date,
+                    'end' => $leave->end_date,
+                    'type' => $leave->leaveType->name,
+                    'emoji' => $leave->leaveType->emoji,
+                    'color' => $leave->leaveType->color,
+                ];
+            });
     }
 
 
@@ -102,12 +155,23 @@ class LeavesIndex extends BaseComponent
 
         if ($this->filterEmployeeId === $employeeId) {
             $this->filterEmployeeId = null;
+            $this->selectedEmployeeForYear = null;
+            $this->yearlyLeaves = collect();
+            $this->loadMonthlyLeaveData();
             return;
         }
 
         $this->filterEmployeeId = $employeeId;
+
+        $this->selectedYear = now()->year;
+        $this->loadYearlyLeaveData($employeeId);
     }
 
+
+    public function backToMonthlyView()
+    {
+        $this->dispatch('reload-page');
+    }
 
 
     public function updatedSearch()
@@ -264,9 +328,11 @@ class LeavesIndex extends BaseComponent
 
 
         $this->dispatch('closemodal');
-        $this->dispatch('reload-page');
+
 
         $this->toast('Request approved successfully!', 'success');
+
+        $this->dispatch('refresh-page-after-update');
     }
 
 
@@ -380,20 +446,14 @@ class LeavesIndex extends BaseComponent
         ]);
 
 
-
-
         // Fire real-time event
         event(new NotificationEvent($notification));
 
-
-        $this->dispatch('reload-page');
-
-
         $this->toast('Leave has been submitted successfully.', 'success');
 
-
-
         $this->resetForm();
+
+        $this->dispatch('refresh-page-after-update');
     }
 
 
@@ -573,8 +633,10 @@ class LeavesIndex extends BaseComponent
 
 
         $this->dispatch('closemodal');
-        $this->dispatch('reload-page');
+
         $this->toast('Leave cancelled successfully!', 'success');
+
+        $this->dispatch('refresh-page-after-update');
     }
 
 
@@ -671,9 +733,11 @@ class LeavesIndex extends BaseComponent
 
         $this->dispatch('closemodal');
 
-        $this->dispatch('reload-page');
+
 
         $this->toast('Leave updated successfully!', 'success');
+
+        $this->dispatch('refresh-page-after-update');
     }
 
 

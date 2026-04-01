@@ -288,7 +288,15 @@
 
                                 <hr class="dropdown-divider">
 
-
+                                @if (auth()->check() && auth()->user()->user_type === 'company')
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center py-2"
+                                           href="{{ route('company.dashboard.company-policy', ['company' => app('authUser')->company->sub_domain]) }}">
+                                            <i class="fas fa-file-alt me-2"></i> Company Policy
+                                        </a>
+                                    </li>
+                                    <hr class="dropdown-divider">
+                                @endif
 
 
                                 @if (auth()->check() && auth()->user()->user_type === 'company')

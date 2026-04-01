@@ -113,6 +113,7 @@ class TrainingIndex extends BaseComponent
     /* Reset form fields */
     public function resetInputFields()
     {
+        $this->dispatch('load-description-add');
         $this->training = null;
         $this->training_id = null;
         $this->course_name = '';

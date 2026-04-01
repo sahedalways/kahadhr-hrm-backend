@@ -346,4 +346,10 @@ class Company extends Model
 
         return round($totalBytes / 1024 / 1024, 2);
     }
+
+
+    public function policies()
+    {
+        return $this->hasMany(CompanyPolicy::class);
+    }
 }

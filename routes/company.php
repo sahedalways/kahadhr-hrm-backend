@@ -23,6 +23,7 @@ use App\Livewire\Backend\Company\Reports\CompanyPayslip;
 use App\Livewire\Backend\Company\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Company\Settings\BankInfoSettings;
 use App\Livewire\Backend\Company\Settings\CalendarYearSettings;
+use App\Livewire\Backend\Company\Settings\CompanyPolicySettings;
 use App\Livewire\Backend\Company\Settings\ProfileSettings;
 use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
@@ -81,6 +82,9 @@ Route::domain('company.' . config('app.base_domain'))
       Route::get('verification-center', VerificationCentreSettings::class)->name('verification-center');
       Route::get('calendar-year', CalendarYearSettings::class)->name('calendar-year');
     });
+
+
+    Route::get('company-policy', CompanyPolicySettings::class)->name('company-policy');
 
 
     Route::prefix('employees')->name('employees.')->group(function () {

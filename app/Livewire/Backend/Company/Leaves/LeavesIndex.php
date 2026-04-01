@@ -11,10 +11,16 @@ use App\Models\LeaveType;
 use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LeavesIndex extends BaseComponent
 {
-    public $employees;
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 10;
     public $openLeaveId = null;
     public $requestDetails;
     public $calendarLeaveInfo;
@@ -23,7 +29,7 @@ class LeavesIndex extends BaseComponent
     public $selectedEmployee;
     public $selectedEmployeeName;
     public $leaveTypes;
-    public $search;
+    public $search = '';
     public $other_leave_reason;
     public $leave_type_id, $start_date, $end_date;
 
@@ -43,10 +49,7 @@ class LeavesIndex extends BaseComponent
     public $yearlyLeaves = [];
     public $selectedEmployeeForYear;
 
-
-
-
-
+    protected $approvedLeavesCollection;
 
     public function mount()
     {
@@ -58,21 +61,106 @@ class LeavesIndex extends BaseComponent
 
         if (request()->has('leave')) {
             $this->openLeaveId = request('leave');
-
-
             $this->viewRequestInfo($this->openLeaveId);
         }
 
-        $this->loadMonthlyLeaveData();
-
-
+        $this->loadApprovedLeaves();
         $this->leaveTypes = LeaveType::all();
-
-
         $this->selectedYear = now()->year;
         $this->selectedEmployeeForYear = null;
     }
 
+    /**
+     * Load approved leaves once and store them
+     */
+    public function loadApprovedLeaves()
+    {
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
+
+        $this->approvedLeavesCollection = LeaveRequest::with('leaveType', 'user.employee')
+            ->where('company_id', $this->company->id)
+            ->where('status', 'approved')
+            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
+                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
+                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
+                        $q->where('start_date', '<', $currentMonthStart)
+                            ->where('end_date', '>', $currentMonthEnd);
+                    });
+            })
+            ->get();
+
+        $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')
+            ->where('company_id', $this->company->id)
+            ->where('status', "pending")
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Get paginated employees with their leaves
+     */
+    public function getEmployeesProperty()
+    {
+        $query = Employee::where('company_id', $this->company->id)
+            ->whereNotNull('user_id')
+            ->orderBy('f_name');
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('f_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('l_name', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        $employees = $query->paginate($this->perPage);
+
+        // Attach leaves to employees
+        if ($this->approvedLeavesCollection) {
+            $employees->getCollection()->transform(function ($emp) {
+                $emp->leaves = $this->approvedLeavesCollection->where('user_id', $emp->user_id);
+                return $emp;
+            });
+        }
+
+        return $employees;
+    }
+
+    /**
+     * Load more employees
+     */
+    public function loadMore()
+    {
+        $this->perPage += 10;
+    }
+
+    /**
+     * Reset pagination when searching
+     */
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when filtering by employee
+     */
+    public function filterByEmployee($employeeId)
+    {
+        if ($this->filterEmployeeId === $employeeId) {
+            $this->filterEmployeeId = null;
+            $this->selectedEmployeeForYear = null;
+            $this->yearlyLeaves = collect();
+            $this->resetPage();
+            return;
+        }
+
+        $this->filterEmployeeId = $employeeId;
+        $this->selectedYear = now()->year;
+        $this->loadYearlyLeaveData($employeeId);
+        $this->resetPage();
+    }
 
     public function changeYear($direction)
     {
@@ -87,47 +175,9 @@ class LeavesIndex extends BaseComponent
         }
     }
 
-    public function loadMonthlyLeaveData()
-    {
-
-        $this->employees = Employee::with('leaves')->where('company_id', $this->company->id)
-            ->whereNotNull('user_id')
-            ->orderBy('f_name')
-            ->get();
-
-
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
-        $approvedLeaves = LeaveRequest::with('leaveType', 'user.employee')
-            ->where('company_id', $this->company->id)
-            ->where('status', 'approved')
-            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
-                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                        $q->where('start_date', '<', $currentMonthStart)
-                            ->where('end_date', '>', $currentMonthEnd);
-                    });
-            })
-            ->get();
-
-        $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')->where('company_id', $this->company->id)->where('status', "pending")
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-
-        $this->employees->map(function ($emp) use ($approvedLeaves) {
-            $emp->leaves = $approvedLeaves->where('user_id', $emp->user_id);
-            return $emp;
-        });
-    }
-
-
     public function loadYearlyLeaveData($employeeId)
     {
         $this->selectedEmployeeForYear = $employeeId;
-
 
         $this->yearlyLeaves = LeaveRequest::where('user_id', $employeeId)
             ->where('status', 'approved')
@@ -148,68 +198,16 @@ class LeavesIndex extends BaseComponent
             });
     }
 
-
-    public function filterByEmployee($employeeId)
-    {
-        $this->filterEmployeeId = null;
-
-        if ($this->filterEmployeeId === $employeeId) {
-            $this->filterEmployeeId = null;
-            $this->selectedEmployeeForYear = null;
-            $this->yearlyLeaves = collect();
-            $this->loadMonthlyLeaveData();
-            return;
-        }
-
-        $this->filterEmployeeId = $employeeId;
-
-        $this->selectedYear = now()->year;
-        $this->loadYearlyLeaveData($employeeId);
-    }
-
-
     public function backToMonthlyView()
     {
         $this->dispatch('reload-page');
     }
 
 
-    public function updatedSearch()
-    {
-        $this->employees = Employee::where('company_id', $this->company->id)
-            ->where(function ($q) {
-                $q->where('f_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('l_name', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy('f_name')
-            ->get();
-
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
-        $approvedLeaves = LeaveRequest::with('leaveType', 'user.employee')
-            ->where('company_id', $this->company->id)
-            ->where('status', 'approved')
-            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
-                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                        $q->where('start_date', '<', $currentMonthStart)
-                            ->where('end_date', '>', $currentMonthEnd);
-                    });
-            })
-            ->get();
-
-        $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')->where('company_id', $this->company->id)->where('status', "pending")
-            ->orderBy('created_at', 'desc')
-            ->get();
 
 
-        $this->employees->map(function ($emp) use ($approvedLeaves) {
-            $emp->leaves = $approvedLeaves->where('user_id', $emp->user_id);
-            return $emp;
-        });
-    }
+
+
 
 
 
@@ -740,13 +738,12 @@ class LeavesIndex extends BaseComponent
         $this->dispatch('refresh-page-after-update');
     }
 
-
-
-
     public function render()
     {
+        $employees = $this->employees;
+
         return view('livewire.backend.company.leaves.leaves-index', [
-            'employees' => $this->employees,
+            'employees' => $employees,
             'leaveRequests' => $this->leaveRequests,
         ]);
     }

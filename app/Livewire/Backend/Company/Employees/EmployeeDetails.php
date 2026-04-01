@@ -598,15 +598,8 @@ class EmployeeDetails extends BaseComponent
             : collect();
 
 
-        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
-            ->orderBy('id')
-            ->get();
 
-
-        $this->customValues = $this->employee->customFieldValues
-            ->pluck('value', 'field_id')
-            ->toArray();
-
+        $this->loadCustomFieldsForEmployeeProfile();
 
         $this->nationalities = [
             "British",
@@ -804,6 +797,24 @@ class EmployeeDetails extends BaseComponent
 
 
 
+    protected function loadCustomFieldsForEmployeeProfile()
+    {
+        $this->customFields = CustomEmployeeProfileField::where('company_id', $this->employee->company_id)
+            ->whereHas('employees', function ($query) {
+                $query->where('employee_id', $this->employee->id);
+            })
+            ->orWhereHas('values', function ($query) {
+                $query->where('employee_id', $this->employee->id);
+            })
+            ->orderBy('id')
+            ->get();
+
+        $this->customValues = $this->employee->customFieldValues
+            ->pluck('value', 'field_id')
+            ->toArray();
+    }
+
+
     public function updatedShareCode($value)
     {
         $this->share_code = strtoupper($value);
@@ -960,14 +971,8 @@ class EmployeeDetails extends BaseComponent
             $this->city = null;
         }
 
-        $this->customFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)
-            ->orderBy('id')
-            ->get();
 
-
-        $this->customValues = $this->employee->customFieldValues
-            ->pluck('value', 'field_id')
-            ->toArray();
+        $this->loadCustomFieldsForEmployeeProfile();
     }
 
     public function sendVerificationLink($employeeId)

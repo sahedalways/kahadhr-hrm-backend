@@ -422,10 +422,20 @@ class ProfileSettings extends BaseComponent
 
         $this->filteredCountries = $this->countries;
 
-
         $this->customFields = CustomEmployeeProfileField::where('company_id', $this->employee->company_id)
+            ->where(function ($query) {
+
+                $query->whereHas('values', function ($subQuery) {
+                    $subQuery->where('employee_id', $this->employee->id);
+                })
+
+                    ->orWhereHas('employees', function ($subQuery) {
+                        $subQuery->where('employee_id', $this->employee->id);
+                    });
+            })
             ->orderBy('id')
             ->get();
+
 
         $this->customValues = $this->employee->customFieldValues
             ->pluck('value', 'field_id')

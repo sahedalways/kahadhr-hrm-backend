@@ -587,8 +587,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Add Custom Employee Field</h6>
-                    <button class="btn-close"
-                            data-bs-dismiss="modal"></button>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
 
                 <div class="modal-body">
@@ -811,8 +815,11 @@
                 <div class="modal-header">
                     <h6 class="modal-title">Edit Custom Field</h6>
                     <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"></button>
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">

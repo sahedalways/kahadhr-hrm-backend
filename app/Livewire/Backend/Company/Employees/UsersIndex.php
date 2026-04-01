@@ -459,6 +459,15 @@ class UsersIndex extends BaseComponent
 
     public function saveCustomField()
     {
+        $totalFields = CustomEmployeeProfileField::where('company_id', auth()->user()->company->id)->count();
+
+        if ($totalFields >= 5) {
+            $this->toast('You can only create up to 5 custom fields', 'error');
+            return;
+        }
+
+
+
         $this->validate([
             'customField.label' => 'required|string|max:255',
             'customField.type' => 'required|in:text,number,date,textarea,select',
@@ -490,6 +499,8 @@ class UsersIndex extends BaseComponent
         $this->dispatch('closemodal');
         $this->resetInputFields();
         $this->resetLoaded();
+        $this->loadCustomFieldsForManagement();
+
         $this->toast('Custom field added successfully', 'success');
     }
 

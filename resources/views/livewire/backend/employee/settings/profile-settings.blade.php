@@ -700,10 +700,14 @@
                                                        class="form-control"
                                                        placeholder="Enter {{ $field->name }}"
                                                        wire:model.defer="customValues.{{ $field->id }}">
+                                            @elseif($field->type === 'number')
+                                                <input type="number"
+                                                       class="form-control"
+                                                       placeholder="Enter {{ $field->name }}"
+                                                       wire:model.defer="customValues.{{ $field->id }}">
                                             @elseif($field->type === 'date')
                                                 <input type="date"
                                                        class="form-control"
-                                                       placeholder="{{ $field->name }}"
                                                        wire:model.defer="customValues.{{ $field->id }}">
                                             @elseif($field->type === 'textarea')
                                                 <textarea class="form-control"
@@ -712,7 +716,8 @@
                                             @elseif($field->type === 'select')
                                                 <select class="form-select"
                                                         wire:model.defer="customValues.{{ $field->id }}">
-                                                    <option value="">{{ $field->name }}</option>
+                                                    <option value="">Select {{ $field->name }}</option>
+
                                                     @foreach ($field->options ?? [] as $opt)
                                                         <option value="{{ $opt }}">{{ $opt }}
                                                         </option>

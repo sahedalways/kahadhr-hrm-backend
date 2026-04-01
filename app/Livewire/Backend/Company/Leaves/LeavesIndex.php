@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Company\Leaves;
 
 use App\Events\NotificationEvent;
+use App\Helpers\LeaveHelper;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
@@ -12,7 +13,7 @@ use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class LeavesIndex extends BaseComponent
 {
@@ -51,6 +52,13 @@ class LeavesIndex extends BaseComponent
 
     protected $approvedLeavesCollection;
 
+    public $totalAnnualHours = 0;
+    public $usedAnnualHours = 0;
+    public $remainingAnnualHours = 0;
+    public $totalLeaveInLiewHours = 0;
+    public $usedLeaveInLiewHours = 0;
+    public $remainingLeaveInLiewHours = 0;
+
     public function mount()
     {
         $this->company = Auth::user()->company;
@@ -69,6 +77,36 @@ class LeavesIndex extends BaseComponent
         $this->selectedYear = now()->year;
         $this->selectedEmployeeForYear = null;
     }
+
+
+
+
+
+    private function calculateLeaveHours($employeeId)
+    {
+        $balanceData = LeaveHelper::getLeaveBalanceData($employeeId);
+
+        $this->totalAnnualHours = $balanceData['total_annual_hours'];
+        $this->usedAnnualHours = $balanceData['used_annual_hours'];
+        $this->remainingAnnualHours = $balanceData['remaining_annual_hours'];
+        $this->totalLeaveInLiewHours = $balanceData['total_leave_in_liew_hours'];
+        $this->usedLeaveInLiewHours = $balanceData['used_leave_in_liew_hours'];
+        $this->remainingLeaveInLiewHours = $balanceData['remaining_leave_in_liew_hours'];
+    }
+
+
+
+    private function resetLeaveHours()
+    {
+        $this->totalAnnualHours = 0;
+        $this->usedAnnualHours = 0;
+        $this->remainingAnnualHours = 0;
+        $this->totalLeaveInLiewHours = 0;
+        $this->usedLeaveInLiewHours = 0;
+        $this->remainingLeaveInLiewHours = 0;
+    }
+
+
 
     /**
      * Load approved leaves once and store them
@@ -153,6 +191,7 @@ class LeavesIndex extends BaseComponent
             $this->selectedEmployeeForYear = null;
             $this->yearlyLeaves = collect();
             $this->resetPage();
+            $this->resetLeaveHours();
             return;
         }
 
@@ -160,6 +199,7 @@ class LeavesIndex extends BaseComponent
         $this->selectedYear = now()->year;
         $this->loadYearlyLeaveData($employeeId);
         $this->resetPage();
+        $this->calculateLeaveHours($employeeId);
     }
 
     public function changeYear($direction)

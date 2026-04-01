@@ -8,9 +8,24 @@
     <div class="container-fluid my-4">
         <div class="row g-3">
 
+            <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <div class="col-auto mb-3">
-                <h5 class="fw-500 text-primary m-0">Leave Management</h5>
+
+                <div class="col-auto">
+                    <h5 class="fw-500 text-primary m-0">Leave Management</h5>
+                </div>
+
+                <!-- Right: Button -->
+                @if ($filterEmployeeId && $selectedEmployeeForYear)
+                    <div>
+                        <button wire:click="backToMonthlyView"
+                                class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-calendar-week me-1"></i>
+                            Back to Monthly View
+                        </button>
+                    </div>
+                @endif
+
             </div>
 
             @php

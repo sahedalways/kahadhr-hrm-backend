@@ -231,10 +231,7 @@
                                          alt="{{ $leave->user->full_name }}">
                                     <div>
                                         <div class="fw-bold text-dark">{{ $leave->user->full_name }}</div>
-                                        <small class="text-muted text-uppercase fw-medium"
-                                               style="font-size: 0.75rem;">
-                                            {{ $leave->user->employee->department->name ?? 'N/A Department' }}
-                                        </small>
+
                                     </div>
                                 </div>
 

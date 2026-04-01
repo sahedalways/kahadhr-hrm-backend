@@ -3,12 +3,10 @@
 namespace App\Livewire\Backend\Employee\Leaves;
 
 use App\Events\NotificationEvent;
+use App\Helpers\LeaveHelper;
 use App\Livewire\Backend\Components\BaseComponent;
-use App\Models\Employee;
-use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
-use App\Models\LeaveSetting;
 use App\Models\Notification;
 use App\Traits\Exportable;
 use Carbon\Carbon;
@@ -45,7 +43,7 @@ class LeavesIndexEmp extends BaseComponent
     {
         $this->leaveTypes = LeaveType::all();
         $this->loaded = collect();
-        $this->calculateLeaveHours();
+        $this->calculateLeaveHours(auth()->user()->id);
         $this->loadMore();
     }
 
@@ -147,7 +145,7 @@ class LeavesIndexEmp extends BaseComponent
         $this->resetInputFields();
 
 
-        $this->calculateLeaveHours();
+        $this->calculateLeaveHours(auth()->user()->id);
 
 
         $this->resetLoaded();
@@ -202,24 +200,21 @@ class LeavesIndexEmp extends BaseComponent
         $this->resetLoaded();
     }
 
-    private function calculateLeaveHours()
+    private function calculateLeaveHours($employeeId)
     {
-        $user = auth()->user();
+        $balanceData = LeaveHelper::getLeaveBalanceData($employeeId);
 
 
-        $leaveBalance = LeaveBalance::where('user_id', $user->id)->first();
 
-
-        $this->totalAnnualHours        = $leaveBalance->total_annual_hours ?? 0;
-        $this->usedAnnualHours         = $leaveBalance->used_annual_hours ?? 0;
-
-        $this->totalLeaveInLiewHours   = $leaveBalance->total_leave_in_liew ?? 0;
-        $this->usedLeaveInLiewHours    = $leaveBalance->used_leave_in_liew ?? 0;
-
-        // ➤ Calculate remaining hours
-        $this->remainingAnnualHours      = ($this->totalAnnualHours - $this->usedAnnualHours);
-        $this->remainingLeaveInLiewHours = ($this->totalLeaveInLiewHours - $this->usedLeaveInLiewHours);
+        $this->totalAnnualHours = $balanceData['total_annual_hours'];
+        $this->usedAnnualHours = $balanceData['used_annual_hours'];
+        $this->remainingAnnualHours = $balanceData['remaining_annual_hours'];
+        $this->totalLeaveInLiewHours = $balanceData['total_leave_in_liew_hours'];
+        $this->usedLeaveInLiewHours = $balanceData['used_leave_in_liew_hours'];
+        $this->remainingLeaveInLiewHours = $balanceData['remaining_leave_in_liew_hours'];
     }
+
+
 
 
 

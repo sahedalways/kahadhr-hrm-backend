@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Company\Settings;
 
+use App\Jobs\SendCompanyPolicyNotification;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyPolicy;
 use App\Models\Employee;
@@ -165,11 +166,11 @@ class CompanyPolicySettings extends BaseComponent
         ]);
 
 
-        // if ($this->send_email) {
-        //     foreach ($this->employees as $emp) {
-
-        //     }
-        // }
+        if ($this->send_email) {
+            foreach ($this->employees as $emp) {
+                SendCompanyPolicyNotification::dispatch($emp->id, $policy->id);
+            }
+        }
 
         $this->toast('Company Policy created successfully!', 'success');
         $this->dispatch('closemodal');
@@ -235,6 +236,17 @@ class CompanyPolicySettings extends BaseComponent
             'title' => $this->title,
             'description' => $this->description,
         ]);
+
+
+        if ($this->send_email) {
+            $employees = Employee::where('company_id', $this->company_id)
+                ->whereNotNull('user_id')
+                ->get();
+
+            foreach ($employees as $employee) {
+                SendCompanyPolicyNotification::dispatch($employee->id, $policy->id);
+            }
+        }
 
         $this->toast('Company Policy updated successfully!', 'success');
         $this->resetInputFields();

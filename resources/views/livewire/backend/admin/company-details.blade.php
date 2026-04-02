@@ -9,14 +9,94 @@
     <div class="container-fluid py-4">
         <div class="row g-4">
 
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                <!-- Back Button -->
 
-            <div class="text-end mb-2">
-                <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
-                   style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
-                   href="{{ route('super-admin.companies') }}">
-                    <i class="fa-solid fa-arrow-left me-2"></i>
-                    Back to Companies
-                </a>
+
+                <!-- Company Info with Avatar -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle"
+                         style="width: 60px; height: 60px; background: linear-gradient(135deg, #0dcaf0, #0b9ed0); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(13, 202, 240, 0.3);">
+                        <span style="color: white; font-weight: 600; font-size: 1.4rem;">
+                            {{ strtoupper(substr($details->company_name, 0, 1)) }}
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0"
+                            style="font-size: 1.5rem; color: #1a2c3e; letter-spacing: -0.3px;">
+                            {{ $details->company_name }}
+                        </h2>
+                        <div class="d-flex gap-2 mt-1 flex-wrap">
+                            <span class="badge"
+                                  style="background: #e9ecef; color: #495057; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                <i class="fas fa-building me-1"
+                                   style="font-size: 0.7rem;"></i>
+                                {{ ucfirst($details->business_type ?? 'Business') }}
+                            </span>
+                            @php
+                                $statusColors = [
+                                    'active' => [
+                                        'bg' => '#d1fae5',
+                                        'color' => '#065f46',
+                                        'dot' => '#10b981',
+                                        'icon' => 'fa-check-circle',
+                                    ],
+                                    'trial' => [
+                                        'bg' => '#dbeafe',
+                                        'color' => '#1e40af',
+                                        'dot' => '#3b82f6',
+                                        'icon' => 'fa-hourglass-half',
+                                    ],
+                                    'expired' => [
+                                        'bg' => '#fee2e2',
+                                        'color' => '#991b1b',
+                                        'dot' => '#dc2626',
+                                        'icon' => 'fa-times-circle',
+                                    ],
+                                    'suspended' => [
+                                        'bg' => '#fef3c7',
+                                        'color' => '#92400e',
+                                        'dot' => '#f59e0b',
+                                        'icon' => 'fa-ban',
+                                    ],
+                                    'inactive' => [
+                                        'bg' => '#f3f4f6',
+                                        'color' => '#374151',
+                                        'dot' => '#6b7280',
+                                        'icon' => 'fa-circle',
+                                    ],
+                                ];
+                                $statusKey = strtolower($details->subscription_status ?? 'inactive');
+                                $statusStyle = $statusColors[$statusKey] ?? $statusColors['inactive'];
+                            @endphp
+                            <span class="badge"
+                                  style="background: {{ $statusStyle['bg'] }}; color: {{ $statusStyle['color'] }}; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                <i class="fas {{ $statusStyle['icon'] }} me-1"
+                                   style="font-size: 0.7rem;"></i>
+                                {{ ucfirst($details->subscription_status ?? 'Inactive') }}
+                            </span>
+                            @if (isset($details->subscription_end) && $details->subscription_end)
+                                <span class="badge"
+                                      style="background: #e9ecef; color: #495057; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                    <i class="fas fa-calendar-alt me-1"
+                                       style="font-size: 0.7rem;"></i>
+                                    Expires: {{ $details->subscription_end->format('d M Y') }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <a class="btn btn-outline-primary d-inline-flex align-items-center rounded-pill px-3 py-2"
+                       style="background-color: #f8f9fa; border: 1px solid #0dcaf0; color: #0dcaf0; transition: all 0.3s ease;"
+                       href="{{ route('super-admin.companies') }}"
+                       onmouseover="this.style.backgroundColor='#0dcaf0'; this.style.color='white';"
+                       onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.color='#0dcaf0';">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        Back to Companies
+                    </a>
+                </div>
             </div>
 
             <!-- Sidebar -->
@@ -126,7 +206,7 @@
                                             <i class="fas fa-chevron-down ms-1 fs-10"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            <li>
+                                            {{-- <li>
                                                 <a class="dropdown-item py-2"
                                                    href="#"
                                                    data-bs-toggle="modal"
@@ -137,7 +217,7 @@
                                                           wire:target="manageCompanyProfile"
                                                           class="spinner-border spinner-border-sm ms-2"></span>
                                                 </a>
-                                            </li>
+                                            </li> --}}
                                             <li>
                                                 <a class="dropdown-item py-2"
                                                    href="#"
@@ -188,28 +268,28 @@
                                         <!-- Company Info -->
                                         <div class="col-md-9 col-lg-10">
                                             <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
-                                                <h2 class="h3 mb-0 fw-bold text-dark">{{ $details->company_name }}
-                                                </h2>
-                                                @php
-                                                    $statusConfig = [
-                                                        'Active' => [
-                                                            'class' => 'bg-success',
-                                                            'icon' => 'fa-check-circle',
-                                                        ],
-                                                        'Inactive' => [
+                                                <h4 class=" mb-0 fw-bold text-dark">{{ $details->company_name }}
+                                                    </h5>
+                                                    @php
+                                                        $statusConfig = [
+                                                            'Active' => [
+                                                                'class' => 'bg-success',
+                                                                'icon' => 'fa-check-circle',
+                                                            ],
+                                                            'Inactive' => [
+                                                                'class' => 'bg-secondary',
+                                                                'icon' => 'fa-circle',
+                                                            ],
+                                                        ];
+                                                        $status = $statusConfig[$details->status] ?? [
                                                             'class' => 'bg-secondary',
                                                             'icon' => 'fa-circle',
-                                                        ],
-                                                    ];
-                                                    $status = $statusConfig[$details->status] ?? [
-                                                        'class' => 'bg-secondary',
-                                                        'icon' => 'fa-circle',
-                                                    ];
-                                                @endphp
-                                                <span class="badge {{ $status['class'] }} px-3 py-2 rounded-pill">
-                                                    <i class="fas {{ $status['icon'] }} me-1 fs-10"></i>
-                                                    {{ $details->status }}
-                                                </span>
+                                                        ];
+                                                    @endphp
+                                                    <span class="badge {{ $status['class'] }} px-3 py-2 rounded-pill">
+                                                        <i class="fas {{ $status['icon'] }} me-1 fs-10"></i>
+                                                        {{ $details->status }}
+                                                    </span>
                                             </div>
 
                                             <div class="row g-3">
@@ -579,6 +659,92 @@
                                             </p>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-pound-sign"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Payment
+                                                    Status</small>
+                                            </div>
+                                            @php
+                                                // Payment status colors for enum: paid, unpaid, pending, failed
+                                                $paymentStatusColors = [
+                                                    'paid' => [
+                                                        'bg' => '#d1fae5',
+                                                        'color' => '#065f46',
+                                                        'icon' => 'fa-check-circle',
+                                                        'label' => 'Paid',
+                                                        'border' => '#10b981',
+                                                    ],
+                                                    'unpaid' => [
+                                                        'bg' => '#fee2e2',
+                                                        'color' => '#991b1b',
+                                                        'icon' => 'fa-exclamation-circle',
+                                                        'label' => 'Unpaid',
+                                                        'border' => '#dc2626',
+                                                    ],
+                                                    'pending' => [
+                                                        'bg' => '#fef3c7',
+                                                        'color' => '#92400e',
+                                                        'icon' => 'fa-clock',
+                                                        'label' => 'Pending',
+                                                        'border' => '#f59e0b',
+                                                    ],
+                                                    'failed' => [
+                                                        'bg' => '#f3f4f6',
+                                                        'color' => '#374151',
+                                                        'icon' => 'fa-times-circle',
+                                                        'label' => 'Failed',
+                                                        'border' => '#6b7280',
+                                                    ],
+                                                ];
+
+                                                // Get payment status from company model
+                                                $paymentStatus = strtolower($details->payment_status ?? 'pending');
+                                                $paymentStyle =
+                                                    $paymentStatusColors[$paymentStatus] ??
+                                                    $paymentStatusColors['pending'];
+                                            @endphp
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1"
+                                                      style="background: {{ $paymentStyle['bg'] }}; color: {{ $paymentStyle['color'] }}; font-weight: 500; border: 1px solid {{ $paymentStyle['border'] }};">
+                                                    <i class="fas {{ $paymentStyle['icon'] }} me-1"></i>
+                                                    {{ $paymentStyle['label'] }}
+                                                </span>
+
+                                                @if ($paymentStatus == 'failed')
+                                                    <i class="fas fa-exclamation-triangle"
+                                                       style="color: #dc3545; font-size: 14px;"
+                                                       title="Payment failed. Please update payment method."></i>
+                                                @endif
+
+                                                @if ($paymentStatus == 'unpaid')
+                                                    <i class="fas fa-bell"
+                                                       style="color: #f59e0b; font-size: 14px;"
+                                                       title="Payment is due"></i>
+                                                @endif
+                                            </div>
+
+                                            @if ($paymentStatus == 'unpaid' && isset($details->payment_due_date))
+                                                <small class="text-muted d-block mt-2">
+                                                    <i class="fas fa-calendar-alt me-1 fs-10"></i>
+                                                    Due Date:
+                                                    {{ \Carbon\Carbon::parse($details->payment_due_date)->format('d M Y') }}
+                                                </small>
+                                            @endif
+
+                                            @if ($paymentStatus == 'failed')
+                                                <small class="text-danger d-block mt-2">
+                                                    <i class="fas fa-exclamation-circle me-1 fs-10"></i>
+                                                    Please update your payment method to continue service
+                                                </small>
+                                            @endif
+                                        </div>
+
+                                    </div>
                                 </div>
 
                                 <!-- Invoices Section -->
@@ -842,7 +1008,7 @@
                                                     <i class="fas fa-building me-1"
                                                        style="color: #0dcaf0;"></i> Company Name
                                                 </label>
-                                                <h3 class="mb-0 fw-bold"
+                                                <h5 class="mb-0 fw-bold"
                                                     style="color: #1e293b;">{{ $details->company_name ?? 'N/A' }}</h3>
                                             </div>
 

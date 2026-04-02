@@ -1366,36 +1366,137 @@
 </script>
 <script>
     document.addEventListener('click', function(e) {
-
         const btn = e.target.closest('.shift-menu-btn');
 
         if (btn) {
             const shiftBlock = btn.closest('.shift-block');
-            const dropdown = btn
-                .closest('.shift-dropdown')
-                .querySelector('.dropdown-schedule-celll');
+            const shiftDropdown = btn.closest('.shift-dropdown');
+            const dropdown = shiftDropdown.querySelector('.dropdown-schedule-celll');
 
-            // reset all
-            document.querySelectorAll('.shift-block')
-                .forEach(el => el.classList.remove('active-z'));
 
-            document.querySelectorAll('.dropdown-schedule-celll')
-                .forEach(el => el !== dropdown && el.classList.add('d-none'));
+            document.querySelectorAll('.shift-block').forEach(el => {
+                el.classList.remove('active-z');
+            });
 
-            // activate current
-            shiftBlock.classList.add('active-z');
-            dropdown.classList.toggle('d-none');
+            document.querySelectorAll('.dropdown-schedule-celll').forEach(el => {
+                if (el !== dropdown) {
+                    el.classList.add('d-none');
+                    el.style.display = '';
+                    el.style.position = '';
+                    el.style.top = '';
+                    el.style.bottom = '';
+                    el.style.left = '';
+                    el.style.right = '';
+                }
+            });
+
+
+            if (dropdown.classList.contains('d-none')) {
+
+                const rect = btn.getBoundingClientRect();
+
+
+                dropdown.style.position = 'fixed';
+                dropdown.style.display = 'block';
+                dropdown.style.visibility = 'hidden';
+
+
+                const actualMenuHeight = dropdown.offsetHeight;
+
+                dropdown.style.visibility = '';
+
+
+                dropdown.style.left = 'auto';
+                dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+                dropdown.style.top = (rect.bottom + 5) + 'px';
+                dropdown.style.bottom = 'auto';
+
+
+                const dropdownBottom = rect.bottom + 5 + actualMenuHeight;
+
+                if (dropdownBottom > window.innerHeight) {
+
+                    dropdown.style.top = 'auto';
+                    dropdown.style.bottom = (window.innerHeight - rect.top + 5) + 'px';
+                }
+
+
+                const testRect = dropdown.getBoundingClientRect();
+                if (testRect.left < 0) {
+                    dropdown.style.left = '10px';
+                    dropdown.style.right = 'auto';
+                }
+
+
+                shiftBlock.classList.add('active-z');
+
+                dropdown.classList.remove('d-none');
+            } else {
+                dropdown.classList.add('d-none');
+                shiftBlock.classList.remove('active-z');
+            }
 
             e.stopPropagation();
             return;
         }
 
-        // click outside → reset everything
-        document.querySelectorAll('.dropdown-schedule-celll')
-            .forEach(el => el.classList.add('d-none'));
 
-        document.querySelectorAll('.shift-block')
-            .forEach(el => el.classList.remove('active-z'));
+        document.querySelectorAll('.dropdown-schedule-celll').forEach(el => {
+            el.classList.add('d-none');
+            el.style.display = '';
+            el.style.position = '';
+        });
+
+        document.querySelectorAll('.shift-block').forEach(el => {
+            el.classList.remove('active-z');
+        });
+    });
+
+
+    window.addEventListener('scroll', function() {
+        document.querySelectorAll('.dropdown-schedule-celll:not(.d-none)').forEach(el => {
+            el.classList.add('d-none');
+            el.closest('.shift-block')?.classList.remove('active-z');
+        });
+    }, true);
+
+    window.addEventListener('resize', function() {
+        document.querySelectorAll('.dropdown-schedule-celll:not(.d-none)').forEach(el => {
+            el.classList.add('d-none');
+            el.closest('.shift-block')?.classList.remove('active-z');
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    const dropdown = mutation.target;
+                    if (!dropdown.classList.contains('d-none')) {
+
+                        const shiftBlock = dropdown.closest('.shift-dropdown')?.closest(
+                            '.shift-block');
+                        if (shiftBlock) {
+                            shiftBlock.style.zIndex = '9999998';
+                        }
+                    } else {
+                        const shiftBlock = dropdown.closest('.shift-dropdown')?.closest(
+                            '.shift-block');
+                        if (shiftBlock) {
+                            shiftBlock.style.zIndex = '';
+                        }
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.dropdown-schedule-celll').forEach(el => {
+            observer.observe(el, {
+                attributes: true
+            });
+        });
     });
 </script>
 

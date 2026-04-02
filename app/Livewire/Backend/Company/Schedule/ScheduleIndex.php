@@ -1697,22 +1697,31 @@ class ScheduleIndex extends BaseComponent
 
     public function updatedViewMode($value)
     {
+
+        if ($value === 'weekly') {
+            $this->startDate = Carbon::now()->startOfWeek(Carbon::MONDAY);
+            $this->endDate = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+        } else {
+            $this->startDate = Carbon::now()->startOfMonth();
+            $this->endDate = Carbon::now()->endOfMonth();
+        }
+
+
         $this->loadShifts();
     }
-
 
 
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
 
-        if ($mode === 'weekly') {
 
-            $this->startDate = now()->startOfDay();
-            $this->endDate = now()->addDays(6)->endOfDay();
-        } elseif ($mode === 'monthly') {
-            $this->startDate = now()->startOfMonth();
-            $this->endDate = now()->endOfMonth();
+        if ($mode === 'weekly') {
+            $this->startDate = Carbon::now()->startOfWeek(Carbon::MONDAY);
+            $this->endDate = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+        } else {
+            $this->startDate = Carbon::now()->startOfMonth();
+            $this->endDate = Carbon::now()->endOfMonth();
         }
 
 

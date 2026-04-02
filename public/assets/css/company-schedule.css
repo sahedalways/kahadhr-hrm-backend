@@ -687,3 +687,20 @@ span.flatpickr-day.today:hover,
     border-color: #007bff !important;
     color: #fff !important;
 }
+
+.dropdown-schedule-celll .dropdown-item {
+    padding: 8px 20px !important;
+    font-size: 13px !important;
+    color: #333 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.dropdown-schedule-celll .dropdown-item:hover {
+    background-color: #f5f5f5 !important;
+}
+
+.dropdown-schedule-celll .dropdown-item.text-danger:hover {
+    background-color: #fee !important;
+}

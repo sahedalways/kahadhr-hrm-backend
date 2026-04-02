@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Company\Settings;
 
 use App\Livewire\Backend\Components\BaseComponent;
+use App\Models\SiteSetting;
 use Livewire\WithFileUploads;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
@@ -262,6 +263,8 @@ class ProfileSettings extends BaseComponent
 
         $company = $this->company;
 
+        $siteSettings = SiteSetting::firstOrNew(['company_id' => $company->id]);
+
 
         if ($this->company_logo instanceof UploadedFile) {
             $company->company_logo = uploadImage(
@@ -287,7 +290,12 @@ class ProfileSettings extends BaseComponent
 
         ]);
 
+        $siteSettings->fill([
+            'site_title'         => $this->company_name,
+            'logo'     => $company->company_logo,
+        ]);
 
+        $siteSettings->save();
 
 
         $this->toast('Company Profile Updated Successfully!', 'success');

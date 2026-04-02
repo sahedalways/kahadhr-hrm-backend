@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+
 
 class Company extends Model
 {
@@ -106,7 +106,7 @@ class Company extends Model
             SiteSetting::create([
                 'company_id'        => $company->id,
                 'site_title'        => $company->company_name,
-                'logo'              =>  $superAdminSetting->logo ?? null,
+                'logo'              =>  null,
                 'favicon'           =>  $superAdminSetting->favicon ?? null,
                 'site_phone_number' => $company->company_mobile,
                 'site_email'        => $company->company_email,

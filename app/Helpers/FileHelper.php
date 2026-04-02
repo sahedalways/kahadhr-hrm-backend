@@ -37,20 +37,12 @@ if (!function_exists('getFileUrl')) {
         }
       }
 
-      // Check company logo
       if ($company && $company->company_logo && file_exists(storage_path('app/public/' . ltrim($company->company_logo, '/')))) {
         return asset('storage/' . ltrim($company->company_logo, '/'));
       }
 
 
-      $siteSettings = SiteSetting::withoutGlobalScope('filterByUserType')->first();
-
-      if ($siteSettings && $siteSettings->logo) {
-        return getFileUrl('image/settings/logo.' . $siteSettings->logo);
-      }
-
-
-      return asset('assets/img/default-image.jpg');
+      return asset('assets/img/company-default-logo.png');
     }
   }
 

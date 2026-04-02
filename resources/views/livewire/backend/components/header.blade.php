@@ -156,7 +156,7 @@
                                  class="cursor-pointer d-flex flex-nowrap align-items-center gap-2">
 
                                 <div class="avatar-wrapper">
-                                    <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
+                                    <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/company-default-logo.png' : $user->employee->avatar_url }}"
                                          alt="Avatar"
                                          class="avatar-img">
                                 </div>

@@ -44,6 +44,12 @@ class BankInfoSettings extends BaseComponent
     public $lastId = null;
     public $hasMore = true;
 
+    public $subscription_status;
+    public $payment_status;
+    public $subscription_start;
+    public $subscription_end;
+    public $trial_ends_at;
+
     protected $listeners = [
         'stripePaymentMethodCreated' => 'save'
     ];
@@ -68,6 +74,17 @@ class BankInfoSettings extends BaseComponent
         }
 
         $this->company_id = auth()->user()->company->id;
+
+
+
+        $this->subscription_status = $this->company->subscription_status ?? 'expired';
+        $this->payment_status = $this->company->payment_status ?? 'pending';
+        $this->subscription_start = $this->company->subscription_start;
+        $this->subscription_end = $this->company->subscription_end;
+        $this->trial_ends_at = $this->company->trial_ends_at ?? null;
+
+
+
         $this->loaded = collect();
         $this->loadMore();
     }

@@ -167,6 +167,285 @@
     </div>
 
 
+
+    <div class="col-12 mt-4">
+        <div class="p-4 rounded-4 border border-light-subtle shadow-sm"
+             style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <div class="rounded-circle p-2"
+                     style="background-color: rgba(13, 202, 240, 0.1);">
+                    <i class="fas fa-credit-card"
+                       style="color: #0dcaf0; font-size: 18px;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">Payment Information</h6>
+                    <p class="text-muted small mb-0">Manage subscription and payment details</p>
+                </div>
+            </div>
+
+            @php
+                // Get subscription info from helper
+                $subInfo = getSubscriptionInfo(
+                    $subscription_status ?? 'expired',
+                    $trial_ends_at ?? null,
+                    $subscription_start ?? null,
+                    $subscription_end ?? null,
+                );
+
+                // Status colors configuration
+                $subStatusColors = [
+                    'active' => [
+                        'bg' => '#d1fae5',
+                        'color' => '#065f46',
+                        'icon' => 'fa-check-circle',
+                    ],
+                    'trial' => [
+                        'bg' => '#dbeafe',
+                        'color' => '#1e40af',
+                        'icon' => 'fa-hourglass-half',
+                    ],
+                    'expired' => [
+                        'bg' => '#fee2e2',
+                        'color' => '#991b1b',
+                        'icon' => 'fa-times-circle',
+                    ],
+                    'suspended' => [
+                        'bg' => '#fef3c7',
+                        'color' => '#92400e',
+                        'icon' => 'fa-ban',
+                    ],
+                ];
+                $subStatus = strtolower($subscription_status ?? 'expired');
+                $subStyle = $subStatusColors[$subStatus] ?? $subStatusColors['expired'];
+
+                // Payment status colors
+                $payStatusColors = [
+                    'paid' => [
+                        'bg' => '#d1fae5',
+                        'color' => '#065f46',
+                        'icon' => 'fa-check-circle',
+                    ],
+                    'unpaid' => [
+                        'bg' => '#fee2e2',
+                        'color' => '#991b1b',
+                        'icon' => 'fa-exclamation-circle',
+                    ],
+                    'pending' => [
+                        'bg' => '#fef3c7',
+                        'color' => '#92400e',
+                        'icon' => 'fa-clock',
+                    ],
+                    'failed' => [
+                        'bg' => '#f3f4f6',
+                        'color' => '#374151',
+                        'icon' => 'fa-times-circle',
+                    ],
+                ];
+                $payStatus = strtolower($payment_status ?? 'pending');
+                $payStyle = $payStatusColors[$payStatus] ?? $payStatusColors['pending'];
+            @endphp
+
+            <div class="row g-4">
+                <!-- Subscription Status -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-chart-line"
+                               style="color: #0dcaf0; font-size: 14px;"></i>
+                            <small class="text-muted text-uppercase fw-semibold">Subscription
+                                Status</small>
+                        </div>
+                        <span class="badge px-3 py-2 rounded-pill"
+                              style="background: {{ $subStyle['bg'] }}; color: {{ $subStyle['color'] }}; font-weight: 500;">
+                            <i class="fas {{ $subStyle['icon'] }} me-1"></i>
+                            {{ ucfirst($subscription_status ?? 'Expired') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Payment Status -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-dollar-sign"
+                               style="color: #0dcaf0; font-size: 14px;"></i>
+                            <small class="text-muted text-uppercase fw-semibold">Payment
+                                Status</small>
+                        </div>
+                        <span class="badge px-3 py-2 rounded-pill"
+                              style="background: {{ $payStyle['bg'] }}; color: {{ $payStyle['color'] }}; font-weight: 500;">
+                            <i class="fas {{ $payStyle['icon'] }} me-1"></i>
+                            {{ ucfirst($payment_status ?? 'Pending') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Subscription Start -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-play-circle"
+                               style="color: #0dcaf0; font-size: 14px;"></i>
+                            <small class="text-muted text-uppercase fw-semibold">Start Date</small>
+                        </div>
+                        <p class="fw-bold mb-0 text-dark"
+                           style="font-size: 0.95rem;">
+                            {{ $subscription_start ? \Carbon\Carbon::parse($subscription_start)->format('d M Y') : 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Subscription End / Next Payment -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="p-3 rounded-3 bg-white border">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-stop-circle"
+                               style="color: #0dcaf0; font-size: 14px;"></i>
+                            <small class="text-muted text-uppercase fw-semibold">
+                                @if ($subscription_status == 'trial')
+                                    Trial End Date
+                                @else
+                                    End Date
+                                @endif
+                            </small>
+                        </div>
+                        <p class="fw-bold mb-0 {{ isset($subscription_end) && \Carbon\Carbon::parse($subscription_end)->isPast() ? 'text-danger' : 'text-dark' }}"
+                           style="font-size: 0.95rem;">
+                            @if ($subscription_status == 'trial' && isset($trial_ends_at))
+                                {{ \Carbon\Carbon::parse($trial_ends_at)->format('d M Y') }}
+                            @elseif(isset($subscription_end))
+                                {{ \Carbon\Carbon::parse($subscription_end)->format('d M Y') }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Information from Helper -->
+            @if ($subInfo['html'] && $subscription_status != 'active' && $subscription_status != 'expired')
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: linear-gradient(135deg, #e0f2fe, #f0f9ff); border-left: 4px solid #0dcaf0;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-info-circle"
+                           style="color: #0dcaf0;"></i>
+                        <span class="small">Subscription Info:</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small">{!! $subInfo['html'] !!}</span>
+                    </div>
+                </div>
+            @endif
+
+
+
+            <!-- Active Subscription Next Payment Info -->
+            @if (
+                $subscription_status == 'active' &&
+                    isset($subscription_end) &&
+                    \Carbon\Carbon::parse($subscription_end)->isFuture())
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: linear-gradient(135deg, #d1fae5, #ecfdf5); border-left: 4px solid #10b981;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-credit-card"
+                           style="color: #10b981;"></i>
+                        <span class="small fw-semibold"
+                              style="color: #065f46;">Next Payment</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small">Your next payment will be charged on
+                            <strong>{{ \Carbon\Carbon::parse($subscription_end)->format('d M Y') }}</strong></span>
+                        @php
+                            $daysUntilPayment = (int) ceil(
+                                \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($subscription_end), false),
+                            );
+                        @endphp
+                        @if ($daysUntilPayment <= 7)
+                            <span class="badge rounded-pill px-2 py-1"
+                                  style="background: #f59e0b; color: white; font-size: 10px;">
+                                {{ $daysUntilPayment }} days left
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            <!-- Alert for Failed Payment -->
+            @if (isset($payment_status) && strtolower($payment_status) == 'failed')
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: #fee2e2; border-left: 4px solid #dc2626;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"
+                           style="color: #dc2626;"></i>
+                        <span class="small fw-semibold"
+                              style="color: #991b1b;">Payment Failed</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small text-danger">Please update your payment method to
+                            continue service</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Alert for Unpaid Payment -->
+            @if (isset($payment_status) && strtolower($payment_status) == 'unpaid')
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-bell"
+                           style="color: #f59e0b;"></i>
+                        <span class="small fw-semibold"
+                              style="color: #92400e;">Payment Due</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small">Please complete your payment to avoid service
+                            interruption</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Expired Subscription Alert -->
+            @if ($subscription_status == 'expired')
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: #fee2e2; border-left: 4px solid #dc2626;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-circle"
+                           style="color: #dc2626;"></i>
+                        <span class="small fw-semibold"
+                              style="color: #991b1b;">Subscription Expired</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small">Please renew your subscription to continue using our
+                            services</span>
+                        <a href="{{ route('subscription.renew') }}"
+                           class="btn btn-sm btn-danger ms-auto"
+                           style="font-size: 11px; padding: 4px 12px;">
+                            Renew Now
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Suspended Subscription Alert -->
+            @if ($subscription_status == 'suspended')
+                <div class="mt-3 p-3 rounded-3"
+                     style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-ban"
+                           style="color: #f59e0b;"></i>
+                        <span class="small fw-semibold"
+                              style="color: #92400e;">Account Suspended</span>
+                        <span class="small text-muted mx-2">|</span>
+                        <span class="small">Please contact support to resolve the issue</span>
+                        <a href="{{ route('contact.support') }}"
+                           class="btn btn-sm btn-warning ms-auto"
+                           style="font-size: 11px; padding: 4px 12px;">
+                            Contact Support
+                        </a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+
+
     <div>
         <div class="row g-3 align-items-center justify-content-between mb-4 mt-5">
 

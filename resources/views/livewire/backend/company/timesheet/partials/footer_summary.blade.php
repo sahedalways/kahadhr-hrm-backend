@@ -7,7 +7,7 @@
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 text-center p-3 h-100">
                     <div class="card-body">
-                        <div class="fw-bold text-muted small">Total Users</div>
+                        <div class="fw-bold text-muted small">Total Employees</div>
                         <div class="h4 fw-bold">
                             {{ collect($employees)->count() }}
                         </div>

@@ -18,6 +18,7 @@ use App\Livewire\Backend\Settings\SecuritySettings;
 use App\Livewire\Backend\Settings\SiteSettings;
 use App\Livewire\Backend\Settings\SmsSettings;
 use App\Livewire\Backend\Settings\SocialSettings;
+use App\Livewire\Backend\Settings\TrialSettings;
 use Illuminate\Support\Facades\Route;
 
 // login route
@@ -72,6 +73,7 @@ Route::domain(config('app.admin_subdomain') . '.' . config('app.base_domain'))->
     Route::get('security', SecuritySettings::class)->name('security');
     Route::get('social', SocialSettings::class)->name('social');
     Route::get('charge', ChargeSettings::class)->name('charge');
+    Route::get('trial', TrialSettings::class)->name('trial');
   });
 
 

@@ -307,6 +307,20 @@
                             </li>
 
 
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/settings/trial*') ? 'active' : '' }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Trial Settings"
+                                   data-bs-trigger="manual"
+                                   href="{{ route('super-admin.settings.trial') }}">
+
+                                    <i class="fas fa-hourglass-half sidenav-mini-icon side-bar-inner"></i>
+                                    <span class="sidenav-normal side-bar-inner"> Trial Settings </span>
+                                </a>
+                            </li>
+
+
 
 
                             <!-- Security Settings -->

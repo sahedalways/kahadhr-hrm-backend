@@ -241,8 +241,6 @@ class TimesheetIndex extends BaseComponent
         $this->buildAttendanceCalendar();
     }
 
-
-
     public function getDisplayDateRangeProperty()
     {
         if ($this->viewMode === 'weekly') {

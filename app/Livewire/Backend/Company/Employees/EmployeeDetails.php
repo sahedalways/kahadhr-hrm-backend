@@ -399,7 +399,7 @@ class EmployeeDetails extends BaseComponent
 
     public function openEmergencyContactModal()
     {
-        $this->activeTab = 'emeregeny';
+        $this->activeTab = 'emergency';
         $this->resetFields();
         $this->dispatch('show-emergency-modal');
     }
@@ -424,7 +424,7 @@ class EmployeeDetails extends BaseComponent
 
     public function openEditEmergencyContactModal($id)
     {
-        $this->activeTab = 'emeregeny';
+        $this->activeTab = 'emergency';
         $contact = EmergencyContact::findOrFail($id);
 
         $this->contactId = $contact->id;

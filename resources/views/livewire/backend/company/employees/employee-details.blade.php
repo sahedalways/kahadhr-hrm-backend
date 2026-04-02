@@ -569,10 +569,10 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade {{ $activeTab === 'emeregeny' ? 'show active' : '' }}"
-                     id="emeregeny"
+                <div class="tab-pane fade {{ $activeTab === 'emergency' ? 'show active' : '' }}"
+                     id="emergency"
                      role="tabpanel"
-                     aria-labelledby="emeregeny-tab">
+                     aria-labelledby="emergency-tab">
                     <div class="card border-0 shadow-sm"
                          style="border-radius:1rem; background-color: #f8f9fa;">
                         <div class="card-body p-4">

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admin_policies', function (Blueprint $table) {
+        Schema::create('reporting_duties', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('file_path')->nullable();
+            $table->enum('visibility', ['company', 'employee', 'both'])->default('company');
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admin_policies');
+        Schema::dropIfExists('reporting_duties');
     }
 };

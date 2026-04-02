@@ -9,6 +9,7 @@ use App\Livewire\Backend\Admin\Dashboard;
 use App\Livewire\Backend\Admin\ManageCompanies;
 use App\Livewire\Backend\Admin\ManageEmployees;
 use App\Livewire\Backend\Admin\Reports;
+use App\Livewire\Backend\Admin\Repots\ReportingDutyIndex;
 use App\Livewire\Backend\Admin\SupportTickets;
 use App\Livewire\Backend\ContactInfo;
 use App\Livewire\Backend\Settings\ChargeSettings;
@@ -71,6 +72,12 @@ Route::domain(config('app.admin_subdomain') . '.' . config('app.base_domain'))->
     Route::get('security', SecuritySettings::class)->name('security');
     Route::get('social', SocialSettings::class)->name('social');
     Route::get('charge', ChargeSettings::class)->name('charge');
+  });
+
+
+  // reports routes
+  Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get('reporting-duties', ReportingDutyIndex::class)->name('reporting-duties');
   });
 
 

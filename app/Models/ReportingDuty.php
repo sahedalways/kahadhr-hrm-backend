@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use App\Traits\Scopes\FilterByUserType;
+
 use Illuminate\Database\Eloquent\Model;
 
-class AdminPolicy extends Model
+class ReportingDuty extends Model
 {
-    use FilterByUserType;
     protected $fillable = [
         'title',
         'description',
         'file_path',
-        'send_email',
+        'visibility',
     ];
 }

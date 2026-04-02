@@ -17,6 +17,7 @@ use App\Livewire\Backend\Employee\Schedule\ScheduleIndex;
 use App\Livewire\Backend\Employee\Settings\ProfileSettings;
 use App\Livewire\Backend\Employee\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Employee\Training\TrainingIndexEmp;
+use App\Livewire\Backend\Repots\LegalDuties;
 use App\Livewire\Backend\Settings\SecuritySettings;
 use Illuminate\Support\Facades\Route;
 
@@ -99,6 +100,8 @@ Route::domain('company.' . config('app.base_domain'))
     Route::prefix('reports')->name('reports.')->group(function () {
       Route::get('/expenses', ExpensesIndex::class)->name('expenses');
       Route::get('/pay-slips', PayslipIndex::class)->name('payslips');
+      Route::get('/legal-duties', LegalDuties::class)
+        ->name('legal-duties');
     });
 
 

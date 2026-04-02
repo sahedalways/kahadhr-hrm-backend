@@ -153,29 +153,6 @@
                     </a>
                 </li>
 
-                {{-- <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="right"
-                       title="Reports"
-                       data-bs-trigger="manual"
-                       href="{{ route('super-admin.reports') }}">
-                        <i class="fas fa-chart-line text-sm opacity-10"></i>
-                        <span class="nav-link-text ms-1">Reports</span>
-                    </a>
-                </li> --}}
-
-                {{-- <li class="nav-item">
-                    <a class="nav-link {{ Request::is('dashboard/support*') ? 'active' : '' }}"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="right"
-                       title="Support Tickets"
-                       data-bs-trigger="manual"
-                       href="{{ route('super-admin.support') }}">
-                        <i class="fas fa-life-ring text-sm opacity-10"></i>
-                        <span class="nav-link-text ms-1">Support Tickets</span>
-                    </a>
-                </li> --}}
 
 
 
@@ -196,6 +173,45 @@
                             <span class="badge bg-danger ms-auto">{{ $unreadContacts }}</span>
                         @endif
                     </a>
+                </li>
+
+
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse"
+                       href="#reports"
+                       class="nav-link {{ Request::is('dashboard/reports*') ? 'active' : '' }}"
+                       aria-controls="reports"
+                       role="button"
+                       aria-expanded="{{ Request::is('dashboard/reports*') ? 'true' : 'false' }}"
+                       data-bs-placement="right"
+                       title="Reports"
+                       data-bs-trigger="manual">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="nav-link-text ms-1">Reports</span>
+                    </a>
+
+                    <div class="collapse {{ Request::is('dashboard/reports*') ? 'show' : '' }}"
+                         id="reports">
+                        <ul class="nav ms-4">
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('dashboard/reports/reporting-duties*') ? 'active' : '' }}"
+                                   href="{{ route('super-admin.reports.reporting-duties') }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Reporting Duties"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-clipboard-list sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Reporting Duties </span>
+                                </a>
+                            </li>
+
+
+
+                        </ul>
+                    </div>
                 </li>
 
 
@@ -580,6 +596,20 @@
                          id="reports">
                         <ul class="nav ms-4">
 
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('reports/legal-duties*') ? 'active' : '' }}"
+                                   href="{{ route('company.dashboard.reports.legal-duties', ['company' => app('authUser')->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Reporting Duties"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-clipboard-list sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Reporting Duties </span>
+                                </a>
+                            </li>
+
+
                             <!-- Employee Profile -->
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::is('dashboard/reports/employee-profile*') ? 'active' : '' }}"
@@ -836,6 +866,19 @@
                     <div class="collapse {{ Request::is('employee/dashboard/reports*') ? 'show' : '' }}"
                          id="employeeReports">
                         <ul class="nav ms-4">
+
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ Request::is('reports/legal-duties*') ? 'active' : '' }}"
+                                   href="{{ route('employee.dashboard.reports.legal-duties', ['company' => app('authUser')->employee->company->sub_domain]) }}"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="Reporting Duties"
+                                   data-bs-trigger="manual">
+                                    <i class="fas fa-clipboard-list sidenav-mini-icon"></i>
+                                    <span class="sidenav-normal"> Reporting Duties </span>
+                                </a>
+                            </li>
 
                             <!-- Expenses -->
                             <li class="nav-item">

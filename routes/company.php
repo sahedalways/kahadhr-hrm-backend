@@ -28,6 +28,7 @@ use App\Livewire\Backend\Company\Settings\ProfileSettings;
 use App\Livewire\Backend\Company\Settings\VerificationCentreSettings;
 use App\Livewire\Backend\Company\Timesheet\TimesheetIndex;
 use App\Livewire\Backend\Company\Training\TrainingIndex;
+use App\Livewire\Backend\Repots\LegalDuties;
 use App\Livewire\Backend\Settings\MailSettings;
 use App\Livewire\Backend\Settings\SecuritySettings;
 use Illuminate\Support\Facades\Route;
@@ -148,6 +149,9 @@ Route::domain('company.' . config('app.base_domain'))
 
       Route::get('/leaves', CompanyLeaves::class)
         ->name('leaves');
+
+      Route::get('/legal-duties', LegalDuties::class)
+        ->name('legal-duties');
     });
 
 

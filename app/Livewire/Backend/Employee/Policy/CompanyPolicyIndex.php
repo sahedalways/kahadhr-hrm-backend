@@ -4,6 +4,7 @@ namespace App\Livewire\Backend\Employee\Policy;
 
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyPolicy;
+use Illuminate\Support\Facades\Storage;
 use Livewire\WithPagination;
 
 class CompanyPolicyIndex extends BaseComponent
@@ -103,14 +104,16 @@ class CompanyPolicyIndex extends BaseComponent
         $this->resetLoaded();
     }
 
+
     public function downloadPolicy($policyId)
     {
         $policy = CompanyPolicy::findOrFail($policyId);
 
-        if ($policy->file_path && file_exists(storage_path('app/public/' . $policy->file_path))) {
+        if ($policy->file_path && Storage::disk('public')->exists($policy->file_path)) {
             return response()->download(storage_path('app/public/' . $policy->file_path));
         }
 
-        session()->flash('error', 'File not found.');
+        $this->toast('File not found.', 'error');
+        return null;
     }
 }

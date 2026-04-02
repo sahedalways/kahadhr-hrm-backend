@@ -793,7 +793,7 @@ class TimesheetIndex extends BaseComponent
             'employeeId' => 'required|exists:users,id',
             'manualDate' => 'required|date',
             'clockInTime' => 'required|date_format:H:i',
-            'clockOutTime' => 'nullable|date_format:H:i|after:clockInTime',
+            'clockOutTime' => 'nullable|date_format:H:i',
         ]);
 
         $clockIn = $this->manualDate . ' ' . $this->clockInTime;
@@ -834,7 +834,7 @@ class TimesheetIndex extends BaseComponent
         $this->toast('Manual entry submitted successfully!', 'success');
 
         $this->reset(['employeeId', 'manualDate', 'clockInTime', 'clockOutTime', 'reason']);
-
+        $this->buildAttendanceCalendar();
         $this->dispatch('closemodal');
     }
 

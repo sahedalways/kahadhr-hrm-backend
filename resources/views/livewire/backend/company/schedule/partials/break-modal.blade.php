@@ -125,19 +125,49 @@
                                             {{ $newBreaks[$index]['duration'] ?? 'Select duration' }}
                                         </button>
 
-
                                         <div class="dropdown-menu p-2"
-                                             style="max-height:200px; overflow-y:auto; scrollbar-width: thin;">
-                                            @for ($i = 0; $i <= 23; $i += 0.25)
-                                                <div class="d-flex justify-content-center">
-                                                    <button type="button"
-                                                            class="dropdown-item text-center py-1"
-                                                            style="width: 60px; transition: background 0.2s;"
-                                                            wire:click="$set('newBreaks.{{ $index }}.duration', '{{ number_format($i, 2) }}')">
-                                                        {{ number_format($i, 2) }}
-                                                    </button>
-                                                </div>
-                                            @endfor
+                                             style="max-height:200px; overflow-y:auto; scrollbar-width: thin; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; min-width: 100px;">
+
+                                            <div class="text-center mb-2 pb-1 border-bottom">
+                                                <small class="text-uppercase fw-bold"
+                                                       style="font-size: 10px; letter-spacing: 0.5px; color: #64748b;">⏲️
+                                                    Duration</small>
+                                            </div>
+
+                                            <div class="row g-1">
+                                                @php
+                                                    $times = [
+                                                        0.1,
+                                                        0.2,
+                                                        0.3,
+                                                        0.4,
+                                                        0.45,
+                                                        0.5,
+                                                        1.0,
+                                                        1.1,
+                                                        1.2,
+                                                        1.3,
+                                                        1.4,
+                                                        1.45,
+                                                        1.5,
+                                                        2.0,
+                                                    ];
+                                                @endphp
+
+                                                @foreach ($times as $time)
+                                                    <div class="col-6">
+                                                        <button type="button"
+                                                                class="btn btn-sm w-100"
+                                                                style="border-radius: 6px; font-size: 12px; padding: 6px 4px; transition: all 0.2s; background: #fff; border: 1px solid #e2e8f0; color: #1e293b;"
+                                                                wire:click="$set('newBreaks.{{ $index }}.duration', '{{ number_format($time, 2) }}')"
+                                                                onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.borderColor='#94a3b8'; this.style.transform='translateY(-1px)';"
+                                                                onmouseout="this.style.backgroundColor='#fff'; this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)';">
+                                                            {{ number_format($time, 2) }} <span
+                                                                  style="font-size: 9px; color: #64748b;">hrs</span>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
 
                                         <style>

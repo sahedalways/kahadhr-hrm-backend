@@ -356,7 +356,7 @@ if (!function_exists('getShiftHours')) {
       $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
     } else {
       $shiftTotalMinutes = 480;
-      $shiftHoursFormatted = '8h 0m';
+      $shiftHoursFormatted = '0h 0m';
     }
 
     $paidBreakMinutes = 0;
@@ -366,7 +366,7 @@ if (!function_exists('getShiftHours')) {
     if ($shiftDate && method_exists($shiftDate, 'breaks') && $shiftDate->breaks) {
       foreach ($shiftDate->breaks as $break) {
         if ($break->duration) {
-          $breakMinutes = parseTimeToMinutes($break->duration); // ✅ fixed
+          $breakMinutes = parseTimeToMinutes($break->duration);
 
           if (isset($break->type) && strtolower($break->type) === 'unpaid') {
             $unpaidBreakMinutes += $breakMinutes;
@@ -403,7 +403,9 @@ if (!function_exists('getShiftHours')) {
     }
 
     return [
-      'shift_hours'           => $shiftHoursFormatted,
+      'shift_hours' => $shiftHoursFormatted == '0h 0m'
+        ? formatMinutesToHours($totalWorkedMinutes)
+        : $shiftHoursFormatted,
       'worked_hours'          => formatMinutesToHours($totalWorkedMinutes),
       'total_break_hours'     => formatMinutesToHours($totalBreakMinutes),
       'paid_break_hours'      => formatMinutesToHours($paidBreakMinutes),

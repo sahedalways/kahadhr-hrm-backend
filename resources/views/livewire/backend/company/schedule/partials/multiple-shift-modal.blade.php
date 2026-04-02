@@ -236,20 +236,57 @@
                                                     <label class="form-label form-label-sm">Duration <span
                                                               class="text-danger">*</span></label>
                                                     <div class="dropdown">
-                                                        <button class="btn btn-sm dropdown-toggle w-100 border"
+                                                        <button class="btn btn-sm dropdown-toggle w-100 border bg-white"
                                                                 type="button"
-                                                                data-bs-toggle="dropdown">
-                                                            {{ $break['duration'] ?? 'Duration' }}
+                                                                data-bs-toggle="dropdown"
+                                                                style="border-radius: 6px; font-size: 13px; text-align: left; background-color: #fff; border-color: #e2e8f0;">
+                                                            <span class="float-start">
+                                                                <i class="fa-regular fa-clock me-1"
+                                                                   style="color: #6c757d;"></i>
+                                                                {{ $break['duration'] ?? 'Select duration' }}
+                                                            </span>
                                                         </button>
-                                                        <div class="dropdown-menu text-center"
-                                                             style="max-height:200px;overflow-y:auto;">
-                                                            @for ($i = 0; $i <= 23; $i += 0.05)
-                                                                <button type="button"
-                                                                        class="dropdown-item"
-                                                                        wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.duration','{{ number_format($i, 2) }}')">
-                                                                    {{ number_format($i, 2) }}
-                                                                </button>
-                                                            @endfor
+                                                        <div class="dropdown-menu p-1"
+                                                             style="max-height: 250px; overflow-y: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; min-width: 120px;">
+                                                            <div class="px-2 py-1 border-bottom mb-1"
+                                                                 style="background: #f8f9fa;">
+                                                                <small class="text-muted fw-semibold">⏱ Duration
+                                                                    (hours)</small>
+                                                            </div>
+                                                            <div class="row g-1 p-1">
+                                                                @php
+                                                                    $times = [
+                                                                        0.1,
+                                                                        0.2,
+                                                                        0.3,
+                                                                        0.4,
+                                                                        0.45,
+                                                                        0.5,
+                                                                        1.0,
+                                                                        1.1,
+                                                                        1.2,
+                                                                        1.3,
+                                                                        1.4,
+                                                                        1.45,
+                                                                        1.5,
+                                                                        2.0,
+                                                                    ];
+                                                                @endphp
+
+                                                                @foreach ($times as $time)
+                                                                    <div class="col-6">
+                                                                        <button type="button"
+                                                                                class="btn btn-sm w-100 duration-option"
+                                                                                style="border-radius: 6px; font-size: 12px; padding: 6px 8px; transition: all 0.2s; background: #fff; border: 1px solid #e2e8f0; color: #1e293b;"
+                                                                                wire:click="$set('multipleShiftNewBreaks.{{ $index }}.{{ $breakIndex }}.duration','{{ number_format($time, 2) }}')"
+                                                                                onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.borderColor='#94a3b8';"
+                                                                                onmouseout="this.style.backgroundColor='#fff'; this.style.borderColor='#e2e8f0';">
+                                                                            {{ number_format($time, 2) }} <span
+                                                                                  style="font-size: 10px; color: #64748b;">hrs</span>
+                                                                        </button>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

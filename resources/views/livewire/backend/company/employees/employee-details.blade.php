@@ -52,71 +52,65 @@
 
         <!-- Sidebar -->
         <div class="col-lg-3">
-            <div class="card shadow-sm"
-                 style="border-radius:14px; border:none; overflow:hidden; background:#fff;">
+            <div class="card border-0 shadow-lg"
+                 style="border-radius: 1rem;">
+                <div class="card-body p-0">
 
-                <div
-                     style="background:linear-gradient(135deg,#0dcaf0,#0b9ed0);
-                   color:#fff;
-                   padding:14px 20px;
-                   font-weight:600;
-                   font-size:0.85rem;
-                   text-transform:uppercase;
-                   letter-spacing:.5px;">
-                    <i class="bi bi-person-circle me-2"></i>
-                    Employee Profile
-                </div>
+                    <div class="list-group list-group-flush"
+                         role="tablist">
 
-                <div class="list-group list-group-flush"
-                     role="tablist">
+                        <div class="list-group-item list-group-item-light text-uppercase fw-bold small py-3"
+                             style="border-top-left-radius: 1rem; border-top-right-radius: 1rem; background: linear-gradient(135deg, #0dcaf0, #0b9ed0); color: white; border: none;">
+                            <i class="bi bi-person-circle me-2"></i>
+                            Employee Navigation
+                        </div>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'overview' ? 'active' : '' }}"
-                       href="#overview"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'overview')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'overview' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-person-lines-fill"
-                           style="font-size:1.1rem; {{ $activeTab === 'overview' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Employee Overview
-                    </a>
+                        <!-- Sidebar Tabs -->
+                        <a class="list-group-item list-group-item-action"
+                           href="#overview"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'overview')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'overview' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-person-lines-fill"
+                               style="font-size: 1.1rem; {{ $activeTab === 'overview' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Employee Overview
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'personalInfo' ? 'active' : '' }}"
-                       href="#personalInfo"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'personalInfo')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'personalInfo' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-person-badge"
-                           style="font-size:1.1rem; {{ $activeTab === 'personalInfo' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Personal Information
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#personalInfo"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'personalInfo')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'personalInfo' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-person-badge"
+                               style="font-size: 1.1rem; {{ $activeTab === 'personalInfo' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Personal Information
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'emeregeny' ? 'active' : '' }}"
-                       href="#emeregeny"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'emeregeny')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'emeregeny' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-briefcase"
-                           style="font-size:1.1rem; {{ $activeTab === 'emeregeny' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Emergency Contacts
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#emergency"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'emergency')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'emergency' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-shield-plus"
+                               style="font-size: 1.1rem; {{ $activeTab === 'emergency' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Emergency Contacts
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'documentsSection' ? 'active' : '' }}"
-                       href="#documentsSection"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'documentsSection')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'documentsSection' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-folder"
-                           style="font-size:1.1rem; {{ $activeTab === 'documentsSection' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Documents
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#documentsSection"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'documentsSection')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'documentsSection' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-folder"
+                               style="font-size: 1.1rem; {{ $activeTab === 'documentsSection' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Documents
+                        </a>
+
+                    </div>
 
                 </div>
             </div>

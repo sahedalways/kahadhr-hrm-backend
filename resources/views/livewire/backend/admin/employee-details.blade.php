@@ -1,83 +1,125 @@
 <div class="container-fluid py-4">
     <div class="row g-4">
-        <!-- Back to Employees List -->
-        <div class="text-end mb-2">
-            <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
-               style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem;"
-               href="{{ route('super-admin.employees') }}">
-                <i class="fa-solid fa-arrow-left me-2"></i>
-                Back to Employees
-            </a>
+
+
+
+
+
+        <div class="col-12 mb-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle"
+                         style="width: 48px; height: 48px; background: linear-gradient(135deg, #0dcaf0, #0b9ed0); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-weight: 600; font-size: 1.2rem;">
+                            {{ strtoupper(substr($employee->f_name, 0, 1) . substr($employee->l_name, 0, 1)) }}
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0"
+                            style="font-size: 1.5rem; color: #1a2c3e; letter-spacing: -0.3px;">
+                            {{ $employee->full_name }}
+                        </h2>
+                        <div class="d-flex gap-2 mt-1">
+                            <span class="badge"
+                                  style="background: #e9ecef; color: #495057; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                <i class="fas fa-briefcase me-1"
+                                   style="font-size: 0.7rem;"></i> {{ ucfirst($employee->role) }}
+                            </span>
+                            @if ($employee->is_active)
+                                <span class="badge"
+                                      style="background: #d1fae5; color: #065f46; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                    <i class="fas fa-circle me-1"
+                                       style="font-size: 0.5rem; color: #10b981;"></i> Active
+                                </span>
+                            @else
+                                <span class="badge"
+                                      style="background: #fee2e2; color: #991b1b; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
+                                    <i class="fas fa-circle me-1"
+                                       style="font-size: 0.5rem; color: #dc2626;"></i> Inactive
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Move button to the right using ms-auto -->
+                <a class="btn btn-sm btn-outline-primary d-inline-flex align-items-center ms-auto"
+                   style="background-color:#f8f9fa; border:1px solid #0d6efd; padding:6px 12px; font-size:0.875rem; border-radius: 8px;"
+                   href="{{ route('super-admin.employees') }}">
+                    <i class="fa-solid fa-arrow-left me-2"></i>
+                    Back to Employees
+                </a>
+
+            </div>
         </div>
+
+
+
+
 
 
         <!-- Sidebar -->
         <div class="col-lg-3">
-            <div class="card shadow-sm"
-                 style="border-radius:14px; border:none; overflow:hidden; background:#fff;">
+            <div class="card border-0 shadow-lg"
+                 style="border-radius: 1rem;">
+                <div class="card-body p-0">
 
-                <div
-                     style="background:linear-gradient(135deg,#0dcaf0,#0b9ed0);
-                   color:#fff;
-                   padding:14px 20px;
-                   font-weight:600;
-                   font-size:0.85rem;
-                   text-transform:uppercase;
-                   letter-spacing:.5px;">
-                    <i class="bi bi-person-circle me-2"></i>
-                    Employee Profile
-                </div>
+                    <div class="list-group list-group-flush"
+                         role="tablist">
 
-                <div class="list-group list-group-flush"
-                     role="tablist">
+                        <div class="list-group-item list-group-item-light text-uppercase fw-bold small py-3"
+                             style="border-top-left-radius: 1rem; border-top-right-radius: 1rem; background: linear-gradient(135deg, #0dcaf0, #0b9ed0); color: white; border: none;">
+                            <i class="bi bi-person-circle me-2"></i>
+                            Employee Navigation
+                        </div>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'overview' ? 'active' : '' }}"
-                       href="#overview"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'overview')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'overview' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-person-lines-fill"
-                           style="font-size:1.1rem; {{ $activeTab === 'overview' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Employee Overview
-                    </a>
+                        <!-- Sidebar Tabs -->
+                        <a class="list-group-item list-group-item-action"
+                           href="#overview"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'overview')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'overview' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-person-lines-fill"
+                               style="font-size: 1.1rem; {{ $activeTab === 'overview' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Employee Overview
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'personalInfo' ? 'active' : '' }}"
-                       href="#personalInfo"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'personalInfo')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'personalInfo' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-person-badge"
-                           style="font-size:1.1rem; {{ $activeTab === 'personalInfo' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Personal Information
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#personalInfo"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'personalInfo')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'personalInfo' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-person-badge"
+                               style="font-size: 1.1rem; {{ $activeTab === 'personalInfo' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Personal Information
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'emeregeny' ? 'active' : '' }}"
-                       href="#emeregeny"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'emeregeny')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'emeregeny' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-briefcase"
-                           style="font-size:1.1rem; {{ $activeTab === 'emeregeny' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Emergency Contacts
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#emergency"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'emergency')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'emergency' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-shield-plus"
+                               style="font-size: 1.1rem; {{ $activeTab === 'emergency' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Emergency Contacts
+                        </a>
 
-                    <a class="list-group-item list-group-item-action {{ $activeTab === 'documentsSection' ? 'active' : '' }}"
-                       href="#documentsSection"
-                       role="tab"
-                       data-bs-toggle="tab"
-                       wire:click.prevent="$set('activeTab', 'documentsSection')"
-                       style="border:none; padding:14px 20px; display:flex; align-items:center; gap:12px;
-               {{ $activeTab === 'documentsSection' ? 'background:#e9f7fc; color:#0dcaf0; font-weight:600; border-left:4px solid #0dcaf0;' : 'font-weight:500; color:#444;' }}">
-                        <i class="bi bi-folder"
-                           style="font-size:1.1rem; {{ $activeTab === 'documentsSection' ? 'color:#0dcaf0;' : 'color:#6c757d;' }}"></i>
-                        Documents
-                    </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="#documentsSection"
+                           role="tab"
+                           wire:click.prevent="$set('activeTab', 'documentsSection')"
+                           style="border: none; padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+                   {{ $activeTab === 'documentsSection' ? 'background: #e9f7fc; color: #0dcaf0; font-weight: 600; border-left: 4px solid #0dcaf0;' : 'font-weight: 500; color: #444;' }}">
+                            <i class="bi bi-folder"
+                               style="font-size: 1.1rem; {{ $activeTab === 'documentsSection' ? 'color: #0dcaf0;' : 'color: #6c757d;' }}"></i>
+                            Documents
+                        </a>
+
+                    </div>
 
                 </div>
             </div>
@@ -100,10 +142,11 @@
                              style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
 
                             <!-- Title -->
-                            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
-                                <i class="fas fa-user-circle me-3 text-info"></i>
+                            <h5 class="fw-bold text-dark d-flex align-items-center mb-4">
+                                <i class="fas fa-user-circle me-3 text-info"
+                                   style="font-size: 1.7rem;"></i>
                                 Employee Overview
-                                </h4>
+                            </h5>
 
 
                         </div>
@@ -399,73 +442,74 @@
                     <div class="card border-0 shadow-sm"
                          style="border-radius:1rem; background-color: #f8f9fa;">
                         <div class="card-body p-4">
-                            <h5 class="mb-4 fw-bold text-dark">Emergency contacts</h4>
+                            <h5 class="fw-bold text-dark d-flex align-items-center mb-4">
+                                <i class="fas fa-phone-alt me-3 text-info"></i>
+                                Emergency Contacts
+                            </h5>
 
-
-
-                                <div class="table-responsive bg-white shadow-sm border"
-                                     style="border-radius: 12px;">
-                                    <table class="table mb-0 align-middle">
-                                        <thead class="bg-light">
+                            <div class="table-responsive bg-white shadow-sm border"
+                                 style="border-radius: 12px;">
+                                <table class="table mb-0 align-middle">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="border-0 ps-4 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Name</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Relationship</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Mobile</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">E-mail</th>
+                                            <th class="border-0 py-3 text-muted fw-bold"
+                                                style="font-size: 14px;">Address</th>
+                                            <th class="border-0 py-3 text-muted fw-bold text-center"
+                                                style="font-size: 14px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($employee->emergencyContacts as $contact)
                                             <tr>
-                                                <th class="border-0 ps-4 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Name</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Relationship</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Mobile</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">E-mail</th>
-                                                <th class="border-0 py-3 text-muted fw-bold"
-                                                    style="font-size: 14px;">Address</th>
-                                                <th class="border-0 py-3 text-muted fw-bold text-center"
-                                                    style="font-size: 14px;">Actions</th>
+                                                <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
+                                                <td class="text-muted">{{ $contact->relationship }}</td>
+                                                <td class="text-muted">
+                                                    {{ $contact->mobile }}<br>
+
+                                                </td>
+                                                <td class="text-muted">{{ $contact->email ?? '' }}</td>
+                                                <td class="text-muted"
+                                                    style="max-width: 200px;">
+                                                    {!! nl2br(e($contact->address)) !!}
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-3">
+                                                        <a href="#"
+                                                           class="text-dark"
+                                                           wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </a>
+
+                                                        <a href="#"
+                                                           class="text-danger"
+                                                           onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                                           wire:click="deleteEmergencyContact({{ $contact->id }})">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($employee->emergencyContacts as $contact)
-                                                <tr>
-                                                    <td class="ps-4 py-4 fw-bold text-dark">{{ $contact->name }}</td>
-                                                    <td class="text-muted">{{ $contact->relationship }}</td>
-                                                    <td class="text-muted">
-                                                        {{ $contact->mobile }}<br>
+                                        @endforeach
 
-                                                    </td>
-                                                    <td class="text-muted">{{ $contact->email ?? '' }}</td>
-                                                    <td class="text-muted"
-                                                        style="max-width: 200px;">
-                                                        {!! nl2br(e($contact->address)) !!}
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="d-flex justify-content-center gap-3">
-                                                            <a href="#"
-                                                               class="text-dark"
-                                                               wire:click.prevent="openEditEmergencyContactModal({{ $contact->id }})">
-                                                                <i class="fas fa-pencil-alt"></i>
-                                                            </a>
-
-                                                            <a href="#"
-                                                               class="text-danger"
-                                                               onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
-                                                               wire:click="deleteEmergencyContact({{ $contact->id }})">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-
-                                            @if ($employee->emergencyContacts->isEmpty())
-                                                <tr>
-                                                    <td colspan="6"
-                                                        class="text-center py-5 text-muted">
-                                                        No emergency contacts found.
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        @if ($employee->emergencyContacts->isEmpty())
+                                            <tr>
+                                                <td colspan="6"
+                                                    class="text-center py-5 text-muted">
+                                                    No emergency contacts found.
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -675,13 +719,14 @@
 
 
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold text-dark mb-0">
-                            <i class="fas fa-id-card-alt text-dark me-2"></i>Employee Profile Summary
-                            </h4>
-                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-                                Last Updated:
-                                {{ $profile && $profile->updated_at ? $profile->updated_at->format('d M, Y') : 'N/A' }}
-                            </span>
+                        <h5 class="fw-bold text-dark d-flex align-items-center mb-0">
+                            <i class="fas fa-id-card-alt me-3 text-info"></i>
+                            Employee Profile Summary
+                        </h5>
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                            Last Updated:
+                            {{ $profile && $profile->updated_at ? $profile->updated_at->format('d M, Y') : 'N/A' }}
+                        </span>
                     </div>
 
                     <div class="row g-4">

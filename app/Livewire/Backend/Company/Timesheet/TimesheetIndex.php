@@ -242,7 +242,6 @@ class TimesheetIndex extends BaseComponent
     }
 
 
-
     public function getDisplayDateRangeProperty()
     {
         if ($this->viewMode === 'weekly') {

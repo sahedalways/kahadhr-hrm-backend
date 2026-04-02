@@ -22,7 +22,7 @@ class SiteSettingSeeder extends Seeder
 
 
     TrialSetting::create([
-      'trial_days' => 1,
+      'trial_days' => 14,
     ]);
   }
 }

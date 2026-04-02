@@ -51,9 +51,9 @@ class UserTableSeeder extends Seeder
       'company_mobile' => '016165238944',
       'company_email' => 'company@company.com',
       'subscription_status' => 'trial',
-      'trial_ends_at' => now()->addDays(14),
+      'trial_ends_at' => now()->addDays(getTrialDays()),
       'subscription_start' => now(),
-      'subscription_end' => now()->addDays(14),
+      'subscription_end' => now()->addDays(getTrialDays()),
     ]);
 
 
@@ -77,8 +77,8 @@ class UserTableSeeder extends Seeder
       'company_email' => 'abc@company.com',
       'subscription_status' => 'trial',
       'subscription_start' => now(),
-      'subscription_end' => now()->addDays(14),
-      'trial_ends_at' => now()->addDays(14),
+      'subscription_end' => now()->addDays(getTrialDays()),
+      'trial_ends_at' => now()->addDays(getTrialDays()),
     ]);
 
 

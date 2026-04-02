@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\SiteSetting;
+use App\Models\TrialSetting;
 
 class SiteSettingSeeder extends Seeder
 {
@@ -17,6 +18,11 @@ class SiteSettingSeeder extends Seeder
       'site_phone_number' => '+8801877556633',
       'site_email'             => 'info@kahadhr.com',
       'copyright_text'    => '© 2026 KahadHR. All rights reserved. Developed and Maintenances by MARSSTATION',
+    ]);
+
+
+    TrialSetting::create([
+      'trial_days' => 1,
     ]);
   }
 }

@@ -5,6 +5,7 @@ use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\ShiftDate;
 use App\Models\SiteSetting;
+use App\Models\TrialSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -423,5 +424,29 @@ if (!function_exists('formatMinutesToHours')) {
     $hours = intdiv($minutes, 60);
     $mins = $minutes % 60;
     return sprintf('%dh %dm', $hours, $mins);
+  }
+
+
+
+
+  /**
+   * Get trial days from settings or return default
+   *
+   * @return int
+   */
+
+
+  if (!function_exists('getTrialDays')) {
+    function getTrialDays()
+    {
+      $trialSetting = TrialSetting::first();
+
+      if ($trialSetting && $trialSetting->trial_days) {
+        return (int) $trialSetting->trial_days;
+      }
+
+
+      return 14;
+    }
   }
 }

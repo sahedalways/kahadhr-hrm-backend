@@ -34,8 +34,8 @@ class FrontAuthRepository
         'company_mobile'       => $data['company_mobile'],
         'company_email'        => $data['company_email'],
         'subscription_start'   => now(),
-        'subscription_end'     => now()->addDays(14),
-        'trial_ends_at' => now()->addDays(14),
+        'subscription_end'     => now()->addDays(getTrialDays()),
+        'trial_ends_at' => now()->addDays(getTrialDays()),
         'subscription_status'  => 'trial',
       ]);
 

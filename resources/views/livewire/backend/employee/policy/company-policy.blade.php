@@ -5,12 +5,22 @@
 
 <div>
     <div class="container-fluid px-0">
-        {{-- Search and Filter Section --}}
+        <div class="col-md-3 mb-5 mt-2">
+            <h5 class="fw-bold text-primary mb-0">
+                <i class="fas fa-file-contract me-2"></i>Company Policies
+            </h5>
+            <p class="text-muted small mb-0">
+                Access, review, and download all company policy
+            </p>
+        </div>
+
+
         <div class="mb-4">
             <div class="row g-3 align-items-center">
                 <div class="col-md-8">
                     <div class="position-relative">
-                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <i
+                           class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                         <input type="text"
                                wire:model.live.debounce.300ms="search"
                                placeholder="Search policies by title or description..."
@@ -20,11 +30,14 @@
                 <div class="col-md-4">
                     <div class="d-flex justify-content-end gap-2">
                         @if ($policies->count() > 0)
-                            <span class="badge bg-primary d-inline-flex align-items-center justify-content-center"
-                                  style="width: 30px; height: 30px; padding: 0;">
-                                <i class="fas fa-file-alt"></i>
-                                {{ $policies->count() }}
-                            </span>
+                            @if ($policies->count() > 0)
+                                <span class="badge bg-primary d-inline-flex align-items-center justify-content-center"
+                                      style="height: 30px; padding: 0 15px; border-radius: 50%; gap: 4px; min-width: 30px;">
+                                    <i class="fas fa-file-alt"
+                                       style="font-size: 14px;"></i>
+                                    <span style="font-size: 12px;">{{ $policies->count() }}</span>
+                                </span>
+                            @endif
                         @endif
                         <div class="dropdown">
                             <button class="btn btn-sm btn-outline-secondary rounded-pill dropdown-toggle px-3"

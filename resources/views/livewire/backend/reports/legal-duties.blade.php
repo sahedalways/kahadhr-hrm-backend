@@ -233,8 +233,8 @@
                         <div class="mb-3">
                             <i class="fas fa-gavel text-muted fs-1"></i>
                         </div>
-                        <h5 class="text-muted">No Legal Duties Found</h5>
-                        <p class="text-muted small">No reporting or legal duties match your search criteria.</p>
+                        <h5 class="text-muted">No Reporting Duties Found</h5>
+                        <p class="text-muted small">No reporting or reporting duties match your search criteria.</p>
                     </div>
                 </div>
             @endforelse

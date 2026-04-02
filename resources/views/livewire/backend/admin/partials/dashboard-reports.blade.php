@@ -258,7 +258,8 @@
                             <tr class="small text-muted text-uppercase">
                                 <th>Company</th>
                                 <th>Subscription Status</th>
-                                <th>Expiry Date</th>
+                                <th>Subscription Start</th>
+                                <th>Subscription End</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -301,20 +302,21 @@
                                             {{ $statusText }}
                                         </span>
                                     </td>
+
+                                    <td>
+
+                                        <span class="mb-0 small fw-bold text-primary">
+                                            {{ \Carbon\Carbon::parse($company->subscription_start)->format('M d, Y') }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <p class="mb-0 small fw-bold text-danger">
                                             {{ \Carbon\Carbon::parse($company->subscription_end)->format('M d, Y') }}
                                         </p>
 
                                         @php
-                                            $startDate = \Carbon\Carbon::parse(
-                                                $company->subscription_start,
-                                            )->startOfDay();
-                                            $endDate = \Carbon\Carbon::parse($company->subscription_end)->startOfDay();
-
-                                            $daysLeft = $startDate->diffInDays($endDate);
+                                            $daysLeft = calculateRemainingTrialDate($company->subscription_end);
                                         @endphp
-
                                         <small class="text-muted">{{ $daysLeft }} days</small>
                                     </td>
 

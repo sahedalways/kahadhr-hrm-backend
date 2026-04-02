@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\SubscriptionHelper;
 use App\Models\ChatMessage;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
@@ -172,6 +173,7 @@ if (!function_exists('todaysShiftForUser')) {
   if (!function_exists('getTrialInfo')) {
     function getTrialInfo($status, $subscription_end)
     {
+
       if ($status !== 'trial' || !$subscription_end) {
         return null;
       }
@@ -447,6 +449,44 @@ if (!function_exists('formatMinutesToHours')) {
 
 
       return 14;
+    }
+  }
+
+
+  if (!function_exists('getSubscriptionInfo')) {
+    function getSubscriptionInfo($status, $trial_end_date = null, $subscription_start_date = null, $subscription_end_date = null)
+    {
+      return SubscriptionHelper::getSubscriptionInfo($status, $trial_end_date, $subscription_start_date, $subscription_end_date);
+    }
+  }
+
+  if (!function_exists('formatSubscriptionDisplay')) {
+    function formatSubscriptionDisplay($status, $trial_end_date = null, $subscription_end_date = null)
+    {
+      $info = SubscriptionHelper::getSubscriptionInfo($status, $trial_end_date, null, $subscription_end_date);
+      return $info['html'];
+    }
+  }
+
+
+
+
+
+  if (!function_exists('calculateRemainingTrialDate')) {
+    /**
+     * Calculate days between dates
+     *
+     * @param string|Carbon $date1
+     * @param string|Carbon $date2
+     * @param string $type - 'difference', 'remaining', 'elapsed'
+     * @return int
+     */
+    function calculateRemainingTrialDate($date1)
+    {
+      if (!$date1) return 0;
+      $today = Carbon::now()->startOfDay();
+      $end = Carbon::parse($date1)->startOfDay();
+      return $today->greaterThan($end) ? 0 : (int) ceil($today->diffInDays($end, false));
     }
   }
 }

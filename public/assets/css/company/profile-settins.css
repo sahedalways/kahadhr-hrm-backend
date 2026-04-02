@@ -1,0 +1,39 @@
+#countryDropdownButton,
+#stateDropdownButton,
+#cityDropdownButton,
+#countryDropdownMenu,
+#stateDropdownMenu,
+#cityDropdownMenu {
+    box-shadow: none !important;
+}
+
+#countryDropdownMenu {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dropdown-item:hover {
+    background-color: #e9f7fc !important;
+    color: #0dcaf0 !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.btn:focus {
+    box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.1) !important;
+    border-color: #0dcaf0 !important;
+}
+
+.form-control,
+.form-select,
+.btn {
+    transition: all 0.2s ease;
+}
+
+.rounded-3 {
+    border-radius: 12px !important;
+}
+
+.rounded-4 {
+    border-radius: 16px !important;
+}

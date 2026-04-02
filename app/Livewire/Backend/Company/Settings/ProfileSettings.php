@@ -32,6 +32,12 @@ class ProfileSettings extends BaseComponent
 
     public $filteredCountries = [];
 
+    public $subscription_status;
+    public $payment_status;
+    public $subscription_start;
+    public $subscription_end;
+    public $trial_ends_at;
+
 
     public $company;
 
@@ -60,6 +66,14 @@ class ProfileSettings extends BaseComponent
         $this->country     = $this->company->country ?: 'United Kingdom';
         $this->state     = $this->company->state ?? null;
         $this->city     = $this->company->city ?? null;
+
+
+
+        $this->subscription_status = $this->company->subscription_status ?? 'expired';
+        $this->payment_status = $this->company->payment_status ?? 'pending';
+        $this->subscription_start = $this->company->subscription_start;
+        $this->subscription_end = $this->company->subscription_end;
+        $this->trial_ends_at = $this->company->trial_ends_at ?? null;
 
 
         $this->old_company_logo = $this->company->company_logo_url;

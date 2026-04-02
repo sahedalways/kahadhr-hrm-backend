@@ -72,7 +72,7 @@
         $showBanner = $company && in_array($company->subscription_status, ['trial', 'suspended']);
         $bannerText =
             $company && $company->subscription_status === 'trial'
-                ? getTrialInfo($company->subscription_status, $company->subscription_end)
+                ? getTrialInfo($company->subscription_status, $company->subscription_start, $company->subscription_end)
                 : ($company && $company->subscription_status === 'suspended'
                     ? 'Your account is suspended. Contact to support'
                     : '');

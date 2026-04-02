@@ -158,7 +158,7 @@
                                 <div class="avatar-wrapper">
                                     <img src="{{ $userType === 'company' ? getCompanyLogoUrl() ?? '/assets/img/default-avatar.png' : $user->employee->avatar_url }}"
                                          alt="Avatar"
-                                         class="rounded-circle avatar-img">
+                                         class="avatar-img">
                                 </div>
 
                                 <i class="fa-solid fa-caret-down"></i>
@@ -167,27 +167,21 @@
                             <style>
                                 .avatar-wrapper {
                                     width: 40px;
-
                                     height: 40px;
-
                                     border-radius: 50%;
-
                                     overflow: hidden;
-
                                     flex-shrink: 0;
-
                                     display: flex;
                                     align-items: center;
                                     justify-content: center;
                                     background: #f0f0f0;
-
                                 }
 
                                 .avatar-img {
                                     width: 100%;
                                     height: 100%;
                                     object-fit: cover;
-
+                                    object-position: center;
                                     display: block;
                                 }
                             </style>

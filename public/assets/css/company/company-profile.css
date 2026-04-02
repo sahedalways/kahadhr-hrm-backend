@@ -1,0 +1,42 @@
+.bg-opacity-20 {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.fs-10 {
+    font-size: 0.75rem;
+}
+
+.card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.vstack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.icon-circle {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(13, 202, 240, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}

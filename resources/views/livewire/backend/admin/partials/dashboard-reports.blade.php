@@ -257,7 +257,7 @@
                         <thead class="bg-light">
                             <tr class="small text-muted text-uppercase">
                                 <th>Company</th>
-                                <th>Plan / Status</th>
+                                <th>Subscription Status</th>
                                 <th>Expiry Date</th>
                                 <th>Action</th>
                             </tr>
@@ -281,24 +281,41 @@
                                         </div>
                                     </td>
 
+                                    @php
+                                        $statusColors = [
+                                            'active' => 'success',
+                                            'trial' => 'info',
+                                            'expired' => 'danger',
+                                            'suspended' => 'warning',
+                                        ];
+
+                                        $statusText = ucfirst($company->subscription_status);
+                                        $color = $statusColors[$company->subscription_status] ?? 'secondary';
+                                    @endphp
+
+
+
                                     <td>
-                                        <span
-                                              class="badge bg-soft-warning text-warning text-uppercase">{{ $company->billing_plan_id ?? 'Trial' }}</span>
-                                        <span class="badge bg-soft-success text-success">{{ $company->status }}</span>
+
+                                        <span class="badge bg-soft-{{ $color }} text-{{ $color }}">
+                                            {{ $statusText }}
+                                        </span>
                                     </td>
                                     <td>
                                         <p class="mb-0 small fw-bold text-danger">
                                             {{ \Carbon\Carbon::parse($company->subscription_end)->format('M d, Y') }}
                                         </p>
+
                                         @php
-                                            $daysLeft = \Carbon\Carbon::parse($company->subscription_end)
-                                                ->startOfDay()
-                                                ->diffInDays(\Carbon\Carbon::now()->startOfDay());
+                                            $startDate = \Carbon\Carbon::parse(
+                                                $company->subscription_start,
+                                            )->startOfDay();
+                                            $endDate = \Carbon\Carbon::parse($company->subscription_end)->startOfDay();
+
+                                            $daysLeft = $startDate->diffInDays($endDate);
                                         @endphp
 
-                                        <small class="text-muted">{{ $daysLeft }} days left</small>
-
-
+                                        <small class="text-muted">{{ $daysLeft }} days</small>
                                     </td>
 
 

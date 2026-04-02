@@ -1,3 +1,9 @@
+@push('styles')
+    <link href="{{ asset('assets/css/company/company-profile.css') }}"
+          rel="stylesheet" />
+@endpush
+
+
 <div>
 
     <div class="container-fluid py-4">
@@ -87,197 +93,356 @@
                     <!-- ================================
                          COMPANY OVERVIEW
                     ===================================== -->
+
                     <div class="tab-pane fade {{ $activeTab === 'overview' ? 'show active' : '' }}"
                          id="overview"
                          role="tabpanel">
 
-
-
-                        <div class="card-header bg-white py-4 border-bottom-0 d-flex align-items-center justify-content-between"
-                             style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-
-                            <!-- Title -->
-                            <h5 class="mb-0  text-dark d-flex align-items-center">
-
-                                Company Overview
-                                </h4>
-
-                                <!-- Menu Button -->
-                                <div class="dropdown"
-                                     wire:ignore.self>
-                                    <!-- Dropdown Button -->
-                                    <button class="btn btn-sm btn-light border-0 px-md-3 px-2"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            wire:ignore>
-                                        <i class="fas fa-ellipsis-v text-muted"></i>
-                                    </button>
-
-                                    <!-- Dropdown Menu -->
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                                        wire:ignore.self>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               href="#"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#manageCompanyProfile"
-                                               wire:click="manageCompanyProfile({{ $details->id }})">
-                                                <i class="fas fa-edit me-2 text-muted"></i> Manage Profile
-                                                <span wire:loading
-                                                      wire:target="manageCompanyProfile"
-                                                      class="spinner-border spinner-border-sm ms-2"></span>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item"
-                                               href="#"
-                                               wire:click.prevent="toggleStatus({{ $details->id }})">
-                                                @if ($details->status == 'Active')
-                                                    <i class="fas fa-user-minus me-2 text-muted"></i> Change to Inactive
-                                                @else
-                                                    <i class="fas fa-user-check me-2 text-muted"></i> Change to Active
-                                                @endif
-                                                <span wire:loading
-                                                      wire:target="toggleStatus"
-                                                      class="spinner-border spinner-border-sm ms-2"></span>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item text-danger"
-                                               href="#"
-                                               wire:click.prevent="$dispatch('confirmDelete', {{ $details->id }})">
-                                                <i class="fas fa-trash me-2"></i> Delete Company
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-
-                        </div>
-
-
-
-                        <div class="card-body p-3 p-md-4">
-                            <div class="row g-4 align-items-start">
-
-                                <!-- Logo -->
-                                <div class="col-lg-3 col-md-4 col-12 text-center">
-                                    <div class="border rounded-4 p-3 bg-light shadow-sm mx-auto"
-                                         style="max-width:180px;">
-                                        <img src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
-                                             class="img-fluid rounded-3 clickable-image"
-                                             style="max-height:120px; object-fit:contain; cursor:pointer;"
-                                             data-src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}">
-                                    </div>
-                                </div>
-
-                                <!-- Info + Contact -->
-                                <div class="col-lg-9 col-md-8 col-12">
-
-                                    <!-- Company Info -->
-                                    <div class="mb-4">
-                                        <h4 class="fw-bold mb-1 d-flex flex-wrap align-items-center gap-2">
-                                            {{ $details->company_name }}
-
-                                            <span
-                                                  class="badge px-3 py-2 fw-semibold
-                        {{ $details->status == 'Active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                {{ $details->status }}
-                                            </span>
-                                        </h4>
-
-                                        <p class="text-muted mb-3 small">
-                                            <i class="fa-solid fa-briefcase me-1"></i>
-                                            {{ $details->business_type ?: 'N/A' }}
-                                        </p>
-
-                                        <dl class="row mb-0 small">
-                                            <dt class="col-4 col-sm-3 fw-semibold text-dark">
-                                                <i class="fa-regular fa-envelope me-1 text-muted"></i>
-                                                Email
-                                            </dt>
-                                            <dd class="col-8 col-sm-9 text-truncate mb-1">
-                                                {{ $details->company_email ?: 'N/A' }}
-                                            </dd>
-
-                                            <dt class="col-4 col-sm-3 fw-semibold text-dark">
-                                                <i class="fa-solid fa-phone me-1 text-muted"></i>
-                                                Phone
-                                            </dt>
-                                            <dd class="col-8 col-sm-9 mb-0">
-                                                {{ $details->company_mobile ?: 'N/A' }}
-                                            </dd>
-                                        </dl>
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <!-- Header Section with Custom Cyan Color -->
+                            <div class="card-header text-white py-4 px-4 border-0"
+                                 style="background-color: #3d75a8;">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 60px; height: 60px;">
+                                            <i class="fas fa-building fa-lg text-dark"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0 fw-bold text-white">Company Overview</h4>
+                                            <p class="mb-0 text-white"
+                                               style="opacity: 0.9;">Company details and contact information</p>
+                                        </div>
                                     </div>
 
-                                    <hr class="my-3">
+                                    <!-- Actions Dropdown -->
+                                    <div class="dropdown"
+                                         wire:ignore.self>
+                                        <button class="btn btn-light btn-sm rounded-pill px-3"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <i class="fas fa-cog me-1"></i> Actions
+                                            <i class="fas fa-chevron-down ms-1 fs-10"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            <li>
+                                                <a class="dropdown-item py-2"
+                                                   href="#"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#manageCompanyProfile"
+                                                   wire:click="manageCompanyProfile({{ $details->id }})">
+                                                    <i class="fas fa-edit me-2 text-primary"></i> Manage Profile
+                                                    <span wire:loading
+                                                          wire:target="manageCompanyProfile"
+                                                          class="spinner-border spinner-border-sm ms-2"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-2"
+                                                   href="#"
+                                                   wire:click.prevent="toggleStatus({{ $details->id }})">
+                                                    @if ($details->status == 'Active')
+                                                        <i class="fas fa-user-minus me-2 text-warning"></i> Change to
+                                                        Inactive
+                                                    @else
+                                                        <i class="fas fa-user-check me-2 text-success"></i> Change to
+                                                        Active
+                                                    @endif
+                                                    <span wire:loading
+                                                          wire:target="toggleStatus"
+                                                          class="spinner-border spinner-border-sm ms-2"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-2 text-danger"
+                                                   href="#"
+                                                   wire:click.prevent="$dispatch('confirmDelete', {{ $details->id }})">
+                                                    <i class="fas fa-trash-alt me-2"></i> Delete Company
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <!-- Contact / Location -->
-                                    <div>
-                                        <h6 class="fw-semibold text-secondary mb-2">
-                                            <i class="fa-solid fa-location-dot me-1"></i>
-                                            Contact Location
-                                        </h6>
+                            <!-- Body Section -->
+                            <div class="card-body p-0">
+                                <!-- Company Header Section -->
+                                <div class="p-4 border-bottom bg-light">
+                                    <div class="row align-items-center g-4">
+                                        <!-- Logo -->
+                                        <div class="col-md-3 col-lg-2 text-center">
+                                            <div class="bg-white rounded-3 p-3 shadow-sm d-inline-block w-100">
+                                                <img src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                                                     class="img-fluid rounded-2 clickable-image"
+                                                     style="max-height: 100px; width: auto; cursor: pointer;"
+                                                     data-src="{{ $details->company_logo_url ?? asset('assets/img/default-avatar.png') }}"
+                                                     alt="Company Logo">
+                                            </div>
+                                        </div>
 
-                                        <dl class="row mb-0 small">
-                                            <dt class="col-5 col-sm-4 text-muted">
-                                                <i class="fa-solid fa-house me-1"></i>
-                                                House Number
-                                            </dt>
-                                            <dd class="col-7 col-sm-8 fw-medium mb-1">
-                                                {{ $details->company_house_number ?: 'N/A' }}
-                                            </dd>
+                                        <!-- Company Info -->
+                                        <div class="col-md-9 col-lg-10">
+                                            <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                                                <h2 class="h3 mb-0 fw-bold text-dark">{{ $details->company_name }}
+                                                </h2>
+                                                @php
+                                                    $statusConfig = [
+                                                        'Active' => [
+                                                            'class' => 'bg-success',
+                                                            'icon' => 'fa-check-circle',
+                                                        ],
+                                                        'Inactive' => [
+                                                            'class' => 'bg-secondary',
+                                                            'icon' => 'fa-circle',
+                                                        ],
+                                                    ];
+                                                    $status = $statusConfig[$details->status] ?? [
+                                                        'class' => 'bg-secondary',
+                                                        'icon' => 'fa-circle',
+                                                    ];
+                                                @endphp
+                                                <span class="badge {{ $status['class'] }} px-3 py-2 rounded-pill">
+                                                    <i class="fas {{ $status['icon'] }} me-1 fs-10"></i>
+                                                    {{ $details->status }}
+                                                </span>
+                                            </div>
 
-                                            <dt class="col-5 col-sm-4 text-muted">
-                                                <i class="fa-solid fa-map-location-dot me-1"></i>
-                                                Address
-                                            </dt>
-
-                                            <dd class="col-7 col-sm-8 fw-medium">
-
-
-                                                <div style="color: #334155; line-height: 1.6;">
-                                                    {{ $details->street ? $details->street . ', ' : '' }}
-                                                    {{ $details->city ? $details->city . ', ' : '' }}
-                                                    {{ $details->state ? $details->state . ', ' : '' }}
-                                                    {{ $details->postcode ? $details->postcode . ', ' : '' }}
-                                                    <span
-                                                          style="font-weight: 700;">{{ $details->country ?? 'N/A' }}</span>
-
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center gap-2 text-muted">
+                                                        <i class="fas fa-tag"
+                                                           style="color: #0dcaf0;"></i>
+                                                        <span class="fw-semibold">Business Type:</span>
+                                                        <span>{{ $details->business_type ?: 'Not specified' }}</span>
+                                                    </div>
                                                 </div>
-                                            </dd>
-
-                                        </dl>
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center gap-2 text-muted">
+                                                        <i class="fas fa-calendar-alt"
+                                                           style="color: #0dcaf0;"></i>
+                                                        <span class="fw-semibold">Joined:</span>
+                                                        <span>{{ $details->created_at ? $details->created_at->format('d M, Y') : 'N/A' }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-
                                 </div>
 
+                                <!-- Contact Information Cards -->
+                                <div class="p-4">
+                                    <div class="row g-4">
+                                        <!-- Contact Details Card -->
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 shadow-sm h-100">
+                                                <div class="card-body">
+                                                    <div
+                                                         class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                             style="width: 50px; height: 50px; background-color: rgba(13, 202, 240, 0.1);">
+
+                                                            <i class="fas fa-address-card"
+                                                               style="color: #0dcaf0;"></i>
+                                                        </div>
+                                                        <h5 class="mb-0 fw-semibold">Contact Details</h5>
+                                                    </div>
+
+                                                    <div class="vstack gap-3">
+                                                        <div class="d-flex align-items-start gap-3">
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                                 style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+
+                                                                <i class="fas fa-envelope"
+                                                                   style="color: #0dcaf0;"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small mb-1">Email Address</div>
+                                                                <div class="fw-medium">
+                                                                    {{ $details->company_email ?: 'Not provided' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-start gap-3">
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                                 style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+
+                                                                <i class="fas fa-phone-alt"
+                                                                   style="color: #0dcaf0;"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small mb-1">Phone Number</div>
+                                                                <div class="fw-medium">
+                                                                    {{ $details->company_mobile ?: 'Not provided' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        @if ($details->company_website ?? false)
+                                                            <div class="d-flex align-items-start gap-3">
+                                                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                                     style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+
+                                                                    <i class="fas fa-globe"
+                                                                       style="color: #0dcaf0;"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="text-muted small mb-1">Website</div>
+                                                                    <div class="fw-medium">
+                                                                        <a href="{{ $details->company_website }}"
+                                                                           target="_blank"
+                                                                           class="text-decoration-none"
+                                                                           style="color: #0dcaf0;">
+                                                                            {{ $details->company_website }}
+                                                                            <i
+                                                                               class="fas fa-external-link-alt ms-1 fs-10"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Address Card -->
+                                        <div class="col-lg-6">
+                                            <div class="card border-0 shadow-sm h-100">
+                                                <div class="card-body">
+                                                    <div
+                                                         class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                             style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+                                                            <i class="fas fa-map-marker-alt"
+                                                               style="color: #0dcaf0;"></i>
+                                                        </div>
+                                                        <h5 class="mb-0 fw-semibold">Address Information</h5>
+                                                    </div>
+
+                                                    <div class="vstack gap-3">
+                                                        <div class="d-flex align-items-start gap-3">
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                                 style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+                                                                <i class="fas fa-home"
+                                                                   style="color: #0dcaf0;"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small mb-1">House/Office No
+                                                                </div>
+                                                                <div class="fw-medium">
+                                                                    {{ $details->company_house_number ?: 'Not provided' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-start gap-3">
+                                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                                 style="width: 36px; height: 36px; background-color: rgba(13, 202, 240, 0.1);">
+                                                                <i class="fas fa-location-dot"
+                                                                   style="color: #0dcaf0;"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <div class="text-muted small mb-1">Full Address</div>
+                                                                <div class="fw-medium">
+                                                                    {{ $details->street ? $details->street . ', ' : '' }}
+                                                                    {{ $details->city ? $details->city . ', ' : '' }}
+                                                                    {{ $details->state ? $details->state . ', ' : '' }}
+                                                                    {{ $details->postcode ? $details->postcode . ', ' : '' }}
+                                                                    <span
+                                                                          class="fw-bold">{{ $details->country ?? 'Not specified' }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional Info if needed -->
+                                    @if (($details->tax_number ?? false) || ($details->registration_number ?? false))
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <div class="card border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <div
+                                                             class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                                            <div class="rounded-circle p-2"
+                                                                 style="background-color: rgba(13, 202, 240, 0.1);">
+                                                                <i class="fas fa-info-circle"
+                                                                   style="color: #0dcaf0;"></i>
+                                                            </div>
+                                                            <h5 class="mb-0 fw-semibold">Additional Information</h5>
+                                                        </div>
+                                                        <div class="row g-3">
+                                                            @if ($details->registration_number)
+                                                                <div class="col-md-6">
+                                                                    <div class="text-muted small mb-1">Registration
+                                                                        Number</div>
+                                                                    <div class="fw-medium">
+                                                                        {{ $details->registration_number }}</div>
+                                                                </div>
+                                                            @endif
+                                                            @if ($details->tax_number)
+                                                                <div class="col-md-6">
+                                                                    <div class="text-muted small mb-1">Tax Number</div>
+                                                                    <div class="fw-medium">{{ $details->tax_number }}
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-
                     </div>
+
 
                     <!-- ================================
                          BILLING / SUBSCRIPTION
                     ===================================== -->
                     <div class="tab-pane fade {{ $activeTab === 'billing' ? 'show active' : '' }}"
                          id="billing"
-                         role="tabpanel"
-                         aria-labelledby="billing-tab">
-                        <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-header bg-white py-3 border-0">
-                                <h5 class="mb-0 fw-bold">Billing / Subscription</h4>
-                            </div>
-                            <div class="card-body p-4">
+                         role="tabpanel">
 
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <!-- Header Section -->
+                            <div class="card-header text-white py-4 px-4 border-0"
+                                 style="background-color: #3d75a8;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fas fa-credit-card fa-lg text-dark"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0 fw-bold text-white">Billing & Subscription</h4>
+                                        <p class="mb-0 text-white"
+                                           style="opacity: 0.9;">Manage payment methods and subscription details</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-4">
+                                <!-- Payment Method Section -->
                                 <div class="mb-4">
+                                    <h5 class="fw-semibold mb-3 d-flex align-items-center gap-2">
+                                        <div class="rounded-circle p-1"
+                                             style="background-color: rgba(13, 202, 240, 0.1);">
+                                            <i class="fas fa-credit-card"
+                                               style="color: #0dcaf0; font-size: 14px;"></i>
+                                        </div>
+                                        Payment Method
+                                    </h5>
 
                                     @if ($stripeCard)
                                         @php
@@ -294,17 +459,16 @@
                                         @endphp
 
                                         <div class="card text-white p-3"
-                                             style="background: {{ $cardBg }}; border-radius: 12px; width: 250px; font-size: 0.85rem;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                             style="background: {{ $cardBg }}; border-radius: 16px; max-width: 320px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <span class="fw-bold text-uppercase">{{ $stripeCard['brand'] }}</span>
-                                                <i class="bi bi-credit-card-2-front-fill"></i>
+                                                <i class="fas fa-credit-card fa-2x"></i>
                                             </div>
-                                            <div class="mb-2"
-                                                 style="font-family: 'Courier New', monospace; font-size: 1rem; letter-spacing: 1.5px;">
-                                                **** **** **** <strong>{{ $stripeCard['last4'] }}</strong>
+                                            <div class="mb-3"
+                                                 style="font-family: 'Courier New', monospace; font-size: 1.1rem; letter-spacing: 2px;">
+                                                •••• •••• •••• <strong>{{ $stripeCard['last4'] }}</strong>
                                             </div>
-                                            <div class="d-flex justify-content-between"
-                                                 style="font-size: 0.75rem;">
+                                            <div class="d-flex justify-content-between">
                                                 <div>
                                                     <small class="text-light opacity-75 d-block">Card Holder</small>
                                                     <strong
@@ -317,214 +481,275 @@
                                             </div>
                                         </div>
                                     @else
-                                        <div class="card border border-dashed rounded text-center p-3 shadow-sm"
-                                             style="width: 250px; font-size: 0.85rem;">
-                                            <p class="text-muted mb-2"><i class="bi bi-info-circle-fill me-1"></i>No
-                                                card saved yet.</p>
+                                        <div class="border border-dashed rounded-4 text-center p-4"
+                                             style="max-width: 320px; border-color: #dee2e6;">
+                                            <i class="fas fa-credit-card fa-3x text-muted mb-2"></i>
+                                            <p class="text-muted mb-0">No card saved yet</p>
                                         </div>
                                     @endif
                                 </div>
 
-
-
-
                                 <!-- Subscription Info Cards -->
                                 <div class="row g-4 mb-4">
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-light rounded-3">
-                                            <small
-                                                   class="text-muted text-uppercase fw-semibold d-block mb-1 fs-7">Registered
-                                                Domain</small>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-globe"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Registered
+                                                    Domain</small>
+                                            </div>
                                             <p class="fs-6 fw-bold mb-0 text-dark">
                                                 {{ $details->registered_domain ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-light rounded-3">
-                                            <small
-                                                   class="text-muted text-uppercase fw-semibold d-block mb-1 fs-7">Calendar
-                                                Year</small>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-calendar"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Calendar
+                                                    Year</small>
+                                            </div>
                                             <p class="fs-6 fw-bold mb-0 text-dark">
                                                 {{ ucfirst($details->calendarYearSetting->calendar_year ?? 'N/A') }}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div
-                                             class="p-3 rounded-3
-                        @if (isset($details->subscription_status) && $details->subscription_status === 'active') bg-success-subtle border border-success @else bg-warning-subtle border border-warning @endif">
-                                            <small
-                                                   class="text-muted text-uppercase fw-semibold d-block mb-1 fs-7">Subscription
-                                                Status</small>
-                                            <span
-                                                  class="badge
-                            @if (isset($details->subscription_status) && $details->subscription_status === 'active') bg-success @else bg-warning text-dark @endif
-                            fs-7 py-1 px-2 fw-bold">
-                                                {{ isset($details->subscription_status) ? ucfirst($details->subscription_status) : 'N/A' }}
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: {{ isset($details->subscription_status) && $details->subscription_status === 'active' ? 'linear-gradient(135deg, #e8f5e9, #ffffff)' : 'linear-gradient(135deg, #fff3e0, #ffffff)' }};">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-chart-line"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Subscription
+                                                    Status</small>
+                                            </div>
+                                            @php
+                                                $statusColors = [
+                                                    'active' => ['bg' => '#28a745', 'icon' => 'fa-check-circle'],
+                                                    'trial' => ['bg' => '#17a2b8', 'icon' => 'fa-hourglass-half'],
+                                                    'expired' => ['bg' => '#dc3545', 'icon' => 'fa-times-circle'],
+                                                    'suspended' => ['bg' => '#ffc107', 'icon' => 'fa-ban'],
+                                                ];
+                                                $currentStatus = $details->subscription_status ?? 'expired';
+                                                $statusColor = $statusColors[$currentStatus] ?? [
+                                                    'bg' => '#6c757d',
+                                                    'icon' => 'fa-question-circle',
+                                                ];
+                                            @endphp
+                                            <span class="badge px-3 py-2 rounded-pill text-white"
+                                                  style="background-color: {{ $statusColor['bg'] }};">
+                                                <i class="fas {{ $statusColor['icon'] }} me-1"></i>
+                                                {{ ucfirst($currentStatus) }}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-light rounded-3">
-                                            <small
-                                                   class="text-muted text-uppercase fw-semibold d-block mb-1 fs-7">Subscription
-                                                Start</small>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-play-circle"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Subscription
+                                                    Start</small>
+                                            </div>
                                             <p class="fs-6 fw-bold mb-0 text-dark">
                                                 {{ $details->subscription_start?->format('d M Y') ?? 'N/A' }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-light rounded-3">
-                                            <small
-                                                   class="text-muted text-uppercase fw-semibold d-block mb-1 fs-7">Subscription
-                                                End</small>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="p-3 rounded-3 border"
+                                             style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-stop-circle"
+                                                   style="color: #0dcaf0;"></i>
+                                                <small class="text-muted text-uppercase fw-semibold">Subscription
+                                                    End</small>
+                                            </div>
                                             <p
-                                               class="fs-6 fw-bold mb-0 @if (isset($details->subscription_end) && $details->subscription_end->isPast()) text-danger @else text-dark @endif">
+                                               class="fs-6 fw-bold mb-0 {{ isset($details->subscription_end) && $details->subscription_end->isPast() ? 'text-danger' : 'text-dark' }}">
                                                 {{ $details->subscription_end?->format('d M Y') ?? 'N/A' }}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Search & Filter for Invoices -->
-                                <form id="invoiceFilterForm"
-                                      method="GET"
-                                      class="row g-2 mb-3">
-                                    <div class="col-md-4">
-                                        <input type="text"
-                                               name="search"
-                                               value="{{ request('search') }}"
-                                               class="form-control form-control-sm"
-                                               placeholder="Search by Invoice #">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="date"
-                                               name="start_date"
-                                               value="{{ request('start_date') }}"
-                                               class="form-control form-control-sm"
-                                               placeholder="Start Date">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="date"
-                                               name="end_date"
-                                               value="{{ request('end_date') }}"
-                                               class="form-control form-control-sm"
-                                               placeholder="End Date">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="submit"
-                                                class="btn btn-sm btn-primary w-100">Filter</button>
-                                    </div>
-                                </form>
+                                <!-- Invoices Section -->
+                                <div class="mt-4">
+                                    <h5 class="fw-semibold mb-3 d-flex align-items-center gap-2">
+                                        <div class="rounded-circle p-1"
+                                             style="background-color: rgba(13, 202, 240, 0.1);">
+                                            <i class="fas fa-file-invoice"
+                                               style="color: #0dcaf0; font-size: 14px;"></i>
+                                        </div>
+                                        Invoice History
+                                    </h5>
 
+                                    <!-- Filter Form -->
+                                    <form id="invoiceFilterForm"
+                                          method="GET"
+                                          class="row g-3 mb-4">
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-0"><i
+                                                       class="fas fa-search"
+                                                       style="color: #0dcaf0;"></i></span>
+                                                <input type="text"
+                                                       name="search"
+                                                       value="{{ request('search') }}"
+                                                       class="form-control border-0 bg-light"
+                                                       placeholder="Search by Invoice #">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="date"
+                                                   name="start_date"
+                                                   value="{{ request('start_date') }}"
+                                                   class="form-control bg-light border-0"
+                                                   placeholder="Start Date">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="date"
+                                                   name="end_date"
+                                                   value="{{ request('end_date') }}"
+                                                   class="form-control bg-light border-0"
+                                                   placeholder="End Date">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit"
+                                                    class="btn text-white w-100 rounded-pill"
+                                                    style="background-color: #0dcaf0;">
+                                                <i class="fas fa-filter me-1"></i> Filter
+                                            </button>
+                                        </div>
+                                    </form>
 
-
-                                <!-- Invoices Table -->
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped align-middle text-center mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Invoice #</th>
-                                                <th>Billing Period</th>
-                                                <th>Subtotal</th>
-                                                <th>VAT</th>
-                                                <th>Total</th>
-                                                <th>Status</th>
-                                                <th>Invoice Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($invoices as $invoice)
+                                    <!-- Invoices Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead style="background-color: #f8f9fa;">
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $invoice->invoice_number }}</td>
-                                                    <td>{{ $invoice->billing_period_start->format('d M, Y') }} -
-                                                        {{ $invoice->billing_period_end->format('d M, Y') }}</td>
-                                                    <td>£{{ number_format($invoice->subtotal, 2) }}</td>
-                                                    <td>£{{ number_format($invoice->vat, 2) }}</td>
-                                                    <td>£{{ number_format($invoice->total, 2) }}</td>
-                                                    <td>
-                                                        <span class="badge bg-success">
-                                                            {{ ucfirst($invoice->status) }}
-                                                        </span>
-                                                    </td>
-                                                    <td>{{ $invoice->created_at->format('d M, Y') }}</td>
+                                                    <th class="py-3">#</th>
+                                                    <th class="py-3">Invoice #</th>
+                                                    <th class="py-3">Billing Period</th>
+                                                    <th class="py-3">Subtotal</th>
+                                                    <th class="py-3">VAT</th>
+                                                    <th class="py-3">Total</th>
+                                                    <th class="py-3">Status</th>
+                                                    <th class="py-3">Invoice Date</th>
                                                 </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="8"
-                                                        class="text-muted">No invoices found.</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($invoices as $invoice)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td class="fw-semibold">#{{ $invoice->invoice_number }}</td>
+                                                        <td>{{ $invoice->billing_period_start->format('d M, Y') }} -
+                                                            {{ $invoice->billing_period_end->format('d M, Y') }}</td>
+                                                        <td>£{{ number_format($invoice->subtotal, 2) }}</td>
+                                                        <td>£{{ number_format($invoice->vat, 2) }}</td>
+                                                        <td class="fw-bold">£{{ number_format($invoice->total, 2) }}
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge rounded-pill px-3 py-1 bg-success">
+                                                                <i class="fas fa-check-circle me-1 fs-10"></i>
+                                                                {{ ucfirst($invoice->status) }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ $invoice->created_at->format('d M, Y') }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="8"
+                                                            class="text-center py-4 text-muted">
+                                                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                                            No invoices found
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
 
 
-
                     <div class="tab-pane fade {{ $activeTab === 'emp' ? 'show active' : '' }}"
                          id="emp"
-                         role="tabpanel"
-                         aria-labelledby="emp-tab">
+                         role="tabpanel">
 
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <!-- Header Section -->
+                            <div class="card-header text-white py-4 px-4 border-0"
+                                 style="background-color: #3d75a8;">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-users fa-lg text-dark"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0 fw-bold text-white">Employees</h4>
+                                            <p class="mb-0 text-white"
+                                               style="opacity: 0.9;">Manage and view all company employees</p>
+                                        </div>
+                                    </div>
 
-                        <div class="card border-0 shadow-sm rounded-4">
-                            <div class="card-header bg-white py-3 border-0">
-                                <h5 class="mb-0 fw-bold">Employees</h4>
+                                    <!-- Employee Stats -->
+                                    <div class="d-flex gap-2">
+                                        <div class="bg-white bg-opacity-20 rounded-circle d-flex flex-column align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px; text-align: center;">
+
+                                            <small class="d-block text-dark"
+                                                   style="font-size: 11px;">Total</small>
+                                            <strong class="text-dark">{{ $details->employees->count() }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
 
+                            <div class="card-body p-0">
                                 @if ($details->employees->count())
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped text-center align-middle">
-                                            <thead class="table-light">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead style="background-color: #f8f9fa;">
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Register</th>
-                                                    <th>Status</th>
+                                                    <th class="py-3 px-4">#</th>
+                                                    <th class="py-3">Name</th>
+                                                    <th class="py-3">Email</th>
+                                                    <th class="py-3">Register Date</th>
+                                                    <th class="py-3 px-4">Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($details->employees as $emp)
                                                     <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-
+                                                        <td class="px-4">{{ $loop->iteration }}</td>
                                                         <td>
                                                             <a href="{{ route('super-admin.dashboard.employees.details', $emp->id) }}"
-                                                               class="badge badge-xs text-primary"
-                                                               style="
-        background: transparent;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-   "
-                                                               onmouseover="this.style.textDecoration='underline'"
-                                                               onmouseout="this.style.textDecoration='none'">
+                                                               class="text-decoration-none fw-semibold"
+                                                               style="color: #0dcaf0;">
+                                                                <i class="fas fa-user-circle me-2"></i>
                                                                 {{ $emp->full_name ?? 'N/A' }}
                                                             </a>
-
-
                                                         </td>
-
-
                                                         <td>{{ $emp->email }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($emp->created_at)->format('d/m/Y') }}
+                                                        <td>{{ \Carbon\Carbon::parse($emp->created_at)->format('d M, Y') }}
                                                         </td>
                                                         <td>
                                                             <span
-                                                                  class="badge rounded-pill px-3 py-2
-                                    {{ $emp->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                                                  class="badge rounded-pill px-3 py-2 {{ $emp->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                                                <i
+                                                                   class="fas {{ $emp->is_active ? 'fa-check-circle' : 'fa-circle' }} me-1 fs-10"></i>
                                                                 {{ $emp->is_active ? 'Active' : 'Inactive' }}
                                                             </span>
                                                         </td>
@@ -532,143 +757,191 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                    </div> <!-- /.table-responsive -->
+                                    </div>
 
-
-                                    <div class="row mt-4">
-                                        <div class="col-12 d-flex gap-3 justify-content-center">
-                                            <!-- Active Employees -->
-                                            <div class="px-4 py-2 rounded-pill shadow-sm small"
-                                                 style="background-color: #e9f5ee; color: #1b5e20; font-weight: 600; border: 1px solid #d1e7dd;">
-                                                Total Active Employees: {{ $activeCount }}
+                                    <!-- Stats Cards -->
+                                    <div class="p-4 border-top"
+                                         style="background-color: #f8f9fa;">
+                                        <div class="row g-3 justify-content-center">
+                                            <div class="col-auto">
+                                                <div class="rounded-pill px-4 py-2 shadow-sm"
+                                                     style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
+                                                    <i class="fas fa-user-check me-2"
+                                                       style="color: #2e7d32;"></i>
+                                                    <span class="fw-semibold"
+                                                          style="color: #1b5e20;">Active: {{ $activeCount }}</span>
+                                                </div>
                                             </div>
-
-                                            <!-- Former/Inactive Employees -->
-                                            <div class="px-4 py-2 rounded-pill shadow-sm small"
-                                                 style="background-color: #fce8e8; color: #c62828; font-weight: 600; border: 1px solid #f8d7da;">
-                                                Total Inactive Employees: {{ $formerCount }}
+                                            <div class="col-auto">
+                                                <div class="rounded-pill px-4 py-2 shadow-sm"
+                                                     style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">
+                                                    <i class="fas fa-user-slash me-2"
+                                                       style="color: #c62828;"></i>
+                                                    <span class="fw-semibold"
+                                                          style="color: #c62828;">Inactive: {{ $formerCount }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 @else
-                                    <p class="text-muted">No employees found.</p>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-users-slash fa-4x text-muted mb-3"></i>
+                                        <p class="text-muted mb-0">No employees found</p>
+                                    </div>
                                 @endif
                             </div>
-
                         </div>
                     </div>
 
                     <div class="tab-pane fade {{ $activeTab === 'companyInfo' ? 'show active' : '' }}"
                          id="companyInfo"
-                         role="tabpanel"
-                         aria-labelledby="companyInfo-tab"
-                         style="font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+                         role="tabpanel">
 
-                        <div class="card border-0 rounded-4 mb-4"
-                             style="box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0 !important; overflow: hidden;">
-
-
-                            <div class="card-header bg-white py-3 border-0">
-                                <h5 class="mb-0 fw-bold">Company Information</h4>
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <!-- Header Section -->
+                            <div class="card-header text-white py-4 px-4 border-0"
+                                 style="background-color: #3d75a8;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fas fa-building fa-lg text-dark"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0 fw-bold text-white">Company Information</h4>
+                                        <p class="mb-0 text-white"
+                                           style="opacity: 0.9;">Detailed company profile and contact information</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="card-body p-4">
-                                <div class="row g-5 align-items-start">
-
-                                    <div class="col-lg-3 col-md-4 text-center">
-                                        <div class="p-4 rounded-4"
-                                             style="background: linear-gradient(145deg, #ffffff, #f8f9fc); border: 1px solid #edf2f7; transition: transform 0.3s ease;">
+                                <div class="row g-4">
+                                    <!-- Logo Section -->
+                                    <div class="col-md-3 text-center">
+                                        <div class="bg-light rounded-4 p-4 text-center">
                                             <img src="{{ $details->company_logo ? asset('storage/' . $details->company_logo) : asset('assets/img/default-avatar.png') }}"
-                                                 class="img-fluid rounded-3"
-                                                 style="max-height: 140px; width: 100%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.08));">
-
-                                            <div class="mt-3">
-                                                <span class="badge"
-                                                      style="background: #eef2ff; color: #4e73df; font-weight: 600; padding: 6px 12px; border-radius: 8px;">
+                                                 class="img-fluid rounded-3 mb-3"
+                                                 style="max-height: 120px; width: auto;">
+                                            <div>
+                                                <span class="badge px-3 py-2 rounded-pill"
+                                                      style="background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                                                    <i class="fas fa-tag me-1"></i>
                                                     {{ $details->business_type ?? 'Business' }}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-9 col-md-8">
-                                        <div class="row row-cols-1 row-cols-md-2 g-4">
-
-                                            <div class="col-12 border-bottom pb-3 mb-2">
-                                                <label
-                                                       style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; margin-bottom: 4px; display: block;">Company
-                                                    Name</label>
-                                                <div style="font-size: 1.15rem; color: #1e293b; font-weight: 600;">
-                                                    {{ $details->company_name ?? 'N/A' }}</div>
+                                    <!-- Company Details -->
+                                    <div class="col-md-9">
+                                        <div class="row g-4">
+                                            <!-- Company Name -->
+                                            <div class="col-12 pb-3 border-bottom">
+                                                <label class="text-muted text-uppercase fw-semibold mb-1 d-block"
+                                                       style="font-size: 11px; letter-spacing: 1px;">
+                                                    <i class="fas fa-building me-1"
+                                                       style="color: #0dcaf0;"></i> Company Name
+                                                </label>
+                                                <h3 class="mb-0 fw-bold"
+                                                    style="color: #1e293b;">{{ $details->company_name ?? 'N/A' }}</h3>
                                             </div>
 
-                                            <div class="col">
-                                                <label
-                                                       style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 2px; display: block;">Company
-                                                    House Number</label>
-                                                <div style="color: #475569; font-weight: 500;">
-                                                    {{ $details->company_house_number ?? 'N/A' }}</div>
-                                            </div>
-
-                                            <div class="col">
-                                                <label
-                                                       style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 2px; display: block;">Company
-                                                    Website</label>
-                                                <div>
-                                                    @if ($details->registered_domain)
-                                                        <a href="https://{{ $details->registered_domain }}"
-                                                           target="_blank"
-                                                           style="color: #4e73df; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center;">
-                                                            {{ $details->registered_domain }}
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                 width="12"
-                                                                 height="12"
-                                                                 fill="currentColor"
-                                                                 class="ms-1"
-                                                                 viewBox="0 0 16 16">
-                                                                <path
-                                                                      d="M8.5 1.5A.5.5 0 0 1 9 1h5a1 1 0 0 1 1 1v5a.5.5 0 0 1-1 0V2.5L7.854 8.646a.5.5 0 1 1-.708-.708L13.293 2H9a.5.5 0 0 1-.5-.5z" />
-                                                            </svg>
-                                                        </a>
-                                                    @else
-                                                        <span style="color: #94a3b8;">N/A</span>
-                                                    @endif
-                                                </div>
-                                            </div>
-
-                                            <div class="col">
-                                                <label
-                                                       style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 2px; display: block;">Company
-                                                    Mobile</label>
-                                                <div style="color: #475569; font-weight: 500;">
-                                                    {{ $details->company_mobile ?? 'N/A' }}</div>
-                                            </div>
-
-                                            <div class="col">
-                                                <label
-                                                       style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 2px; display: block;">Company
-                                                    Email</label>
-                                                <div style="color: #475569; font-weight: 500;">
-                                                    {{ $details->company_email ?? 'N/A' }}</div>
-                                            </div>
-
-                                            <div class="col-12 mt-4">
-                                                <div class="p-3 rounded-3"
-                                                     style="background-color: #f8fafc; border: 1px dashed #cbd5e1;">
-                                                    <label
-                                                           style="font-size: 0.75rem; color: #64748b; font-weight: 700; margin-bottom: 4px; display: block;">Registered
-                                                        Office Address</label>
-                                                    <div style="color: #334155; line-height: 1.6;">
-                                                        {{ $details->street ? $details->street . ', ' : '' }}
-                                                        {{ $details->city ? $details->city . ', ' : '' }}
-                                                        {{ $details->state ? $details->state . ', ' : '' }}
-                                                        {{ $details->postcode ? $details->postcode . ', ' : '' }}
+                                            <!-- Contact Info Grid -->
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-start gap-3">
+                                                    <div class="rounded-circle p-2"
+                                                         style="background-color: rgba(13, 202, 240, 0.1);">
+                                                        <i class="fas fa-home"
+                                                           style="color: #0dcaf0;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-muted small d-block">House Number</label>
                                                         <span
-                                                              style="font-weight: 700;">{{ $details->country ?? 'N/A' }}</span>
+                                                              class="fw-medium">{{ $details->company_house_number ?? 'N/A' }}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-start gap-3">
+                                                    <div class="rounded-circle p-2"
+                                                         style="background-color: rgba(13, 202, 240, 0.1);">
+                                                        <i class="fas fa-globe"
+                                                           style="color: #0dcaf0;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-muted small d-block">Website</label>
+                                                        @if ($details->registered_domain)
+                                                            <a href="https://{{ $details->registered_domain }}"
+                                                               target="_blank"
+                                                               class="text-decoration-none"
+                                                               style="color: #0dcaf0;">
+                                                                {{ $details->registered_domain }}
+                                                                <i class="fas fa-external-link-alt ms-1 fs-10"></i>
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted">N/A</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-start gap-3">
+                                                    <div class="rounded-circle p-2"
+                                                         style="background-color: rgba(13, 202, 240, 0.1);">
+                                                        <i class="fas fa-phone-alt"
+                                                           style="color: #0dcaf0;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-muted small d-block">Phone Number</label>
+                                                        <span
+                                                              class="fw-medium">{{ $details->company_mobile ?? 'N/A' }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-start gap-3">
+                                                    <div class="rounded-circle p-2"
+                                                         style="background-color: rgba(13, 202, 240, 0.1);">
+                                                        <i class="fas fa-envelope"
+                                                           style="color: #0dcaf0;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-muted small d-block">Email Address</label>
+                                                        <span
+                                                              class="fw-medium">{{ $details->company_email ?? 'N/A' }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Address Section -->
+                                            <div class="col-12 mt-2">
+                                                <div class="p-3 rounded-3"
+                                                     style="background-color: rgba(13, 202, 240, 0.05); border: 1px solid rgba(13, 202, 240, 0.1);">
+                                                    <div class="d-flex align-items-start gap-3">
+                                                        <div class="rounded-circle p-2"
+                                                             style="background-color: rgba(13, 202, 240, 0.1);">
+                                                            <i class="fas fa-map-marker-alt"
+                                                               style="color: #0dcaf0;"></i>
+                                                        </div>
+                                                        <div>
+                                                            <label class="text-muted small d-block mb-1">Registered
+                                                                Office Address</label>
+                                                            <div class="fw-medium"
+                                                                 style="color: #334155; line-height: 1.6;">
+                                                                {{ $details->street ? $details->street . ', ' : '' }}
+                                                                {{ $details->city ? $details->city . ', ' : '' }}
+                                                                {{ $details->state ? $details->state . ', ' : '' }}
+                                                                {{ $details->postcode ? $details->postcode . ', ' : '' }}
+                                                                <span
+                                                                      class="fw-bold">{{ $details->country ?? 'N/A' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

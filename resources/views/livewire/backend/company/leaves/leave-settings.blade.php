@@ -64,7 +64,7 @@
                        wire:model="total_leave_in_liew"
                        min="0"
                        step="0.01"
-                       placeholder="Enter total leave in lieu">
+                       placeholder="Enter total carrry forward">
                 @error('total_leave_in_liew')
                     <span class="text-danger small">{{ $message }}</span>
                 @enderror

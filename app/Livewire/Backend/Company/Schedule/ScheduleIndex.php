@@ -1962,23 +1962,18 @@ class ScheduleIndex extends BaseComponent
         }
 
 
-        $totalBreakMinutes = 0;
-        $paidMinutes = 0;
-        $unpaidMinutes = 0;
+        $unpaidBreakMinutes = 0;
+
 
         foreach ($this->multipleShiftNewBreaks[$shiftIndex] ?? [] as $break) {
             if (!empty($break['name']) && !empty($break['type']) && !empty($break['duration'])) {
-
                 $duration = (float) $break['duration'];
                 $hours = floor($duration);
                 $minutes = ($duration - $hours) * 100;
                 $breakMinutes = $hours * 60 + $minutes;
 
-                if (strtolower($break['type']) === 'paid') {
-                    $totalBreakMinutes += $breakMinutes;
-                    $paidMinutes += $breakMinutes;
-                } else {
-                    $unpaidMinutes += $breakMinutes;
+                if (strtolower($break['type']) === 'unpaid') {
+                    $unpaidBreakMinutes += $breakMinutes;
                 }
             }
         }
@@ -1998,7 +1993,7 @@ class ScheduleIndex extends BaseComponent
         $totalMinutes = ($hours * 60) + $minutes;
 
         $paidBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
-        $totalMinutes += $paidBreakMinutes;
+        $totalMinutes -= $unpaidBreakMinutes;
 
         $newHours = floor($totalMinutes / 60);
         $newMinutes = $totalMinutes % 60;
@@ -2095,12 +2090,12 @@ class ScheduleIndex extends BaseComponent
         $this->unpaidBreaksCount = $unpaidCount;
         $this->paidBreaksDuration = sprintf('%02d:%02d', floor($paidMinutes / 60), $paidMinutes % 60);
         $this->unpaidBreaksDuration = sprintf('%02d:%02d', floor($unpaidMinutes / 60), $unpaidMinutes % 60);
-
         if ($this->originalShiftTotalTime) {
             [$shiftHours, $shiftMinutes] = explode(':', $this->originalShiftTotalTime);
             $shiftTotalMinutes = ($shiftHours * 60) + $shiftMinutes;
 
-            $shiftTotalMinutes += $paidMinutes;
+
+            $shiftTotalMinutes -= $unpaidMinutes;
 
             $newHours = floor($shiftTotalMinutes / 60);
             $newMinutes = $shiftTotalMinutes % 60;

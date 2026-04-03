@@ -27,7 +27,7 @@
                             <div class="card-header bg-transparent text-center mt-5">
                                 <div class="d-flex flex-column align-items-center justify-content-center mt-2 mb-4">
                                     <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <img src="{{ getCompanyLogoUrl() }}"
+                                        <img src="{{ siteSetting()->logo_url }}"
                                              alt="Logo"
                                              class="login-logo mb-3"
                                              style="width: 100px; height: auto;">

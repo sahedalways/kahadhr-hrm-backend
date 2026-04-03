@@ -297,6 +297,13 @@
                                    class="form-control"
                                    wire:model="file"
                                    accept="application/pdf">
+
+                            <div class="mt-2 small fst-italic text-secondary">
+                                <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a
+                                time •
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF
+                            </div>
                             @error('file')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -440,6 +447,13 @@
                                    class="form-control"
                                    wire:model="file"
                                    accept="application/pdf">
+
+                            <div class="mt-2 small fst-italic text-secondary">
+                                <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a
+                                time •
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF
+                            </div>
                             @error('file')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

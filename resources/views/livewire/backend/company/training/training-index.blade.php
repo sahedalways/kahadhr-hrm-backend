@@ -368,6 +368,8 @@
                                 <option value="file">File (PDF)</option>
                             </select>
 
+
+
                             @error('content_type')
                                 <div class="text-danger mt-1"
                                      style="font-size: 0.875rem;">{{ $message }}</div>
@@ -386,6 +388,13 @@
                                        wire:model="instruction_file"
                                        accept="application/pdf">
                             @endif
+
+                            <div class="mt-2 small fst-italic text-secondary">
+                                <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file/video at a
+                                time •
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, MP4, MOV, AVI, WMV
+                            </div>
 
                             @error('instruction_file')
                                 <div class="text-danger mt-1"
@@ -655,6 +664,8 @@
                                 <option value="file">File (PDF)</option>
                             </select>
 
+
+
                             @error('content_type')
                                 <div class="text-danger mt-1"
                                      style="font-size: 0.875rem;">{{ $message }}</div>
@@ -729,6 +740,12 @@
                                 @endif
 
 
+                            </div>
+                            <div class="mt-2 small fst-italic text-secondary">
+                                <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file/video at a
+                                time •
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, MP4, MOV, AVI, WMV
                             </div>
                         @endif
 

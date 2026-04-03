@@ -222,7 +222,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h6 class="modal-title fw-600">Assign New Document</h6>
+                    <h6 class="modal-title fw-600"></h6>
                     <button type="button"
                             class="btn btn-light"
                             data-bs-dismiss="modal">
@@ -276,6 +276,13 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+
+                            <div class="mt-2 small fst-italic text-secondary">
+                                <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF
+                            </div>
+
 
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Expires At</label>

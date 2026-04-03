@@ -713,7 +713,7 @@ class ProfileSettings extends BaseComponent
             'email'                    => 'Email Address',
             'phone_no'                 => 'Phone Number',
             'f_name'                   => 'First Name',
-            'l_name'                   => 'Last Name',
+            'l_name'                   => 'Surname',
             'title'                    => 'Title',
             'job_title'                => 'Job Title',
             'contract_hours'           => 'Contract Hours (Weekly)',

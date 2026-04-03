@@ -35,7 +35,7 @@ class CompanyEmployeeProfile extends BaseComponent
         $this->company_id = auth()->user()->company->id;
         $this->profileFields = [
             'f_name' => 'First Name',
-            'l_name' => 'Last Name',
+            'l_name' => 'Surname',
             'email' => 'Email',
             'is_active' => 'Status',
             'role' => 'Role',

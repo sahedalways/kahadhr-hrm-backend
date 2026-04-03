@@ -429,11 +429,11 @@
 
                                 <!-- Last Name -->
                                 <div class="col-md-6">
-                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <label class="form-label">Surname <span class="text-danger">*</span></label>
                                     <input type="text"
                                            class="form-control"
                                            wire:model="l_name"
-                                           placeholder="Enter last name">
+                                           placeholder="Enter Surname">
                                     @error('l_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror

@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
     <title>New Contact Message</title>
 
     <style>
@@ -113,7 +114,7 @@
                 </div>
 
                 <div class="details-row">
-                    <span class="label">Last Name:</span>
+                    <span class="label">Surname:</span>
                     {{ $contact->last_name }}
                 </div>
 
@@ -157,7 +158,8 @@
             </p>
 
             <p>
-                <a href="{{ config('app.frontend_url') }}" target="_blank">
+                <a href="{{ config('app.frontend_url') }}"
+                   target="_blank">
                     {{ config('app.frontend_url') }}
                 </a>
 

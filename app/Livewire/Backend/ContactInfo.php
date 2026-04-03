@@ -128,7 +128,7 @@ class ContactInfo extends BaseComponent
         $columns = [
             'ID',
             'First Name',
-            'Last Name',
+            'Surname',
             'Email',
             'Phone',
             'Topic',

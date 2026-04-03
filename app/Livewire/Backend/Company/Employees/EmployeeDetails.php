@@ -1147,7 +1147,7 @@ class EmployeeDetails extends BaseComponent
             'email'                    => 'Email Address',
             'phone_no'                 => 'Phone Number',
             'f_name'                   => 'First Name',
-            'l_name'                   => 'Last Name',
+            'l_name'                   => 'Surname',
             'title'                    => 'Title',
             'job_title'                => 'Job Title',
             'hourly_salary'                => 'Hourly Salary',

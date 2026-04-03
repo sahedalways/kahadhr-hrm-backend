@@ -343,7 +343,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-5">
-                                    <label class="form-label small fw-bold text-secondary">Last Name <span
+                                    <label class="form-label small fw-bold text-secondary">Surname <span
                                               class="text-danger">*</span></label>
                                     <input type="text"
                                            class="form-control border-light-subtle shadow-none bg-light bg-opacity-50"

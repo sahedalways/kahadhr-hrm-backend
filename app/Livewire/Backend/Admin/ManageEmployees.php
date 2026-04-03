@@ -181,7 +181,7 @@ class ManageEmployees extends BaseComponent
         $columns = [
             'Employee ID',
             'First Name',
-            'Last Name',
+            'Surname',
             'Email',
             'Phone',
             'Job Title',

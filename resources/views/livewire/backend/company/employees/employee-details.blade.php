@@ -1612,12 +1612,12 @@
 
                             <!-- 3. Last Name -->
                             <div class="col-md-5">
-                                <label class="form-label small fw-semibold text-secondary">Last Name <span
+                                <label class="form-label small fw-semibold text-secondary">Surname <span
                                           class="text-danger">*</span></label>
                                 <input type="text"
                                        class="form-control border-light-subtle shadow-none"
                                        wire:model="l_name"
-                                       placeholder="Enter Last Name">
+                                       placeholder="Enter Surname">
                                 @error('l_name')
                                     <span class="text-danger x-small">{{ $message }}</span>
                                 @enderror

@@ -555,7 +555,7 @@ class UsersIndex extends BaseComponent
             'email'             => 'Email Address',
             'phone_no'          => 'Phone Number',
             'f_name'            => 'First Name',
-            'l_name'            => 'Last Name',
+            'l_name'            => 'Surname',
             'nationality'       => 'Nationality',
             'date_of_birth'     => 'Date of Birth',
             'job_title'         => 'Job Title',
@@ -777,7 +777,7 @@ class UsersIndex extends BaseComponent
         $columns = [
             'Employee ID',
             'First Name',
-            'Last Name',
+            'Surname',
             'Email',
             'Phone',
             'Job Title',

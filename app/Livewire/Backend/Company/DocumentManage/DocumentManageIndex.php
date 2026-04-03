@@ -4,7 +4,6 @@ namespace App\Livewire\Backend\Company\DocumentManage;
 
 use App\Events\NotificationEvent;
 use App\Jobs\EmployeeAssignedNotificationJob;
-use App\Jobs\EmployeeAssignedNotificationJob as JobsEmployeeAssignedNotificationJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\CompanyDocument;
 use App\Models\EmailSetting;
@@ -96,12 +95,12 @@ class DocumentManageIndex extends BaseComponent
             'expires_at' => 'nullable|date',
             'emp_id' => 'nullable|integer|exists:employees,id',
             'send_email' => 'boolean',
-            'file_path' => 'required|file|mimes:pdf|max:5120',
+            'file_path' => 'required|file|mimes:pdf|max:3120',
         ], [
             'file_path.required' => 'Please upload a file.',
             'file_path.file'     => 'The uploaded file is not valid.',
             'file_path.mimes'    => 'The uploaded file must be a PDF.',
-            'file_path.max'      => 'The uploaded file must not exceed 5 MB.',
+            'file_path.max'      => 'The uploaded file must not exceed 3 MB.',
         ]);
 
         if ($this->send_email) {
@@ -182,8 +181,15 @@ class DocumentManageIndex extends BaseComponent
             'emp_id' => 'nullable|integer|exists:employees,id',
             'status' => 'required|in:pending,signed,expired',
             'expires_at' => 'nullable|date',
-            'file_path' => 'nullable|file|mimes:pdf|max:20240',
+            'file_path' => 'nullable|file|mimes:pdf|max:3120',
+
+        ], [
+            'file_path.file'     => 'The uploaded file is not valid.',
+            'file_path.mimes'    => 'The uploaded file must be a PDF.',
+            'file_path.max'      => 'The uploaded file must not exceed 3 MB.',
         ]);
+
+
 
         $doc = CompanyDocument::where('company_id', $this->company_id)
             ->find($this->document_id);

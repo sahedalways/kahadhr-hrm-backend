@@ -237,10 +237,10 @@ class DocumentManageTypesIndex extends BaseComponent
             'doc_type_id' => 'required',
             'expires_at'  => 'nullable|date',
             'emp_id'      => 'required|integer|exists:employees,id',
-            'new_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,webp,heic,heif|max:10240',
+            'new_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,webp,heic,heif|max:3072',
         ], [
             'new_file.mimes' => 'The uploaded file must be a PDF or an image (jpg, jpeg, png, gif, webp, HEIC, HEIF).',
-            'new_file.max'   => 'The uploaded file size must not exceed 10 MB.',
+            'new_file.max'   => 'The uploaded file size must not exceed 3 MB.',
             'new_file.file'  => 'The uploaded file is not valid.',
         ]);
 
@@ -379,8 +379,14 @@ class DocumentManageTypesIndex extends BaseComponent
             'doc_type_id' => 'required',
             'expires_at' => 'nullable|date',
             'emp_id' => 'required|integer|exists:employees,id',
-            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp|max:20480',
+            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp|max:3072',
             'send_email' => 'boolean',
+
+        ], [
+            'file_path.required' => 'Please upload a file.',
+            'new_file.mimes' => 'The uploaded file must be a PDF or an image (jpg, jpeg, png, gif, webp, HEIC, HEIF).',
+            'new_file.max'   => 'The uploaded file size must not exceed 3 MB.',
+            'new_file.file'  => 'The uploaded file is not valid.',
         ]);
 
         if ($this->send_email) {

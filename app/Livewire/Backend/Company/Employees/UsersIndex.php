@@ -123,7 +123,7 @@ class UsersIndex extends BaseComponent
 
 
     protected $rulesCsv = [
-        'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+        'csv_file' => 'required|file|mimes:csv,txt|max:3072',
     ];
 
 

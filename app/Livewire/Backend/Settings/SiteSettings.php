@@ -29,9 +29,9 @@ class SiteSettings extends BaseComponent
         'site_phone_number' => 'required|string|max:20',
         'site_email'   => 'required|email|max:255',
         'copyright_text' => 'required|string|max:255',
-        'logo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:2048',
-        'favicon' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:1024',
-        'hero_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:2096',
+        'logo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:3072',
+        'favicon' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:3072',
+        'hero_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic,heif|max:3072',
 
     ];
 
@@ -39,15 +39,15 @@ class SiteSettings extends BaseComponent
     protected $messages = [
         'logo.image'       => 'The uploaded logo must be a valid image.',
         'logo.mimes'       => 'The logo must be an image of type: jpeg, jpg, png, gif, webp, HEIC, HEIF.',
-        'logo.max'         => 'The logo must not exceed 2 MB.',
+        'logo.max'         => 'The logo must not exceed 3 MB.',
 
         'favicon.image'    => 'The uploaded favicon must be a valid image.',
         'favicon.mimes'    => 'The favicon must be an image of type: jpeg, jpg, png, gif, webp, HEIC, HEIF.',
-        'favicon.max'      => 'The favicon must not exceed 1 MB.',
+        'favicon.max'      => 'The favicon must not exceed 3 MB.',
 
         'hero_image.image' => 'The uploaded hero image must be a valid image.',
         'hero_image.mimes' => 'The hero image must be an image of type: jpeg, jpg, png, gif, webp, HEIC, HEIF.',
-        'hero_image.max'   => 'The hero image must not exceed 2 MB.',
+        'hero_image.max'   => 'The hero image must not exceed 3 MB.',
     ];
 
     /* set value at the time of render */

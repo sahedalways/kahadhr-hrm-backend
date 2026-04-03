@@ -150,12 +150,12 @@ class TrainingIndexEmp extends BaseComponent
     public function submitProof()
     {
         $this->validate([
-            'proofFile' => 'required|file|mimes:pdf,jpeg,png,jpg,heic,heif|max:5240',
+            'proofFile' => 'required|file|mimes:pdf,jpeg,png,jpg,heic,heif|max:3072',
         ], [
             'proofFile.required' => 'Please upload the proof file.',
             'proofFile.file'     => 'The uploaded file must be valid.',
             'proofFile.mimes'    => 'The proof file must be a PDF or image (jpeg, jpg, png, HEIC, HEIF).',
-            'proofFile.max'      => 'The proof file must not exceed 5.24 MB.',
+            'proofFile.max'      => 'The proof file must not exceed 3 MB.',
         ]);
 
 

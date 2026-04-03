@@ -199,7 +199,7 @@ class CompanyPayslip extends BaseComponent
     public function savePayslip()
     {
         $this->validate([
-            'file'    => 'required|file|mimes:pdf|max:2048',
+            'file'    => 'required|file|mimes:pdf|max:3072',
             'user_id' => 'required|exists:users,id',
             'month'   => 'required|string',
             'year'    => 'required|numeric',
@@ -207,7 +207,7 @@ class CompanyPayslip extends BaseComponent
             'file.required' => 'Please upload a file.',
             'file.file'     => 'The uploaded file is not valid.',
             'file.mimes'    => 'The uploaded file must be a PDF.',
-            'file.max'      => 'The uploaded file must not exceed 2 MB.',
+            'file.max'      => 'The uploaded file must not exceed 3 MB.',
         ]);
 
 
@@ -278,9 +278,23 @@ class CompanyPayslip extends BaseComponent
 
         $this->validate([
             'user_id' => 'required|exists:users,id',
-            'month' => 'required|string',
-            'year' => 'required|numeric',
-            'file'    => $isNewUpload ? 'required|file|mimes:pdf|max:2048' : 'nullable',
+            'month'   => 'required|string',
+            'year'    => 'required|numeric',
+            'file'    => $isNewUpload ? 'required|file|mimes:pdf|max:3072' : 'nullable',
+        ], [
+            'user_id.required' => 'Please select a user.',
+            'user_id.exists'   => 'Selected user is invalid.',
+
+            'month.required'   => 'Month is required.',
+            'month.string'     => 'Month must be a valid text.',
+
+            'year.required'    => 'Year is required.',
+            'year.numeric'     => 'Year must be a number.',
+
+            'file.required'    => 'Please upload a PDF file.',
+            'file.file'        => 'The uploaded file is not valid.',
+            'file.mimes'       => 'Only PDF files are allowed.',
+            'file.max'         => 'File size must not exceed 3 MB.',
         ]);
 
         $newFilePath = $payslip->file_path;
@@ -340,7 +354,12 @@ class CompanyPayslip extends BaseComponent
         if (!$request) return;
 
         $this->validate([
-            'file' => 'required|file|mimes:pdf|max:2048',
+            'file' => 'required|file|mimes:pdf|max:3072',
+        ], [
+            'file.required' => 'Please upload a PDF file.',
+            'file.file'     => 'The uploaded file is not valid.',
+            'file.mimes'    => 'Only PDF files are allowed.',
+            'file.max'      => 'File size must not exceed 3 MB.',
         ]);
 
         $fileName = 'payslip_' . rand(100000, 999999) . '_' . now()->format('YmdHis') . '.' . $this->file->getClientOriginalExtension();

@@ -219,7 +219,7 @@ class TrainingIndex extends BaseComponent
                     }
                 },
                 'mimes:mp4,mov,avi,wmv,pdf',
-                'max:212000',
+                'max:3072',
             ],
 
             'require_proof' => 'boolean',
@@ -227,7 +227,7 @@ class TrainingIndex extends BaseComponent
         ], [
             'instruction_file.file'  => 'The uploaded instruction file must be valid.',
             'instruction_file.mimes' => 'The instruction file must be a video (mp4, mov, avi, wmv) or PDF.',
-            'instruction_file.max'   => 'The instruction file size must not exceed 212 MB.',
+            'instruction_file.max'   => 'The instruction file size must not exceed 3 MB.',
         ]);
 
 
@@ -349,8 +349,8 @@ class TrainingIndex extends BaseComponent
 
         if ($this->instruction_file instanceof UploadedFile) {
             $rules['instruction_file'] = $this->content_type === 'video'
-                ? 'file|mimes:mp4,mov,avi,wmv|max:212000'
-                : 'file|mimes:pdf|max:10480';
+                ? 'file|mimes:mp4,mov,avi,wmv|max:3072'
+                : 'file|mimes:pdf|max:3072';
         }
 
         $this->validate($rules);

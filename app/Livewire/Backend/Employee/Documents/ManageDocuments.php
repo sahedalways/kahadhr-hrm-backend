@@ -242,12 +242,12 @@ class ManageDocuments extends BaseComponent
 
         $this->validate([
             'expires_at' => 'nullable|date',
-            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,heic,heif|max:10480',
+            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,heic,heif|max:3072',
         ], [
             'file_path.required' => 'Please upload a file.',
             'file_path.file'     => 'The uploaded file is not valid.',
             'file_path.mimes'    => 'The file must be a PDF or an image (jpg, jpeg, png, HEIC, HEIF).',
-            'file_path.max'      => 'The uploaded file must not exceed 10 MB.',
+            'file_path.max'      => 'The uploaded file must not exceed 3 MB.',
         ]);
 
         $file = $this->file_path;

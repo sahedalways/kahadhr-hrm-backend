@@ -1403,7 +1403,7 @@
                                             <input type="text"
                                                    class="form-control border-light-subtle shadow-none"
                                                    wire:model="street"
-                                                   placeholder="Enter House Number">
+                                                   placeholder="Enter Street">
 
                                             @error('street')
                                                 <span class="text-danger x-small">{{ $message }}</span>

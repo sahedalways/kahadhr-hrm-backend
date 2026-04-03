@@ -231,15 +231,15 @@
                                     <!-- Post Code -->
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
-                                            <i class="fas fa-mail-bulk me-1"></i> Post Code <span
+                                            <i class="fas fa-mail-bulk me-1"></i> Postcode <span
                                                   class="text-danger">*</span>
                                         </label>
                                         <input type="text"
                                                class="form-control form-control-lg border-0 bg-light rounded-3"
                                                style="padding: 12px 16px; text-transform: uppercase;"
                                                wire:model="postcode"
-                                               oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()"
-                                               placeholder="e.g. SW1A 1AA">
+                                               oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '')"
+                                               placeholder="Example: E16 4DE">
                                         @error('postcode')
                                             <span class="text-danger small d-block mt-1">{{ $message }}</span>
                                         @enderror

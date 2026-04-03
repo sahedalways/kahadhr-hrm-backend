@@ -1985,14 +1985,14 @@
 
 
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-semibold text-secondary">Post Code
+                                            <label class="form-label small fw-semibold text-secondary">Postcode
                                                 <span class="text-danger">*</span></label>
 
                                             <input type="text"
                                                    class="form-control border-light-subtle shadow-none"
                                                    wire:model="postcode"
-                                                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
-                                                   placeholder="e.g. AB1234">
+                                                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '').toUpperCase()"
+                                                   placeholder="Example: E16 4DE">
                                             @error('postcode')
                                                 <span class="text-danger x-small">{{ $message }}</span>
                                             @enderror
@@ -2023,7 +2023,7 @@
                                             <input type="text"
                                                    class="form-control border-light-subtle shadow-none"
                                                    wire:model="street"
-                                                   placeholder="Enter House Number">
+                                                   placeholder="Enter Street">
 
                                             @error('street')
                                                 <span class="text-danger x-small">{{ $message }}</span>

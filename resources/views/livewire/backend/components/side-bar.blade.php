@@ -612,7 +612,7 @@
 
 
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('reports/legal-duties*') ? 'active' : '' }}"
+                                <a class="nav-link {{ request()->routeIs('company.dashboard.reports.legal-duties') ? 'active' : '' }}"
                                    href="{{ route('company.dashboard.reports.legal-duties', ['company' => app('authUser')->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"
@@ -883,7 +883,7 @@
 
 
                             <li class="nav-item">
-                                <a class="nav-link {{ Request::is('reports/legal-duties*') ? 'active' : '' }}"
+                                <a class="nav-link {{ Request::is('employee/dashboard/reports/legal-duties*') ? 'active' : '' }}"
                                    href="{{ route('employee.dashboard.reports.legal-duties', ['company' => app('authUser')->employee->company->sub_domain]) }}"
                                    data-bs-toggle="tooltip"
                                    data-bs-placement="right"

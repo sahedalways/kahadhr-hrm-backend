@@ -204,41 +204,29 @@
                                         <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
                                             <i class="fas fa-city me-1"></i> City
                                         </label>
-                                        <div style="position:relative;">
-                                            <button class="btn w-100 text-start d-flex align-items-center justify-content-between border-0 bg-light rounded-3"
-                                                    type="button"
-                                                    id="cityDropdownButton"
-                                                    style="padding: 12px 16px; background: #f8f9fa !important;"
-                                                    @if (empty($cities)) disabled @endif>
-                                                <span>{{ $city ?? 'Select City' }}</span>
-                                                <i class="fas fa-chevron-down text-muted"></i>
-                                            </button>
 
-                                            <div id="cityDropdownMenu"
-                                                 wire:ignore.self
-                                                 style="display:none; position:absolute; z-index:1000; width:100%; max-height:250px; overflow-y:auto; background:#fff; border:1px solid #e9ecef; border-radius:12px; padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
-                                                <input type="text"
-                                                       class="form-control mb-2 rounded-3"
-                                                       placeholder="Search city..."
-                                                       wire:model.live="citySearch"
-                                                       style="border: 1px solid #e9ecef;">
-                                                @forelse ($cities as $c)
-                                                    <a href="#"
-                                                       class="dropdown-item py-2 rounded-2"
-                                                       style="transition: all 0.2s;"
-                                                       wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown()">
-                                                        {{ $c }}
-                                                    </a>
-                                                @empty
-                                                    <span class="dropdown-item text-muted small">Select state
-                                                        first</span>
-                                                @endforelse
-                                            </div>
-                                        </div>
+                                        <!-- Datalist based input (hidden button style) -->
+                                        <input type="text"
+                                               class="btn w-100 text-start d-flex align-items-center justify-content-between border-0 bg-light rounded-3"
+                                               list="cityList"
+                                               wire:model.live="city"
+                                               placeholder="Type or select city"
+                                               autocomplete="off"
+                                               style="padding: 12px 16px; background: #f8f9fa !important; cursor: pointer;"
+                                               id="cityInput">
+
+                                        <datalist id="cityList">
+                                            @foreach ($cities as $c)
+                                                <option value="{{ $c }}">{{ $c }}</option>
+                                            @endforeach
+                                        </datalist>
+
                                         @error('city')
                                             <span class="text-danger small d-block mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
+
+
 
                                     <!-- Post Code -->
                                     <div class="col-md-6">

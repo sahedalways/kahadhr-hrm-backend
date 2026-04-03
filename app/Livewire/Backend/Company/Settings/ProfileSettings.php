@@ -50,6 +50,8 @@ class ProfileSettings extends BaseComponent
         }
 
 
+        $this->country = 'United Kingdom';
+
         $this->company_name          = $this->company->company_name;
         $this->sub_domain            = $this->company->sub_domain;
         $this->company_house_number  = $this->company->company_house_number;
@@ -68,9 +70,6 @@ class ProfileSettings extends BaseComponent
 
         $this->old_company_logo = $this->company->company_logo_url;
 
-
-
-        $this->country = 'United Kingdom';
 
         $this->countries = Cache::remember(
             'countries.list',

@@ -1957,45 +1957,28 @@
                                             @enderror
                                         </div>
 
+
                                         <div class="col-md-6"
                                              id="cityDropdownContainer">
                                             <label class="form-label">City </label>
-                                            <div style="position:relative;">
-                                                <button class="btn btn-sm w-100 text-start"
-                                                        type="button"
-                                                        id="cityDropdownButton"
-                                                        style="border:1px solid #ccc; background:#fff;"
-                                                        @if (empty($cities)) disabled @endif>
-                                                    {{ $city ?? 'Select City' }}
-                                                </button>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   list="cityList"
+                                                   wire:model.live="city"
+                                                   placeholder="Type or select city"
+                                                   autocomplete="off">
 
-                                                <div id="cityDropdownMenu"
-                                                     wire:ignore.self
-                                                     style="display:none; position:absolute; z-index:1000; width:100%; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding: 8px;">
-                                                    <input type="text"
-                                                           class="form-control mb-2"
-                                                           placeholder="Search city..."
-                                                           wire:model.live="citySearch">
+                                            <datalist id="cityList">
+                                                @foreach ($cities as $c)
+                                                    <option value="{{ $c }}">{{ $c }}
+                                                    </option>
+                                                @endforeach
+                                            </datalist>
 
-                                                    @forelse ($cities as $c)
-                                                        <a href="#"
-                                                           class="dropdown-item"
-                                                           wire:click.prevent="$set('city', '{{ $c }}'); closeDropdown()">
-                                                            {{ $c }}
-                                                        </a>
-                                                    @empty
-                                                        <span class="dropdown-item text-muted small">Select state
-                                                            first</span>
-                                                    @endforelse
-                                                </div>
-                                            </div>
                                             @error('city')
                                                 <span class="text-danger small">{{ $message }}</span>
                                             @enderror
                                         </div>
-
-
-
 
 
 

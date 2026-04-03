@@ -407,14 +407,6 @@ class ClockModal extends BaseComponent
         } else {
             $this->elapsedTime = '00:00:00';
         }
-
-
-
-        // $this->dispatch(
-        //     'update-header-timer',
-        //     time: $this->elapsedTime,
-        //     running: !$this->attendance->clock_out
-        // )->to('backend.components.header');
     }
 
 
@@ -459,13 +451,15 @@ class ClockModal extends BaseComponent
 
 
 
-
         return view('livewire.backend.employee.clock-modal.clock-modal', [
             'showClockInButton' => $showClockInButton,
             'showClockOutButton' => $showClockOutButton,
             'statusLabel' => $statusLabel,
         ]);
     }
+
+
+
 
 
     public function resetReasons()

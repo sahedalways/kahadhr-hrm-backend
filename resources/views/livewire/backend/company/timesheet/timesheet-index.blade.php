@@ -690,25 +690,130 @@
                         <div class="row mb-3">
                             <div class="col-12">
                                 <div class="border rounded-3 p-3 bg-light">
-                                    <div class="row text-center">
-                                        <div class="col-6">
-                                            <div class="p-2">
-                                                <small class="text-success d-block mb-1">
-                                                    <i class="fas fa-coffee me-1"></i>Paid Breaks
-                                                </small>
-                                                <span
-                                                      class="h5 mb-0 fw-bold text-success">{{ $hours['paid_break_hours'] }}</span>
-                                                <small class="text-muted d-block mt-1">Rest breaks</small>
+                                    <div class="row">
+                                        {{-- Paid Breaks --}}
+                                        <div class="col-6 border-end">
+                                            <div class="text-center">
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success bg-opacity-10 text-dark px-3 py-2">
+                                                        <i class="fas fa-coffee me-1"></i> Paid Breaks
+                                                    </span>
+                                                </div>
+
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-success dropdown-toggle w-100"
+                                                            type="button"
+                                                            data-bs-toggle="dropdown"
+                                                            style="border-radius: 8px; font-weight: 500;">
+                                                        {{ $selectedPaidBreakDuration ? number_format($selectedPaidBreakDuration, 2) . ' hrs' : $hours['paid_break_hours'] ?? '0h 0m' }}
+                                                    </button>
+
+                                                    <div class="dropdown-menu p-3 shadow-lg"
+                                                         style="min-width: 260px; border-radius: 12px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+
+                                                        <div class="text-center mb-3 pb-2 border-bottom">
+                                                            <small class="text-uppercase fw-bold text-muted"
+                                                                   style="font-size: 11px; letter-spacing: 0.5px;">
+                                                                <i class="fas fa-clock me-1"></i> Select Duration
+                                                            </small>
+                                                        </div>
+
+                                                        {{-- Custom Input Field --}}
+                                                        <div class="mb-3 pb-2 border-bottom">
+                                                            <label
+                                                                   class="form-label small fw-semibold text-muted mb-1">
+                                                                <i class="fas fa-keyboard me-1"></i> Break Duration
+                                                            </label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number"
+                                                                       class="form-control text-center"
+                                                                       wire:model.defer="customPaidBreakHours"
+                                                                       step="0.01"
+                                                                       min="0"
+                                                                       max="24"
+                                                                       placeholder="e.g., 0.45, 1.00"
+                                                                       style="font-size: 13px;">
+                                                                <span class="input-group-text">hrs</span>
+                                                                <button class="btn btn-success"
+                                                                        type="button"
+                                                                        wire:click="setCustomPaidBreak"
+                                                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </div>
+                                                            <small class="text-muted"
+                                                                   style="font-size: 10px;">
+                                                                <i class="fas fa-info-circle"></i> Enter values like
+                                                                0.45 (45 min), 1.00 (1 hour)
+                                                            </small>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {{-- Unpaid Breaks --}}
                                         <div class="col-6">
-                                            <div class="p-2">
-                                                <small class="text-warning d-block mb-1">
-                                                    <i class="fas fa-utensils me-1"></i>Unpaid Breaks
-                                                </small>
-                                                <span
-                                                      class="h5 mb-0 fw-bold text-warning">{{ $hours['unpaid_break_hours'] }}</span>
-                                                <small class="text-muted d-block mt-1">Meal breaks</small>
+                                            <div class="text-center">
+                                                <div class="mb-2">
+                                                    <span class="badge bg-warning bg-opacity-10 text-dark px-3 py-2">
+                                                        <i class="fas fa-utensils me-1"></i> Unpaid Breaks
+                                                    </span>
+                                                </div>
+
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-warning dropdown-toggle w-100"
+                                                            type="button"
+                                                            data-bs-toggle="dropdown"
+                                                            style="border-radius: 8px; font-weight: 500;">
+                                                        {{ $selectedUnpaidBreakDuration ? number_format($selectedUnpaidBreakDuration, 2) . ' hrs' : $hours['unpaid_break_hours'] ?? '0h 0m' }}
+                                                    </button>
+
+                                                    <div class="dropdown-menu p-3 shadow-lg"
+                                                         style="min-width: 260px; border-radius: 12px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+
+                                                        <div class="text-center mb-3 pb-2 border-bottom">
+                                                            <small class="text-uppercase fw-bold text-muted"
+                                                                   style="font-size: 11px; letter-spacing: 0.5px;">
+                                                                <i class="fas fa-clock me-1"></i> Select Duration
+                                                            </small>
+                                                        </div>
+
+                                                        {{-- Custom Input Field --}}
+                                                        <div class="mb-3 pb-2 border-bottom">
+                                                            <label
+                                                                   class="form-label small fw-semibold text-muted mb-1">
+                                                                <i class="fas fa-keyboard me-1"></i> Break Duration
+                                                            </label>
+                                                            <div class="input-group input-group-sm">
+                                                                <input type="number"
+                                                                       class="form-control text-center"
+                                                                       wire:model.defer="customUnpaidBreakHours"
+                                                                       step="0.01"
+                                                                       min="0"
+                                                                       max="24"
+                                                                       placeholder="e.g., 0.45, 1.00"
+                                                                       style="font-size: 13px;">
+                                                                <span class="input-group-text">hrs</span>
+                                                                <button class="btn btn-warning"
+                                                                        type="button"
+                                                                        wire:click="setCustomUnpaidBreak"
+                                                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </div>
+                                                            <small class="text-muted"
+                                                                   style="font-size: 10px;">
+                                                                <i class="fas fa-info-circle"></i> Enter values like
+                                                                0.45 (45 min), 1.00 (1 hour)
+                                                            </small>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -716,6 +821,31 @@
                             </div>
                         </div>
 
+                        <style>
+                            .dropdown-item:hover:not(.bg-success):not(.bg-warning) {
+                                background-color: #f8f9fa;
+                                transform: translateX(3px);
+                            }
+
+                            .dropdown-item:active {
+                                transform: translateX(0);
+                            }
+
+                            /* Custom scrollbar */
+                            .dropdown-menu .row.g-1::-webkit-scrollbar {
+                                width: 4px;
+                            }
+
+                            .dropdown-menu .row.g-1::-webkit-scrollbar-track {
+                                background: #f1f1f1;
+                                border-radius: 10px;
+                            }
+
+                            .dropdown-menu .row.g-1::-webkit-scrollbar-thumb {
+                                background: #c1c1c1;
+                                border-radius: 10px;
+                            }
+                        </style>
 
 
 
@@ -1060,6 +1190,90 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+
+
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label small text-secondary mb-1">
+                                    Break Duration
+                                </label>
+
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100"
+                                            type="button"
+                                            data-bs-toggle="dropdown">
+                                        {{ $manualBreakDuration ?? 'Select duration' }}
+                                    </button>
+
+                                    <div class="dropdown-menu p-2"
+                                         style="max-height:200px; overflow-y:auto; scrollbar-width: thin; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; min-width: 100px;">
+
+                                        <div class="text-center mb-2 pb-1 border-bottom">
+                                            <small class="text-uppercase fw-bold"
+                                                   style="font-size: 10px; letter-spacing: 0.5px; color: #64748b;">⏲️
+                                                Duration</small>
+                                        </div>
+
+                                        <div class="row g-1">
+                                            @php
+                                                $times = [
+                                                    0.1,
+                                                    0.2,
+                                                    0.3,
+                                                    0.4,
+                                                    0.45,
+                                                    0.5,
+                                                    1.0,
+                                                    1.1,
+                                                    1.2,
+                                                    1.3,
+                                                    1.4,
+                                                    1.45,
+                                                    1.5,
+                                                    2.0,
+                                                ];
+                                            @endphp
+
+                                            @foreach ($times as $time)
+                                                <div class="col-6">
+                                                    <button type="button"
+                                                            class="btn btn-sm w-100"
+                                                            style="border-radius: 6px; font-size: 12px; padding: 6px 4px; transition: all 0.2s; background: #fff; border: 1px solid #e2e8f0; color: #1e293b;"
+                                                            wire:click="$set('manualBreakDuration', '{{ number_format($time, 2) }}')"
+                                                            onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.borderColor='#94a3b8'; this.style.transform='translateY(-1px)';"
+                                                            onmouseout="this.style.backgroundColor='#fff'; this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)';">
+                                                        {{ number_format($time, 2) }} <span
+                                                              style="font-size: 9px; color: #64748b;">hrs</span>
+                                                    </button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                                @error('manualBreakDuration')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- Paid/Unpaid Checkbox --}}
+                            <div class="col-md-12 mb-2">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="isPaidBreak"
+                                           wire:model="isPaidBreak">
+                                    <label class="form-check-label "
+                                           for="isPaidBreak">
+                                        Paid Break
+                                    </label>
+                                </div>
+                                <small class="text-muted">
+                                    <em>Check if this break period is paid, leave unchecked for unpaid break</em>
+                                </small>
+                                @error('isPaidBreak')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
 
                             {{-- Reason --}}
                             <div class="col-md-12 mb-2">

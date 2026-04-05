@@ -322,6 +322,10 @@ if (!function_exists('parseTimeToMinutes')) {
     return $minutes;
   }
 }
+
+
+
+
 if (!function_exists('getShiftHours')) {
   function getShiftHours($attendance): array
   {
@@ -345,28 +349,51 @@ if (!function_exists('getShiftHours')) {
     }
 
     $date = $clockIn->format('Y-m-d');
-    $employeeId = $attendance->user->employee->id;
-
-    $shiftDate = ShiftDate::where('date', $date)
-      ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
-      ->first();
+    $employeeId = $attendance->user->employee->id ?? null;
+    $isManual = $attendance->is_manual ?? false;
 
     $shiftHoursFormatted = '0h 0m';
     $shiftTotalMinutes = 0;
+    $shiftDate = null; // Initialize $shiftDate
 
-    if ($shiftDate && $shiftDate->total_hours) {
-      $shiftTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
-      $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
-    } else {
-      $shiftTotalMinutes = 480;
-      $shiftHoursFormatted = '0h 0m';
+    if ($employeeId) {
+      $shiftDate = ShiftDate::where('date', $date)
+        ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+        ->first();
+
+      if ($shiftDate && $shiftDate->total_hours) {
+        $shiftTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
+        $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
+      } else {
+        // Fixed: This was incorrectly setting minutes to a string
+        $shiftTotalMinutes = 0;
+        $shiftHoursFormatted = '0h 0m';
+      }
     }
 
     $paidBreakMinutes = 0;
     $unpaidBreakMinutes = 0;
     $totalBreakMinutes = 0;
 
-    if ($shiftDate && method_exists($shiftDate, 'breaks') && $shiftDate->breaks) {
+    // Fixed: Check if breaks relationship exists and is not null
+    if ($attendance && method_exists($attendance, 'breaks') && $attendance->breaks) {
+      foreach ($attendance->breaks as $break) {
+        if ($break->duration) {
+          $breakMinutes = parseTimeToMinutes($break->duration);
+
+          if (isset($break->type) && strtolower($break->type) === 'unpaid') {
+            $unpaidBreakMinutes += $breakMinutes;
+          } else {
+            $paidBreakMinutes += $breakMinutes;
+          }
+
+          $totalBreakMinutes += $breakMinutes;
+        }
+      }
+    }
+
+    // Fixed: Check if $shiftDate exists before accessing its breaks
+    if ($employeeId && $shiftDate && method_exists($shiftDate, 'breaks')) {
       foreach ($shiftDate->breaks as $break) {
         if ($break->duration) {
           $breakMinutes = parseTimeToMinutes($break->duration);
@@ -386,7 +413,7 @@ if (!function_exists('getShiftHours')) {
       return [
         'shift_hours'           => $shiftHoursFormatted,
         'worked_hours'          => '0h 0m',
-        'total_break_hours'     => formatMinutesToHours($totalBreakMinutes), // ✅
+        'total_break_hours'     => formatMinutesToHours($totalBreakMinutes),
         'paid_break_hours'      => formatMinutesToHours($paidBreakMinutes),
         'unpaid_break_hours'    => formatMinutesToHours($unpaidBreakMinutes),
         'actual_worked_hours'   => '0h 0m'
@@ -398,15 +425,25 @@ if (!function_exists('getShiftHours')) {
     }
 
     $totalWorkedMinutes = (int) round($clockIn->diffInRealMinutes($clockOut));
-
     $actualWorkedMinutes = $totalWorkedMinutes - $unpaidBreakMinutes;
 
     if ($actualWorkedMinutes < 0) {
       $actualWorkedMinutes = 0;
     }
 
+
+    // if ($isManual && $shiftTotalMinutes > 0) {
+    //   $adjustedShiftMinutes = $shiftTotalMinutes - $unpaidBreakMinutes;
+    //   if ($adjustedShiftMinutes < 0) {
+    //     $adjustedShiftMinutes = 0;
+    //   }
+    //   $shiftHoursFormatted = formatMinutesToHours($adjustedShiftMinutes);
+    // }
+
+
+
     return [
-      'shift_hours' => $shiftHoursFormatted == '0h 0m'
+      'shift_hours' => ($shiftHoursFormatted == '0h 0m' && $shiftTotalMinutes === 0)
         ? formatMinutesToHours($totalWorkedMinutes)
         : $shiftHoursFormatted,
       'worked_hours'          => formatMinutesToHours($totalWorkedMinutes),
@@ -417,7 +454,6 @@ if (!function_exists('getShiftHours')) {
     ];
   }
 }
-
 
 
 if (!function_exists('formatMinutesToHours')) {

@@ -6,6 +6,7 @@ use App\Events\NotificationEvent;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
+use App\Models\BreakofShift;
 use App\Models\Employee;
 use App\Models\Notification;
 use App\Models\ShiftDate;
@@ -76,6 +77,169 @@ class TimesheetIndex extends BaseComponent
 
     public $editingClockIn = false;
     public $editingClockOut = false;
+    public $manualBreakDuration;
+    public $isPaidBreak = false;
+    public $customPaidBreakHours = '';
+    public $customUnpaidBreakHours = '';
+
+
+    public $selectedPaidBreakDuration = null;
+    public $selectedUnpaidBreakDuration = null;
+
+    public function setCustomPaidBreak()
+    {
+        if (!$this->selectedAttendance) return;
+
+        $duration = (float) $this->customPaidBreakHours;
+
+        // Validation
+        if ($duration < 0) {
+            $this->toast('Duration cannot be negative', 'error');
+            return;
+        }
+
+        if ($duration > 2) {
+            $this->toast('Duration cannot exceed 2 hours', 'error');
+            return;
+        }
+
+        $this->selectedPaidBreakDuration = $duration;
+
+
+        BreakofShift::where('attendance_id', $this->selectedAttendance->id)
+            ->where('type', 'Paid')
+            ->delete();
+
+
+        if ($duration > 0) {
+            BreakofShift::create([
+                'attendance_id' => $this->selectedAttendance->id,
+                'type' => 'Paid',
+                'duration' => number_format($duration, 2),
+                'title' => null,
+                'shift_date_id' => null,
+            ]);
+        }
+
+
+        $this->selectedAttendance->refresh();
+
+        $this->customPaidBreakHours = '';
+
+        $message = $duration > 0 ? "Paid break updated to " . number_format($duration, 2) . " hours!" : "Paid break removed!";
+        $this->toast($message, 'success');
+    }
+
+    public function setCustomUnpaidBreak()
+    {
+        if (!$this->selectedAttendance) return;
+
+        $newDuration = (float) $this->customUnpaidBreakHours;
+        $newBreakMinutes = $newDuration * 60;
+
+        // Validation
+        if ($newDuration < 0) {
+            $this->toast('Duration cannot be negative', 'error');
+            return;
+        }
+
+        if ($newDuration > 2) {
+            $this->toast('Duration cannot exceed 2 hours', 'error');
+            return;
+        }
+
+        // Get existing unpaid break duration
+        $existingBreak = BreakofShift::where('attendance_id', $this->selectedAttendance->id)
+            ->where('type', 'Unpaid')
+            ->first();
+
+        $oldDuration = $existingBreak ? (float) $existingBreak->duration : 0;
+        $oldBreakMinutes = $oldDuration * 60;
+
+        // Calculate the difference (how many minutes to add or subtract from shift)
+        $minutesDifference = $newBreakMinutes - $oldBreakMinutes;
+
+        // Update or create break record
+        if ($newDuration > 0) {
+            if ($existingBreak) {
+                // Update existing break
+                $existingBreak->update([
+                    'duration' => number_format($newDuration, 2),
+                ]);
+            } else {
+                // Create new break
+                BreakofShift::create([
+                    'attendance_id' => $this->selectedAttendance->id,
+                    'type' => 'Unpaid',
+                    'duration' => number_format($newDuration, 2),
+                    'title' => null,
+                    'shift_date_id' => null,
+                ]);
+            }
+        } else {
+            // Remove break if duration is 0
+            if ($existingBreak) {
+                $existingBreak->delete();
+            }
+        }
+
+        $this->selectedUnpaidBreakDuration = $newDuration;
+
+
+        if ($minutesDifference != 0) {
+            $this->updateShiftTotalHours($minutesDifference);
+        }
+
+
+        $this->selectedAttendance->refresh();
+
+        $this->customUnpaidBreakHours = '';
+
+        $message = $newDuration > 0
+            ? "Unpaid break updated to " . number_format($newDuration, 2) . " hours!"
+            : "Unpaid break removed!";
+        $this->toast($message, 'success');
+    }
+
+
+    private function updateShiftTotalHours($minutesToAdjust)
+    {
+
+        if ($this->selectedAttendance->is_manual == 0) {
+            $clockIn = Carbon::parse($this->selectedAttendance->clock_in);
+            $date = $clockIn->format('Y-m-d');
+            $employeeId = $this->selectedAttendance->user->employee->id ?? null;
+
+            if ($employeeId) {
+
+                $shiftDate = ShiftDate::where('date', $date)
+                    ->whereHas('employees', function ($q) use ($employeeId) {
+                        $q->where('employee_id', $employeeId);
+                    })
+                    ->first();
+
+                if ($shiftDate) {
+
+                    $currentTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
+
+
+                    $newTotalMinutes = $currentTotalMinutes - $minutesToAdjust;
+
+
+                    if ($newTotalMinutes < 0) {
+                        $newTotalMinutes = 0;
+                    }
+
+
+                    $shiftDate->update([
+                        'total_hours' => formatMinutesToHours($newTotalMinutes)
+                    ]);
+                }
+            }
+        }
+    }
+
+
 
     public function toggleClockInEdit()
     {
@@ -145,7 +309,7 @@ class TimesheetIndex extends BaseComponent
 
     public function openAttendanceModal($attendanceId)
     {
-        $this->selectedAttendance = Attendance::with(['user', 'requests'])
+        $this->selectedAttendance = Attendance::with(['user', 'requests', 'breaks'])
             ->where('company_id', $this->company_id)
             ->find($attendanceId);
 
@@ -154,6 +318,14 @@ class TimesheetIndex extends BaseComponent
             $this->clockOutTime = $this->selectedAttendance->clock_out
                 ? Carbon::parse($this->selectedAttendance->clock_out)->format('H:i')
                 : null;
+
+
+
+            $paidBreak = $this->selectedAttendance->breaks->where('type', 'Paid')->first();
+            $unpaidBreak = $this->selectedAttendance->breaks->where('type', 'Unpaid')->first();
+
+            $this->selectedPaidBreakDuration = $paidBreak ? (float) $paidBreak->duration : 0;
+            $this->selectedUnpaidBreakDuration = $unpaidBreak ? (float) $unpaidBreak->duration : 0;
         }
 
         $this->dispatch('open-attendance-modal');
@@ -797,6 +969,8 @@ class TimesheetIndex extends BaseComponent
             'manualDate' => 'required|date',
             'clockInTime' => 'required|date_format:H:i',
             'clockOutTime' => 'nullable|date_format:H:i',
+            'manualBreakDuration' => 'nullable|numeric|min:0',
+            'isPaidBreak' => 'boolean',
         ]);
 
         $clockIn = $this->manualDate . ' ' . $this->clockInTime;
@@ -818,6 +992,20 @@ class TimesheetIndex extends BaseComponent
             'needs_approval' => 0,
             'status' => 'approved',
         ]);
+
+
+
+        if ($this->manualBreakDuration && $this->manualBreakDuration > 0) {
+            BreakofShift::create([
+                'title' => null,
+                'type' => $this->isPaidBreak ? 'Paid' : 'Unpaid',
+                'duration' => number_format($this->manualBreakDuration, 2),
+                'shift_date_id' => null,
+                'attendance_id' => $attendance->id,
+            ]);
+        }
+
+
 
         $message = "Manual attendance has been submitted for {$this->manualDate}.";
 

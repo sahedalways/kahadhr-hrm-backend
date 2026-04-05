@@ -40,4 +40,10 @@ class Attendance extends Model
     {
         return $this->hasMany(AttendanceRequest::class);
     }
+
+
+    public function breaks()
+    {
+        return $this->hasMany(BreakofShift::class, 'attendance_id');
+    }
 }

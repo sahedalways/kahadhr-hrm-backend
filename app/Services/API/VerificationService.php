@@ -18,8 +18,8 @@ class VerificationService
 
   public function sendEmailOtp(?string $email = null,  ?string $name = null): bool
   {
-    // $otp = rand(100000, 999999);
-    $otp = 123456;
+    $otp = rand(100000, 999999);
+    // $otp = 123456;
 
     $this->repository->updateOrInsert([
       'email' => $email,
@@ -38,8 +38,8 @@ class VerificationService
 
   public function sendPhoneOtp(string $phoneNo,  ?string $name = null): bool
   {
-    // $otp = rand(100000, 999999);
-    $otp = 123456;
+    $otp = rand(100000, 999999);
+    // $otp = 123456;
 
     $this->repository->updateOrInsert([
       'phone' => $phoneNo,

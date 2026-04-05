@@ -14,6 +14,7 @@ use Stripe\StripeClient;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 
@@ -59,7 +60,16 @@ class CompanyDetails extends BaseComponent
 
     public $filteredCountries = [];
 
-    protected $listeners = ['deleteCompany', 'openModal', 'tick'];
+    public $forceActiveCompanyId;
+    public $forceActiveDays = 30;
+
+
+    protected $listeners = [
+        'deleteCompany',
+        'openModal',
+        'tick',
+
+    ];
 
     public function boot(CompanyService $companyService)
     {
@@ -67,6 +77,78 @@ class CompanyDetails extends BaseComponent
     }
 
 
+
+
+    public function forceToActive()
+    {
+
+        $this->validate([
+            'forceActiveDays' => 'required|integer|min:1|max:600',
+        ]);
+
+        $days = (int) $this->forceActiveDays;
+
+        $companyId = $this->company_id;
+
+        if (!$companyId) {
+            $this->toast('Company ID not provided.', 'error');
+
+            return;
+        }
+
+        $company = Company::find($companyId);
+
+        if (!$company) {
+            $this->toast('Company not found.', 'error');
+
+            return;
+        }
+
+        if ($company->subscription_status !== 'trial') {
+            $this->toast('This company is not in trial status. Only trial companies can be forced to active.', 'error');
+
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $today = Carbon::today();
+            $subscriptionEnd = $today->copy()->addDays($days);
+
+            $company->update([
+                'subscription_status' => 'active',
+                'subscription_start' => $today,
+                'subscription_end' => $subscriptionEnd,
+                'trial_ends_at' => $today,
+                'status' => 'Active',
+                'payment_status' => 'paid',
+            ]);
+
+            DB::commit();
+
+
+            $this->details = Company::with(['bankInfos', 'employees', 'billingPlan', 'calendarYearSetting'])
+                ->findOrFail($companyId);
+
+            $this->toast(
+                sprintf(
+                    'Company "%s" has been forced to active status successfully! Subscription active until %s.',
+                    $company->company_name,
+                    $subscriptionEnd->format('d M Y')
+                ),
+                'success'
+            );
+
+
+            $this->forceActiveDays = 30;
+            $this->dispatch('closemodal');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->toast('Failed to force company to active: ' . $e->getMessage(), 'error');
+            $this->dispatch('closemodal');
+        }
+    }
 
 
 

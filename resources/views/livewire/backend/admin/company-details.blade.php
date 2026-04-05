@@ -27,43 +27,38 @@
                             {{ $details->company_name }}
                         </h2>
                         <div class="d-flex gap-2 mt-1 flex-wrap">
-                            <span class="badge"
-                                  style="background: #e9ecef; color: #495057; font-weight: 500; padding: 4px 10px; border-radius: 20px;">
-                                <i class="fas fa-building me-1"
-                                   style="font-size: 0.7rem;"></i>
-                                {{ ucfirst($details->business_type ?? 'Business') }}
-                            </span>
+
                             @php
                                 $statusColors = [
                                     'active' => [
                                         'bg' => '#d1fae5',
                                         'color' => '#065f46',
                                         'dot' => '#10b981',
-                                        'icon' => 'fa-check-circle',
+                                        'icon' => 'fa-credit-card',
                                     ],
                                     'trial' => [
                                         'bg' => '#dbeafe',
                                         'color' => '#1e40af',
                                         'dot' => '#3b82f6',
-                                        'icon' => 'fa-hourglass-half',
+                                        'icon' => 'fa-credit-card',
                                     ],
                                     'expired' => [
                                         'bg' => '#fee2e2',
                                         'color' => '#991b1b',
                                         'dot' => '#dc2626',
-                                        'icon' => 'fa-times-circle',
+                                        'icon' => 'fa-credit-card',
                                     ],
                                     'suspended' => [
                                         'bg' => '#fef3c7',
                                         'color' => '#92400e',
                                         'dot' => '#f59e0b',
-                                        'icon' => 'fa-ban',
+                                        'icon' => 'fa-credit-card',
                                     ],
                                     'inactive' => [
                                         'bg' => '#f3f4f6',
                                         'color' => '#374151',
                                         'dot' => '#6b7280',
-                                        'icon' => 'fa-circle',
+                                        'icon' => 'fa-credit-card',
                                     ],
                                 ];
                                 $statusKey = strtolower($details->subscription_status ?? 'inactive');
@@ -206,18 +201,7 @@
                                             <i class="fas fa-chevron-down ms-1 fs-10"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            {{-- <li>
-                                                <a class="dropdown-item py-2"
-                                                   href="#"
-                                                   data-bs-toggle="modal"
-                                                   data-bs-target="#manageCompanyProfile"
-                                                   wire:click="manageCompanyProfile({{ $details->id }})">
-                                                    <i class="fas fa-edit me-2 text-primary"></i> Manage Profile
-                                                    <span wire:loading
-                                                          wire:target="manageCompanyProfile"
-                                                          class="spinner-border spinner-border-sm ms-2"></span>
-                                                </a>
-                                            </li> --}}
+
                                             <li>
                                                 <a class="dropdown-item py-2"
                                                    href="#"
@@ -234,6 +218,18 @@
                                                           class="spinner-border spinner-border-sm ms-2"></span>
                                                 </a>
                                             </li>
+
+                                            @if ($details->subscription_status == 'trial')
+                                                <li>
+                                                    <a class="dropdown-item py-2"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#forceActiveModal">
+                                                        <i class="fas fa-bolt me-2 text-primary"></i> Force to Active
+                                                    </a>
+                                                </li>
+                                            @endif
+
+
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
@@ -1502,6 +1498,114 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Force Active Modal -->
+    <div wire:ignore.self
+         class="modal fade"
+         id="forceActiveModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="forceActiveModal"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered"
+             role="document">
+            <div class="modal-content">
+                <div class="modal-header"
+                     style="background: linear-gradient(135deg, #0dcaf0, #0b9ed0);">
+                    <h6 class="modal-title fw-600 text-white">
+                        <i class="fas fa-bolt me-2"></i> Force Company to Active
+                    </h6>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex p-3 mb-3">
+                            <i class="fas fa-exclamation-triangle fa-2x text-dark"></i>
+                        </div>
+                        <h5 class="fw-bold">Force Subscription to Active</h5>
+                        <p class="text-muted small">
+                            This will change the company's subscription status from <strong
+                                    class="text-info">Trial</strong>
+                            to <strong class="text-success">Active</strong> and set the subscription period.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-calendar-alt me-1 text-primary"></i>
+                            Subscription Duration (Days)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-clock text-primary"></i>
+                            </span>
+                            <input type="number"
+                                   class="form-control form-control-lg text-center fw-bold"
+                                   wire:model="forceActiveDays"
+                                   min="1"
+                                   max="600"
+                                   step="1"
+                                   placeholder="Enter days (1-600)"
+                                   style="font-size: 1.1rem;">
+                            <span class="input-group-text bg-light border-start-0">Days</span>
+                        </div>
+                        @error('forceActiveDays')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Select between 1 to 600 days for the subscription period
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info small p-3 rounded-3"
+                         style="background: #e3f2fd;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>What will happen?</strong>
+                        <ul class="mb-0 mt-2 ps-3">
+                            <li>Subscription status will change to <strong class="text-success">Active</strong></li>
+                            <li>Subscription start date: <strong>{{ now()->format('d M Y') }}</strong></li>
+                            <li>Subscription end date: Based on selected days</li>
+                            <li>Trial ends at: <strong>{{ now()->format('d M Y') }}</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="button"
+                            class="btn btn-success rounded-pill px-4"
+                            wire:click="forceToActive"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove>
+                            <i class="fas fa-bolt me-1"></i> Force to Active
+                        </span>
+                        <span wire:loading>
+                            <i class="fas fa-spinner fa-spin me-1"></i> Processing...
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

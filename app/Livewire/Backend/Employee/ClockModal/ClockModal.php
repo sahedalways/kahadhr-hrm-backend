@@ -33,6 +33,7 @@ class ClockModal extends BaseComponent
     public $clockInTime;
     public $timezone;
     public $attendance;
+    public $clockInType;
     public $elapsedTime = 0;
     public $userTimezone = 'UTC';
     public $previousAttendances = [];
@@ -59,27 +60,33 @@ class ClockModal extends BaseComponent
     public function clockIn()
     {
         if (!$this->clockInLatitude || !$this->clockInLongitude) {
-            $this->toast("Location access required. Please enable location and try again.", 'error');
+            $this->toast("Location access required.", 'error');
             return;
         }
 
-
-
         $shiftStart = $this->shiftStartTime;
         $grace = config('attendance.grace_minutes');
-
-
-        $bdTime = now()->setTimezone('Asia/Dhaka');
-
-
         $ukTime = now()->setTimezone('Europe/London');
 
         $needsApproval = false;
+        $type = null;
 
-        if ($ukTime->gt($shiftStart->copy()->addMinutes($grace))) {
+
+        if ($ukTime->lt($shiftStart->copy()->subMinutes($grace))) {
             $needsApproval = true;
+            $type = 'early_clock_in';
+            $this->clockInType = 'early';
             $this->showClockInReason = true;
 
+            if (empty($this->clockInReason)) {
+                $this->addError('clockInReason', 'Reason is required for early clock in.');
+                return;
+            }
+        } elseif ($ukTime->gt($shiftStart->copy()->addMinutes($grace))) {
+            $needsApproval = true;
+            $this->clockInType = 'late';
+            $this->clockInType = $type;
+            $this->showClockInReason = true;
 
             if (empty($this->clockInReason)) {
                 $this->addError('clockInReason', 'Reason is required for late clock in.');
@@ -88,7 +95,6 @@ class ClockModal extends BaseComponent
         } else {
             $this->showClockInReason = false;
         }
-
 
         $attendance = Attendance::create([
             'user_id' => Auth::id(),
@@ -107,49 +113,47 @@ class ClockModal extends BaseComponent
             $item = AttendanceRequest::create([
                 'user_id' => Auth::id(),
                 'attendance_id' => $attendance->id,
-                'type' => 'late_clock_in',
+                'type' => $type,
                 'reason' => $this->clockInReason,
                 'status' => 'pending',
             ]);
 
-
             $submitterName = auth()->user()->full_name;
-            $message = "Employee '{$submitterName}' clocked in late.";
+            $message = ($type === 'early_clock_in')
+                ? "Employee '{$submitterName}' clocked in early."
+                : "Employee '{$submitterName}' clocked in late.";
 
             $notification = Notification::create([
                 'company_id' => auth()->user()->employee->company_id,
                 'user_id' => null,
                 'notifiable_id' => $item->id,
-                'type' => 'late_clock_in',
-
+                'type' => $type,
                 'data' => [
                     'message' => $message,
                     'latitude' => $this->clockInLatitude,
                     'longitude' => $this->clockInLongitude,
                     'accuracy' => $this->clockInAccuracy,
-
                 ],
             ]);
 
-
             event(new NotificationEvent($notification));
 
-
             $this->clockInReason = '';
             $this->showClockInReason = false;
             $this->updateWorkingHoursCount();
             $this->dispatch('closemodal');
             $this->dispatch('reloadPage');
 
-            $this->toast("Late Clock-In recorded, pending approval.", 'warning');
+            $toastMessage = ($type === 'early_clock_in')
+                ? "Early Clock-In recorded, pending approval."
+                : "Late Clock-In recorded, pending approval.";
+            $this->toast($toastMessage, 'warning');
         } else {
-
             $this->clockInReason = '';
             $this->showClockInReason = false;
             $this->updateWorkingHoursCount();
             $this->dispatch('closemodal');
             $this->dispatch('reloadPage');
-
             $this->toast("Clock In successful!", 'success');
         }
     }
@@ -159,7 +163,7 @@ class ClockModal extends BaseComponent
     public function clockOut()
     {
         if (!$this->clockOutLatitude && !$this->clockOutLongitude) {
-            $this->toast("Location access required. Please enable location and try again.", 'error');
+            $this->toast("Location access required.", 'error');
             return;
         }
 
@@ -441,12 +445,14 @@ class ClockModal extends BaseComponent
                 $statusLabel = 'Todays Worked';
             }
         } else {
+            // if ($now->greaterThanOrEqualTo($shiftStartMinusGrace) && $now->lessThanOrEqualTo($shiftEnd)) {
 
-            if ($now->greaterThanOrEqualTo($shiftStartMinusGrace) && $now->lessThanOrEqualTo($shiftEnd)) {
+            if (!$now->lessThanOrEqualTo($shiftEnd)) {
+                $showClockInButton = false;
+            } else {
                 $showClockInButton = true;
+                $statusLabel = 'Not Started';
             }
-
-            $statusLabel = 'Not Started';
         }
 
 

@@ -858,6 +858,7 @@ class TimesheetIndex extends BaseComponent
 
 
         $this->dispatch('closemodal');
+        $this->buildAttendanceCalendar();
         $this->resetLoaded();
     }
 
@@ -895,7 +896,7 @@ class TimesheetIndex extends BaseComponent
 
         $this->toast('Request rejected successfully!', 'error');
         $this->resetLoaded();
-
+        $this->buildAttendanceCalendar();
         $this->dispatch('closemodal');
     }
 

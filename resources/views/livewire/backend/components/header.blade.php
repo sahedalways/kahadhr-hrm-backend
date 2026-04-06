@@ -161,7 +161,7 @@
                                          class="avatar-img">
                                 </div>
 
-                                <i class="fa-solid fa-caret-down"></i>
+                                <i class="fa-solid fa-caret-down text-light"></i>
                             </div>
 
                             <style>

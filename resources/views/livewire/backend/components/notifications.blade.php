@@ -101,7 +101,14 @@
                             'company' => $companySubDomain,
                             'id' => $notification['notifiable_id'] ?? null,
                         ]);
-                    } elseif (in_array($notification['type'], ['late_clock_in', 'late_clock_out', 'early_clock_out'])) {
+                    } elseif (
+                        in_array($notification['type'], [
+                            'late_clock_in',
+                            'late_clock_out',
+                            'early_clock_out',
+                            'early_clock_in',
+                        ])
+                    ) {
                         $route = route('company.dashboard.timesheet.index', [
                             'company' => $companySubDomain,
                             'id' => $notification['notifiable_id'] ?? null,

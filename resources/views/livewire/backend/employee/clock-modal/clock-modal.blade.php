@@ -42,13 +42,15 @@
                             <div class="mb-2">
                                 <input type="text"
                                        class="form-control"
-                                       placeholder="Enter reason for late"
+                                       placeholder="Enter reason for {{ $clockInType ?? 'late' }} clock in"
                                        wire:model.defer="clockInReason">
                                 @error('clockInReason')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                         @endif
+
+
                         @if ($showClockInButton)
                             <button type="button"
                                     wire:click="clockIn"
@@ -69,13 +71,6 @@
                             </button>
                         @endif
 
-                        @if (!$showClockInButton || !$showClockOutReason)
-                            <small class="text-muted fst-italic mt-1"
-                                   style="font-size: 0.75rem;">
-                                <i class="bi bi-info-circle"></i> You can clock in within
-                                {{ config('attendance.grace_minutes', 15) }} minutes grace period
-                            </small>
-                        @endif
 
                         @if ($showClockOutReason)
                             <div class="mb-2">
@@ -90,27 +85,34 @@
                         @endif
 
 
+
+
                         @if ($showClockOutButton)
-                            <button type="button"
-                                    onclick="confirmClockOut()"
-                                    wire:loading.attr="disabled"
-                                    wire:target="clockOut"
-                                    class="btn btn-app-clock-out btn-lg">
-
-                                <!-- Normal Text -->
-                                <span wire:loading.remove
-                                      wire:target="clockOut">
+                            @if ($showClockOutReason)
+                                <button type="button"
+                                        wire:click="clockOut"
+                                        wire:loading.attr="disabled"
+                                        wire:target="clockOut"
+                                        class="btn btn-app-clock-out btn-lg">
+                                    <span wire:loading.remove
+                                          wire:target="clockOut">
+                                        <i class="bi bi-box-arrow-left me-2"></i> CLOCK OUT
+                                    </span>
+                                    <span wire:loading
+                                          wire:target="clockOut">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Processing...
+                                    </span>
+                                </button>
+                            @else
+                                <button type="button"
+                                        onclick="confirmClockOut()"
+                                        class="btn btn-app-clock-out btn-lg">
                                     <i class="bi bi-box-arrow-left me-2"></i> CLOCK OUT
-                                </span>
-
-                                <!-- Loading State -->
-                                <span wire:loading
-                                      wire:target="clockOut">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Processing...
-                                </span>
-                            </button>
+                                </button>
+                            @endif
                         @endif
+
 
                     </div>
                     <input type="hidden"

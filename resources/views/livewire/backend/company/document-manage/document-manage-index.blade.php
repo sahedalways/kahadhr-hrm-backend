@@ -222,7 +222,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h6 class="modal-title fw-600"></h6>
+                    <h6 class="modal-title fw-600">Assign Document</h6>
                     <button type="button"
                             class="btn btn-light"
                             data-bs-dismiss="modal">
@@ -237,6 +237,7 @@
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Document Name </label>
                                 <input type="text"
+                                       placeholder="Enter document name"
                                        class="form-control"
                                        wire:model="name">
                                 @error('name')

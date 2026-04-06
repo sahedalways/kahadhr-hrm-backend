@@ -69,6 +69,13 @@
                             </button>
                         @endif
 
+                        @if (!$showClockInButton || !$showClockOutReason)
+                            <small class="text-muted fst-italic mt-1"
+                                   style="font-size: 0.75rem;">
+                                <i class="bi bi-info-circle"></i> You can clock in within
+                                {{ config('attendance.grace_minutes', 15) }} minutes grace period
+                            </small>
+                        @endif
 
                         @if ($showClockOutReason)
                             <div class="mb-2">

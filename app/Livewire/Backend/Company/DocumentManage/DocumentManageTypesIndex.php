@@ -384,9 +384,9 @@ class DocumentManageTypesIndex extends BaseComponent
 
         ], [
             'file_path.required' => 'Please upload a file.',
-            'new_file.mimes' => 'The uploaded file must be a PDF or an image (jpg, jpeg, png, gif, webp, HEIC, HEIF).',
-            'new_file.max'   => 'The uploaded file size must not exceed 3 MB.',
-            'new_file.file'  => 'The uploaded file is not valid.',
+            'file_path.mimes' => 'The uploaded file must be a PDF or an image (jpg, jpeg, png, gif, webp, HEIC, HEIF).',
+            'file_path.max'   => 'The uploaded file size must not exceed 3 MB.',
+            'file_path.file'  => 'The uploaded file is not valid.',
         ]);
 
         if ($this->send_email) {

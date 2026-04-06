@@ -1,15 +1,31 @@
+@php
+
+    if (empty($dates) || count($dates) == 0) {
+        $dates = $this->dates;
+    }
+
+    $firstDate = $dates[0]['date'] ?? null;
+    $expectedFirstDate = $currentYear . '-' . str_pad($currentMonth, 2, '0', STR_PAD_LEFT) . '-01';
+
+    if ($firstDate != $expectedFirstDate) {
+        $dates = $this->dates;
+    }
+@endphp
+
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white d-flex justify-content-between align-items-center p-3">
-        <h5 class="mb-0">{{ $currentDate->format('F Y') }}</h5>
+        <h5 class="mb-0">
+            {{ Carbon\Carbon::create($currentYear, $currentMonth, 1)->format('F Y') }}
+        </h5>
         <div class="btn-group">
-            <a href="?year={{ $prevMonth->year }}&month={{ $prevMonth->month }}"
-               class="btn btn-sm btn-outline-secondary">
+            <button wire:click="changeMonth('prev')"
+                    class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-chevron-left"></i>
-            </a>
-            <a href="?year={{ $nextMonth->year }}&month={{ $nextMonth->month }}"
-               class="btn btn-sm btn-outline-secondary">
+            </button>
+            <button wire:click="changeMonth('next')"
+                    class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-chevron-right"></i>
-            </a>
+            </button>
         </div>
     </div>
 
@@ -33,18 +49,16 @@
                     </div>
                 @endforeach
             </div>
-
             @forelse($employees as $emp)
                 @if ($filterEmployeeId && $filterEmployeeId !== $emp->user_id)
                     @continue
                 @endif
 
                 <div class="timeline-grid timeline-row"
-                     wire:key="emp-{{ $emp->user_id }}"
-                     wire:ignore>
+                     wire:key="emp-{{ $emp->user_id }}">
                     <div class="employee-cell sticky-col border-bottom bg-white">
                         <div class="d-flex align-items-center p-2 gap-2 employee-clickable
-                            {{ $filterEmployeeId === $emp->user_id ? 'employee-active' : '' }}"
+                {{ $filterEmployeeId === $emp->user_id ? 'employee-active' : '' }}"
                              wire:click="filterByEmployee({{ $emp->user_id }})">
                             <img src="{{ $emp->avatar_url ?? 'https://ui-avatars.com/api/?name=' . $emp->full_name }}"
                                  class="rounded-circle border border-2 border-primary-subtle"
@@ -63,61 +77,48 @@
 
                                 <div class="text-end ms-auto d-flex align-items-center gap-2">
                                     @php
-                                        $currentViewYear = request()->get('year', now()->year);
-                                        $currentViewMonth = request()->get('month', now()->month);
+                                        $totalLeaveDays = 0;
 
-                                        $currentMonthLeaves = $emp->leaves->filter(function ($leave) use (
-                                            $currentViewYear,
-                                            $currentViewMonth,
+                                        $leavesCollection =
+                                            $filterEmployeeId === $emp->user_id
+                                                ? $approvedLeavesCollection->where('user_id', $emp->user_id)
+                                                : $emp->leaves;
+
+                                        $totalLeaveDays = $leavesCollection->sum(function ($leave) use (
+                                            $currentYear,
+                                            $currentMonth,
                                         ) {
-                                            $leaveStart = \Carbon\Carbon::parse($leave->start_date);
-                                            $leaveEnd = \Carbon\Carbon::parse($leave->end_date);
+                                            $start = \Carbon\Carbon::parse($leave->start_date)->startOfDay();
+                                            $end = \Carbon\Carbon::parse($leave->end_date)->startOfDay();
+
                                             $currentStart = \Carbon\Carbon::create(
-                                                $currentViewYear,
-                                                $currentViewMonth,
+                                                $currentYear,
+                                                $currentMonth,
                                                 1,
                                             )->startOfMonth();
                                             $currentEnd = \Carbon\Carbon::create(
-                                                $currentViewYear,
-                                                $currentViewMonth,
-                                                1,
-                                            )->endOfMonth();
-
-                                            return $leaveStart <= $currentEnd && $leaveEnd >= $currentStart;
-                                        });
-
-                                        $totalLeaveDays = $currentMonthLeaves->sum(function ($leave) {
-                                            $start = \Carbon\Carbon::parse($leave->start_date);
-                                            $end = \Carbon\Carbon::parse($leave->end_date);
-                                            $currentViewYear = request()->get('year', now()->year);
-                                            $currentViewMonth = request()->get('month', now()->month);
-
-                                            $currentStart = \Carbon\Carbon::create(
-                                                $currentViewYear,
-                                                $currentViewMonth,
-                                                1,
-                                            )->startOfMonth();
-                                            $currentEnd = \Carbon\Carbon::create(
-                                                $currentViewYear,
-                                                $currentViewMonth,
+                                                $currentYear,
+                                                $currentMonth,
                                                 1,
                                             )->endOfMonth();
 
                                             $effectiveStart = $start->lt($currentStart) ? $currentStart : $start;
                                             $effectiveEnd = $end->gt($currentEnd) ? $currentEnd : $end;
 
-                                            if ($effectiveStart > $effectiveEnd) {
+                                            if ($effectiveStart->gt($effectiveEnd)) {
                                                 return 0;
                                             }
 
-                                            return $effectiveStart->diffInDays($effectiveEnd) + 1;
+                                            $days = $effectiveStart->diffInDays($effectiveEnd->copy()->startOfDay());
+                                            return round($days) + 1;
                                         });
                                     @endphp
 
                                     @if ($totalLeaveDays > 0)
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
                                             <i class="fas fa-plane-departure me-1"></i>
-                                            {{ $totalLeaveDays }} {{ Str::plural('Day', $totalLeaveDays) }}
+                                            {{ number_format($totalLeaveDays, 0) }}
+                                            {{ Str::plural('Day', $totalLeaveDays) }}
                                         </span>
                                     @endif
                                 </div>
@@ -127,8 +128,17 @@
 
                     @foreach ($dates as $d)
                         @php
-                            $leave = $emp->leaves->first(function ($l) use ($d) {
-                                return $l->start_date <= $d['date'] && $l->end_date >= $d['date'];
+
+                            $employeeLeaves = $this->approvedLeavesCollection->where('user_id', $emp->user_id);
+                            $cellDate = \Carbon\Carbon::parse($d['date'])->startOfDay();
+
+                            $leave = $employeeLeaves->first(function ($l) use ($cellDate, $emp) {
+                                $startDate = \Carbon\Carbon::parse($l->start_date)->startOfDay();
+                                $endDate = \Carbon\Carbon::parse($l->end_date)->endOfDay();
+
+                                $isInRange = $cellDate->gte($startDate) && $cellDate->lte($endDate);
+
+                                return $isInRange;
                             });
 
                             $isWeekend = $d['is_weekend'];
@@ -139,9 +149,10 @@
                             $cellClass .= $hasLeave ? 'has-leave ' : '';
 
                             $tooltipTitle = $hasLeave
-                                ? $leave->leaveType->name . ' (' . $leave->leaveType->emoji . ')'
+                                ? ($leave->leaveType->name ?? 'Leave') . ' (' . ($leave->leaveType->emoji ?? '🌴') . ')'
                                 : '';
                         @endphp
+
 
                         <div class="{{ $cellClass }}"
                              style="cursor: pointer; min-width: 45px;"
@@ -382,8 +393,7 @@
                             <input type="date"
                                    class="form-control"
                                    id="start_date"
-                                   wire:model="start_date"
-                                   min="{{ date('Y-m-d') }}">
+                                   wire:model="start_date">
                             @error('start_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -394,8 +404,7 @@
                             <input type="date"
                                    class="form-control"
                                    id="end_date"
-                                   wire:model="end_date"
-                                   min="{{ date('Y-m-d') }}">
+                                   wire:model="end_date">
                             @error('end_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror

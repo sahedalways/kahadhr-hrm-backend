@@ -50,7 +50,7 @@ class LeavesIndex extends BaseComponent
     public $yearlyLeaves = [];
     public $selectedEmployeeForYear;
 
-    protected $approvedLeavesCollection;
+    public $approvedLeavesCollection;
 
     public $totalAnnualHours = 0;
     public $usedAnnualHours = 0;
@@ -58,6 +58,11 @@ class LeavesIndex extends BaseComponent
     public $totalLeaveInLiewHours = 0;
     public $usedLeaveInLiewHours = 0;
     public $remainingLeaveInLiewHours = 0;
+
+    public $currentYear;
+    public $currentMonth;
+
+    public $dates = [];
 
     public function mount()
     {
@@ -67,20 +72,61 @@ class LeavesIndex extends BaseComponent
             abort(403, 'Company not found.');
         }
 
+
+        $this->currentYear = now()->year;
+        $this->currentMonth = now()->month;
+
+        $this->loadDates();
+
         if (request()->has('leave')) {
             $this->openLeaveId = request('leave');
             $this->viewRequestInfo($this->openLeaveId);
         }
 
         $this->loadApprovedLeaves();
+        $this->loadPendingRequests();
+
         $this->leaveTypes = LeaveType::all();
         $this->selectedYear = now()->year;
         $this->selectedEmployeeForYear = null;
     }
 
 
+    public function refreshData()
+    {
+        $this->loadApprovedLeaves();
+        $this->loadPendingRequests();
 
+        if ($this->filterEmployeeId) {
+            $this->calculateLeaveHours($this->filterEmployeeId);
+            $this->loadYearlyLeaveData($this->filterEmployeeId);
+        }
+    }
 
+    public function loadDates()
+    {
+        // Make sure currentYear and currentMonth are set
+        if (!$this->currentYear || !$this->currentMonth) {
+            $this->currentYear = now()->year;
+            $this->currentMonth = now()->month;
+        }
+
+        $startOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
+        $endOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->endOfMonth();
+
+        $this->dates = [];
+        $currentDate = $startOfMonth->copy();
+
+        while ($currentDate <= $endOfMonth) {
+            $this->dates[] = [
+                'date' => $currentDate->format('Y-m-d'),
+                'day' => $currentDate->day,
+                'letter' => $currentDate->format('D'),
+                'is_weekend' => in_array($currentDate->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY]),
+            ];
+            $currentDate->addDay();
+        }
+    }
 
     private function calculateLeaveHours($employeeId)
     {
@@ -94,8 +140,6 @@ class LeavesIndex extends BaseComponent
         $this->remainingLeaveInLiewHours = $balanceData['remaining_leave_in_liew_hours'];
     }
 
-
-
     private function resetLeaveHours()
     {
         $this->totalAnnualHours = 0;
@@ -106,35 +150,69 @@ class LeavesIndex extends BaseComponent
         $this->remainingLeaveInLiewHours = 0;
     }
 
-
-
     /**
-     * Load approved leaves once and store them
+     * Load approved leaves for the current selected month/year
      */
     public function loadApprovedLeaves()
     {
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
+        // Make sure currentYear and currentMonth are set
+        if (!$this->currentYear || !$this->currentMonth) {
+            $this->currentYear = now()->year;
+            $this->currentMonth = now()->month;
+        }
+
+        $startOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
+        $endOfMonth = Carbon::create($this->currentYear, $this->currentMonth, 1)->endOfMonth();
 
         $this->approvedLeavesCollection = LeaveRequest::with('leaveType', 'user.employee')
             ->where('company_id', $this->company->id)
             ->where('status', 'approved')
-            ->where(function ($query) use ($currentMonthStart, $currentMonthEnd) {
-                $query->whereBetween('start_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhereBetween('end_date', [$currentMonthStart, $currentMonthEnd])
-                    ->orWhere(function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                        $q->where('start_date', '<', $currentMonthStart)
-                            ->where('end_date', '>', $currentMonthEnd);
+            ->where(function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->whereBetween('start_date', [$startOfMonth, $endOfMonth])
+                    ->orWhereBetween('end_date', [$startOfMonth, $endOfMonth])
+                    ->orWhere(function ($q) use ($startOfMonth, $endOfMonth) {
+                        $q->where('start_date', '<', $startOfMonth)
+                            ->where('end_date', '>', $endOfMonth);
                     });
             })
             ->get();
+    }
 
+    public function loadPendingRequests()
+    {
         $this->leaveRequests = LeaveRequest::with('leaveType', 'user.employee')
             ->where('company_id', $this->company->id)
-            ->where('status', "pending")
+            ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
+    public function changeMonth($direction)
+    {
+        if ($direction === 'prev') {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->subMonth();
+        } else {
+            $date = Carbon::create($this->currentYear, $this->currentMonth, 1)->addMonth();
+        }
+
+        $this->currentYear = $date->year;
+        $this->currentMonth = $date->month;
+
+
+        // $this->resetPage();
+
+        $this->loadDates();
+        $this->loadApprovedLeaves();
+
+
+
+        if ($this->filterEmployeeId) {
+            $this->calculateLeaveHours($this->filterEmployeeId);
+            $this->loadYearlyLeaveData($this->filterEmployeeId);
+        }
+    }
+
+
 
     /**
      * Get paginated employees with their leaves
@@ -154,10 +232,15 @@ class LeavesIndex extends BaseComponent
 
         $employees = $query->paginate($this->perPage);
 
-        // Attach leaves to employees
-        if ($this->approvedLeavesCollection) {
+        // Attach leaves to employees from approvedLeavesCollection
+        if ($this->approvedLeavesCollection && $this->approvedLeavesCollection->count() > 0) {
             $employees->getCollection()->transform(function ($emp) {
                 $emp->leaves = $this->approvedLeavesCollection->where('user_id', $emp->user_id);
+                return $emp;
+            });
+        } else {
+            $employees->getCollection()->transform(function ($emp) {
+                $emp->leaves = collect();
                 return $emp;
             });
         }
@@ -202,6 +285,7 @@ class LeavesIndex extends BaseComponent
         $this->calculateLeaveHours($employeeId);
     }
 
+
     public function changeYear($direction)
     {
         if ($direction === 'prev') {
@@ -242,13 +326,6 @@ class LeavesIndex extends BaseComponent
     {
         $this->dispatch('reload-page');
     }
-
-
-
-
-
-
-
 
 
     public function viewRequestInfo($id)
@@ -370,7 +447,7 @@ class LeavesIndex extends BaseComponent
 
         $this->toast('Request approved successfully!', 'success');
 
-        $this->dispatch('refresh-page-after-update');
+        $this->refreshData();
     }
 
 
@@ -491,7 +568,7 @@ class LeavesIndex extends BaseComponent
 
         $this->resetForm();
 
-        $this->dispatch('refresh-page-after-update');
+        $this->refreshData();
     }
 
 
@@ -674,7 +751,7 @@ class LeavesIndex extends BaseComponent
 
         $this->toast('Leave cancelled successfully!', 'success');
 
-        $this->dispatch('refresh-page-after-update');
+        $this->refreshData();
     }
 
 
@@ -775,16 +852,30 @@ class LeavesIndex extends BaseComponent
 
         $this->toast('Leave updated successfully!', 'success');
 
-        $this->dispatch('refresh-page-after-update');
+        $this->refreshData();
     }
 
     public function render()
     {
-        $employees = $this->employees;
+
+        if (empty($this->dates) || count($this->dates) == 0) {
+            $this->loadDates();
+        }
+
+
+        $this->loadDates();
+        $this->loadApprovedLeaves();
+
+        $employees = $this->getEmployeesProperty();
 
         return view('livewire.backend.company.leaves.leaves-index', [
             'employees' => $employees,
             'leaveRequests' => $this->leaveRequests,
+            'approvedLeavesCollection' => $this->approvedLeavesCollection,
+            'currentYear' => $this->currentYear,
+            'currentMonth' => $this->currentMonth,
+            'dates' => $this->dates,
+            'filterEmployeeId' => $this->filterEmployeeId,
         ]);
     }
 }

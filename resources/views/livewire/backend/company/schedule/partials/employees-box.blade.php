@@ -1,5 +1,12 @@
+@php
+    $availableEmployees = $shiftEmployees->filter(function ($emp) {
+        return !in_array($emp->id, $this->newShift['employees'] ?? []);
+    });
+@endphp
+
 <div class="row g-2 mb-3 shift-form-row"
-     x-data="{ showAddPanel: false }">
+     x-data="{ showAddPanel: false }"
+     @click.away="showAddPanel = false">
     <div class="col-3 pt-1">
         <label class="fw-semibold">Employees <span class="text-danger">*</span></label>
     </div>
@@ -7,6 +14,8 @@
     <div class="col-9">
         <div class="p-2 border rounded d-flex flex-wrap align-items-center gap-2"
              style="min-height: 50px; background-color: #f9f9f9;">
+
+            {{-- Selected Employees Show (যারা ইতিমধ্যে সিলেক্ট করা আছে) --}}
             @foreach ($this->selectedShiftEmployees as $employee)
                 @php
                     $isOnLeave = false;
@@ -56,15 +65,16 @@
 
             <div x-show="showAddPanel"
                  x-transition
-                 class="mt-2 w-100">
+                 class="mt-2 w-100"
+                 @click.away="showAddPanel = false">
                 <div class="card card-body p-0 shadow-sm">
                     <div class="input-group input-group-sm shift-employee-list">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                         <input type="text"
                                class="form-control"
                                placeholder="Search employees"
-                               wire:model="shiftEmployeeSearch"
-                               wire:keyup="set('shiftEmployeeSearch', $event.target.value)">
+                               wire:model.live="shiftEmployeeSearch"
+                               wire:keyup.debounce.300ms="set('shiftEmployeeSearch', $event.target.value)">
 
                         <span class="input-group-text">
                             <i wire:loading
@@ -76,12 +86,23 @@
                     <div class="list-group list-group-flush"
                          style="max-height: 200px; overflow-y: auto;">
                         <div class="list-group-item list-group-item-action bg-light fw-semibold small py-1">
-                            All employees ({{ $shiftEmployees->count() }})
+                            All employees ({{ $availableEmployees->count() }})
                         </div>
 
-                        @forelse ($shiftEmployees as $employee)
+                        {{-- শুধুমাত্র available employees দেখাবে (যারা সিলেক্ট করা নেই) --}}
+                        @forelse ($availableEmployees as $employee)
                             @php
-                                $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                                $isOnLeave = false;
+                                if (!empty($this->selectedDates)) {
+                                    foreach ($this->selectedDates as $date) {
+                                        if (hasLeave($employee->id, $date)) {
+                                            $isOnLeave = true;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    $isOnLeave = hasLeave($employee->id, $this->selectedDate);
+                                }
                             @endphp
                             <a href="#"
                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -97,12 +118,16 @@
                                 </div>
 
                                 <small class="{{ $isOnLeave ? 'text-danger' : 'text-success' }} fw-semibold">
-                                    {{ $isOnLeave ? 'Unavailable' : 'Available' }}
+                                    {{ $isOnLeave ? 'On Leave' : 'Available' }}
                                 </small>
                             </a>
                         @empty
                             <div class="list-group-item text-center text-muted">
-                                No available employees found.
+                                @if ($shiftEmployeeSearch)
+                                    No employees found matching "{{ $shiftEmployeeSearch }}"
+                                @else
+                                    All employees are already selected
+                                @endif
                             </div>
                         @endforelse
                     </div>

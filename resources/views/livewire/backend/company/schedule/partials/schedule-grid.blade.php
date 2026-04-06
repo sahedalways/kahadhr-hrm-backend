@@ -538,7 +538,7 @@
                                                     @endif
 
                                                     <!-- Breaks -->
-                                                    @if (!empty($content['breaks']))
+                                                    @if (isset($content['breaks']) && !empty($content['breaks']) && count($content['breaks']) > 0)
                                                         <div class="mb-0">
                                                             <div class="d-flex align-items-center mb-2">
                                                                 <i class="fas fa-coffee text-warning me-2"></i>
@@ -631,10 +631,8 @@
 
 
     @if ($showAddShiftPanel)
-        <div class="shift-panel-overlay"
-             wire:click="closeAddShiftPanel">
-            <div class="shift-panel"
-                 @click.stop>
+        <div class="shift-panel-overlay">
+            <div class="shift-panel">
 
                 {{-- HEADER --}}
                 <div
@@ -1380,6 +1378,7 @@
 
             document.querySelectorAll('.dropdown-schedule-celll').forEach(el => {
                 if (el !== dropdown) {
+
                     el.classList.add('d-none');
                     el.style.display = '';
                     el.style.position = '';
@@ -1426,6 +1425,41 @@
                     dropdown.style.left = '10px';
                     dropdown.style.right = 'auto';
                 }
+
+
+                const dropdownItems = dropdown.querySelectorAll('.dropdown-item');
+                dropdownItems.forEach(item => {
+
+                    item.style.setProperty('color', '#212529', 'important');
+                    item.style.setProperty('background-color', 'transparent', 'important');
+
+
+                    const newItem = item.cloneNode(true);
+                    item.parentNode.replaceChild(newItem, item);
+
+                    newItem.addEventListener('mouseenter', function(e) {
+                        if (this.classList.contains('text-danger')) {
+                            this.style.setProperty('background-color', '#fee2e2', 'important');
+                            this.style.setProperty('color', '#dc3545', 'important');
+                        } else {
+                            this.style.setProperty('background-color', '#f8f9fa', 'important');
+                            this.style.setProperty('color', '#212529', 'important');
+                        }
+                    });
+
+                    newItem.addEventListener('mouseleave', function(e) {
+                        if (this.classList.contains('text-danger')) {
+                            this.style.setProperty('background-color', 'transparent',
+                                'important');
+                            this.style.setProperty('color', '#dc3545', 'important');
+                        } else {
+                            this.style.setProperty('background-color', 'transparent',
+                                'important');
+                            this.style.setProperty('color', '#212529', 'important');
+                        }
+                    });
+                });
+
 
 
                 shiftBlock.classList.add('active-z');

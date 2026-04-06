@@ -598,7 +598,7 @@ class ScheduleIndex extends BaseComponent
             'newShift.title'      => 'required|string|max:255',
             'newShift.job'        => 'required|string|max:255',
             'newShift.start_time' => 'required|date_format:H:i',
-            'newShift.end_time'   => 'required|date_format:H:i|after:newShift.start_time',
+            'newShift.end_time'   => 'required|date_format:H:i',
         ], [
             'newShift.title.required' => 'Shift title is required.',
             'newShift.job.required'   => 'Job title is required.',
@@ -1871,8 +1871,22 @@ class ScheduleIndex extends BaseComponent
             $diff = $end->diffInMinutes($start, false);
             $diff = abs($diff);
 
-            $hours = floor($diff / 60);
-            $minutes = $diff % 60;
+
+            $unpaidMinutes = 0;
+            foreach ($this->newBreaks as $break) {
+                if (!empty($break['duration']) && strtolower($break['type'] ?? '') === 'unpaid') {
+                    $duration = (float) $break['duration'];
+                    $hours = floor($duration);
+                    $minutes = ($duration - $hours) * 100;
+                    $unpaidMinutes += ($hours * 60) + $minutes;
+                }
+            }
+
+            $totalMinutes = $diff - $unpaidMinutes;
+
+
+            $hours = floor($totalMinutes / 60);
+            $minutes = $totalMinutes % 60;
 
             $this->newShift['total_hours'] = sprintf('%02d:%02d', $hours, $minutes);
             $this->originalShiftTotalTime = $this->newShift['total_hours'];
@@ -1899,8 +1913,21 @@ class ScheduleIndex extends BaseComponent
             $diff = $end->diffInMinutes($start, false);
             $diff = abs($diff);
 
-            $hours = floor($diff / 60);
-            $minutes = $diff % 60;
+            $unpaidMinutes = 0;
+            foreach ($this->multipleShiftNewBreaks[$shiftIndex] ?? [] as $break) {
+                if (!empty($break['duration']) && strtolower($break['type'] ?? '') === 'unpaid') {
+                    $duration = (float) $break['duration'];
+                    $hours = floor($duration);
+                    $minutes = ($duration - $hours) * 100;
+                    $unpaidMinutes += ($hours * 60) + $minutes;
+                }
+            }
+
+
+            $totalMinutes = $diff - $unpaidMinutes;
+
+            $hours = floor($totalMinutes / 60);
+            $minutes = $totalMinutes % 60;
 
             $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $hours, $minutes);
 
@@ -2674,7 +2701,7 @@ class ScheduleIndex extends BaseComponent
         $this->validate([
             'newShift.title' => 'required|string',
             'newShift.start_time' => 'required|date_format:H:i',
-            'newShift.end_time' => 'required|date_format:H:i|after:newShift.start_time',
+            'newShift.end_time' => 'required|date_format:H:i',
             'newShift.employees' => 'required|array|min:1',
             'newShift.address' => 'nullable|string|max:255',
             'newShift.note' => 'nullable|string|max:500',
@@ -2885,7 +2912,12 @@ class ScheduleIndex extends BaseComponent
                 'note' => $this->newShift['note'],
             ]);
 
-            $shiftDate->employees()->sync($this->newShift['employees']);
+            $existingEmployees = $shiftDate->employees()->pluck('employee_id')->toArray();
+
+            $allEmployees = array_unique(array_merge($existingEmployees, $this->newShift['employees']));
+
+
+            $shiftDate->employees()->sync($allEmployees);
 
             $shiftDate->breaks()->delete();
 
@@ -2915,6 +2947,12 @@ class ScheduleIndex extends BaseComponent
         $this->dispatch('refreshSchedule');
         $this->toast('Shift Updated Successfully for ' . count($datesToProcess) . ' date(s)!', 'success');
     }
+
+
+
+
+
+
 
 
     private function getEmployeeWeeklyMinutesExcludingShift($employeeId, $date, $excludeShiftDateId = null): int

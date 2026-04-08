@@ -397,9 +397,17 @@
                             </div>
 
                             @error('instruction_file')
-                                <div class="text-danger mt-1"
-                                     style="font-size: 0.875rem;">{{ $message }}</div>
+                                <span class="text-danger mt-1"
+                                      style="font-size: 0.875rem;">
+                                    @if ($message == 'The instruction_file failed to upload.')
+                                        File is too large! Maximum allowed is 3MB.
+                                    @else
+                                        {{ $message }}
+                                    @endif
+                                </span>
                             @enderror
+
+
 
                             <div wire:loading
                                  wire:target="instruction_file"
@@ -688,10 +696,20 @@
                                    accept="application/pdf">
                         @endif
 
+
+
                         @error('instruction_file')
-                            <div class="text-danger mt-1"
-                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                            <span class="text-danger mt-1"
+                                  style="font-size: 0.875rem;">
+                                @if ($message == 'The instruction_file failed to upload.')
+                                    File is too large! Maximum allowed is 3MB.
+                                @else
+                                    {{ $message }}
+                                @endif
+                            </span>
                         @enderror
+
+
 
                         <div wire:loading
                              wire:target="instruction_file"

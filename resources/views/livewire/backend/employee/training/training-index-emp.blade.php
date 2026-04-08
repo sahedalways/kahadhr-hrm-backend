@@ -401,7 +401,15 @@
                            accept=".pdf, image/*">
 
                     @error('proofFile')
-                        <span class="text-danger">{{ $message }}</span>
+                        <span class="text-danger mt-1 d-block"
+                              style="font-size: 0.875rem;">
+
+                            @if (str_contains($message, 'failed to upload'))
+                                <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                            @else
+                                {{ $message }}
+                            @endif
+                        </span>
                     @enderror
                 </div>
 

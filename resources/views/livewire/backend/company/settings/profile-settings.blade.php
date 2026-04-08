@@ -299,9 +299,20 @@
                                                 GIF,
                                                 WebP, HEIC, HEIF
                                             </div>
+
+
+
                                             @error('company_logo')
-                                                <span class="text-danger small d-block mt-1">{{ $message }}</span>
+                                                <span class="text-danger small d-block mt-1">
+                                                    @if ($message == 'The company_logo failed to upload.')
+                                                        Image is too large! Maximum allowed is 3MB.
+                                                    @else
+                                                        {{ $message }}
+                                                    @endif
+                                                </span>
                                             @enderror
+
+
 
                                             @if ($company_logo)
                                                 <div class="mt-3 text-center">

@@ -60,6 +60,8 @@ class DocumentManageTypesIndex extends BaseComponent
 
     public $emailGatewayMissing = false;
 
+
+
     public function mount()
     {
         $this->employees = Employee::where('company_id', auth()->user()->company->id)
@@ -379,7 +381,7 @@ class DocumentManageTypesIndex extends BaseComponent
             'doc_type_id' => 'required',
             'expires_at' => 'nullable|date',
             'emp_id' => 'required|integer|exists:employees,id',
-            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp|max:3072',
+            'file_path' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp,heic,heif|max:3072',
             'send_email' => 'boolean',
 
         ], [

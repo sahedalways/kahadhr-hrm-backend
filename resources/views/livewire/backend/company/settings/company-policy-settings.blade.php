@@ -217,8 +217,15 @@
                                accept="application/pdf,image/jpeg,image/png">
 
                         @error('file')
-                            <div class="text-danger mt-1"
-                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                            <span class="text-danger mt-1 d-block"
+                                  style="font-size: 0.875rem;">
+
+                                @if (str_contains($message, 'failed to upload'))
+                                    <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                @else
+                                    {{ $message }}
+                                @endif
+                            </span>
                         @enderror
 
                         <div wire:loading
@@ -357,9 +364,17 @@
                                accept="application/pdf,image/jpeg,image/png">
 
                         @error('file')
-                            <div class="text-danger mt-1"
-                                 style="font-size: 0.875rem;">{{ $message }}</div>
+                            <span class="text-danger mt-1 d-block"
+                                  style="font-size: 0.875rem;">
+
+                                @if (str_contains($message, 'failed to upload'))
+                                    <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                @else
+                                    {{ $message }}
+                                @endif
+                            </span>
                         @enderror
+
 
                         <div wire:loading
                              wire:target="file"

@@ -1,5 +1,6 @@
 @push('styles')
-    <link href="{{ asset('assets/css/onboarding.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/onboarding.css') }}"
+          rel="stylesheet" />
 @endpush
 
 <div>
@@ -18,25 +19,31 @@
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <input type="text" class="form-control border-start-0" placeholder="Search by title"
-                                wire:model="search" wire:keyup="set('search', $event.target.value)">
+                            <input type="text"
+                                   class="form-control border-start-0"
+                                   placeholder="Search by title"
+                                   wire:model="search"
+                                   wire:keyup="set('search', $event.target.value)">
                         </div>
                     </div>
 
                     {{-- Sort + Add --}}
                     <div
-                        class="col-xl-4 col-md-7 d-flex justify-content-end gap-3 align-items-center flex-column flex-md-row">
+                         class="col-xl-4 col-md-7 d-flex justify-content-end gap-3 align-items-center flex-column flex-md-row">
 
 
-                        <select class="form-select ps-4" wire:change="handleSort($event.target.value)">
+                        <select class="form-select ps-4"
+                                wire:change="handleSort($event.target.value)">
                             <option value="desc">Newest First</option>
                             <option value="asc">Oldest First</option>
                         </select>
 
 
 
-                        <button data-bs-toggle="modal" data-bs-target="#addAnnouncement" wire:click="resetInputFields"
-                            class="btn btn-primary d-flex align-items-center w-100 justify-content-center">
+                        <button data-bs-toggle="modal"
+                                data-bs-target="#addAnnouncement"
+                                wire:click="resetInputFields"
+                                class="btn btn-primary d-flex align-items-center w-100 justify-content-center">
                             <i class="fa fa-plus me-2"></i>
                             <span class="text-nowrap"> Add Onboarding</span>
                         </button>
@@ -49,7 +56,8 @@
                         Showing results for: <strong>{{ $search ?: 'All Onboardings' }}</strong>
                     </p>
 
-                    <div wire:loading wire:target="search">
+                    <div wire:loading
+                         wire:target="search">
                         <span class="spinner-border spinner-border-sm text-primary"></span>
                         <span class="text-primary small ms-1">Searching...</span>
                     </div>
@@ -89,7 +97,7 @@
                                             'id' => $item->id,
                                             'company' => app('authUser')->company->sub_domain,
                                         ]) }}"
-                                            class="btn btn-primary btn-sm">
+                                           class="btn btn-primary btn-sm">
                                             View
                                         </a>
                                     </div>
@@ -102,14 +110,18 @@
                                     @endphp
 
                                     @if ($item->media && $isImage)
-                                        <img src="{{ asset('storage/' . $item->media) }}" class="card-img-top rounded"
-                                            alt="media">
+                                        <img src="{{ asset('storage/' . $item->media) }}"
+                                             class="card-img-top rounded"
+                                             alt="media">
                                     @elseif ($item->media && $isVideo)
-                                        <video class="w-100 rounded" controls>
-                                            <source src="{{ asset('storage/' . $item->media) }}" type="video/mp4">
+                                        <video class="w-100 rounded"
+                                               controls>
+                                            <source src="{{ asset('storage/' . $item->media) }}"
+                                                    type="video/mp4">
                                         </video>
                                     @elseif ($item->media && $isAudio)
-                                        <audio controls class="w-100">
+                                        <audio controls
+                                               class="w-100">
                                             <source src="{{ asset('storage/' . $item->media) }}">
                                         </audio>
                                     @else
@@ -128,7 +140,7 @@
                                 </div>
 
                                 <div
-                                    class="card-footer gap-4 flex-wrap bg-light border-0 d-flex justify-content-between align-items-center">
+                                     class="card-footer gap-4 flex-wrap bg-light border-0 d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="badge bg-secondary">
                                             @if (isset($item->creator) && $item->creator->user_type === 'company')
@@ -144,12 +156,13 @@
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-primary btn-sm" wire:click="edit({{ $item->id }})">
+                                        <button class="btn btn-primary btn-sm"
+                                                wire:click="edit({{ $item->id }})">
                                             <i class="fas fa-edit"></i>
                                         </button>
 
                                         <button class="btn btn-danger btn-sm"
-                                            wire:click.prevent="$dispatch('confirmDelete', {{ $item->id }})">
+                                                wire:click.prevent="$dispatch('confirmDelete', {{ $item->id }})">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -176,9 +189,12 @@
         {{-- Load More --}}
         @if ($hasMore)
             <div class="text-center mt-4">
-                <button class="btn btn-outline-light px-4 py-2" wire:click="loadMore">
+                <button class="btn btn-outline-light px-4 py-2"
+                        wire:click="loadMore">
                     Load More
-                    <span wire:loading wire:target="loadMore" class="spinner-border spinner-border-sm ms-2"></span>
+                    <span wire:loading
+                          wire:target="loadMore"
+                          class="spinner-border spinner-border-sm ms-2"></span>
                 </button>
             </div>
         @endif
@@ -186,13 +202,19 @@
     </div>
 
 
-    <div wire:ignore.self class="modal fade" id="addAnnouncement" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="addAnnouncement"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 {{-- Modal Header --}}
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Add New Announcement</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal"
+                            data-bs-dismiss="modal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -204,7 +226,9 @@
                             {{-- Title --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="title">
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model="title">
                                 @error('title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -214,7 +238,8 @@
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Description <span class="text-danger">*</span></label>
                                 <div wire:ignore>
-                                    <div id="editorDetails" style="height: 130px; background: #fff;">
+                                    <div id="editorDetails"
+                                         style="height: 130px; background: #fff;">
 
                                     </div>
                                 </div>
@@ -226,12 +251,29 @@
                             {{-- Media --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Media (Image / Video / Audio)</label>
-                                <input type="file" class="form-control" wire:model="mediaFile"
-                                    accept="image/*,video/*,audio/*">
+                                <input type="file"
+                                       class="form-control"
+                                       wire:model="mediaFile"
+                                       accept="image/*,video/*,audio/*">
+
                                 @error('mediaFile')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger mt-1 d-block"
+                                          style="font-size: 0.875rem;">
+
+                                        @if (str_contains($message, 'failed to upload'))
+                                            <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                        @else
+                                            {{ $message }}
+                                        @endif
+                                    </span>
                                 @enderror
-                                <div wire:loading wire:target="mediaFile" class="small text-primary mt-1">
+
+
+
+
+                                <div wire:loading
+                                     wire:target="mediaFile"
+                                     class="small text-primary mt-1">
                                     <i class="fas fa-spinner fa-spin"></i> Uploading...
                                 </div>
 
@@ -253,28 +295,33 @@
                                     @endphp
 
                                     <div class="border rounded p-2 position-relative mt-2"
-                                        style="width: 180px; text-align:center;">
+                                         style="width: 180px; text-align:center;">
                                         @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                            <img src="{{ $fileUrl }}" class="img-fluid rounded"
-                                                style="height: 100px; object-fit: cover;">
+                                            <img src="{{ $fileUrl }}"
+                                                 class="img-fluid rounded"
+                                                 style="height: 100px; object-fit: cover;">
                                             <p class="small mb-0">{{ $shortName }}</p>
                                         @elseif (strtolower($extension) === 'pdf')
-                                            <a href="{{ $fileUrl }}" target="_blank"
-                                                class="d-block text-decoration-none">
+                                            <a href="{{ $fileUrl }}"
+                                               target="_blank"
+                                               class="d-block text-decoration-none">
                                                 <i class="fas fa-file-pdf fa-2x text-danger"></i>
                                                 <p class="small mb-0">{{ $shortName }}</p>
                                             </a>
                                         @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
-                                            <video width="100%" height="100" controls>
+                                            <video width="100%"
+                                                   height="100"
+                                                   controls>
                                                 <source src="{{ $fileUrl }}"
-                                                    type="video/{{ strtolower($extension) }}">
+                                                        type="video/{{ strtolower($extension) }}">
                                                 Your browser does not support the video tag.
                                             </video>
                                             <p class="small mb-0">{{ $shortName }}</p>
                                         @elseif (in_array(strtolower($extension), ['mp3', 'wav', 'ogg']))
-                                            <audio controls class="w-100 mt-1">
+                                            <audio controls
+                                                   class="w-100 mt-1">
                                                 <source src="{{ $fileUrl }}"
-                                                    type="audio/{{ strtolower($extension) }}">
+                                                        type="audio/{{ strtolower($extension) }}">
                                                 Your browser does not support the audio element.
                                             </audio>
                                             <p class="small mb-0">{{ $shortName }}</p>
@@ -292,17 +339,22 @@
 
                     {{-- Footer --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm"
-                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button"
+                                class="btn btn-secondary btn-sm"
+                                data-bs-dismiss="modal">Cancel</button>
 
 
 
-                        <button type="submit" class="btn btn-success btn-sm" wire:loading.attr="disabled"
-                            wire:target="save">
-                            <span wire:loading wire:target="save">
+                        <button type="submit"
+                                class="btn btn-success btn-sm"
+                                wire:loading.attr="disabled"
+                                wire:target="save">
+                            <span wire:loading
+                                  wire:target="save">
                                 <i class="fas fa-spinner fa-spin me-2"></i> Saving...
                             </span>
-                            <span wire:loading.remove wire:target="save">Save</span>
+                            <span wire:loading.remove
+                                  wire:target="save">Save</span>
                         </button>
                     </div>
                 </form>
@@ -314,13 +366,19 @@
 
 
 
-    <div wire:ignore.self class="modal fade" id="editAnnouncement" data-bs-backdrop="static">
+    <div wire:ignore.self
+         class="modal fade"
+         id="editAnnouncement"
+         data-bs-backdrop="static">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 {{-- Header --}}
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Edit Announcement</h6>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="close">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal"
+                            aria-label="close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -332,7 +390,9 @@
                             {{-- Title --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" wire:model="title">
+                                <input type="text"
+                                       class="form-control"
+                                       wire:model="title">
                                 @error('title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -342,7 +402,8 @@
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Description <span class="text-danger">*</span></label>
                                 <div wire:ignore>
-                                    <div id="editorDetailsEdit" style="height: 130px; background: #fff;">
+                                    <div id="editorDetailsEdit"
+                                         style="height: 130px; background: #fff;">
                                         {!! $description !!}
                                     </div>
                                 </div>
@@ -354,12 +415,24 @@
                             {{-- Media --}}
                             <div class="col-md-12 mb-2">
                                 <label class="form-label">Media (Image / Video / Audio)</label>
-                                <input type="file" class="form-control" wire:model="mediaFile"
-                                    accept="image/*,video/*,audio/*">
+                                <input type="file"
+                                       class="form-control"
+                                       wire:model="mediaFile"
+                                       accept="image/*,video/*,audio/*">
                                 @error('mediaFile')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger mt-1 d-block"
+                                          style="font-size: 0.875rem;">
+
+                                        @if (str_contains($message, 'failed to upload'))
+                                            <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                        @else
+                                            {{ $message }}
+                                        @endif
+                                    </span>
                                 @enderror
-                                <div wire:loading wire:target="mediaFile" class="small text-primary mt-1">
+                                <div wire:loading
+                                     wire:target="mediaFile"
+                                     class="small text-primary mt-1">
                                     <i class="fas fa-spinner fa-spin"></i> Uploading...
                                 </div>
 
@@ -382,28 +455,33 @@
                                     @endphp
 
                                     <div class="border rounded p-2 position-relative mt-2"
-                                        style="width: 180px; text-align:center;">
+                                         style="width: 180px; text-align:center;">
                                         @if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                            <img src="{{ $fileUrl }}" class="img-fluid rounded"
-                                                style="height: 100px; object-fit: cover;">
+                                            <img src="{{ $fileUrl }}"
+                                                 class="img-fluid rounded"
+                                                 style="height: 100px; object-fit: cover;">
                                             <p class="small mb-0">{{ $shortName }}</p>
                                         @elseif (strtolower($extension) === 'pdf')
-                                            <a href="{{ $fileUrl }}" target="_blank"
-                                                class="d-block text-decoration-none">
+                                            <a href="{{ $fileUrl }}"
+                                               target="_blank"
+                                               class="d-block text-decoration-none">
                                                 <i class="fas fa-file-pdf fa-2x text-danger"></i>
                                                 <p class="small mb-0">{{ $shortName }}</p>
                                             </a>
                                         @elseif (in_array(strtolower($extension), ['mp4', 'mov', 'webm', 'ogg']))
-                                            <video width="100%" height="100" controls>
+                                            <video width="100%"
+                                                   height="100"
+                                                   controls>
                                                 <source src="{{ $fileUrl }}"
-                                                    type="video/{{ strtolower($extension) }}">
+                                                        type="video/{{ strtolower($extension) }}">
                                                 Your browser does not support the video tag.
                                             </video>
                                             <p class="small mb-0">{{ $shortName }}</p>
                                         @elseif (in_array(strtolower($extension), ['mp3', 'wav', 'ogg']))
-                                            <audio controls class="w-100 mt-1">
+                                            <audio controls
+                                                   class="w-100 mt-1">
                                                 <source src="{{ $fileUrl }}"
-                                                    type="audio/{{ strtolower($extension) }}">
+                                                        type="audio/{{ strtolower($extension) }}">
                                                 Your browser does not support the audio element.
                                             </audio>
                                             <p class="small mb-0">{{ $shortName }}</p>
@@ -418,12 +496,17 @@
 
                     {{-- Footer --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success btn-sm" wire:loading.attr="disabled"
-                            wire:target="update,media">
-                            <span wire:loading wire:target="update"><i
-                                    class="fas fa-spinner fa-spin me-2"></i>Updating...</span>
-                            <span wire:loading.remove wire:target="update">Update</span>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-success btn-sm"
+                                wire:loading.attr="disabled"
+                                wire:target="update,media">
+                            <span wire:loading
+                                  wire:target="update"><i class="fas fa-spinner fa-spin me-2"></i>Updating...</span>
+                            <span wire:loading.remove
+                                  wire:target="update">Update</span>
                         </button>
                     </div>
                 </form>

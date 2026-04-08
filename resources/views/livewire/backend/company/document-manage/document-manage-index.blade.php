@@ -274,7 +274,13 @@
                                        wire:model="file_path"
                                        accept="application/pdf">
                                 @error('file_path')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        @if ($message == 'The file_path failed to upload.')
+                                            File size is too large! Maximum allowed is 3MB.
+                                        @else
+                                            {{ $message }}
+                                        @endif
+                                    </span>
                                 @enderror
                             </div>
 
@@ -408,7 +414,13 @@
                                        wire:model="file_path"
                                        accept="application/pdf">
                                 @error('file_path')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        @if ($message == 'The file_path failed to upload.')
+                                            File size is too large! Maximum allowed is 3MB.
+                                        @else
+                                            {{ $message }}
+                                        @endif
+                                    </span>
                                 @enderror
                             </div>
 

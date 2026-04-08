@@ -569,14 +569,21 @@
                                        wire:model="file_path"
                                        accept="application/pdf, image/*">
                                 @error('file_path')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        @if ($message == 'The file_path failed to upload.')
+                                            File size is too large! Maximum allowed is 3MB.
+                                        @else
+                                            {{ $message }}
+                                        @endif
+                                    </span>
                                 @enderror
                             </div>
 
                             <div class="mt-2 small fst-italic text-secondary">
                                 <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
                                 <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
-                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG, GIF, WebP
+                                <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG, GIF, WebP,
+                                HEIC, HEIF
                             </div>
 
 
@@ -813,9 +820,22 @@
                                            wire:model="new_file"
                                            accept="application/pdf, image/*">
 
-                                    @error('new_file')
-                                        <span class="text-danger">{{ $message }}</span>
+                                    @error('file_path')
+                                        <span class="text-danger">
+                                            @if ($message == 'The file_path failed to upload.')
+                                                File size is too large! Maximum allowed is 3MB.
+                                            @else
+                                                {{ $message }}
+                                            @endif
+                                        </span>
                                     @enderror
+                                    <div class="mt-2 small fst-italic text-secondary">
+                                        <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                                        <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
+                                        <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG, GIF,
+                                        WebP,
+                                        HEIC, HEIF
+                                    </div>
 
                                     @if ($new_file)
                                         <div class="small text-success mt-1">

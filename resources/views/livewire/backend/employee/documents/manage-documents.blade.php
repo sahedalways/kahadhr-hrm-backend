@@ -672,9 +672,16 @@
 
 
                                     @error('file_path')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
+                                        <span class="text-danger mt-1 d-block"
+                                              style="font-size: 0.875rem;">
 
+                                            @if (str_contains($message, 'failed to upload'))
+                                                <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                            @else
+                                                {{ $message }}
+                                            @endif
+                                        </span>
+                                    @enderror
                                     @if ($file_path)
                                         <div class="mt-2 small text-success">
                                             {{ $file_path->getClientOriginalName() }}

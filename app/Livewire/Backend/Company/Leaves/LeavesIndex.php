@@ -371,7 +371,6 @@ class LeavesIndex extends BaseComponent
 
 
 
-
         if (in_array($request->leave_type_id, [2, 3, 4, 6])) {
             if ($request->leave_type_id != 4) {
                 if (!$this->paidStatus || !in_array($this->paidStatus, ['paid', 'unpaid'])) {
@@ -537,6 +536,11 @@ class LeavesIndex extends BaseComponent
         if ($request->leave_type_id == 5) {
             $leaveBalance->used_leave_in_liew = ($leaveBalance->used_leave_in_liew ?? 0) + $totalHours;
         }
+
+
+        $leaveBalance->save();
+
+
         $leaveTypeName = optional($request->leaveType)->name ?? 'Leave';
         $message = "{$leaveTypeName} request approved for you.";
 

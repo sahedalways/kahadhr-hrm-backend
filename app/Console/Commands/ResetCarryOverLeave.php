@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CalendarYearSetting;
 use Illuminate\Console\Command;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
@@ -19,10 +20,22 @@ class ResetCarryOverLeave extends Command
         $employees = Employee::withoutGlobalScopes()->get();
 
         foreach ($employees as $employee) {
-            $joinDate = Carbon::parse($employee->start_date);
-            $oneYearLater = $joinDate->copy()->addYear();
 
-            if ($today->equalTo($oneYearLater) || $today->gt($oneYearLater)) {
+            $calendarSetting = CalendarYearSetting::where('company_id', $employee->company_id)->first();
+
+            $calendarType = $calendarSetting->calendar_year ?? 'english';
+
+            $resetDate = null;
+
+            if ($calendarType === 'english') {
+                $resetDate = Carbon::create($today->year, 1, 1);
+            }
+
+            if ($calendarType === 'hmrc') {
+                $resetDate = Carbon::create($today->year, 4, 1);
+            }
+
+            if ($today->equalTo($resetDate)) {
 
                 $leaveBalance = LeaveBalance::firstOrNew([
                     'user_id' => $employee->user_id,
@@ -30,19 +43,20 @@ class ResetCarryOverLeave extends Command
                 ]);
 
                 if ($leaveBalance->exists) {
+
+
                     if ($leaveBalance->carry_over_hours > 0) {
-                        $leaveBalance->total_leave_in_liew = $leaveBalance->total_leave_in_liew + $leaveBalance->carry_over_hours;
-                        $leaveBalance->used_annual_hours = 0;
-                        $leaveBalance->used_leave_in_liew = 0;
-                        $leaveBalance->carry_over_hours = 0;
-                    } else {
-                        $leaveBalance->used_annual_hours = 0;
-                        $leaveBalance->used_leave_in_liew = 0;
-                        $leaveBalance->carry_over_hours = 0;
+                        $leaveBalance->total_leave_in_liew += $leaveBalance->carry_over_hours;
                     }
 
+
+                    $leaveBalance->used_annual_hours = 0;
+                    $leaveBalance->used_leave_in_liew = 0;
+                    $leaveBalance->carry_over_hours = 0;
+
                     $leaveBalance->save();
-                    $this->info("Adjusted leave balance for employee ID: {$employee->user_id}");
+
+                    $this->info("Reset leave for employee ID: {$employee->user_id}");
                 }
             }
         }

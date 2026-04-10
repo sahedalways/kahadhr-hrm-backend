@@ -1033,4 +1033,34 @@
             Livewire.dispatch("refreshUnreadCount");
         });
     });
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const body = document.body;
+        const toggler = document.querySelector('.sidenav-toggler');
+
+
+        let sidebarState = localStorage.getItem('khr_sidebar_state');
+
+        if (sidebarState === 'collapsed') {
+            body.classList.add('g-sidenav-pinned');
+        } else {
+            body.classList.remove('g-sidenav-pinned');
+        }
+
+        if (toggler) {
+            toggler.addEventListener('click', function() {
+                setTimeout(() => {
+                    if (body.classList.contains('g-sidenav-pinned')) {
+                        localStorage.setItem('khr_sidebar_state', 'collapsed');
+                    } else {
+                        localStorage.setItem('khr_sidebar_state', 'expanded');
+                    }
+                }, 100);
+            });
+        }
+    });
 </script>

@@ -2520,7 +2520,12 @@ class ScheduleIndex extends BaseComponent
         foreach ($calendarShifts as $dateKey => $shifts) {
             foreach ($shifts as $shift) {
                 foreach ($shift['employees'] as $emp) {
-                    $calendarShiftsByEmployee[$emp['id']][$dateKey][] = $shift;
+
+                    $shiftWithColor = $shift;
+                    if (!isset($shiftWithColor['color']) && isset($shift['shift']['color'])) {
+                        $shiftWithColor['color'] = $shift['shift']['color'];
+                    }
+                    $calendarShiftsByEmployee[$emp['id']][$dateKey][] = $shiftWithColor;
                 }
             }
         }
@@ -2528,7 +2533,6 @@ class ScheduleIndex extends BaseComponent
         $employeesWithShifts = $employees->filter(function ($employee) use ($calendarShiftsByEmployee) {
             return isset($calendarShiftsByEmployee[$employee->id]) && !empty($calendarShiftsByEmployee[$employee->id]);
         });
-
 
         $startDate = Carbon::parse($this->startDate ?? now())->format('Y-m-d');
         $endDate = Carbon::parse($this->endDate ?? now())->format('Y-m-d');

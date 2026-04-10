@@ -95,23 +95,32 @@
                                 {{ $policy->title }}
                             </h5>
 
+
                             @php
-                                $descriptionText = strip_tags($policy->description);
-                                $descriptionLength = strlen($descriptionText);
-                                $needsTruncation = $descriptionLength > 120;
+                                $descriptionText = strip_tags(
+                                    $policy->description,
+                                    '<p><br><b><strong><i><em><u><ul><ol><li><h1><h2><h3><h4><h5><h6><span><div><font>',
+                                );
+                                $plainText = strip_tags($policy->description);
+                                $descriptionLength = strlen($plainText);
+                                $needsTruncation = $descriptionLength > 50;
                             @endphp
 
                             <div class="description-wrapper mb-3">
-                                <p class="card-text text-muted small mb-2 line-clamp-3"
-                                   id="description-{{ $policy->id }}"
-                                   style="display: -webkit-box; line-height: 1.5;">
-                                    {{ Str::limit($descriptionText, 120) }}
-                                </p>
-                                <p class="card-text text-muted small mb-2"
-                                   id="full-description-{{ $policy->id }}"
-                                   style="display: none; line-height: 1.5;">
-                                    {{ $descriptionText }}
-                                </p>
+
+                                <div class="card-text text-muted small mb-2 line-clamp-3"
+                                     id="description-{{ $policy->id }}"
+                                     style="display: block; line-height: 1.5; overflow: hidden; text-overflow: ellipsis;">
+                                    {!! Str::limit($descriptionText, 120) !!}
+                                </div>
+
+
+                                <div class="card-text text-muted small mb-2"
+                                     id="full-description-{{ $policy->id }}"
+                                     style="display: none; line-height: 1.5;">
+                                    {!! $descriptionText !!}
+                                </div>
+
                                 @if ($needsTruncation)
                                     <a href="javascript:void(0)"
                                        class="text-primary small text-decoration-none fw-semibold"
@@ -125,6 +134,7 @@
                                         </span>
                                     </a>
                                 @endif
+
                             </div>
 
                             {{-- File Preview if exists --}}
@@ -164,7 +174,8 @@
                                                     <i class="fas fa-file-pdf text-danger fs-1"></i>
                                                 </div>
                                                 <div>
-                                                    <small class="text-dark fw-semibold d-block">Policy Document</small>
+                                                    <small class="text-dark fw-semibold d-block">Policy
+                                                        Document</small>
                                                     <small class="text-muted">PDF • {{ $fileSize }}</small>
                                                 </div>
                                             </div>
@@ -181,7 +192,8 @@
                                                     <i class="fas fa-file-alt text-secondary fs-1"></i>
                                                 </div>
                                                 <div>
-                                                    <small class="text-dark fw-semibold d-block">Document File</small>
+                                                    <small class="text-dark fw-semibold d-block">Document
+                                                        File</small>
                                                     <small class="text-muted">{{ strtoupper($ext) }} •
                                                         {{ $fileSize }}</small>
                                                 </div>

@@ -49,7 +49,7 @@
 
             .blink-me {
                 animation: blink-animation 0.5s ease-in-out 2;
-                /* Blinks twice */
+
             }
         </style>
 
@@ -954,19 +954,19 @@
             display: none !important;
         }
 
-        /* Normal expanded sidebar */
+
         .navbar-vertical {
             overflow-y: auto;
             overflow-x: hidden;
         }
 
-        /* Collapsed sidebar */
+
         .g-sidenav-show.g-sidenav-pinned .navbar-vertical {
             max-width: 4rem !important;
             overflow: hidden !important;
         }
 
-        /* Prevent children from overflowing */
+
         .g-sidenav-show.g-sidenav-pinned .navbar-vertical *,
         .g-sidenav-show.g-sidenav-pinned .navbar-vertical .navbar-collapse,
         .g-sidenav-show.g-sidenav-pinned .navbar-vertical .navbar-nav {

@@ -97,23 +97,29 @@
 
 
                             @php
-                                $descriptionText = strip_tags($duty->description);
-                                $descriptionLength = strlen($descriptionText);
-                                $needsTruncation = $descriptionLength > 120;
+                                $descriptionText = strip_tags(
+                                    $duty->description,
+                                    '<p><br><b><strong><i><em><u><ul><ol><li><h1><h2><h3><h4><h5><h6><span><div><font>',
+                                );
+                                $plainText = strip_tags($duty->description);
+                                $descriptionLength = strlen($plainText);
+                                $needsTruncation = $descriptionLength > 50;
                             @endphp
 
                             <div class="description-wrapper mb-3">
-                                <p class="card-text text-muted small mb-2 line-clamp-3"
-                                   id="description-{{ $duty->id }}"
-                                   style="display: -webkit-box; line-height: 1.5;">
-                                    {{ Str::limit($descriptionText, 120) }}
-                                </p>
+                                <!-- Truncated version with HTML -->
+                                <div class="card-text text-muted small mb-2 line-clamp-3"
+                                     id="description-{{ $duty->id }}"
+                                     style="display: block; line-height: 1.5; overflow: hidden; text-overflow: ellipsis;">
+                                    {!! Str::limit($descriptionText, 120) !!}
+                                </div>
 
-                                <p class="card-text text-muted small mb-2"
-                                   id="full-description-{{ $duty->id }}"
-                                   style="display: none; line-height: 1.5;">
-                                    {{ $descriptionText }}
-                                </p>
+
+                                <div class="card-text text-muted small mb-2"
+                                     id="full-description-{{ $duty->id }}"
+                                     style="display: none; line-height: 1.5;">
+                                    {!! $descriptionText !!}
+                                </div>
 
                                 @if ($needsTruncation)
                                     <a href="javascript:void(0)"
@@ -161,7 +167,7 @@
                                                     <i class="fas fa-file-pdf text-danger fs-1"></i>
                                                 </div>
                                                 <div>
-                                                    <small class="text-dark fw-semibold d-block">Legal Document</small>
+                                                    <small class="text-dark fw-semibold d-block">Duty Document</small>
                                                     <small class="text-muted">PDF • {{ $fileSize }}</small>
                                                 </div>
                                             </div>

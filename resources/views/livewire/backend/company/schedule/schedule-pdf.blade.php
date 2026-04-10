@@ -1,6 +1,25 @@
 <?php
-// Set headers at the very beginning
+
 header('Content-Type: text/html; charset=utf-8');
+
+function getContrastColor($hexColor)
+{
+    $hexColor = ltrim($hexColor, '#');
+
+    if (strlen($hexColor) == 3) {
+        $r = hexdec(substr($hexColor, 0, 1) . substr($hexColor, 0, 1));
+        $g = hexdec(substr($hexColor, 1, 1) . substr($hexColor, 1, 1));
+        $b = hexdec(substr($hexColor, 2, 1) . substr($hexColor, 2, 1));
+    } else {
+        $r = hexdec(substr($hexColor, 0, 2));
+        $g = hexdec(substr($hexColor, 2, 2));
+        $b = hexdec(substr($hexColor, 4, 2));
+    }
+
+    $luminance = 0.299 * $r + 0.587 * $g + 0.114 * $b;
+
+    return $luminance > 128 ? '#000000' : '#ffffff';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,9 +64,8 @@ header('Content-Type: text/html; charset=utf-8');
             padding: 10px 5px;
         }
 
+
         .shift-box {
-            background-color: #000;
-            color: #fff;
             padding: 4px;
             border-radius: 4px;
             font-size: 8px;
@@ -61,7 +79,7 @@ header('Content-Type: text/html; charset=utf-8');
             margin-bottom: 2px;
         }
 
-        /* Ensure proper character rendering */
+
         .utf8-safe {
             unicode-bidi: embed;
             direction: ltr;
@@ -136,8 +154,17 @@ header('Content-Type: text/html; charset=utf-8');
                                         $endTime = isset($shift['end_time'])
                                             ? \Carbon\Carbon::parse($shift['end_time'])->format('g:i A')
                                             : '';
+
+                                        $shiftColor = isset($shift['color'])
+                                            ? $shift['color']
+                                            : (isset($shift['shift']['color'])
+                                                ? $shift['shift']['color']
+                                                : '#3366ff');
+
+                                        $textColor = getContrastColor($shiftColor);
                                     @endphp
-                                    <div class="shift-box">
+                                    <div class="shift-box"
+                                         style="background-color: {{ $shiftColor }}; color: {{ $textColor }};">
                                         <span class="shift-title">{{ $shiftTitle }}</span>
                                         @if ($startTime && $endTime)
                                             {{ $startTime }} - {{ $endTime }}

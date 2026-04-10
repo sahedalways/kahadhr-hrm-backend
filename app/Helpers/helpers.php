@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\SubscriptionHelper;
+use App\Models\CalendarYearSetting;
 use App\Models\ChatMessage;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
@@ -524,5 +525,17 @@ if (!function_exists('formatMinutesToHours')) {
       $end = Carbon::parse($date1)->startOfDay();
       return $today->greaterThan($end) ? 0 : (int) ceil($today->diffInDays($end, false));
     }
+  }
+
+
+  /**
+   * Get company's calendar setting
+   *
+   * @param int $companyId
+   * @return object|null
+   */
+  function getCompanyCalendarSetting($companyId)
+  {
+    return CalendarYearSetting::where('company_id', $companyId)->first();
   }
 }

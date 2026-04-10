@@ -87,8 +87,27 @@ class LeavesIndex extends BaseComponent
         $this->loadPendingRequests();
 
         $this->leaveTypes = LeaveType::all();
-        $this->selectedYear = now()->year;
+
+        $calendarType = $this->getCompanyCalendarType();
+        $currentDate = Carbon::now();
+        if ($calendarType === 'hmrc') {
+            $this->selectedYear = $currentDate->month >= 4 ? $currentDate->year : $currentDate->year - 1;
+        } else {
+            $this->selectedYear = $currentDate->year;
+        }
+
         $this->selectedEmployeeForYear = null;
+    }
+
+
+
+
+    private function getCompanyCalendarType()
+    {
+        $calendarSetting = getCompanyCalendarSetting(auth()->user()->company->id);
+        $calendarType = $calendarSetting->calendar_year ?? 'english';
+
+        return $calendarType;
     }
 
 
@@ -278,6 +297,16 @@ class LeavesIndex extends BaseComponent
             return;
         }
 
+
+        $calendarType = $this->getCompanyCalendarType();
+        $currentDate = Carbon::now();
+
+        if ($calendarType === 'hmrc') {
+            $this->selectedYear = $currentDate->month >= 4 ? $currentDate->year : $currentDate->year - 1;
+        } else {
+            $this->selectedYear = $currentDate->year;
+        }
+
         $this->filterEmployeeId = $employeeId;
         $this->selectedYear = now()->year;
         $this->loadYearlyLeaveData($employeeId);
@@ -302,13 +331,23 @@ class LeavesIndex extends BaseComponent
     public function loadYearlyLeaveData($employeeId)
     {
         $this->selectedEmployeeForYear = $employeeId;
+        $calendarType = $this->getCompanyCalendarType();
+
+
+        if ($calendarType === 'hmrc') {
+            $startDate = Carbon::create($this->selectedYear, 4, 1)->startOfDay();
+            $endDate = Carbon::create($this->selectedYear + 1, 3, 31)->endOfDay();
+        } else {
+            $startDate = Carbon::create($this->selectedYear, 1, 1)->startOfDay();
+            $endDate = Carbon::create($this->selectedYear, 12, 31)->endOfDay();
+        }
+
+
 
         $this->yearlyLeaves = LeaveRequest::where('user_id', $employeeId)
             ->where('status', 'approved')
-            ->where(function ($query) {
-                $query->whereYear('start_date', $this->selectedYear)
-                    ->orWhereYear('end_date', $this->selectedYear);
-            })
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->orWhereBetween('end_date', [$startDate, $endDate])
             ->with('leaveType')
             ->get()
             ->map(function ($leave) {
@@ -318,6 +357,7 @@ class LeavesIndex extends BaseComponent
                     'type' => $leave->leaveType->name,
                     'emoji' => $leave->leaveType->emoji,
                     'color' => $leave->leaveType->color,
+                    'id' => $leave->id,
                 ];
             });
     }

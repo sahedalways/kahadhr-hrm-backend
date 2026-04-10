@@ -4,6 +4,8 @@
      @endpush
 
 
+
+
      @if ($filterEmployeeId && $selectedEmployeeForYear)
          <div class="col-12 mb-4">
              <div class="card border-0 shadow-sm">
@@ -175,6 +177,10 @@
      @endif
 
      @if ($filterEmployeeId && $selectedEmployeeForYear)
+         @php
+             $calendarType = getCompanyCalendarSetting(auth()->user()->company->id);
+         @endphp
+
          <div class="col-12">
              <div class="card shadow-sm mb-4">
                  <div class="card-header bg-white p-3">
@@ -199,8 +205,13 @@
                                      <i class="fas fa-chevron-left"></i>
                                  </button>
 
+
                                  <span class="px-3 fw-bold text-primary border-start border-end">
-                                     {{ $selectedYear }}
+                                     @if ($calendarType === 'hmrc')
+                                         {{ $selectedYear }}-{{ $selectedYear + 1 }}
+                                     @else
+                                         {{ $selectedYear }}
+                                     @endif
                                  </span>
 
                                  <button wire:click="changeYear('next')"
@@ -220,43 +231,91 @@
              </div>
 
              <div class="card-body">
-                 {{-- Year Calendar Grid --}}
+
                  <div class="year-calendar-grid">
                      @php
-                         $months = [];
-                         for ($m = 1; $m <= 12; $m++) {
-                             $months[] = \Carbon\Carbon::create($selectedYear, $m, 1);
+                         $calendarType = $this->getCompanyCalendarType();
+
+                         if ($calendarType === 'hmrc') {
+                             $months = [
+                                 4 => 'April',
+                                 5 => 'May',
+                                 6 => 'June',
+                                 7 => 'July',
+                                 8 => 'August',
+                                 9 => 'September',
+                                 10 => 'October',
+                                 11 => 'November',
+                                 12 => 'December',
+                                 1 => 'January',
+                                 2 => 'February',
+                                 3 => 'March',
+                             ];
+                             $yearMapping = [
+                                 4 => $selectedYear,
+                                 5 => $selectedYear,
+                                 6 => $selectedYear,
+                                 7 => $selectedYear,
+                                 8 => $selectedYear,
+                                 9 => $selectedYear,
+                                 10 => $selectedYear,
+                                 11 => $selectedYear,
+                                 12 => $selectedYear,
+                                 1 => $selectedYear + 1,
+                                 2 => $selectedYear + 1,
+                                 3 => $selectedYear + 1,
+                             ];
+                         } else {
+                             $months = [
+                                 1 => 'January',
+                                 2 => 'February',
+                                 3 => 'March',
+                                 4 => 'April',
+                                 5 => 'May',
+                                 6 => 'June',
+                                 7 => 'July',
+                                 8 => 'August',
+                                 9 => 'September',
+                                 10 => 'October',
+                                 11 => 'November',
+                                 12 => 'December',
+                             ];
+                             $yearMapping = array_fill(1, 12, $selectedYear);
                          }
                      @endphp
 
                      <div class="row">
-                         @foreach ($months as $month)
+                         @foreach ($months as $monthNum => $monthName)
+                             @php
+                                 $displayYear = $yearMapping[$monthNum];
+                                 $month = Carbon\Carbon::create($displayYear, $monthNum, 1);
+                                 $daysInMonth = $month->daysInMonth;
+
+                                 $firstDayOfMonth = $month->copy()->startOfMonth();
+                                 $startOffset = $firstDayOfMonth->dayOfWeekIso - 1;
+                             @endphp
                              <div class="col-md-3 col-sm-6 mb-4">
-                                 <div class="month-card border rounded">
+                                 <div class="month-card border rounded h-100">
                                      <div class="month-header bg-light p-2 text-center fw-bold">
-                                         {{ $month->format('F') }}
+                                         {{ $monthName }} {{ $displayYear }}
                                      </div>
                                      <div class="month-days p-2">
-                                         @php
-                                             $daysInMonth = $month->daysInMonth;
-                                             $firstDayOfMonth = $month->copy()->startOfMonth();
-                                             $startOffset = $firstDayOfMonth->dayOfWeek;
-                                         @endphp
 
-                                         <div class="day-names d-grid"
+                                         <div class="day-names d-grid mb-1"
                                               style="grid-template-columns: repeat(7, 1fr);">
-                                             @foreach (['S', 'M', 'T', 'W', 'T', 'F', 'S'] as $day)
-                                                 <div class="text-center small text-muted">
-                                                     {{ $day }}
+                                             @foreach (['M', 'T', 'W', 'T', 'F', 'S', 'S'] as $day)
+                                                 <div class="text-center small text-muted fw-bold">{{ $day }}
                                                  </div>
                                              @endforeach
                                          </div>
 
                                          <div class="calendar-days d-grid"
                                               style="grid-template-columns: repeat(7, 1fr); gap: 2px;">
+
                                              @for ($i = 0; $i < $startOffset; $i++)
-                                                 <div class="text-center text-muted small">-</div>
+                                                 <div class="text-center text-muted small p-1">-</div>
                                              @endfor
+
 
                                              @for ($day = 1; $day <= $daysInMonth; $day++)
                                                  @php
@@ -279,7 +338,7 @@
                                                          $leaveTypeName = $leaveOnDate['type'] ?? 'Leave';
                                                          $leaveEmoji =
                                                              $leaveOnDate['emoji'] ??
-                                                             ($leaveOnDate->leaveType->emoji ?? '🌴');
+                                                             ($leaveOnDate['leaveType']['emoji'] ?? '🌴');
                                                          $startDate = \Carbon\Carbon::parse(
                                                              $leaveOnDate['start'],
                                                          )->format('d M, Y');
@@ -306,25 +365,28 @@
                                                  @endphp
 
                                                  <div class="calendar-day text-center p-1 position-relative rounded
-    {{ $isWeekend ? 'bg-light' : '' }}
-    {{ $leaveOnDate ? 'has-leave shadow-sm' : '' }}"
+                                    {{ $isWeekend ? 'bg-light' : '' }}
+                                    {{ $hasLeave ? 'has-leave shadow-sm border border-primary' : '' }}"
                                                       style="font-size: 0.8rem; min-height: 45px; cursor: pointer;"
-                                                      @if ($leaveOnDate) data-tooltip="{{ $tooltipTitle ?? 'Leave' }}"
-        data-leave-type="{{ $leaveOnDate['leave_type'] ?? '' }}" @endif>
+                                                      @if ($hasLeave) data-tooltip="{{ $tooltipTitle }}"
+                                        data-leave-type="{{ $leaveOnDate['leave_type'] ?? '' }}"
+                                        wire:click="showLeaveRequestInfo({{ $leaveOnDate['id'] ?? '' }})" @endif>
 
-                                                     <span class="day-number fw-semibold">{{ $day }}</span>
+                                                     <span
+                                                           class="day-number fw-semibold {{ $isWeekend ? 'text-danger' : '' }}">
+                                                         {{ $day }}
+                                                     </span>
 
-                                                     @if ($leaveOnDate)
+                                                     @if ($hasLeave)
                                                          <div class="position-absolute top-0 end-0">
-                                                             <span class="leave-badge">
+                                                             <span class="badge bg-primary rounded-circle p-1"
+                                                                   style="font-size: 10px;">
                                                                  {{ $leaveOnDate['emoji'] ?? '🌴' }}
                                                              </span>
                                                          </div>
-
-
                                                          <div class="position-absolute bottom-0 start-0 end-0">
                                                              <div class="bg-gradient-primary"
-                                                                  style="height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 0 0 8px 8px;">
+                                                                  style="height: 2px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 0 0 4px 4px;">
                                                              </div>
                                                          </div>
                                                      @endif

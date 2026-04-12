@@ -15,14 +15,16 @@ class EmployeeInvitationMail extends Mailable implements ShouldQueue
 
     public $employee;
     public $inviteUrl;
+    public $companyName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($employee, $inviteUrl)
+    public function __construct($employee, $inviteUrl, $companyName)
     {
         $this->employee = $employee;
         $this->inviteUrl = $inviteUrl;
+        $this->companyName = $companyName;
     }
 
     /**
@@ -45,6 +47,7 @@ class EmployeeInvitationMail extends Mailable implements ShouldQueue
             with: [
                 'employee' => $this->employee,
                 'inviteUrl' => $this->inviteUrl,
+                'companyName' => $this->companyName,
             ],
         );
     }

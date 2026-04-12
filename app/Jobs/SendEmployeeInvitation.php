@@ -17,18 +17,20 @@ class SendEmployeeInvitation implements ShouldQueue
 
     public $employee;
     public $inviteUrl;
+    public $companyName;
 
-    public function __construct($employee, $inviteUrl)
+    public function __construct($employee, $inviteUrl, $companyName)
     {
         $this->employee = $employee;
         $this->inviteUrl = $inviteUrl;
+        $this->companyName = $companyName;
     }
 
     public function handle()
     {
         try {
             Mail::to($this->employee->email)
-                ->send(new EmployeeInvitationMail($this->employee, $this->inviteUrl));
+                ->send(new EmployeeInvitationMail($this->employee, $this->inviteUrl, $this->companyName));
         } catch (\Exception $e) {
 
             Log::error('Failed to send employee invitation email', [

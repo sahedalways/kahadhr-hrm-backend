@@ -603,8 +603,10 @@ class UsersIndex extends BaseComponent
 
             DB::commit();
 
+            $employee->load('company');
 
-            SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+
+            SendEmployeeInvitation::dispatch($employee, $inviteUrl, $employee->company->company_name);
 
             // Reset form
             $this->reset([

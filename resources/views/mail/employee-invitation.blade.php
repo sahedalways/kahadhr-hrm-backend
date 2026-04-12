@@ -105,15 +105,16 @@
 
         <!-- Header -->
         <div class="email-header">
-            Welcome to {{ siteSetting()->site_title ?? 'Our Company' }}
+            Welcome to {{ $companyName ?? 'Our Company' }}
         </div>
 
         <!-- Body -->
         <div class="email-body">
-            <h2>Hello {{ $employee->email }},</h2>
+            <h2>Hello {{ $employee->full_name }},</h2>
 
             <p>
-                You have been added as an employee at <strong>{{ siteSetting()->site_title ?? 'Our Company' }}</strong>.
+                You have been added as an employee at
+                <strong>{{ $companyName ?? 'Our Company' }}</strong>.
             </p>
 
             <p>
@@ -121,15 +122,55 @@
             </p>
 
 
-            <div class="details-box"
-                 style="text-align: center;">
+            <table role="presentation"
+                   cellspacing="0"
+                   cellpadding="0"
+                   align="center"
+                   style="margin-top:15px; margin-bottom:10px;">
+                <tr>
+                    <td align="center"
+                        bgcolor="#164f84"
+                        style="border-radius:6px;">
+                        <a href="{{ $inviteUrl }}"
+                           target="_blank"
+                           style="
+                    display:inline-block;
+                    padding:12px 20px;
+                    font-size:14px;
+                    color:#ffffff;
+                    text-decoration:none;
+                    font-weight:600;
+                    border-radius:6px;
+               ">
+                            Set Your Password
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+
+            <p
+               style="
+    font-size:12px;
+    color:#777777;
+    text-align:center;
+    word-break:break-all;
+    margin:10px 20px 0;
+">
+                If the button above does not work, copy and paste this link into your browser:
+            </p>
+
+            <p style="
+    font-size:12px;
+    text-align:center;
+    margin:5px 20px 20px;
+">
                 <a href="{{ $inviteUrl }}"
-                   class="btn-link"
                    target="_blank"
-                   style="color:#fff;">
-                    Set Your Password
+                   style="color:#164f84; text-decoration:none;">
+                    {{ $inviteUrl }}
                 </a>
-            </div>
+            </p>
 
             <p>
                 This link will expire in 48 hours. If you did not expect this email, please ignore it.

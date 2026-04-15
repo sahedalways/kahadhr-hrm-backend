@@ -1006,7 +1006,10 @@ class EmployeeDetails extends BaseComponent
         );
 
 
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+        $employee->load('company');
+
+
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl, $employee->company->company_name);
 
         $this->toast('Verification link sent successfully!', 'success');
     }
@@ -1590,7 +1593,11 @@ class EmployeeDetails extends BaseComponent
         );
 
         // Dispatch job
-        SendEmployeeInvitation::dispatch($employee, $inviteUrl);
+
+        $employee->load('company');
+
+
+        SendEmployeeInvitation::dispatch($employee, $inviteUrl, $employee->company->company_name);
 
         $this->toast('Password reset link sent successfully!', 'success');
     }

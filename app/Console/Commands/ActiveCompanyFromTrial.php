@@ -13,7 +13,7 @@ class ActiveCompanyFromTrial extends Command
      *
      * @var string
      */
-    protected $signature = 'app:active-company-from-trial';
+    protected $signature = 'companies:active-company-from-trial';
 
     /**
      * The console command description.

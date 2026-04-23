@@ -58,7 +58,7 @@ class SiteSetting extends Model
     protected static function booted()
     {
         static::addGlobalScope('filterByUserType', function (Builder $builder) {
-            $user = auth()->check() ? app('authUser') : null;
+            $user = auth()->check() ? auth()->user() : null;
 
             if (!$user) {
                 $builder->whereNull('company_id');

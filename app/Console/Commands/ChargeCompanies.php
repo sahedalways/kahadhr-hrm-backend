@@ -45,7 +45,6 @@ class ChargeCompanies extends Command
 
 
         foreach ($companies as $company) {
-
             $minCharge = config('billing.minimum_monthly_charge', 50);
             $employeeCount = Employee::withTrashed()
                 ->withoutGlobalScope('filterByUserType')
@@ -137,9 +136,13 @@ class ChargeCompanies extends Command
                 PaymentStatusEmailJob::dispatch($company->id, 'payment_failed');
 
 
-                if ($company->payment_failed_count >= 3) {
+                if (
+                    $company->payment_failed_count >= 3 &&
+                    $company->subscription_status !== 'suspended'
+                ) {
                     $company->subscription_status = 'suspended';
                     $company->save();
+
 
                     $company->notify('subscription_suspended', [
                         'message' => 'Your subscription has been suspended due to multiple failed payments.',

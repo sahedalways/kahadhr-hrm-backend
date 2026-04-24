@@ -34,7 +34,7 @@ return new class extends Migration
 
             $table->date('expires_at')->nullable();
 
-            $table->timestamp('last_notified_at')->nullable();
+
             $table->timestamps();
         });
     }

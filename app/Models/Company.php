@@ -298,7 +298,12 @@ class Company extends Model
         }
 
 
-        $invoices = \DB::table('invoices')->where('company_id', $this->id)->pluck('pdf_path');
+        $invoices = \DB::table('invoices')
+            ->where('company_id', $this->id)
+            ->whereNotNull('pdf_path')
+            ->pluck('pdf_path');
+
+
         foreach ($invoices as $file) {
             if (Storage::disk('public')->exists($file)) {
                 $totalBytes += Storage::disk('public')->size($file);

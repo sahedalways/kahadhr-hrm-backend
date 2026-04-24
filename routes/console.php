@@ -12,7 +12,9 @@ Artisan::command('inspire', function () {
 // for charging company
 Schedule::command('companies:active-company-from-trial')->daily();
 
-Schedule::command('companies:charge')->dailyAt('00:00');
+Schedule::command('companies:charge')
+    ->dailyAt('00:00')
+    ->withoutOverlapping();
 
 Schedule::command('companies:activate-from-trial')->daily();
 

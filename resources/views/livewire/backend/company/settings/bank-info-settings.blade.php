@@ -24,8 +24,8 @@
                            style="color: #0dcaf0; font-size: 18px;"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-0 text-dark">Payment Information</h6>
-                        <p class="text-muted small mb-0">Manage subscription and payment details</p>
+                        <h5 class="fw-bold mb-0 text-dark">Payment Information</h6>
+                            <p class="text-muted small mb-0">Manage subscription and payment details</p>
                     </div>
                 </div>
 
@@ -255,7 +255,7 @@
 
 
 
-                    <!-- Active Subscription Next Payment Info -->
+
                     @if (
                         $subscription_status == 'active' &&
                             isset($subscription_end) &&
@@ -268,8 +268,11 @@
                                 <span class="small fw-semibold"
                                       style="color: #065f46;">Next Payment</span>
                                 <span class="small text-muted mx-2">|</span>
-                                <span class="small">Your next payment will be charged on
-                                    <strong>{{ \Carbon\Carbon::parse($subscription_end)->format('d M Y') }}</strong></span>
+                                <span class="small">
+                                    Your next payment will be charged on
+                                    <strong>{{ \Carbon\Carbon::parse($subscription_end)->format('d M Y') }}</strong>
+                                </span>
+
                                 @php
                                     $daysUntilPayment = (int) ceil(
                                         \Carbon\Carbon::now()->diffInDays(
@@ -278,6 +281,7 @@
                                         ),
                                     );
                                 @endphp
+
                                 @if ($daysUntilPayment <= 7)
                                     <span class="badge rounded-pill px-2 py-1"
                                           style="background: #f59e0b; color: white; font-size: 10px;">
@@ -286,9 +290,34 @@
                                 @endif
                             </div>
                         </div>
+                    @elseif (isset($subscription_end) &&
+                            \Carbon\Carbon::parse($subscription_end)->isPast() &&
+                            in_array($payment_status, ['unpaid', 'failed', 'pending']))
+                        <div class="mt-3 p-3 rounded-3"
+                             style="background: linear-gradient(135deg, #fee2e2, #fef2f2); border-left: 4px solid #ef4444;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-exclamation-triangle"
+                                   style="color: #ef4444;"></i>
+
+                                <span class="small fw-semibold"
+                                      style="color: #7f1d1d;">
+                                    Payment Issue
+                                </span>
+
+                                <span class="small text-muted mx-2">|</span>
+
+                                <span class="small"
+                                      style="color: #7f1d1d;">
+                                    Your last payment attempt was unsuccessful.
+                                    This may be caused by insufficient funds or an issue with your card.
+                                    We will retry automatically, but you may update your payment method to prevent
+                                    interruption.
+                                </span>
+                            </div>
+                        </div>
                     @endif
 
-                    <!-- Alert for Failed Payment -->
+
                     @if (isset($payment_status) && strtolower($payment_status) == 'failed')
                         <div class="mt-3 p-3 rounded-3"
                              style="background: #fee2e2; border-left: 4px solid #dc2626;">

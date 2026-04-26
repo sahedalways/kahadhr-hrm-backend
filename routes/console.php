@@ -13,8 +13,7 @@ Artisan::command('inspire', function () {
 Schedule::command('companies:active-company-from-trial')->daily();
 
 Schedule::command('companies:charge')
-    ->dailyAt('00:00')
-    ->withoutOverlapping();
+    ->dailyAt('00:10');
 
 Schedule::command('companies:activate-from-trial')->daily();
 
@@ -33,7 +32,7 @@ Schedule::command('attendance:auto-clock-out')->dailyAt('00:01');
 
 Schedule::command('sharecode:expire')->daily();
 
-Schedule::command('backup:run')->dailyAt('02:00');
+Schedule::command('backup:run')->dailyAt('03:00');
 
 Schedule::command('sessions:clear-old')->dailyAt('02:00');
 

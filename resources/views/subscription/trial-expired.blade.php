@@ -17,7 +17,7 @@
 
                         <a href="{{ route('company.dashboard.settings.bank-info', ['company' => auth()->user()->company->sub_domain]) }}"
                            class="btn btn-light btn-lg fw-bold shadow-sm"
-                           style="border-radius: 50px; padding: 0.75rem 2rem; font-size: 1.1rem; color: #ffffff; background: #0058fc;">
+                           style="border-radius: 50px; padding: 0.75rem 2rem; font-size: 1.1rem; color: #ffffff; background: #2998ff;">
                             <i class="bi bi-credit-card-2-front-fill me-2"></i> Subscribe Now
                         </a>
                     </div>

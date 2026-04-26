@@ -2,14 +2,21 @@
 
 namespace App\Livewire\Backend\Company\Settings;
 
+use App\Jobs\InvoiceEmailJob;
+use App\Jobs\PaymentStatusEmailJob;
 use App\Livewire\Backend\Components\BaseComponent;
 use App\Models\Company;
 use App\Models\CompanyBankInfo;
+use App\Models\CompanyChargeRate;
+use App\Models\Employee;
 use Carbon\Carbon;
 use Stripe\StripeClient;
 use App\Models\Invoice;
+use App\Services\PaymentGateway;
 use App\Traits\Exportable;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination;
 
 class BankInfoSettings extends BaseComponent
@@ -89,6 +96,7 @@ class BankInfoSettings extends BaseComponent
         $this->loadMore();
     }
 
+
     public function save($paymentMethodId)
     {
         $validatedData = [
@@ -104,23 +112,42 @@ class BankInfoSettings extends BaseComponent
 
         $this->stripe_payment_method_id = $paymentMethodId;
 
+        $this->fetchStripeCardInfo();
 
-        $isTrialCompany = Company::where('id', auth()->user()->company->id)->where('subscription_status', 'trial')
+        $isTrialCompany = Company::where('id', $this->company->id)
+            ->where('subscription_status', 'trial')
             ->first();
 
         if ($isTrialCompany) {
-            $isTrialCompany->subscription_status = 'active';
-            $isTrialCompany->subscription_start = Carbon::today();
-            $isTrialCompany->subscription_end = Carbon::today()->addMonth();
-            $isTrialCompany->payment_status = 'unpaid';
-            $isTrialCompany->save();
+            $isTrialCompany->update([
+                'subscription_status' => 'active',
+                'subscription_start' => Carbon::today(),
+                'subscription_end' => Carbon::today()->addMonth(),
+                'payment_status' => 'unpaid',
+            ]);
         }
 
+        $company = $this->company->fresh();
 
-        $this->fetchStripeCardInfo();
+
+        Cache::lock("charge-once-{$company->id}", 300)->get(function () use ($company) {
+
+            if (
+                $company->subscription_status === 'active' &&
+                $company->subscription_end &&
+                \Carbon\Carbon::parse($company->subscription_end)->lte(\Carbon\Carbon::today())
+            ) {
+                $this->chargeCompanyImmediately($company);
+            }
+        });
+
         $this->dispatch('closemodal');
+
         $this->toast('Card Payment Info Saved Successfully!', 'success');
     }
+
+
+
 
     public function fetchStripeCardInfo()
     {
@@ -293,6 +320,167 @@ class BankInfoSettings extends BaseComponent
                 'keys' => ['Invoice #', 'Billing Period', 'Employee Fee', 'Total Employees', 'Subtotal', 'VAT', 'Total', 'Status', 'Invoice Date'],
             ]
         );
+    }
+
+
+    public function chargeCompanyImmediately($company)
+    {
+        $rate = optional(CompanyChargeRate::first())->rate;
+
+        if (!$rate) {
+            return;
+        }
+
+
+        $minCharge = config('billing.minimum_monthly_charge', 50);
+
+        $employeeCount = Employee::withTrashed()
+            ->withoutGlobalScope('filterByUserType')
+            ->where('company_id', $company->id)
+            ->where('is_billable', true)
+            ->whereDate('billable_from', '<=', now()->endOfMonth())
+            ->count();
+
+        if ($employeeCount == 0) {
+            $amount = $minCharge;
+        } else {
+            $amount = $employeeCount * $rate;
+        }
+
+        $vat = 0;
+        $total = $amount + $vat;
+
+        $card = $company->defaultCard();
+
+
+
+        if (!$card || !$card->stripe_payment_method_id) {
+            $company->payment_status = 'failed';
+            $company->increment('payment_failed_count');
+            $company->refresh();
+
+
+            $company->update([
+                'payment_status' => 'failed',
+            ]);
+
+
+            $company->notify('payment_failed', [
+                'message' => 'Payment attempt failed. Please update your card.',
+                'failed_attempts' => $company->payment_failed_count,
+            ]);
+
+            PaymentStatusEmailJob::dispatch($company->id, 'payment_failed');
+
+            if ($company->payment_failed_count >= 3) {
+                $company->update([
+                    'subscription_status' => 'suspended',
+                ]);
+
+
+                $company->notify('subscription_suspended', [
+                    'message' => 'Your subscription has been suspended due to multiple failed payments.',
+                ]);
+
+                PaymentStatusEmailJob::dispatch($company->id, 'subscription_suspended');
+            }
+
+
+            return;
+        }
+
+        $result = $this->gateway->charge(
+            $card->stripe_payment_method_id,
+            $amount
+        );
+
+
+        if ($result->success) {
+            $company->subscription_start = now();
+            $company->subscription_end = now()->addMonth();
+            $company->subscription_status = 'active';
+            $company->payment_status = 'paid';
+            $company->payment_failed_count = 0;
+            $company->save();
+
+
+            $invoiceNumber = 'INV-' . strtoupper(uniqid());
+
+            $invoice = Invoice::create([
+                'company_id' => $company->id,
+                'billing_period_start' => now()->startOfMonth(),
+                'billing_period_end' => now()->endOfMonth(),
+                'employee_fee' => $rate,
+                'total_employees_billed' => $employeeCount,
+                'subtotal' => $amount,
+                'total' => $total,
+                'vat' => $vat,
+                'invoice_date' => now(),
+                'invoice_number' => $invoiceNumber,
+                'currency' => 'GBP',
+                'status' => 'paid',
+            ]);
+
+            Employee::onlyTrashed()
+                ->withoutGlobalScope('filterByUserType')
+                ->where('company_id', $company->id)
+                ->forceDelete();
+
+
+            Employee::query()
+                ->withoutGlobalScope('filterByUserType')
+                ->where('company_id', $company->id)
+                ->whereNull('deleted_at')
+                ->update([
+                    'billable_from' => now()->addDays(3),
+                    'is_billable' => false,
+                    'updated_at' => now(),
+                ]);
+
+            InvoiceEmailJob::dispatch($invoice->id, $company->id);
+
+            Log::info(
+                "Charged and invoiced {$company->company_name}: {$total} GBP",
+                [
+                    'company_id' => $company->id,
+                    'amount' => $amount,
+                    'total' => $total,
+                    'date' => now()->toDateTimeString(),
+                ]
+            );
+        } else {
+            $company->payment_status = 'failed';
+            $company->increment('payment_failed_count');
+            $company->refresh();
+
+
+            $company->update([
+                'payment_status' => 'failed',
+            ]);
+
+
+            $company->notify('payment_failed', [
+                'message' => 'Payment attempt failed. Please update your card.',
+                'failed_attempts' => $company->payment_failed_count,
+            ]);
+
+            PaymentStatusEmailJob::dispatch($company->id, 'payment_failed');
+
+            if ($company->payment_failed_count >= 3) {
+                $company->update([
+                    'subscription_status' => 'suspended',
+                ]);
+
+
+                $company->notify('subscription_suspended', [
+                    'message' => 'Your subscription has been suspended due to multiple failed payments.',
+                ]);
+
+                PaymentStatusEmailJob::dispatch($company->id, 'subscription_suspended');
+            }
+        }
+
+        return false;
     }
 
 

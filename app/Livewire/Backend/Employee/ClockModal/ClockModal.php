@@ -84,8 +84,8 @@ class ClockModal extends BaseComponent
             }
         } elseif ($ukTime->gt($shiftStart->copy()->addMinutes($grace))) {
             $needsApproval = true;
+            $type = 'late_clock_in';
             $this->clockInType = 'late';
-            $this->clockInType = $type;
             $this->showClockInReason = true;
 
             if (empty($this->clockInReason)) {

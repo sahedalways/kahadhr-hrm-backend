@@ -51,7 +51,7 @@ class AutoClockOutMidnight extends Command
                 'attendance_id' => $attendance->id,
                 'type' => 'auto_clock_out',
                 'reason' => 'Auto Clock Out at Midnight',
-                'status' => 'pending',
+                'status' => 'approved',
             ]);
 
             $this->info("Auto Clock Out done for user {$attendance->user_id}");

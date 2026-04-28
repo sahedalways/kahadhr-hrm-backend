@@ -4,6 +4,7 @@
 // all those super admin routes below
 
 use App\Jobs\SendTestMailJob;
+use Carbon\Carbon;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 
@@ -25,11 +26,21 @@ require __DIR__ . '/dev-tools.php';
 
 
 Route::get('/trial-expired', function () {
-  if (auth()->check() && auth()->user()->company->subscription_status === 'active') {
-    return redirect()->route(
-      'company.dashboard.index',
-      ['company' => auth()->user()->company->sub_domain]
-    );
+
+  if (auth()->check()) {
+    $company = auth()->user()->company;
+
+
+    if (
+      $company->subscription_status === 'trial' &&
+      $company->trial_ends_at &&
+      Carbon::parse($company->trial_ends_at)->isFuture()
+    ) {
+      return redirect()->route(
+        'company.dashboard.index',
+        ['company' => $company->sub_domain]
+      );
+    }
   }
 
   return view('subscription.trial-expired');

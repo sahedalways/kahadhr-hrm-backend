@@ -221,7 +221,17 @@
                 @endforeach
             </div>
 
+            <style>
+                @keyframes spinModern {
+                    from {
+                        transform: rotate(0deg);
+                    }
 
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+            </style>
 
 
 
@@ -1013,8 +1023,9 @@
                         Pending Request
                     </h5>
                     <button type="button"
-                            class="btn btn-light rounded-pill"
-                            onclick="closeAllModals()">
+                            class="btn btn-light d-flex align-items-center justify-content-center"
+                            onclick="closeAllModals()"
+                            style="width: 40px; height: 40px; border-radius: 50%;">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>

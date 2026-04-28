@@ -131,40 +131,88 @@
             </div>
 
             {{-- PENDING REQUESTS --}}
-            <div class="request-item position-relative mb-2 d-flex justify-content-between align-items-center p-3 border"
-                 wire:click="viewRequest({{ $req->id }})"
-                 wire:loading.class="opacity-50"
-                 wire:target="viewRequest({{ $req->id }})"
-                 style="
-        cursor: pointer;
-        border-radius: 8px;
-        background: {{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }};
-        transition: all 0.3s ease;
-     "
-                 onmouseover="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff20' }}';"
-                 onmouseout="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }}';">
+            <div class="pending-requests-section mb-4 mt-3"
+                 style="font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;">
+                <h3 class="requests-header mb-3"
+                    style="color: #ffffff; font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem!important; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;">
+                    <span
+                          style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 4px 12px; border-radius: 40px; font-size: 0.9rem;">📋</span>
+                    Pending Requests ({{ $records->sum(fn($r) => $r->requests->where('status', 'pending')->count()) }})
+                </h3>
 
+                @foreach ($records as $record)
+                    @php
+                        $pendingRequests = $record->requests->where('status', 'pending');
+                    @endphp
 
-                <div>
-                    <p class="mb-1 fw-bold text-white">{{ $record->user->full_name }}</p>
-                    <small class="text-light">
-                        {{ ucfirst(str_replace('_', ' ', $req->type)) }} - Pending
-                    </small>
-                </div>
+                    @foreach ($pendingRequests as $req)
+                        <div class="request-item mb-3 d-flex justify-content-between align-items-center p-3"
+                             wire:click="viewRequest({{ $req->id }})"
+                             wire:loading.class="opacity-50"
+                             wire:target="viewRequest({{ $req->id }})"
+                             style="
+                     cursor: pointer;
+                     border-radius: 14px;
+                     background: {{ $highlightId === $req->id ? 'linear-gradient(135deg, #fff9e6, #fff3cd)' : 'rgba(255, 255, 255, 0.06)' }};
+                     backdrop-filter: blur(2px);
+                     transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+                     border: 1px solid {{ $highlightId === $req->id ? '#ffdf7e' : 'rgba(255, 255, 255, 0.08)' }};
+                     box-shadow: {{ $highlightId === $req->id ? '0 6px 14px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.05)' }};
+                     position: relative;
+                     overflow: hidden;
+                 "
+                             onmouseover="this.style.background='{{ $highlightId === $req->id ? 'linear-gradient(135deg, #fff7e8, #ffe8b5)' : 'rgba(255, 255, 255, 0.12)' }}'; this.style.borderColor='{{ $highlightId === $req->id ? '#ffcf5c' : 'rgba(255,255,255,0.2)' }}'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 22px rgba(0,0,0,0.18)';"
+                             onmouseout="this.style.background='{{ $highlightId === $req->id ? 'linear-gradient(135deg, #fff9e6, #fff3cd)' : 'rgba(255, 255, 255, 0.06)' }}'; this.style.borderColor='{{ $highlightId === $req->id ? '#ffdf7e' : 'rgba(255, 255, 255, 0.08)' }}'; this.style.transform='translateY(0)'; this.style.boxShadow='{{ $highlightId === $req->id ? '0 6px 14px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.05)' }}';">
 
+                            <!-- subtle shine accent for highlighted items -->
+                            @if ($highlightId === $req->id)
+                                <div
+                                     style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #f5b042, #e67e22); border-radius: 14px 0 0 14px;">
+                                </div>
+                            @endif
 
-                <div>
-                    <i class="fas fa-eye text-primary fs-5"></i>
-                </div>
+                            <!-- left content: user info + request type badge -->
+                            <div style="flex: 1; min-width: 0;">
+                                <div
+                                     style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px;">
+                                    <p class="mb-0 fw-bold"
+                                       style="margin: 0; font-size: 1rem; font-weight: 700; color: #ffffff; letter-spacing: -0.2px; text-shadow: 0 1px 1px rgba(0,0,0,0.1);">
+                                        {{ $record->user->full_name }}
+                                    </p>
 
+                                </div>
 
-                <div wire:loading
-                     wire:target="viewRequest({{ $req->id }})"
-                     class="position-absolute end-0 top-50 translate-middle-y me-3">
-                    <div class="spinner-border spinner-border-sm text-primary"
-                         role="status"></div>
-                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                    <small
+                                           style="color: #cbd5e1; font-size: 0.75rem; font-weight: 500; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                                        <span style="font-size: 0.7rem;">📌</span>
+                                        {{ $req->type ? ucfirst(str_replace('_', ' ', $req->type)) : 'Type not specified' }}
+                                    </small>
 
+                                </div>
+                            </div>
+
+                            <!-- eye icon with modern circle background + loader container -->
+                            <div style="display: flex; align-items: center; gap: 14px; position: relative;">
+                                <div style="background: rgba(99, 102, 241, 0.15); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 60px; transition: all 0.2s; backdrop-filter: blur(2px);"
+                                     onmouseover="this.style.background='rgba(99, 102, 241, 0.35)'; this.style.transform='scale(1.02)';"
+                                     onmouseout="this.style.background='rgba(99, 102, 241, 0.15)'; this.style.transform='scale(1)';">
+                                    <i class="fas fa-eye"
+                                       style="color: #a5b4fc; font-size: 1.25rem; transition: all 0.2s;"></i>
+                                </div>
+
+                                <!-- Livewire loading spinner (positioned relative but still inline) -->
+                                <div wire:loading
+                                     wire:target="viewRequest({{ $req->id }})"
+                                     style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%);">
+                                    <div
+                                         style="width: 24px; height: 24px; border: 2px solid rgba(99,102,241,0.2); border-top-color: #818cf8; border-radius: 50%; animation: spinModern 0.7s linear infinite;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endforeach
             </div>
 
 

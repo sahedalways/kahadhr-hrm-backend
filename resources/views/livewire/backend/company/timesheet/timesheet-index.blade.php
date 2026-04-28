@@ -131,50 +131,40 @@
             </div>
 
             {{-- PENDING REQUESTS --}}
-            <div class="pending-requests-section mb-4 mt-3">
-                <h3 class="requests-header text-white mb-3">
-                    Pending Requests ({{ $records->sum(fn($r) => $r->requests->where('status', 'pending')->count()) }})
-                </h3>
+            <div class="request-item position-relative mb-2 d-flex justify-content-between align-items-center p-3 border"
+                 wire:click="viewRequest({{ $req->id }})"
+                 wire:loading.class="opacity-50"
+                 wire:target="viewRequest({{ $req->id }})"
+                 style="
+        cursor: pointer;
+        border-radius: 8px;
+        background: {{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }};
+        transition: all 0.3s ease;
+     "
+                 onmouseover="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff20' }}';"
+                 onmouseout="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }}';">
 
-                @foreach ($records as $record)
-                    @php
-                        $pendingRequests = $record->requests->where('status', 'pending');
-                    @endphp
 
-                    @foreach ($pendingRequests as $req)
-                        <div lass="request-item mb-2 d-flex justify-content-between align-items-center p-3 border"
-                             wire:click="viewRequest({{ $req->id }})"
-                             wire:loading.class="opacity-50"
-                             wire:target="viewRequest({{ $req->id }})"
-                             style="
-                    cursor: pointer;
-                    border-radius: 8px;
-                    background: {{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }};
-                    transition: all 0.3s ease;
-                 "
-                             onmouseover="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff20' }}'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';"
-                             onmouseout="this.style.background='{{ $highlightId === $req->id ? '#fff3cd' : '#ffffff10' }}'; this.style.boxShadow='none';">
+                <div>
+                    <p class="mb-1 fw-bold text-white">{{ $record->user->full_name }}</p>
+                    <small class="text-light">
+                        {{ ucfirst(str_replace('_', ' ', $req->type)) }} - Pending
+                    </small>
+                </div>
 
-                            <div>
-                                <p class="mb-1 fw-bold text-white">{{ $record->user->full_name }}</p>
-                                <small class="text-light">
-                                    {{ ucfirst(str_replace('_', ' ', $req->type)) }} - Pending
-                                </small>
-                            </div>
 
-                            <div>
-                                <i class="fas fa-eye text-primary fs-5"></i>
-                            </div>
+                <div>
+                    <i class="fas fa-eye text-primary fs-5"></i>
+                </div>
 
-                            <div wire:loading
-                                 wire:target="viewRequest({{ $req->id }})"
-                                 class="position-absolute end-0 me-3">
-                                <div class="spinner-border spinner-border-sm text-primary"
-                                     role="status"></div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endforeach
+
+                <div wire:loading
+                     wire:target="viewRequest({{ $req->id }})"
+                     class="position-absolute end-0 top-50 translate-middle-y me-3">
+                    <div class="spinner-border spinner-border-sm text-primary"
+                         role="status"></div>
+                </div>
+
             </div>
 
 

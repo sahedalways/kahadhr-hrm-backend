@@ -194,14 +194,19 @@
 
                             <!-- eye icon with modern circle background + loader container -->
                             <div style="display: flex; align-items: center; gap: 14px; position: relative;">
-                                <div style="background: rgba(99, 102, 241, 0.15); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 60px; transition: all 0.2s; backdrop-filter: blur(2px);"
+
+                                <!-- 👁️ ICON -->
+                                <div wire:loading.remove
+                                     wire:target="viewRequest({{ $req->id }})"
+                                     style="background: rgba(99, 102, 241, 0.15); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 60px; transition: all 0.2s; backdrop-filter: blur(2px);"
                                      onmouseover="this.style.background='rgba(99, 102, 241, 0.35)'; this.style.transform='scale(1.02)';"
                                      onmouseout="this.style.background='rgba(99, 102, 241, 0.15)'; this.style.transform='scale(1)';">
+
                                     <i class="fas fa-eye"
-                                       style="color: #a5b4fc; font-size: 1.25rem; transition: all 0.2s;"></i>
+                                       style="color: #a5b4fc; font-size: 1.25rem;"></i>
                                 </div>
 
-                                <!-- Livewire loading spinner (positioned relative but still inline) -->
+                                <!-- 🔄 SPINNER -->
                                 <div wire:loading
                                      wire:target="viewRequest({{ $req->id }})"
                                      style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%);">
@@ -209,6 +214,7 @@
                                          style="width: 24px; height: 24px; border: 2px solid rgba(99,102,241,0.2); border-top-color: #818cf8; border-radius: 50%; animation: spinModern 0.7s linear infinite;">
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     @endforeach

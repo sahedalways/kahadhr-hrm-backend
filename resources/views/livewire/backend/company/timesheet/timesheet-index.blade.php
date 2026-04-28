@@ -142,8 +142,10 @@
                     @endphp
 
                     @foreach ($pendingRequests as $req)
-                        <div class="request-item mb-2 d-flex justify-content-between align-items-center p-3 border"
+                        <div lass="request-item mb-2 d-flex justify-content-between align-items-center p-3 border"
                              wire:click="viewRequest({{ $req->id }})"
+                             wire:loading.class="opacity-50"
+                             wire:target="viewRequest({{ $req->id }})"
                              style="
                     cursor: pointer;
                     border-radius: 8px;
@@ -162,6 +164,13 @@
 
                             <div>
                                 <i class="fas fa-eye text-primary fs-5"></i>
+                            </div>
+
+                            <div wire:loading
+                                 wire:target="viewRequest({{ $req->id }})"
+                                 class="position-absolute end-0 me-3">
+                                <div class="spinner-border spinner-border-sm text-primary"
+                                     role="status"></div>
                             </div>
                         </div>
                     @endforeach

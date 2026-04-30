@@ -133,7 +133,7 @@ class BankInfoSettings extends BaseComponent
         Cache::lock("charge-once-{$company->id}", 300)->get(function () use ($company) {
 
             if (
-                $company->subscription_status === 'active' &&
+                in_array($company->subscription_status, ['active', 'suspended']) &&
                 $company->subscription_end &&
                 \Carbon\Carbon::parse($company->subscription_end)->lte(\Carbon\Carbon::today())
             ) {
@@ -325,6 +325,11 @@ class BankInfoSettings extends BaseComponent
 
     public function chargeCompanyImmediately($company)
     {
+        if ($company->payment_status === 'paid') {
+            return true;
+        }
+
+
         $rate = optional(CompanyChargeRate::first())->rate;
 
         if (!$rate) {
@@ -356,8 +361,10 @@ class BankInfoSettings extends BaseComponent
 
         if (!$card || !$card->stripe_payment_method_id) {
             $company->payment_status = 'failed';
-            $company->increment('payment_failed_count');
-            $company->refresh();
+            if ($company->payment_failed_count < 3) {
+                $company->increment('payment_failed_count');
+                $company->refresh();
+            }
 
 
             $company->update([
@@ -450,8 +457,10 @@ class BankInfoSettings extends BaseComponent
             );
         } else {
             $company->payment_status = 'failed';
-            $company->increment('payment_failed_count');
-            $company->refresh();
+            if ($company->payment_failed_count < 3) {
+                $company->increment('payment_failed_count');
+                $company->refresh();
+            }
 
 
             $company->update([

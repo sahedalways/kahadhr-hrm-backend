@@ -74,7 +74,7 @@
             $company && $company->subscription_status === 'trial'
                 ? getTrialInfo($company->subscription_status, $company->subscription_start, $company->subscription_end)
                 : ($company && $company->subscription_status === 'suspended'
-                    ? 'Your account is suspended. Contact to support'
+                    ? 'Your account is suspended. Update your payment method to restore access.'
                     : '');
     @endphp
 

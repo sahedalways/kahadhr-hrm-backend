@@ -24,7 +24,7 @@
                            style="color: #0dcaf0; font-size: 18px;"></i>
                     </div>
                     <div>
-                        <h5 class="fw-bold mb-0 text-dark">Payment Information</h6>
+                        <h5 class="fw-bold mb-0 text-dark">Subscription Settings</h6>
                             <p class="text-muted small mb-0">Manage subscription and payment details</p>
                     </div>
                 </div>
@@ -300,7 +300,7 @@
                                    style="color: #ef4444;"></i>
 
                                 <span class="small fw-semibold"
-                                      style="color: #7f1d1d;">
+                                      style="color: #7f1d1d; white-space: nowrap;">
                                     Payment Issue
                                 </span>
 
@@ -370,25 +370,8 @@
                         </div>
                     @endif
 
-                    <!-- Suspended Subscription Alert -->
-                    @if ($subscription_status == 'suspended')
-                        <div class="mt-3 p-3 rounded-3"
-                             style="background: #fef3c7; border-left: 4px solid #f59e0b;">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fas fa-ban"
-                                   style="color: #f59e0b;"></i>
-                                <span class="small fw-semibold"
-                                      style="color: #92400e;">Account Suspended</span>
-                                <span class="small text-muted mx-2">|</span>
-                                <span class="small">Please contact support to resolve the issue</span>
-                                <a href="{{ route('contact.support') }}"
-                                   class="btn btn-sm btn-warning ms-auto"
-                                   style="font-size: 11px; padding: 4px 12px;">
-                                    Contact Support
-                                </a>
-                            </div>
-                        </div>
-                    @endif
+
+
                 </div>
             </div>
 

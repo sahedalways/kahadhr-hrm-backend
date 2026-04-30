@@ -135,7 +135,7 @@ class SubscriptionHelper
         return [
             'html' => '<div class="suspended-info">
                             <span class="text-danger fw-bold">⛔ Account Suspended</span><br>
-                            <small>Please contact support to resolve the issue.</small>
+
                         </div>',
             'days_left' => 0
         ];

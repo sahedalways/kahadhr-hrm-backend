@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckCompanySuspended
@@ -15,11 +16,10 @@ class CheckCompanySuspended
      */
     public function handle(Request $request, Closure $next)
     {
-        $company = auth()->user()->company ?? null;
+        $user = Auth::user();
 
-        // যদি company suspended থাকে
-        if ($company && $company->subscription_status === 'suspended') {
-            abort(403, 'Your account is suspended. Please contact support.');
+        if ($user->user_type == 'company' && $user->company->subscription_status === 'suspended') {
+            return redirect()->route('subscription.suspended');
         }
 
         return $next($request);

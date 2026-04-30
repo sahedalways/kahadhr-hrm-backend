@@ -62,7 +62,9 @@ Route::domain('company.' . config('app.base_domain'))
 
 
     Route::prefix('settings')->name('settings.')->group(function () {
-      Route::get('bank-info', BankInfoSettings::class)->name('bank-info');
+      Route::get('bank-info', BankInfoSettings::class)
+        ->name('bank-info')
+        ->withoutMiddleware(['checkSuspended']);
     });
   });
 

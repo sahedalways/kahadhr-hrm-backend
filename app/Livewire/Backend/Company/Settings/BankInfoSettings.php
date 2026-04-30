@@ -123,7 +123,7 @@ class BankInfoSettings extends BaseComponent
                 'subscription_status' => 'active',
                 'subscription_start' => Carbon::today(),
                 'subscription_end' => Carbon::today()->addMonth(),
-                'payment_status' => 'unpaid',
+                'payment_status' => 'pending',
             ]);
         }
 

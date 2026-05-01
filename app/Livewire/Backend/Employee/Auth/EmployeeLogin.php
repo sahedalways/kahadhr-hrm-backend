@@ -232,6 +232,9 @@ class EmployeeLogin extends BaseComponent
 
         Auth::loginUsingId($user->id, $this->rememberMe);
 
+        session()->regenerate();
+
+
         return redirect()->intended(route('employee.dashboard.index', ['company' => $employee->company->sub_domain]));
     }
 }

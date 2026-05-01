@@ -243,6 +243,7 @@ class CompanyLogin extends BaseComponent
 
         $otpCookie = Cookie::get('company_otp_' . $user->id);
         if ($otpCookie) {
+            session()->regenerate();
             $this->trackLoginSession();
             Auth::loginUsingId($user->id, true);
             return redirect()->intended('dashboard/');
@@ -250,6 +251,8 @@ class CompanyLogin extends BaseComponent
 
 
         if (!$user->securitySetting->two_step_enabled) {
+            session()->regenerate();
+
             $this->trackLoginSession();
             Auth::loginUsingId($user->id, true);
             return redirect()->intended('dashboard/');
@@ -322,6 +325,7 @@ class CompanyLogin extends BaseComponent
                 $cookieValue = Str::random(40);
                 Cookie::queue('company_otp_' . $this->userId, $cookieValue, 60 * 24 * 30);
             }
+            session()->regenerate();
 
             $this->trackLoginSession();
 

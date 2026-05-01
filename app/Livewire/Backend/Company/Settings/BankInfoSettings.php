@@ -61,7 +61,10 @@ class BankInfoSettings extends BaseComponent
         'stripePaymentMethodCreated' => 'save'
     ];
 
-    public function mount()
+
+    public $gateway;
+
+    public function mount(PaymentGateway $gateway)
     {
         $this->company = app('authUser')->company;
         if (!$this->company) {
@@ -90,7 +93,7 @@ class BankInfoSettings extends BaseComponent
         $this->subscription_end = $this->company->subscription_end;
         $this->trial_ends_at = $this->company->trial_ends_at ?? null;
 
-
+        $this->gateway = $gateway;
 
         $this->loaded = collect();
         $this->loadMore();

@@ -27,22 +27,37 @@ class ActiveCompanyFromTrial extends Command
      */
     public function handle()
     {
-        $this->info('Checking trial companies...');
+        try {
+            $this->info('Checking trial companies...');
 
-        $companies = Company::where('subscription_status', 'trial')
-            ->whereDate('trial_ends_at', '<=', Carbon::today())
-            ->get();
+            $companies = Company::where('subscription_status', 'trial')
+                ->whereNotNull('trial_ends_at')
+                ->whereDate('trial_ends_at', '<=', Carbon::today())
+                ->get();
 
-        foreach ($companies as $company) {
-            $company->subscription_status = 'active';
-            $company->subscription_start = Carbon::today();
-            $company->subscription_end = Carbon::today()->addMonth();
-            $company->payment_status = 'unpaid';
-            $company->save();
+            if ($companies->isEmpty()) {
+                $this->info('No trial companies to activate.');
+                return Command::SUCCESS;
+            }
 
-            $this->info("Activated: {$company->company_name}");
+            foreach ($companies as $company) {
+                $company->subscription_status = 'active';
+                $company->subscription_start = Carbon::today();
+                $company->subscription_end = Carbon::today()->addMonth();
+                $company->payment_status = 'pending';
+                $company->save();
+
+                $this->info("Activated: {$company->company_name}");
+            }
+
+            $this->info('Trial activation completed.');
+
+            return Command::SUCCESS;
+        } catch (\Exception $e) {
+            \Log::error('Trial activation error: ' . $e->getMessage());
+            $this->error($e->getMessage());
+
+            return Command::FAILURE;
         }
-
-        $this->info('Trial activation completed.');
     }
 }

@@ -14,7 +14,6 @@ Schedule::command('companies:active-company-from-trial')->daily();
 Schedule::command('companies:charge')
     ->dailyAt('00:10');
 
-Schedule::command('companies:activate-from-trial')->daily();
 
 Schedule::command('otp:delete-expired')->daily();
 

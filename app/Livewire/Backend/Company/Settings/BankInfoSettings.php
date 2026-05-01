@@ -62,7 +62,7 @@ class BankInfoSettings extends BaseComponent
     ];
 
 
-    public $gateway;
+    protected $gateway;
 
     public function mount(PaymentGateway $gateway)
     {

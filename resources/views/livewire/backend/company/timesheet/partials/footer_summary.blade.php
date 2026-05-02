@@ -37,6 +37,15 @@
             </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center p-3 h-100">
+                <div class="card-body">
+                    <div class="fw-bold text-muted small">Total Hours</div>
+                    <div class="h4 fw-bold text-secondary">{{ $totalHours ?? '0h 0m' }}</div>
+                </div>
+            </div>
+        </div>
+
         {{-- Pending Requests --}}
         <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center p-3 h-100">
@@ -51,7 +60,7 @@
         <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center p-3 h-100">
                 <div class="card-body">
-                    <div class="fw-bold text-muted small">Approved</div>
+                    <div class="fw-bold text-muted small">Approved Requests</div>
                     <div class="h4 fw-bold text-success">{{ $totalApproved ?? 0 }}</div>
                 </div>
             </div>
@@ -61,21 +70,14 @@
         <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center p-3 h-100">
                 <div class="card-body">
-                    <div class="fw-bold text-muted small">Rejected</div>
+                    <div class="fw-bold text-muted small">Rejected Requests</div>
                     <div class="h4 fw-bold text-danger">{{ $totalRejected ?? 0 }}</div>
                 </div>
             </div>
         </div>
 
-        {{-- Total Hours --}}
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 text-center p-3 h-100">
-                <div class="card-body">
-                    <div class="fw-bold text-muted small">Total Hours</div>
-                    <div class="h4 fw-bold text-secondary">{{ $totalHours ?? '0h 0m' }}</div>
-                </div>
-            </div>
-        </div>
+
+
 
     </div>
 </div>

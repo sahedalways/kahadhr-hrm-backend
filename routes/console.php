@@ -25,7 +25,7 @@ Schedule::command('leave:reset-carry-over')->daily();
 
 Schedule::command('employees:update-billable')->daily();
 
-Schedule::command('attendance:auto-clock-out')->dailyAt('00:01');
+Schedule::command('attendance:auto-clock-out')->dailyAt('00:30');
 
 
 Schedule::command('sharecode:expire')->daily();

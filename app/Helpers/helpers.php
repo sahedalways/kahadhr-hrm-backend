@@ -330,6 +330,10 @@ if (!function_exists('parseTimeToMinutes')) {
 if (!function_exists('getShiftHours')) {
   function getShiftHours($attendance): array
   {
+    \Log::info('Attendance: ' . ($attendance ?? 'null'));
+    \Log::info('Breaks data: ', ['breaks' => $attendance->breaks]);
+
+
     $clockIn = $attendance->clock_in instanceof Carbon
       ? $attendance->clock_in
       : ($attendance->clock_in ? Carbon::parse($attendance->clock_in) : null);
@@ -366,7 +370,6 @@ if (!function_exists('getShiftHours')) {
         $shiftTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
         $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
       } else {
-        // Fixed: This was incorrectly setting minutes to a string
         $shiftTotalMinutes = 0;
         $shiftHoursFormatted = '0h 0m';
       }
@@ -376,7 +379,7 @@ if (!function_exists('getShiftHours')) {
     $unpaidBreakMinutes = 0;
     $totalBreakMinutes = 0;
 
-    // Fixed: Check if breaks relationship exists and is not null
+
     if ($attendance && method_exists($attendance, 'breaks') && $attendance->breaks) {
       foreach ($attendance->breaks as $break) {
         if ($break->duration) {
@@ -393,22 +396,7 @@ if (!function_exists('getShiftHours')) {
       }
     }
 
-    // Fixed: Check if $shiftDate exists before accessing its breaks
-    if ($employeeId && $shiftDate && method_exists($shiftDate, 'breaks')) {
-      foreach ($shiftDate->breaks as $break) {
-        if ($break->duration) {
-          $breakMinutes = parseTimeToMinutes($break->duration);
 
-          if (isset($break->type) && strtolower($break->type) === 'unpaid') {
-            $unpaidBreakMinutes += $breakMinutes;
-          } else {
-            $paidBreakMinutes += $breakMinutes;
-          }
-
-          $totalBreakMinutes += $breakMinutes;
-        }
-      }
-    }
 
     if (!$clockOut) {
       return [
@@ -433,14 +421,6 @@ if (!function_exists('getShiftHours')) {
     }
 
 
-    // if ($isManual && $shiftTotalMinutes > 0) {
-    //   $adjustedShiftMinutes = $shiftTotalMinutes - $unpaidBreakMinutes;
-    //   if ($adjustedShiftMinutes < 0) {
-    //     $adjustedShiftMinutes = 0;
-    //   }
-    //   $shiftHoursFormatted = formatMinutesToHours($adjustedShiftMinutes);
-    // }
-
 
 
     return [
@@ -455,6 +435,8 @@ if (!function_exists('getShiftHours')) {
     ];
   }
 }
+
+
 
 
 if (!function_exists('formatMinutesToHours')) {

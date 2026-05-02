@@ -12,6 +12,7 @@ use App\Models\Notification;
 use App\Models\ShiftDate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination;
 
 class TimesheetIndex extends BaseComponent
@@ -344,9 +345,27 @@ class TimesheetIndex extends BaseComponent
         $this->totalApproved = $flat->where('status', 'approved')->count();
         $this->totalRejected = $flat->where('status', 'rejected')->count();
 
-        $this->totalHours = $this->calculateTotalHours();
-    }
+        // Debug log
+        Log::info('Refresh Stats:', [
+            'viewMode' => $this->viewMode,
+            'startDate' => $this->startDate instanceof Carbon ? $this->startDate->format('Y-m-d') : $this->startDate,
+            'endDate' => $this->endDate instanceof Carbon ? $this->endDate->format('Y-m-d') : $this->endDate,
+            'total_absents' => $this->totalAbsents,
+            'total_leaves' => $this->totalLeaves,
+            'total_pending' => $this->totalPending,
+            'total_approved' => $this->totalApproved,
+            'total_rejected' => $this->totalRejected,
+            'flat_count' => $flat->count(),
+            'attendance_calendar' => $this->attendanceCalendar,
 
+        ]);
+
+        $this->totalHours = $this->calculateTotalHours();
+
+        Log::info('Total Hours Calculated:', [
+            'total_hours' => $this->totalHours,
+        ]);
+    }
 
 
 
@@ -367,65 +386,64 @@ class TimesheetIndex extends BaseComponent
 
 
 
-
     public function setViewMode($mode)
     {
         $this->viewMode = $mode;
+        $today = Carbon::today();
 
         if ($mode === 'weekly') {
-
-            $this->startDate = now()->startOfDay();
-            $this->endDate = now()->addDays(6)->endOfDay();
+            $this->startDate = $today->copy()->startOfWeek(Carbon::MONDAY);
+            $this->endDate = $today->copy()->endOfWeek(Carbon::SUNDAY);
+            $this->currentDate = $today;
         } elseif ($mode === 'monthly') {
-            $this->startDate = now()->startOfMonth();
-            $this->endDate = now()->endOfMonth();
+            $this->startDate = $today->copy()->startOfMonth();
+            $this->endDate = $today->copy()->endOfMonth();
+            $this->currentDate = $today;
         }
-        $this->buildAttendanceCalendar();
-        $this->loadEmployees();
-    }
 
+        $this->loadEmployees();
+        $this->buildAttendanceCalendar();
+    }
 
     public function goToPrevious()
     {
         if ($this->viewMode === 'weekly') {
-            $this->startDate->subWeek();
-            $this->endDate->subWeek();
-            $this->currentDate->subWeek();
+            $this->startDate = $this->startDate->copy()->subWeek()->startOfWeek(Carbon::MONDAY);
+            $this->endDate = $this->startDate->copy()->endOfWeek(Carbon::SUNDAY);
         } elseif ($this->viewMode === 'monthly') {
-            $this->startDate->subMonth()->startOfMonth();
+            $this->startDate = $this->startDate->copy()->subMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
-            $this->currentDate->subMonth();
         }
+        $this->currentDate = $this->startDate->copy();
         $this->buildAttendanceCalendar();
     }
 
     public function goToNext()
     {
         if ($this->viewMode === 'weekly') {
-            $this->startDate->addWeek();
-            $this->endDate->addWeek();
-            $this->currentDate->addWeek();
+            $this->startDate = $this->startDate->copy()->addWeek()->startOfWeek(Carbon::MONDAY);
+            $this->endDate = $this->startDate->copy()->endOfWeek(Carbon::SUNDAY);
         } elseif ($this->viewMode === 'monthly') {
-            $this->startDate->addMonth()->startOfMonth();
+            $this->startDate = $this->startDate->copy()->addMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
-            $this->currentDate->addMonth();
         }
+        $this->currentDate = $this->startDate->copy();
         $this->buildAttendanceCalendar();
     }
-
-
 
 
     public function getDisplayDateRangeProperty()
     {
         if ($this->viewMode === 'weekly') {
+            $monday = $this->startDate->copy()->startOfWeek(Carbon::MONDAY);
+            $sunday = $monday->copy()->endOfWeek(Carbon::SUNDAY);
 
-            if ($this->startDate->format('Y') !== $this->endDate->format('Y')) {
-                return $this->startDate->format('M d, Y') . ' - ' . $this->endDate->format('M d, Y');
-            } elseif ($this->startDate->format('m') !== $this->endDate->format('m')) {
-                return $this->startDate->format('M d') . ' - ' . $this->endDate->format('M d, Y');
+            if ($monday->format('Y') !== $sunday->format('Y')) {
+                return $monday->format('M d, Y') . ' - ' . $sunday->format('M d, Y');
+            } elseif ($monday->format('m') !== $sunday->format('m')) {
+                return $monday->format('M d') . ' - ' . $sunday->format('M d, Y');
             } else {
-                return $this->startDate->format('M d') . ' - ' . $this->endDate->format('d, Y');
+                return $monday->format('M d') . ' - ' . $sunday->format('d, Y');
             }
         } elseif ($this->viewMode === 'monthly') {
             return $this->startDate->format('F Y');
@@ -493,12 +511,12 @@ class TimesheetIndex extends BaseComponent
     public function buildAttendanceCalendar()
     {
         $start = $this->viewMode === 'weekly'
-            ? $this->startDate->copy()->startOfWeek()
-            : $this->startDate->copy()->startOfMonth()->startOfWeek();
+            ? $this->startDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay()
+            : $this->startDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY)->startOfDay();
 
         $end = $this->viewMode === 'weekly'
-            ? $this->endDate->copy()->endOfWeek()
-            : $this->endDate->copy()->endOfMonth()->endOfWeek();
+            ? $this->startDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay()
+            : $this->endDate->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY)->endOfDay();
 
         $rows = Attendance::with('user:id,f_name,l_name', 'requests')
             ->where('company_id', $this->company_id)
@@ -683,6 +701,7 @@ class TimesheetIndex extends BaseComponent
         $hours = intdiv($totalMinutes, 60);
         $minutes = $totalMinutes % 60;
 
+
         return "{$hours}h {$minutes}m";
     }
 
@@ -691,6 +710,7 @@ class TimesheetIndex extends BaseComponent
 
     private function flatAttendances()
     {
+
         return collect($this->attendanceCalendar)->flatten(1);
     }
 
@@ -700,8 +720,8 @@ class TimesheetIndex extends BaseComponent
         $this->company_id = app('authUser')->company->id;
         $this->loaded = collect();
         $this->loadMore();
-        $this->startDate = Carbon::today();
-        $this->endDate = Carbon::today()->copy()->addDays(6);
+        $this->startDate = Carbon::today()->startOfWeek(Carbon::MONDAY);
+        $this->endDate = Carbon::today()->endOfWeek(Carbon::SUNDAY);
         $this->currentDate = Carbon::today();
 
         $start = $this->startDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY);

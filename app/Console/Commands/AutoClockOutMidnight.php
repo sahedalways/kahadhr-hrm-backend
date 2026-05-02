@@ -35,8 +35,7 @@ class AutoClockOutMidnight extends Command
             ->get();
 
         foreach ($attendances as $attendance) {
-            $user = $attendance->user;
-            $userTimezone = $user->timezone ?? 'Asia/Dhaka';
+            $userTimezone = 'Europe/London';
             $now = now()->setTimezone($userTimezone);
 
 

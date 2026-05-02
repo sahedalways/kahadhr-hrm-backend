@@ -475,10 +475,16 @@
                                                         <i class="fas fa-calendar-check me-2"></i>
                                                         {{ $content['title'] ?? 'Shift Details' }}
                                                     </h5>
+
+
+
                                                     <button type="button"
-                                                            class="btn-close btn-close-white"
+                                                            class="btn btn-light d-flex align-items-center justify-content-center p-0"
                                                             data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+                                                            aria-label="Close"
+                                                            style="width: 30px; height: 30px; border-radius: 50%; font-size: 12px;">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
                                                 </div>
 
                                                 <!-- Body -->
@@ -497,8 +503,9 @@
                                                             <div class="d-flex align-items-center mb-2">
                                                                 <i class="fas fa-map-marker-alt text-primary me-2"></i>
                                                                 <strong>Address:</strong>
-                                                                <span
-                                                                      class="ms-1">{{ $content['shift']['address'] ?? '-' }}</span>
+                                                                <span class="ms-1">
+                                                                    {{ !empty($content['shift']['address']) ? $content['shift']['address'] : 'N/A' }}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -1860,9 +1860,8 @@ class ScheduleIndex extends BaseComponent
     public function calculateTotalHours()
     {
         if ($this->newShift['start_time'] && $this->newShift['end_time']) {
-            $start = \Carbon\Carbon::createFromFormat('H:i', $this->newShift['start_time']);
-            $end = \Carbon\Carbon::createFromFormat('H:i', $this->newShift['end_time']);
-
+            $start = Carbon::createFromFormat('H:i', $this->newShift['start_time']);
+            $end = Carbon::createFromFormat('H:i', $this->newShift['end_time']);
 
             if ($end->lt($start)) {
                 $end->addDay();
@@ -1871,11 +1870,10 @@ class ScheduleIndex extends BaseComponent
             $diff = $end->diffInMinutes($start, false);
             $diff = abs($diff);
 
-
             $unpaidMinutes = 0;
             foreach ($this->newBreaks as $break) {
                 if (!empty($break['duration']) && strtolower($break['type'] ?? '') === 'unpaid') {
-                    $duration = (float) $break['duration'];
+                    $duration = floatval($break['duration']);
                     $hours = floor($duration);
                     $minutes = ($duration - $hours) * 100;
                     $unpaidMinutes += ($hours * 60) + $minutes;
@@ -1883,7 +1881,6 @@ class ScheduleIndex extends BaseComponent
             }
 
             $totalMinutes = $diff - $unpaidMinutes;
-
 
             $hours = floor($totalMinutes / 60);
             $minutes = $totalMinutes % 60;
@@ -1895,16 +1892,14 @@ class ScheduleIndex extends BaseComponent
 
 
 
-
     public function calculateMultiTotalHours($shiftIndex)
     {
         $shift = $this->multipleShifts[$shiftIndex] ?? null;
         if (!$shift) return;
 
         if (!empty($shift['start_time']) && !empty($shift['end_time'])) {
-            $start = \Carbon\Carbon::createFromFormat('H:i', $shift['start_time']);
-            $end = \Carbon\Carbon::createFromFormat('H:i', $shift['end_time']);
-
+            $start = Carbon::createFromFormat('H:i', $shift['start_time']);
+            $end = Carbon::createFromFormat('H:i', $shift['end_time']);
 
             if ($end->lt($start)) {
                 $end->addDay();
@@ -1916,13 +1911,12 @@ class ScheduleIndex extends BaseComponent
             $unpaidMinutes = 0;
             foreach ($this->multipleShiftNewBreaks[$shiftIndex] ?? [] as $break) {
                 if (!empty($break['duration']) && strtolower($break['type'] ?? '') === 'unpaid') {
-                    $duration = (float) $break['duration'];
+                    $duration = floatval($break['duration']);
                     $hours = floor($duration);
                     $minutes = ($duration - $hours) * 100;
                     $unpaidMinutes += ($hours * 60) + $minutes;
                 }
             }
-
 
             $totalMinutes = $diff - $unpaidMinutes;
 
@@ -1930,12 +1924,9 @@ class ScheduleIndex extends BaseComponent
             $minutes = $totalMinutes % 60;
 
             $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $hours, $minutes);
-
-
             $this->originalMultiShiftTotalTime[$shiftIndex] = $this->multipleShifts[$shiftIndex]['total_hours'];
         }
     }
-
 
 
 
@@ -2023,18 +2014,7 @@ class ScheduleIndex extends BaseComponent
         $this->showBreaks[$shiftIndex] = false;
 
 
-        $originalHours = $this->originalMultiShiftTotalTime[$shiftIndex] ?? $this->multipleShifts[$shiftIndex]['total_hours'];
-
-        [$hours, $minutes] = explode(':', $originalHours);
-        $totalMinutes = ($hours * 60) + $minutes;
-
-        $paidBreakMinutes = $this->calculateTotalBreakMinutes($shiftIndex);
-        $totalMinutes -= $unpaidBreakMinutes;
-
-        $newHours = floor($totalMinutes / 60);
-        $newMinutes = $totalMinutes % 60;
-
-        $this->multipleShifts[$shiftIndex]['total_hours'] = sprintf('%02d:%02d', $newHours, $newMinutes);
+        $this->calculateMultiTotalHours($shiftIndex);
     }
 
 
@@ -2126,19 +2106,8 @@ class ScheduleIndex extends BaseComponent
         $this->unpaidBreaksCount = $unpaidCount;
         $this->paidBreaksDuration = sprintf('%02d:%02d', floor($paidMinutes / 60), $paidMinutes % 60);
         $this->unpaidBreaksDuration = sprintf('%02d:%02d', floor($unpaidMinutes / 60), $unpaidMinutes % 60);
-        if ($this->originalShiftTotalTime) {
-            [$shiftHours, $shiftMinutes] = explode(':', $this->originalShiftTotalTime);
-            $shiftTotalMinutes = ($shiftHours * 60) + $shiftMinutes;
 
-
-            $shiftTotalMinutes -= $unpaidMinutes;
-
-            $newHours = floor($shiftTotalMinutes / 60);
-            $newMinutes = $shiftTotalMinutes % 60;
-
-            $this->newShift['total_hours'] = sprintf('%02d:%02d', $newHours, $newMinutes);
-        }
-
+        $this->calculateTotalHours();
         $this->dispatch('closemodal');
     }
 
@@ -2381,6 +2350,7 @@ class ScheduleIndex extends BaseComponent
             : Carbon::parse($this->endDate);
 
         $filteredEmployeeIds = $this->employees->pluck('id')->toArray();
+
 
         foreach ($this->calendarShifts as $dateKey => $shifts) {
             $date = Carbon::parse($dateKey);

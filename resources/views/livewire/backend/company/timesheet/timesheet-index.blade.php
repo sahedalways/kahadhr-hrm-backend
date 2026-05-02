@@ -345,7 +345,26 @@
                                                 @endif
 
 
-                                                {{-- Absent indicator --}}
+                                                @php
+                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
+                                                    $attendanceUserIds = collect(
+                                                        $this->attendanceCalendar[$dateKey] ?? [],
+                                                    )
+                                                        ->pluck('user_id')
+                                                        ->unique();
+
+                                                    $attendanceEmployeeIds = \App\Models\Employee::whereIn(
+                                                        'user_id',
+                                                        $attendanceUserIds,
+                                                    )
+                                                        ->pluck('id')
+                                                        ->toArray();
+
+                                                    $absentCount = count(
+                                                        array_diff($shiftEmployees, $attendanceEmployeeIds),
+                                                    );
+                                                @endphp
+
                                                 @if ($isCurrentMonth && $isPastOrToday && $absentCount > 0)
                                                     <div class="position-absolute bottom-0 start-0 w-100 px-1 pb-1">
                                                         <div class="badge bg-danger d-flex align-items-center justify-content-center gap-1 w-100 shadow-sm"
@@ -737,7 +756,7 @@
                             <div class="col-4">
                                 <div class="border rounded-3 p-2">
                                     <small class="text-muted d-block">Worked Hours</small>
-                                    <span class="fw-bold">{{ $hours['worked_hours'] }}</span>
+                                    <span class="fw-bold">{{ $hours['actual_worked_hours'] }}</span>
                                 </div>
                             </div>
 

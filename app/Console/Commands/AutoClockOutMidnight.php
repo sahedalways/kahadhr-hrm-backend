@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Attendance;
 use App\Models\AttendanceRequest;
+use App\Models\Employee;
+use App\Models\ShiftDate;
 use Carbon\Carbon;
 
 class AutoClockOutMidnight extends Command
@@ -36,26 +38,37 @@ class AutoClockOutMidnight extends Command
 
         foreach ($attendances as $attendance) {
             $userTimezone = 'Europe/London';
-            $now = now()->setTimezone($userTimezone);
+            $attendanceDate = Carbon::parse($attendance->clock_in)->format('Y-m-d');
+
+            $shiftEndTime = $this->getShiftEndTime($attendance->user_id, $attendanceDate, $userTimezone);
+            $clockOutTime = $shiftEndTime ?? now()->setTimezone($userTimezone);
 
 
             $attendance->update([
-                'clock_out' => $now,
+                'clock_out' => $clockOutTime,
+                'status' => 'approved',
                 'clock_out_location' => 'Auto Clock Out',
             ]);
 
 
-            AttendanceRequest::create([
-                'user_id' => $attendance->user_id,
-                'attendance_id' => $attendance->id,
-                'type' => 'auto_clock_out',
-                'reason' => 'Auto Clock Out at Midnight',
-                'status' => 'approved',
-            ]);
 
             $this->info("Auto Clock Out done for user {$attendance->user_id}");
         }
 
         $this->info('All open attendances auto clocked out.');
+    }
+
+    private function getShiftEndTime($userId, $attendanceDate, $timezone)
+    {
+        $employee = Employee::where('user_id', $userId)->first();
+        if (!$employee) return null;
+
+        $shift = ShiftDate::whereDate('date', $attendanceDate)
+            ->whereHas('employees', fn($q) => $q->where('employee_id', $employee->id))
+            ->first();
+
+        if (!$shift || !$shift->end_time) return null;
+
+        return Carbon::parse($shift->date . ' ' . $shift->end_time, $timezone);
     }
 }

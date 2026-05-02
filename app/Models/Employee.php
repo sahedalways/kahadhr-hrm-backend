@@ -61,6 +61,7 @@ class Employee extends Model
 
 
 
+
     /**
      * Relation: Employee belongs to a Company
      */

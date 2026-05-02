@@ -165,7 +165,7 @@ if (!function_exists('todaysShiftForUser')) {
 
     return ShiftDate::whereDate('date', Carbon::today())
       ->whereHas('employees', fn($q) => $q->where('user_id', $userId))
-      ->with(['shift', 'breaks']) // eager load anything you need
+      ->with(['shift', 'breaks'])
       ->first();
   }
 
@@ -330,9 +330,6 @@ if (!function_exists('parseTimeToMinutes')) {
 if (!function_exists('getShiftHours')) {
   function getShiftHours($attendance): array
   {
-    \Log::info('Attendance: ' . ($attendance ?? 'null'));
-    \Log::info('Breaks data: ', ['breaks' => $attendance->breaks]);
-
 
     $clockIn = $attendance->clock_in instanceof Carbon
       ? $attendance->clock_in
@@ -359,7 +356,7 @@ if (!function_exists('getShiftHours')) {
 
     $shiftHoursFormatted = '0h 0m';
     $shiftTotalMinutes = 0;
-    $shiftDate = null; // Initialize $shiftDate
+    $shiftDate = null;
 
     if ($employeeId) {
       $shiftDate = ShiftDate::where('date', $date)

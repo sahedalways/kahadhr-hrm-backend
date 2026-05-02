@@ -40,8 +40,17 @@
         <div class="col-md-3">
             <div class="card shadow-sm border-0 text-center p-3 h-100">
                 <div class="card-body">
-                    <div class="fw-bold text-muted small">Total Hours</div>
-                    <div class="h4 fw-bold text-secondary">{{ $totalHours ?? '0h 0m' }}</div>
+                    <div class="fw-bold text-muted small"> Shift Hours</div>
+                    <div class="h4 fw-bold text-secondary">{{ $totalShiftHours ?? '0h 0m' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-center p-3 h-100">
+                <div class="card-body">
+                    <div class="fw-bold text-muted small"> Worked Hours</div>
+                    <div class="h4 fw-bold text-secondary">{{ $totalWorkedHours ?? '0h 0m' }}</div>
                 </div>
             </div>
         </div>

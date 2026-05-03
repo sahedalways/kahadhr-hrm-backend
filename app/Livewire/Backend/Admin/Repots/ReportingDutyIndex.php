@@ -116,14 +116,14 @@ class ReportingDutyIndex extends BaseComponent
         $this->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'file' => 'required|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
+            'file' => 'required|mimes:pdf,jpg,jpeg,png,heic,heif,docx, doc|max:3240',
             'visibility' => 'required|in:both,company,employee',
         ], [
             'title.required' => 'Please enter the reporting duty title.',
             'title.max' => 'Title cannot exceed 255 characters.',
             'file.required' => 'Please upload a file (PDF, Image, or Document).',
             'file.mimes' => 'The file must be a PDF, Image (jpg, jpeg, png), or Document (doc, docx).',
-            'file.max' => 'The file size must not exceed 10MB.',
+            'file.max' => 'The file size must not exceed 3MB.',
             'visibility.required' => 'Please select visibility level.',
         ]);
 

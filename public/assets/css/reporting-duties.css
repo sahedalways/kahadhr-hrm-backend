@@ -79,7 +79,6 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-
 /* Button Styles */
 .btn-outline-primary,
 .btn-outline-secondary {
@@ -107,4 +106,41 @@
     .file-preview-modern {
         padding: 0.75rem !important;
     }
+}
+
+.full-description-content a,
+.description-wrapper a {
+    color: #0d6efd !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+}
+
+.full-description-content a:hover,
+.description-wrapper a:hover {
+    color: #0a58ca !important;
+    text-decoration: underline !important;
+}
+
+/* For any links inside description */
+.card-text a {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+.card-text a:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+/* Ensure links are clickable and visible */
+.description-wrapper a[href] {
+    display: inline-block;
+    font-weight: 500;
+}
+
+/* For external links */
+.description-wrapper a[target="_blank"]::after {
+    content: " ↗";
+    font-size: 0.8em;
+    display: inline-block;
 }

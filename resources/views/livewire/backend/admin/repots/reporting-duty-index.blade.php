@@ -3,6 +3,57 @@
           rel="stylesheet">
 @endpush
 
+<style>
+    [x-cloak] {
+        display: none !important;
+    }
+
+    .description-cell {
+        max-width: 300px;
+        word-wrap: break-word;
+    }
+
+    .full-desc {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    /* Ensure Quill content displays properly */
+    .description-cell p {
+        margin-bottom: 0.5rem;
+    }
+
+    .description-cell ul,
+    .description-cell ol {
+        padding-left: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .description-cell strong,
+    .description-cell b {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .description-cell a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .description-cell a:hover {
+        text-decoration: underline;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Fix for truncated text */
+    .truncated-desc {
+        word-break: break-word;
+    }
+</style>
+
 @php
     $id = request('id');
 @endphp
@@ -63,7 +114,8 @@
                         <div class="col-lg-3 col-md-3 col-6">
                             <select class="form-select"
                                     wire:model.live="visibility">
-                                <option value="both">Both </option>
+                                <option value="">All Visibility</option>
+                                <option value="both">Both</option>
                                 <option value="company">Company Only</option>
                                 <option value="employee">Employee Only</option>
                             </select>
@@ -71,7 +123,7 @@
 
                         <div class="col-lg-3 col-md-3 col-6">
                             <select class="form-select"
-                                    wire:change="handleSort($event.target.value)">
+                                    wire:model.live="sortOrder">
                                 <option value="desc">Newest First</option>
                                 <option value="asc">Oldest First</option>
                             </select>
@@ -98,7 +150,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered mt-0 text-center align-middle">
+
+                    <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
@@ -112,34 +165,75 @@
 
                         <tbody>
                             @php $i = 1; @endphp
+
                             @forelse($duties as $duty)
-                                <tr class="{{ $id == $duty->id ? 'table-primary' : '' }}">
+                                @php
+                                    // Description handling
+                                    $plainText = strip_tags($duty->description);
+                                    $needsTruncation = strlen($plainText) > 50;
+
+                                    $truncatedPlainText =
+                                        mb_substr($plainText, 0, 50) . (strlen($plainText) > 50 ? '...' : '');
+                                    $truncatedHtml = nl2br(e($truncatedPlainText));
+
+                                    // Visibility handling
+                                    $visibility = strtolower(trim($duty->visibility ?? ''));
+
+                                    $badgeClass = match ($visibility) {
+                                        'both' => 'bg-info',
+                                        'company' => 'bg-primary',
+                                        'employee' => 'bg-success',
+                                        default => 'bg-secondary',
+                                    };
+
+                                    $visibilityText = match ($visibility) {
+                                        'both' => 'Both',
+                                        'company' => 'Company Only',
+                                        'employee' => 'Employee Only',
+                                        default => 'Not Set',
+                                    };
+                                @endphp
+
+                                <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td>
+
+                                    <td class="text-start">
                                         <strong>{{ $duty->title }}</strong>
                                     </td>
-                                    <td>
-                                        {!! Str::limit($duty->description, 100) !!}
+
+                                    {{-- Description --}}
+                                    <td class="text-start"
+                                        style="max-width: 300px;">
+                                        <div class="description-cell">
+
+                                            <div id="truncated-{{ $duty->id }}">
+                                                {!! $truncatedHtml !!}
+                                            </div>
+
+                                            <div id="full-{{ $duty->id }}"
+                                                 style="display:none;">
+                                                {!! $duty->description !!}
+                                            </div>
+
+                                            @if ($needsTruncation)
+                                                <a href="javascript:void(0)"
+                                                   onclick="toggleDescription({{ $duty->id }})"
+                                                   class="text-primary small fw-semibold">
+                                                    <span id="toggle-text-{{ $duty->id }}">See More</span>
+                                                </a>
+                                            @endif
+
+                                        </div>
                                     </td>
+
+                                    {{-- Visibility --}}
                                     <td>
-                                        @php
-                                            $badgeClass = match ($duty->visibility) {
-                                                'both' => 'bg-info',
-                                                'company' => 'bg-primary',
-                                                'employee' => 'bg-success',
-                                                default => 'bg-secondary',
-                                            };
-                                            $visibilityText = match ($duty->visibility) {
-                                                'both' => 'Both',
-                                                'company' => 'Company Only',
-                                                'employee' => 'Employee Only',
-                                                default => ucfirst($duty->visibility),
-                                            };
-                                        @endphp
-                                        <span class="badge {{ $badgeClass }}">
+                                        <span class="badge rounded-pill {{ $badgeClass }}">
                                             {{ $visibilityText }}
                                         </span>
                                     </td>
+
+                                    {{-- File --}}
                                     <td>
                                         @if ($duty->file_path)
                                             <a href="{{ asset('storage/' . $duty->file_path) }}"
@@ -151,34 +245,41 @@
                                             <span class="text-muted">No file</span>
                                         @endif
                                     </td>
+
+                                    {{-- Actions --}}
                                     <td>
-                                        <a href="#"
-                                           class="badge bg-danger text-white cursor-pointer"
-                                           wire:click.prevent="$dispatch('confirmDelete', {{ $duty->id }})">
-                                            <i class="fa fa-trash"></i> Delete
-                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger px-3"
+                                                wire:click="deleteDuty({{ $duty->id }})"
+                                                onclick="return confirm('Are you sure you want to delete this duty?')">
+                                            <i class="fa fa-trash me-1"></i> Delete
+                                        </button>
                                     </td>
                                 </tr>
+
                             @empty
                                 <tr>
                                     <td colspan="6"
                                         class="text-center p-5">
-                                        <i class="fa fa-folder-open fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No reporting duties found</p>
+                                        <i class="fa fa-folder-open fa-3x text-muted mb-3 d-block"></i>
+                                        <p class="text-muted mb-0">No reporting duties found</p>
                                     </td>
                                 </tr>
                             @endforelse
+
                         </tbody>
                     </table>
 
+                    {{-- Load More --}}
                     @if ($hasMore)
                         <div class="text-center mt-4 mb-3">
                             <button wire:click="loadMore"
                                     class="btn btn-outline-primary rounded-pill px-4 py-2">
-                                <i class="fa fa-arrow-down me-2"></i>Load More
+                                <i class="fa fa-arrow-down me-2"></i> Load More
                             </button>
                         </div>
                     @endif
+
                 </div>
             </div>
         </div>
@@ -233,7 +334,7 @@
                         <label class="fw-bold mb-2">Visibility <span class="text-danger">*</span></label>
                         <select class="form-select"
                                 wire:model="visibility">
-                            <option value="both">Both </option>
+                            <option value="both">Both</option>
                             <option value="company">Company Only</option>
                             <option value="employee">Employee Only</option>
                         </select>
@@ -242,8 +343,6 @@
                             <div class="text-danger mt-1"
                                  style="font-size: 0.875rem;">{{ $message }}</div>
                         @enderror
-
-
 
                         <hr class="my-4">
 
@@ -254,12 +353,18 @@
                                wire:model="file"
                                accept="application/pdf,image/jpeg,image/png,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 
+                        <div class="mt-2 small fst-italic text-secondary">
+                            <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                            <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
+                            <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG, WebP,
+                            HEIC, HEIF, DOC or DOCX formats only
+                        </div>
+
                         @error('file')
                             <span class="text-danger mt-1 d-block"
                                   style="font-size: 0.875rem;">
-
                                 @if (str_contains($message, 'failed to upload'))
-                                    <strong>File size is too large!</strong> Maximum allowed is 3MB.
+                                    <strong>File size is too large!</strong> Maximum allowed is 3 MB.
                                 @else
                                     {{ $message }}
                                 @endif
@@ -281,8 +386,15 @@
                                 $fileUrl = $isObject ? $file->temporaryUrl() : asset('storage/' . $file);
                                 $fileName = $isObject ? $file->getClientOriginalName() : basename($file);
 
-                                $shortName = shortFileName($fileName);
-                                $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png']);
+                                $shortName = strlen($fileName) > 30 ? substr($fileName, 0, 27) . '...' : $fileName;
+                                $isImage = in_array(strtolower($extension), [
+                                    'jpg',
+                                    'jpeg',
+                                    'png',
+                                    'webp',
+                                    'heic',
+                                    'heif',
+                                ]);
                                 $isPdf = strtolower($extension) === 'pdf';
                             @endphp
 
@@ -316,15 +428,17 @@
                         @endif
 
                         <div class="modal-footer mt-4">
-                            <button class="btn btn-secondary"
+                            <button type="button"
+                                    class="btn btn-secondary"
                                     data-bs-dismiss="modal">Cancel</button>
                             <button type="submit"
                                     class="btn btn-success"
                                     wire:loading.attr="disabled"
                                     wire:target="saveDuty">
                                 <span wire:loading
-                                      wire:target="saveDuty"><i class="fas fa-spinner fa-spin me-2"></i>
-                                    Saving...</span>
+                                      wire:target="saveDuty">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Saving...
+                                </span>
                                 <span wire:loading.remove
                                       wire:target="saveDuty">Save Duty</span>
                             </button>
@@ -340,34 +454,63 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
 <script>
+    // Toggle function for See More/Less
+    function toggleDescription(id) {
+        const truncatedDiv = document.getElementById(`truncated-${id}`);
+        const fullDiv = document.getElementById(`full-${id}`);
+        const toggleText = document.getElementById(`toggle-text-${id}`);
+        const chevron = document.getElementById(`chevron-${id}`);
+
+        if (truncatedDiv.style.display === 'none') {
+            // Switch to truncated view
+            truncatedDiv.style.display = 'block';
+            fullDiv.style.display = 'none';
+            if (toggleText) toggleText.textContent = 'See More';
+            if (chevron) {
+                chevron.classList.remove('fa-chevron-up');
+                chevron.classList.add('fa-chevron-down');
+            }
+        } else {
+            // Switch to full view
+            truncatedDiv.style.display = 'none';
+            fullDiv.style.display = 'block';
+            if (toggleText) toggleText.textContent = 'See Less';
+            if (chevron) {
+                chevron.classList.remove('fa-chevron-down');
+                chevron.classList.add('fa-chevron-up');
+            }
+        }
+    }
+
+    // Initialize Quill editor
     document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('dutyDescriptionEditor')) {
+            const quillDetails = new Quill('#dutyDescriptionEditor', {
+                theme: 'snow'
+            });
 
-        const quillDetails = new Quill('#dutyDescriptionEditor', {
-            theme: 'snow'
-        });
+            quillDetails.on('text-change', function() {
+                @this.set('description', quillDetails.root.innerHTML);
+            });
 
-        quillDetails.on('text-change', function() {
-            @this.set('description', quillDetails.root.innerHTML);
-        });
+            Livewire.on('reset-editor', () => {
+                if (quillDetails) {
+                    quillDetails.root.innerHTML = '';
+                }
+            });
 
-        Livewire.on('reset-editor', () => {
-            quillDetails.root.innerHTML = '';
-        });
-
-        Livewire.on('load-description-add', (description) => {
-            quillDetails.root.innerHTML = description || '';
-        });
-
-    });
-</script>
-
-<script>
-    Livewire.on('confirmDelete', id => {
-        if (confirm("Are you sure you want to delete this reporting duty?")) {
-            Livewire.dispatch('deleteDuty', {
-                id: id
+            Livewire.on('load-description-add', (description) => {
+                if (quillDetails && description) {
+                    quillDetails.root.innerHTML = description;
+                }
             });
         }
+    });
+
+    // Re-initialize after Livewire updates
+    document.addEventListener('livewire:navigated', function() {
+        console.log('Livewire navigation completed');
     });
 </script>

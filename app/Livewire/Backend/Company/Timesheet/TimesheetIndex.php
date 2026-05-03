@@ -425,7 +425,6 @@ class TimesheetIndex extends BaseComponent
             $start = Carbon::parse($this->startDate)->startOfWeek(Carbon::MONDAY)->startOfDay();
             $end = Carbon::parse($this->endDate)->endOfWeek(Carbon::SUNDAY)->endOfDay();
         } else {
-
             $start = Carbon::parse($this->startDate)->startOfMonth()->startOfDay();
             $end = Carbon::parse($this->endDate)->endOfMonth()->endOfDay();
         }
@@ -442,22 +441,37 @@ class TimesheetIndex extends BaseComponent
 
             $clockIn = Carbon::parse($attendance->clock_in);
             $clockOut = Carbon::parse($attendance->clock_out);
-
             if ($clockOut->lessThan($clockIn)) {
                 $clockOut->addDay();
             }
-
             $workedMinutes = $clockIn->diffInRealMinutes($clockOut);
 
-            foreach ($attendance->breaks as $break) {
-                if (strtolower($break->type) === 'unpaid' && $break->duration) {
-                    $workedMinutes -= parseTimeToMinutes($break->duration);
+
+            $mergedBreaks = collect();
+
+
+            if ($attendance->breaks && $attendance->breaks->count() > 0) {
+                $mergedBreaks = $mergedBreaks->merge($attendance->breaks);
+            }
+
+
+            $employeeId = $attendance->user->employee->id ?? null;
+            if ($employeeId) {
+                $shiftDate = ShiftDate::whereDate('date', $clockIn->format('Y-m-d'))
+                    ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
+                    ->with('breaks')
+                    ->first();
+                if ($shiftDate && $shiftDate->breaks && $shiftDate->breaks->count() > 0) {
+                    $mergedBreaks = $mergedBreaks->merge($shiftDate->breaks);
                 }
             }
 
-            foreach ($attendance->breaks as $break) {
-                if (strtolower($break->type) === 'paid' && $break->duration) {
-                    $workedMinutes += parseTimeToMinutes($break->duration);
+
+            foreach ($mergedBreaks as $break) {
+                if (!$break->duration) continue;
+                $breakMinutes = parseTimeToMinutes($break->duration);
+                if (strtolower($break->type) === 'unpaid') {
+                    $workedMinutes -= $breakMinutes;
                 }
             }
 
@@ -466,7 +480,6 @@ class TimesheetIndex extends BaseComponent
 
         $hours = intdiv($totalMinutes, 60);
         $minutes = $totalMinutes % 60;
-
         return "{$hours}h {$minutes}m";
     }
 

@@ -144,80 +144,82 @@ class CompanyTimesheet extends BaseComponent
             $clockOut = $att->clock_out ? Carbon::parse($att->clock_out) : null;
 
 
-            $workedMinutes = $clockOut ? $clockIn->diffInMinutes($clockOut) : 0;
-            $workedHoursFormatted = str_pad(floor($workedMinutes / 60), 2, '0', STR_PAD_LEFT) . ":" . str_pad($workedMinutes % 60, 2, '0', STR_PAD_LEFT);
-
-            $shiftTotalHours = '00:00';
-            $paidBreakFormatted = 'N/A';
-            $unpaidBreakFormatted = 'N/A';
-
-
-            if ($att->is_manual && $att->breaks && $att->breaks->count() > 0) {
-
-                $paidMinutes = 0;
-                $unpaidMinutes = 0;
-                $shiftTotalHours = $workedHoursFormatted;
-
-                foreach ($att->breaks as $break) {
-
-                    $breakMinutes = parseTimeToMinutes($break->duration);
-
-                    if (strtolower($break->type) === 'paid') {
-                        $paidMinutes += $breakMinutes;
-                    } else {
-                        $unpaidMinutes += $breakMinutes;
-                    }
-                }
-
-                if ($paidMinutes > 0) {
-                    $paidBreakFormatted = str_pad(floor($paidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
-                        str_pad($paidMinutes % 60, 2, '0', STR_PAD_LEFT);
-                }
-
-                if ($unpaidMinutes > 0) {
-                    $unpaidBreakFormatted = str_pad(floor($unpaidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
-                        str_pad($unpaidMinutes % 60, 2, '0', STR_PAD_LEFT);
-                }
-            } elseif ($att->user && $att->user->employee) {
+            $shiftDate = null;
+            $attendanceDate = $clockIn->format('Y-m-d');
+            if ($att->user && $att->user->employee) {
                 $employee = $att->user->employee;
-                $attendanceDate = $clockIn->format('Y-m-d');
-
-
                 $shiftDate = ShiftDate::whereDate('date', $attendanceDate)
                     ->whereHas('employees', function ($q) use ($employee) {
                         $q->where('employee_id', $employee->id);
                     })
                     ->with('breaks')
                     ->first();
+            }
 
-                if ($shiftDate) {
-                    $shiftTotalHours = $shiftDate->total_hours ?? '00:00';
 
-                    $paidMinutes = $shiftDate->breaks->where('type', 'Paid')->sum(function ($break) {
-                        $parts = explode('.', $break->duration);
-                        $hours = (int) ($parts[0] ?? 0);
-                        $minutes = (int) ($parts[1] ?? 0);
-                        return ($hours * 60) + $minutes;
-                    });
+            $shiftTotalHours = '00:00';
+            if ($shiftDate) {
+                $startTime = Carbon::parse($shiftDate->start_time);
+                $endTime = Carbon::parse($shiftDate->end_time);
+                if ($endTime->lessThan($startTime)) {
+                    $endTime->addDay();
+                }
+                $shiftTotalMinutes = $startTime->diffInMinutes($endTime);
+                $shiftTotalHours = str_pad(floor($shiftTotalMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
+                    str_pad($shiftTotalMinutes % 60, 2, '0', STR_PAD_LEFT);
+            }
 
-                    $unpaidMinutes = $shiftDate->breaks->where('type', 'Unpaid')->sum(function ($break) {
-                        $parts = explode('.', $break->duration);
-                        $hours = (int) ($parts[0] ?? 0);
-                        $minutes = (int) ($parts[1] ?? 0);
-                        return ($hours * 60) + $minutes;
-                    });
 
-                    if ($paidMinutes > 0) {
-                        $paidBreakFormatted = str_pad(floor($paidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
-                            str_pad($paidMinutes % 60, 2, '0', STR_PAD_LEFT);
-                    }
+            $workedMinutes = $clockOut ? $clockIn->diffInMinutes($clockOut) : 0;
 
-                    if ($unpaidMinutes > 0) {
-                        $unpaidBreakFormatted = str_pad(floor($unpaidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
-                            str_pad($unpaidMinutes % 60, 2, '0', STR_PAD_LEFT);
+
+
+            $paidMinutes = 0;
+            $unpaidMinutes = 0;
+
+
+            if ($att->breaks && $att->breaks->count() > 0) {
+                foreach ($att->breaks as $break) {
+                    $breakMinutes = parseTimeToMinutes($break->duration);
+                    if (strtolower($break->type) === 'paid') {
+                        $paidMinutes += $breakMinutes;
+                    } else {
+                        $unpaidMinutes += $breakMinutes;
                     }
                 }
             }
+
+
+            if ($shiftDate && $shiftDate->breaks && $shiftDate->breaks->count() > 0) {
+                foreach ($shiftDate->breaks as $break) {
+                    $duration = (float) $break->duration;
+                    $hours = floor($duration);
+                    $minutes = ($duration - $hours) * 100;
+                    $breakMinutes = ($hours * 60) + (int) $minutes;
+
+                    if (strtolower($break->type) === 'paid') {
+                        $paidMinutes += $breakMinutes;
+                    } elseif (strtolower($break->type) === 'unpaid') {
+                        $unpaidMinutes += $breakMinutes;
+                    }
+                }
+            }
+
+            $paidBreakFormatted = 'N/A';
+            $unpaidBreakFormatted = 'N/A';
+
+            if ($paidMinutes > 0) {
+                $paidBreakFormatted = str_pad(floor($paidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
+                    str_pad($paidMinutes % 60, 2, '0', STR_PAD_LEFT);
+            }
+
+            if ($unpaidMinutes > 0) {
+                $unpaidBreakFormatted = str_pad(floor($unpaidMinutes / 60), 2, '0', STR_PAD_LEFT) . ':' .
+                    str_pad($unpaidMinutes % 60, 2, '0', STR_PAD_LEFT);
+            }
+
+            $workedMinutes = max(0, $workedMinutes - $unpaidMinutes);
+            $workedHoursFormatted = str_pad(floor($workedMinutes / 60), 2, '0', STR_PAD_LEFT) . ":" . str_pad($workedMinutes % 60, 2, '0', STR_PAD_LEFT);
 
             return [
                 'employee'     => $att->user->employee->full_name ?? '',

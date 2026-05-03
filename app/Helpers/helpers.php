@@ -354,6 +354,7 @@ if (!function_exists('getShiftHours')) {
 
     $shiftHoursFormatted = '0h 0m';
     $shiftTotalMinutes = 0;
+    $shiftDate = null; // store shiftDate for later use
 
     if ($employeeId) {
       $shiftDate = ShiftDate::where('date', $date)
@@ -361,38 +362,52 @@ if (!function_exists('getShiftHours')) {
         ->first();
 
       if ($shiftDate) {
-        // শুধু start_time এবং end_time থেকে shift hours calculate করুন
+        // shift hours from start_time/end_time
         $startTime = Carbon::parse($shiftDate->start_time);
         $endTime = Carbon::parse($shiftDate->end_time);
-
         if ($endTime->lessThan($startTime)) {
           $endTime->addDay();
         }
-
         $shiftTotalMinutes = $startTime->diffInMinutes($endTime);
         $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
       }
     }
 
+
     $paidBreakMinutes = 0;
     $unpaidBreakMinutes = 0;
     $totalBreakMinutes = 0;
 
+    // 1. Attendance breaks
     if ($attendance && method_exists($attendance, 'breaks') && $attendance->breaks) {
       foreach ($attendance->breaks as $break) {
         if ($break->duration) {
           $breakMinutes = parseTimeToMinutes($break->duration);
-
           if (isset($break->type) && strtolower($break->type) === 'unpaid') {
             $unpaidBreakMinutes += $breakMinutes;
           } else {
             $paidBreakMinutes += $breakMinutes;
           }
-
           $totalBreakMinutes += $breakMinutes;
         }
       }
     }
+
+    // 2. ShiftDate breaks (if exists)
+    if ($shiftDate && $shiftDate->breaks && $shiftDate->breaks->count() > 0) {
+      foreach ($shiftDate->breaks as $break) {
+        if ($break->duration) {
+          $breakMinutes = parseTimeToMinutes($break->duration);
+          if (isset($break->type) && strtolower($break->type) === 'unpaid') {
+            $unpaidBreakMinutes += $breakMinutes;
+          } else {
+            $paidBreakMinutes += $breakMinutes;
+          }
+          $totalBreakMinutes += $breakMinutes;
+        }
+      }
+    }
+    // ---------------------------------------------------------
 
     if (!$clockOut) {
       return [
@@ -411,7 +426,6 @@ if (!function_exists('getShiftHours')) {
 
     $totalWorkedMinutes = (int) round($clockIn->diffInRealMinutes($clockOut));
     $actualWorkedMinutes = $totalWorkedMinutes - $unpaidBreakMinutes;
-
     if ($actualWorkedMinutes < 0) {
       $actualWorkedMinutes = 0;
     }

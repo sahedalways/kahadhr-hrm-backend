@@ -170,10 +170,10 @@
                                 @php
                                     // Description handling
                                     $plainText = strip_tags($duty->description);
-                                    $needsTruncation = strlen($plainText) > 50;
+                                    $needsTruncation = strlen($plainText) > 20;
 
                                     $truncatedPlainText =
-                                        mb_substr($plainText, 0, 50) . (strlen($plainText) > 50 ? '...' : '');
+                                        mb_substr($plainText, 0, 20) . (strlen($plainText) > 20 ? '...' : '');
                                     $truncatedHtml = nl2br(e($truncatedPlainText));
 
                                     // Visibility handling

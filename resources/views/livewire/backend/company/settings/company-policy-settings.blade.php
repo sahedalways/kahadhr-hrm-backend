@@ -7,6 +7,13 @@
     $id = request('id');
 @endphp
 
+
+<style>
+    .description-cell a {
+        color: #0d6efd !important;
+        text-decoration: underline;
+    }
+</style>
 <div>
     <div class="row g-3 align-items-center justify-content-between mb-4">
 
@@ -111,10 +118,38 @@
                                     </td>
 
 
-                                    <td>
-                                        {!! Str::limit($policy->description, 100) !!}
-                                    </td>
+                                    <td x-data="{ expanded: false }"
+                                        class="policy-description">
+                                        <div x-show="expanded"
+                                             x-collapse.duration.300ms
+                                             class="prose prose-sm max-w-none text-gray-700 leading-relaxed description-cell">
+                                            {!! $policy->description !!}
+                                        </div>
 
+                                        <div x-show="!expanded"
+                                             x-collapse.duration.300ms
+                                             class="text-gray-500 text-sm description-cell">
+                                            {!! Str::limit(strip_tags($policy->description), 50) !!}
+                                        </div>
+
+                                        <button @click="expanded = !expanded"
+                                                class="text-primary small fw-semibold inline-flex items-center gap-1 bg-transparent border-0 p-0 hover:text-primary-dark transition-colors duration-200 focus:outline-none"
+                                                style="background: none; box-shadow: none;">
+                                            <span id="toggle-text"
+                                                  x-text="expanded ? 'See Less' : 'See More'"></span>
+                                            <svg class="w-3 h-3 ml-1 transition-transform duration-200"
+                                                 :class="expanded ? 'rotate-180' : ''"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 viewBox="0 0 24 24"
+                                                 style="display: inline-block;">
+                                                <path stroke-linecap="round"
+                                                      stroke-linejoin="round"
+                                                      stroke-width="2"
+                                                      d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                    </td>
 
                                     <td>
                                         <a data-bs-toggle="modal"
@@ -214,7 +249,14 @@
                         <input type="file"
                                class="form-control"
                                wire:model="file"
-                               accept="application/pdf,image/jpeg,image/png">
+                               accept=".pdf,.jpg,.jpeg,.png,.heic,.heif">
+
+                        <div class="mt-2 small fst-italic text-secondary">
+                            <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                            <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
+                            <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG
+                            HEIC, HEIF formats only
+                        </div>
 
                         @error('file')
                             <span class="text-danger mt-1 d-block"
@@ -361,7 +403,14 @@
                         <input type="file"
                                class="form-control"
                                wire:model="file"
-                               accept="application/pdf,image/jpeg,image/png">
+                               accept=".pdf,.jpg,.jpeg,.png,.heic,.heif">
+
+                        <div class="mt-2 small fst-italic text-secondary">
+                            <i class="bi bi-cloud-upload me-1 text-primary"></i> 3 MB max •
+                            <i class="bi bi-file-earmark-plus me-1 text-success"></i> 1 file at a time •
+                            <i class="bi bi-filetype-pdf me-1 text-purple"></i> PDF, JPG, JPEG, PNG
+                            HEIC, HEIF formats only
+                        </div>
 
                         @error('file')
                             <span class="text-danger mt-1 d-block"

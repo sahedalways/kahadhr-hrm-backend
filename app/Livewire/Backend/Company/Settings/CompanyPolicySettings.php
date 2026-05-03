@@ -139,14 +139,14 @@ class CompanyPolicySettings extends BaseComponent
         $this->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'file' => 'required|mimes:pdf,jpg,jpeg,png|max:10240',
+            'file' => 'required|mimes:pdf,jpg,jpeg,png,heic,heif|max:3240',
             'send_email' => 'boolean',
         ], [
             'title.required' => 'Please enter the policy title.',
             'title.max' => 'Title cannot exceed 255 characters.',
             'file.required' => 'Please upload a PDF or Image file.',
             'file.mimes' => 'The file must be a PDF or an Image (jpg, jpeg, png).',
-            'file.max' => 'The file size must not exceed 10MB.',
+            'file.max' => 'The file size must not exceed 3MB.',
         ]);
 
 
@@ -207,14 +207,14 @@ class CompanyPolicySettings extends BaseComponent
 
 
         if ($this->file instanceof UploadedFile) {
-            $rules['file'] = 'mimes:pdf,jpg,jpeg,png|max:10240';
+            $rules['file'] = 'mimes:pdf,jpg,jpeg,png|max:3240';
         }
 
         $this->validate($rules, [
             'title.required' => 'Please enter the policy title.',
             'title.max' => 'Title cannot exceed 255 characters.',
             'file.mimes' => 'The file must be a PDF or an Image (jpg, jpeg, png).',
-            'file.max' => 'The file size must not exceed 10MB.',
+            'file.max' => 'The file size must not exceed 3MB.',
         ]);
 
 

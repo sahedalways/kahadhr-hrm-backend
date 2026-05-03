@@ -377,16 +377,6 @@ class TimesheetIndex extends BaseComponent
 
         $this->totalShiftHours = $this->calculateTotalShiftHours();
         $this->totalWorkedHours = $this->calculateTotalWorkedHours();
-
-        Log::info('Refresh Stats - Monthly View:', [
-            'viewMode' => $this->viewMode,
-            'start' => $this->startDate instanceof Carbon ? $this->startDate->format('Y-m-d') : $this->startDate,
-            'end' => $this->endDate instanceof Carbon ? $this->endDate->format('Y-m-d') : $this->endDate,
-            'shift_hours' => $this->totalShiftHours,
-            'worked_hours' => $this->totalWorkedHours,
-            'absents' => $this->totalAbsents,
-            'leaves' => $this->totalLeaves,
-        ]);
     }
 
 
@@ -399,7 +389,6 @@ class TimesheetIndex extends BaseComponent
             $start = Carbon::parse($this->startDate)->startOfWeek(Carbon::MONDAY);
             $end = Carbon::parse($this->endDate)->endOfWeek(Carbon::SUNDAY);
         } else {
-
             $start = Carbon::parse($this->startDate)->startOfMonth();
             $end = Carbon::parse($this->endDate)->endOfMonth();
         }
@@ -411,16 +400,15 @@ class TimesheetIndex extends BaseComponent
             ->get();
 
         foreach ($shiftDates as $shiftDate) {
-            if ($shiftDate->total_hours) {
-                $totalMinutes += parseTimeToMinutes($shiftDate->total_hours);
-            } else {
-                $startTime = Carbon::parse($shiftDate->start_time);
-                $endTime = Carbon::parse($shiftDate->end_time);
-                if ($endTime->lessThan($startTime)) {
-                    $endTime->addDay();
-                }
-                $totalMinutes += $startTime->diffInMinutes($endTime);
+
+            $startTime = Carbon::parse($shiftDate->start_time);
+            $endTime = Carbon::parse($shiftDate->end_time);
+
+            if ($endTime->lessThan($startTime)) {
+                $endTime->addDay();
             }
+
+            $totalMinutes += $startTime->diffInMinutes($endTime);
         }
 
         $hours = intdiv($totalMinutes, 60);
@@ -514,6 +502,7 @@ class TimesheetIndex extends BaseComponent
             $this->startDate = $today->copy()->startOfMonth();
             $this->endDate = $today->copy()->endOfMonth();
             $this->currentDate = $today;
+            $this->generateMonthlyWeeks();
         }
 
         $this->loadEmployees();
@@ -530,7 +519,11 @@ class TimesheetIndex extends BaseComponent
         } elseif ($this->viewMode === 'monthly') {
             $this->startDate = $this->startDate->copy()->subMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->generateMonthlyWeeks();
         }
+
+
+
         $this->currentDate = $this->startDate->copy();
         $this->totalShiftHours = $this->calculateTotalShiftHours();
         $this->totalWorkedHours = $this->calculateTotalWorkedHours();
@@ -545,7 +538,10 @@ class TimesheetIndex extends BaseComponent
         } elseif ($this->viewMode === 'monthly') {
             $this->startDate = $this->startDate->copy()->addMonth()->startOfMonth();
             $this->endDate = $this->startDate->copy()->endOfMonth();
+            $this->generateMonthlyWeeks();
         }
+
+
         $this->currentDate = $this->startDate->copy();
         $this->totalShiftHours = $this->calculateTotalShiftHours();
         $this->totalWorkedHours = $this->calculateTotalWorkedHours();
@@ -626,18 +622,38 @@ class TimesheetIndex extends BaseComponent
         $this->employees = $query->orderBy('f_name')->get();
     }
 
+    public function generateMonthlyWeeks()
+    {
+        $startOfMonth = Carbon::parse($this->startDate)->startOfMonth();
+        $startOfCalendar = $startOfMonth->copy()->startOfWeek(Carbon::MONDAY);
+        $endOfCalendar = $startOfMonth->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
+
+        $days = collect();
+        $current = $startOfCalendar->copy();
+
+        while ($current <= $endOfCalendar) {
+            $days->push($current->copy());
+            $current->addDay();
+        }
+
+        $this->weeks = $days->chunk(7);
+    }
+
 
 
 
     public function buildAttendanceCalendar()
     {
-        $start = $this->viewMode === 'weekly'
-            ? $this->startDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay()
-            : $this->startDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY)->startOfDay();
+        if ($this->viewMode === 'weekly') {
+            $start = $this->startDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay();
+            $end = $this->startDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay();
+        } else {
+            $start = Carbon::parse($this->startDate)->startOfMonth()->startOfDay();
+            $end = Carbon::parse($this->startDate)->endOfMonth()->endOfDay();
+        }
 
-        $end = $this->viewMode === 'weekly'
-            ? $this->startDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay()
-            : $this->endDate->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY)->endOfDay();
+
+
 
         $rows = Attendance::with('user:id,f_name,l_name', 'requests')
             ->where('company_id', $this->company_id)
@@ -676,6 +692,8 @@ class TimesheetIndex extends BaseComponent
             ->get()
             ->groupBy(fn($row) => $row->date)               // Y-m-d
             ->map(fn($g) => $g->pluck('employee_id')->toArray());
+
+
 
 
         $this->refreshStats();
@@ -872,11 +890,8 @@ class TimesheetIndex extends BaseComponent
         $this->endDate = Carbon::today()->endOfWeek(Carbon::SUNDAY);
         $this->currentDate = Carbon::today();
 
-        $start = $this->startDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY);
-        $end   = $this->startDate->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
-        $days  = collect(Carbon::parse($start)->daysUntil($end)->toArray());
+        $this->generateMonthlyWeeks();
 
-        $this->weeks = $days->chunk(7);
         $this->loadEmployees();
         $this->buildAttendanceCalendar();
         $this->refreshStats();

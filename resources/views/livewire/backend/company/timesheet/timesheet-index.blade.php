@@ -284,100 +284,89 @@
                                     <th>Sun</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 @foreach ($weeks as $week)
                                     <tr>
                                         @foreach ($week as $day)
                                             @php
-                                                $isCurrent = $day->month == $this->startDate->month;
+                                                $isCurrentMonth = $day->month == $this->startDate->month;
                                                 $dateKey = $day->format('Y-m-d');
                                                 $hasAtt = !empty($this->attendanceCalendar[$dateKey]);
-                                                $employees = $this->shiftMap[$dateKey] ?? [];
-
+                                                $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
                                             @endphp
 
                                             <td class="schedule-cell month-cell {{ $day->equalTo(today()) ? 'bg-primary-light-cell' : '' }}"
-                                                style="height:120px; width:14.28%; position:relative; vertical-align:top; padding:4px;">
+                                                style="height:120px; width:14.28%; position:relative; vertical-align:top; padding:4px;
+                                {{ !$isCurrentMonth ? 'background-color: #f8f9fa; opacity: 0.6;' : '' }}">
 
                                                 {{-- Date number --}}
-                                                <span class="date-number fw-bold">{{ $day->day }}</span>
-                                                @php
-                                                    $isCurrentMonth = $day->month === $this->startDate->month;
-                                                    $isPastOrToday = $day->lessThanOrEqualTo(today());
+                                                <span
+                                                      class="date-number fw-bold {{ !$isCurrentMonth ? 'text-muted' : '' }}">
+                                                    {{ $day->day }}
+                                                </span>
 
-                                                    $attendances = collect($this->attendanceCalendar[$dateKey] ?? []);
-                                                    $totalAtt = $attendances->count();
-                                                    $visibleAtt = $attendances->take(2); // সর্বোচ্চ ২ টা দেখাবে
-                                                    $moreCount = $totalAtt - 2;
+                                                {{-- শুধু current month এর জন্য attendance দেখাবে --}}
+                                                @if ($isCurrentMonth)
+                                                    @php
+                                                        $attendances = collect(
+                                                            $this->attendanceCalendar[$dateKey] ?? [],
+                                                        );
+                                                        $totalAtt = $attendances->count();
+                                                        $visibleAtt = $attendances->take(2);
+                                                        $moreCount = $totalAtt - 2;
+                                                    @endphp
 
-                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
-                                                    $attendanceUserIds = $attendances->pluck('user_id')->unique();
-                                                    $absentCount = collect($shiftEmployees)
-                                                        ->diff($attendanceUserIds)
-                                                        ->count();
-                                                @endphp
+                                                    {{-- Attendance Section --}}
+                                                    @if ($totalAtt > 0)
+                                                        <div class="d-flex flex-column gap-1">
+                                                            @foreach ($visibleAtt as $att)
+                                                                <div class="attendance-wrapper"
+                                                                     style="transform: scale(0.95); margin-left: -5px; margin-right: -5px;">
+                                                                    @include(
+                                                                        'livewire.backend.company.timesheet.partials._attendance-block',
+                                                                        ['att' => $att]
+                                                                    )
+                                                                </div>
+                                                            @endforeach
 
-                                                {{-- Attendance Section --}}
-                                                @if ($isCurrentMonth && $totalAtt > 0)
-                                                    <div class="d-flex flex-column gap-1">
-                                                        @foreach ($visibleAtt as $att)
-                                                            <div class="attendance-wrapper"
-                                                                 style="transform: scale(0.95); margin-left: -5px; margin-right: -5px;">
-                                                                @include(
-                                                                    'livewire.backend.company.timesheet.partials._attendance-block',
-                                                                    ['att' => $att]
-                                                                )
-                                                            </div>
-                                                        @endforeach
-
-
-
-                                                        {{-- More Indicator --}}
-                                                        @if ($moreCount > 0)
-                                                            <div class="text-center py-1 rounded"
-                                                                 style="font-size: 10px; cursor: pointer; background: #f8f9fa; color: #007bff; border: 1px dashed #007bff; font-weight: 600;"
-                                                                 wire:click="openAttendanceMoreModal('{{ $dateKey }}')">
-                                                                +{{ $moreCount }} others
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @endif
-
-
-                                                @php
-                                                    $shiftEmployees = $this->shiftMap[$dateKey] ?? [];
-                                                    $attendanceUserIds = collect(
-                                                        $this->attendanceCalendar[$dateKey] ?? [],
-                                                    )
-                                                        ->pluck('user_id')
-                                                        ->unique();
-
-                                                    $attendanceEmployeeIds = \App\Models\Employee::whereIn(
-                                                        'user_id',
-                                                        $attendanceUserIds,
-                                                    )
-                                                        ->pluck('id')
-                                                        ->toArray();
-
-                                                    $absentCount = count(
-                                                        array_diff($shiftEmployees, $attendanceEmployeeIds),
-                                                    );
-                                                @endphp
-
-                                                @if ($isCurrentMonth && $isPastOrToday && $absentCount > 0)
-                                                    <div class="position-absolute bottom-0 start-0 w-100 px-1 pb-1">
-                                                        <div class="badge bg-danger d-flex align-items-center justify-content-center gap-1 w-100 shadow-sm"
-                                                             style="font-size: 10px; height: 22px; cursor: pointer; border-radius: 4px;"
-                                                             wire:click="showAbsentDetails('{{ $dateKey }}')">
-                                                            <i class="fas fa-user-times"
-                                                               style="font-size: 9px;"></i>
-                                                            <span>{{ $absentCount }} Absent</span>
+                                                            @if ($moreCount > 0)
+                                                                <div class="text-center py-1 rounded"
+                                                                     style="font-size: 10px; cursor: pointer; background: #f8f9fa; color: #007bff; border: 1px dashed #007bff; font-weight: 600;"
+                                                                     wire:click="openAttendanceMoreModal('{{ $dateKey }}')">
+                                                                    +{{ $moreCount }} others
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    </div>
+                                                    @endif
+
+                                                    {{-- Absent Badge --}}
+                                                    @php
+                                                        $isPastOrToday = $day->lessThanOrEqualTo(today());
+                                                        $attendanceUserIds = $attendances->pluck('user_id')->unique();
+                                                        $attendanceEmployeeIds = \App\Models\Employee::whereIn(
+                                                            'user_id',
+                                                            $attendanceUserIds,
+                                                        )
+                                                            ->pluck('id')
+                                                            ->toArray();
+                                                        $absentCount = count(
+                                                            array_diff($shiftEmployees, $attendanceEmployeeIds),
+                                                        );
+                                                    @endphp
+
+                                                    @if ($isPastOrToday && $absentCount > 0)
+                                                        <div
+                                                             class="position-absolute bottom-0 start-0 w-100 px-1 pb-1">
+                                                            <div class="badge bg-danger d-flex align-items-center justify-content-center gap-1 w-100 shadow-sm"
+                                                                 style="font-size: 10px; height: 22px; cursor: pointer; border-radius: 4px;"
+                                                                 wire:click="showAbsentDetails('{{ $dateKey }}')">
+                                                                <i class="fas fa-user-times"
+                                                                   style="font-size: 9px;"></i>
+                                                                <span>{{ $absentCount }} Absent</span>
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 @endif
-
-
                                             </td>
                                         @endforeach
                                     </tr>

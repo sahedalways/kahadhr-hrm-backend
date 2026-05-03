@@ -330,7 +330,6 @@ if (!function_exists('parseTimeToMinutes')) {
 if (!function_exists('getShiftHours')) {
   function getShiftHours($attendance): array
   {
-
     $clockIn = $attendance->clock_in instanceof Carbon
       ? $attendance->clock_in
       : ($attendance->clock_in ? Carbon::parse($attendance->clock_in) : null);
@@ -352,30 +351,32 @@ if (!function_exists('getShiftHours')) {
 
     $date = $clockIn->format('Y-m-d');
     $employeeId = $attendance->user->employee->id ?? null;
-    $isManual = $attendance->is_manual ?? false;
 
     $shiftHoursFormatted = '0h 0m';
     $shiftTotalMinutes = 0;
-    $shiftDate = null;
 
     if ($employeeId) {
       $shiftDate = ShiftDate::where('date', $date)
         ->whereHas('employees', fn($q) => $q->where('employee_id', $employeeId))
         ->first();
 
-      if ($shiftDate && $shiftDate->total_hours) {
-        $shiftTotalMinutes = parseTimeToMinutes($shiftDate->total_hours);
+      if ($shiftDate) {
+        // শুধু start_time এবং end_time থেকে shift hours calculate করুন
+        $startTime = Carbon::parse($shiftDate->start_time);
+        $endTime = Carbon::parse($shiftDate->end_time);
+
+        if ($endTime->lessThan($startTime)) {
+          $endTime->addDay();
+        }
+
+        $shiftTotalMinutes = $startTime->diffInMinutes($endTime);
         $shiftHoursFormatted = formatMinutesToHours($shiftTotalMinutes);
-      } else {
-        $shiftTotalMinutes = 0;
-        $shiftHoursFormatted = '0h 0m';
       }
     }
 
     $paidBreakMinutes = 0;
     $unpaidBreakMinutes = 0;
     $totalBreakMinutes = 0;
-
 
     if ($attendance && method_exists($attendance, 'breaks') && $attendance->breaks) {
       foreach ($attendance->breaks as $break) {
@@ -392,8 +393,6 @@ if (!function_exists('getShiftHours')) {
         }
       }
     }
-
-
 
     if (!$clockOut) {
       return [
@@ -417,13 +416,8 @@ if (!function_exists('getShiftHours')) {
       $actualWorkedMinutes = 0;
     }
 
-
-
-
     return [
-      'shift_hours' => ($shiftHoursFormatted == '0h 0m' && $shiftTotalMinutes === 0)
-        ? formatMinutesToHours($totalWorkedMinutes)
-        : $shiftHoursFormatted,
+      'shift_hours'           => $shiftHoursFormatted,
       'worked_hours'          => formatMinutesToHours($totalWorkedMinutes),
       'total_break_hours'     => formatMinutesToHours($totalBreakMinutes),
       'paid_break_hours'      => formatMinutesToHours($paidBreakMinutes),

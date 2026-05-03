@@ -52,6 +52,14 @@
     .truncated-desc {
         word-break: break-word;
     }
+
+    .clamp-html {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 
 @php
@@ -201,26 +209,54 @@
                                         <strong>{{ $duty->title }}</strong>
                                     </td>
 
+
+
+
+
+
+
+
                                     {{-- Description --}}
                                     <td class="text-start"
                                         style="max-width: 300px;">
-                                        <div class="description-cell">
+                                        <div class="description-wrapper mb-3"
+                                             x-data="{ expanded: false }">
 
-                                            <div id="truncated-{{ $duty->id }}">
-                                                {!! $truncatedHtml !!}
-                                            </div>
+                                            <!-- Short Description (truncated) -->
+                                            <div x-show="!expanded"
+                                                 x-transition.duration.300ms
+                                                 class="card-text text-muted small mb-2 description-cell clamp-html">
 
-                                            <div id="full-{{ $duty->id }}"
-                                                 style="display:none;">
                                                 {!! $duty->description !!}
+
                                             </div>
+
+                                            <!-- Full Description (with HTML) -->
+                                            <div x-show="expanded"
+                                                 x-transition.duration.300ms
+                                                 class="card-text text-muted small mb-2 full-description-content description-cell"
+                                                 x-html="@js($duty->description)">
+                                            </div>
+
+                                            @php
+                                                $needsTruncation = strlen(strip_tags($duty->description)) > 20;
+                                            @endphp
 
                                             @if ($needsTruncation)
-                                                <a href="javascript:void(0)"
-                                                   onclick="toggleDescription({{ $duty->id }})"
-                                                   class="text-primary small fw-semibold">
-                                                    <span id="toggle-text-{{ $duty->id }}">See More</span>
-                                                </a>
+                                                <button @click="expanded = !expanded"
+                                                        type="button"
+                                                        class="btn btn-link text-primary small fw-semibold p-0 m-0 text-decoration-none mt-1"
+                                                        style="background: none; border: none; box-shadow: none;">
+
+                                                    <span x-show="!expanded">
+                                                        <i class="fas fa-chevron-down me-1"></i>See More
+                                                    </span>
+
+                                                    <span x-show="expanded">
+                                                        <i class="fas fa-chevron-up me-1"></i>See Less
+                                                    </span>
+
+                                                </button>
                                             @endif
 
                                         </div>

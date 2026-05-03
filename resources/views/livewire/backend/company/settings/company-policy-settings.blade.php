@@ -13,6 +13,13 @@
         color: #0d6efd !important;
         text-decoration: underline;
     }
+
+    .clamp-html {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 <div>
     <div class="row g-3 align-items-center justify-content-between mb-4">
@@ -128,8 +135,8 @@
 
                                         <div x-show="!expanded"
                                              x-collapse.duration.300ms
-                                             class="text-gray-500 text-sm description-cell">
-                                            {!! Str::limit(strip_tags($policy->description), 50) !!}
+                                             class="text-gray-500 text-sm description-cell clamp-html">
+                                            {!! $policy->description !!}
                                         </div>
 
                                         <button @click="expanded = !expanded"

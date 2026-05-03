@@ -102,11 +102,10 @@
                                 <div class="description-wrapper mb-3"
                                      x-data="{ expanded: false }">
 
-
-                                    <div class="card-text text-muted small mb-2"
+                                    <div class="card-text text-muted small mb-2 clamp-html"
                                          x-show="!expanded"
                                          x-cloak>
-                                        {!! nl2br(e($truncatedDescription)) !!}
+                                        {!! $duty->description !!}
                                     </div>
 
 
@@ -264,6 +263,13 @@
     <style>
         [x-cloak] {
             display: none !important;
+        }
+
+        .clamp-html {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 

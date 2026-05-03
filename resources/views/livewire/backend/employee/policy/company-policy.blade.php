@@ -102,8 +102,10 @@
                                     <!-- Short Description (truncated) -->
                                     <div x-show="!expanded"
                                          x-transition.duration.300ms
-                                         class="card-text text-muted small mb-2 description-cell">
-                                        {{ Str::limit(strip_tags($policy->description), 20) }}
+                                         class="card-text text-muted small mb-2 description-cell clamp-html">
+
+                                        {!! $policy->description !!}
+
                                     </div>
 
                                     <!-- Full Description (with HTML) -->
@@ -267,6 +269,14 @@
     <style>
         [x-cloak] {
             display: none !important;
+        }
+
+        .clamp-html {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .description-cell a {

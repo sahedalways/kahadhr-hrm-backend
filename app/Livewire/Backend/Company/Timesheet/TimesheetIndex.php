@@ -1170,6 +1170,21 @@ class TimesheetIndex extends BaseComponent
             'isPaidBreak' => 'boolean',
         ]);
 
+
+        $employee = Employee::where('user_id', $this->employeeId)->first();
+        if ($employee) {
+            $shiftDate = ShiftDate::whereDate('date', $this->manualDate)
+                ->whereHas('employees', function ($q) use ($employee) {
+                    $q->where('employee_id', $employee->id);
+                })
+                ->first();
+
+            if ($shiftDate) {
+                $shiftDate->breaks()->delete();
+            }
+        }
+
+
         $clockIn = $this->manualDate . ' ' . $this->clockInTime;
         $clockOut = $this->clockOutTime ? $this->manualDate . ' ' . $this->clockOutTime : null;
 

@@ -142,22 +142,10 @@ class AdminLogin extends BaseComponent
     public function startOtpCooldown()
     {
         $this->otpCooldown = 120;
-
-        $this->dispatch('start-otp-countdown');
+        $this->otp = [];
+        $this->dispatch('startOtpCountdown', time: $this->otpCooldown);
     }
 
-
-    public function canResendOtp()
-    {
-        return $this->otpCooldown <= 0;
-    }
-
-    public function tick()
-    {
-        if ($this->otpCooldown > 0) {
-            $this->otpCooldown--;
-        }
-    }
 
 
 
@@ -204,10 +192,10 @@ class AdminLogin extends BaseComponent
             }
         }
 
-        $this->startOtpCooldown();
+
         $this->showOtpModal = true;
         $this->code_sent = true;
-        $this->otpCooldown = 120;
+        $this->startOtpCooldown();
     }
 
 

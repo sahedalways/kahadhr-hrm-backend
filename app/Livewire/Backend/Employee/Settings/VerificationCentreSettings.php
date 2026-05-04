@@ -21,7 +21,7 @@ class VerificationCentreSettings extends BaseComponent
     public $verification_code;
     public $updating_field;
 
-    protected $listeners = ['openModal', 'tick'];
+    protected $listeners = ['openModal'];
 
     public function openModal($field)
     {
@@ -124,18 +124,15 @@ class VerificationCentreSettings extends BaseComponent
         }
     }
 
+
     public function startOtpCooldown()
     {
         $this->otpCooldown = 120;
-        $this->dispatch('start-otp-countdown');
+        $this->otp = [];
+        $this->dispatch('startOtpCountdown', time: $this->otpCooldown);
     }
 
-    public function tick()
-    {
-        if ($this->otpCooldown > 0) {
-            $this->otpCooldown--;
-        }
-    }
+
 
     public function verifyAndUpdate(VerificationService $verificationService)
     {

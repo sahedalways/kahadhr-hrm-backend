@@ -16,15 +16,21 @@
                         <div class="col-md-4 d-flex align-items-end">
                             <div class="flex-grow-1">
                                 <label class="form-label">Company Mobile <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control shadow-sm" wire:model="company_mobile"
-                                    readonly oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <input type="text"
+                                       class="form-control shadow-sm"
+                                       wire:model="company_mobile"
+                                       readonly
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 @error('company_mobile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="button" class="btn btn-primary ms-2 mb-0" wire:click="openModal('mobile')"
-                                data-bs-toggle="modal" data-bs-target="#verifyModal">
+                            <button type="button"
+                                    class="btn btn-primary ms-2 mb-0"
+                                    wire:click="openModal('mobile')"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#verifyModal">
                                 Change
                             </button>
                         </div>
@@ -32,14 +38,20 @@
                         <div class="col-md-4 d-flex align-items-end">
                             <div class="flex-grow-1">
                                 <label class="form-label">Company Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" wire:model="company_email" readonly>
+                                <input type="email"
+                                       class="form-control"
+                                       wire:model="company_email"
+                                       readonly>
                                 @error('company_email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="button" class="btn btn-primary ms-2 mb-0" wire:click="openModal('email')"
-                                data-bs-toggle="modal" data-bs-target="#verifyModal">
+                            <button type="button"
+                                    class="btn btn-primary ms-2 mb-0"
+                                    wire:click="openModal('email')"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#verifyModal">
                                 Change
                             </button>
                         </div>
@@ -51,14 +63,24 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="verifyModal" tabindex="-1" role="dialog"
-        aria-labelledby="verifyModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
+    <div wire:ignore.self
+         class="modal fade"
+         id="verifyModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="verifyModal"
+         aria-hidden="true"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg"
+             role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title fw-600">Verification Centre</h6>
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
-                        aria-label="Close">
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -67,28 +89,37 @@
                     <div class="modal-body">
 
                         @if (!$passwordVerified)
-                            <div class="mb-3" wire:ignore>
+                            <div class="mb-3"
+                                 wire:ignore>
                                 <label>Enter Password <span class="text-danger">*</span></label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control extra-padding shadow-sm" id="password"
-                                    wire:model.defer="passwordInput">
-                                <span class="icon-position " style="cursor:pointer;"
-                                    onclick="togglePassword('password', this)">
-                                    <i class="fas fa-eye"></i>
-                                </span>
+                                    <input type="password"
+                                           class="form-control extra-padding shadow-sm"
+                                           id="password"
+                                           wire:model.defer="passwordInput">
+                                    <span class="icon-position "
+                                          style="cursor:pointer;"
+                                          onclick="togglePassword('password', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
                                 </div>
 
 
                             </div>
                             <div class="text-end">
-                                <button type="button" class="btn btn-primary" wire:click="verifyPassword"
-                                    wire:loading.attr="disabled" wire:target="verifyPassword">
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        wire:click="verifyPassword"
+                                        wire:loading.attr="disabled"
+                                        wire:target="verifyPassword">
 
-                                    <span wire:loading wire:target="verifyPassword">
+                                    <span wire:loading
+                                          wire:target="verifyPassword">
                                         <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
                                     </span>
 
-                                    <span wire:loading.remove wire:target="verifyPassword">
+                                    <span wire:loading.remove
+                                          wire:target="verifyPassword">
                                         Verify Password
                                     </span>
                                 </button>
@@ -102,19 +133,29 @@
                                 <div class="mb-3">
                                     <label>New Email <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input type="email" class="form-control form-control-sm shadow-sm"
-                                            wire:model="new_email" placeholder="Enter new email" style="height: 38px;">
+                                        <input type="email"
+                                               class="form-control form-control-sm shadow-sm"
+                                               wire:model="new_email"
+                                               placeholder="Enter new email"
+                                               style="height: 38px;">
 
-                                        <button
-                                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                            type="button" style="height: 38px;"
-                                            wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
-                                            wire:loading.attr="disabled" wire:target="requestVerification"
-                                            @if ($otpCooldown > 0) disabled @endif>
-                                            <span wire:loading wire:target="requestVerification">
+                                        <button class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                                type="button"
+                                                style="height: 38px;"
+                                                wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                                wire:loading.attr="disabled"
+                                                wire:target="requestVerification"
+                                                @if ($otpCooldown > 0) disabled @endif>
+                                            <span wire:loading
+                                                  wire:target="requestVerification">
                                                 <i class="fas fa-spinner fa-spin me-2"></i> Sending...
                                             </span>
-                                            <span wire:loading.remove wire:target="requestVerification">
+
+
+                                            <span wire:loading.remove
+                                                  wire:target="requestVerification"
+                                                  id="otpTimer"
+                                                  data-time="{{ $otpCooldown }}">
                                                 @if ($otpCooldown > 0)
                                                     Resend In
                                                     {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
@@ -133,9 +174,7 @@
                                     </div>
 
                                     <!-- Livewire polling for countdown -->
-                                    @if ($otpCooldown > 0)
-                                        <div wire:poll.1000ms="tick"></div>
-                                    @endif
+
 
                                     @error('new_email')
                                         <span class="text-danger">{{ $message }}</span>
@@ -148,19 +187,26 @@
                                 <div class="mb-3">
                                     <label>New Mobile No. <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control shadow-sm form-control-sm"
-                                            wire:model="new_mobile" placeholder="Enter new mobile no."
-                                            style="height: 38px;">
-                                        <button
-                                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                            type="button" style="height: 38px;"
-                                            wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
-                                            wire:loading.attr="disabled" wire:target="requestVerification"
-                                            @if ($otpCooldown > 0) disabled @endif>
-                                            <span wire:loading wire:target="requestVerification">
+                                        <input type="text"
+                                               class="form-control shadow-sm form-control-sm"
+                                               wire:model="new_mobile"
+                                               placeholder="Enter new mobile no."
+                                               style="height: 38px;">
+                                        <button class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                                type="button"
+                                                style="height: 38px;"
+                                                wire:click.prevent.stop="requestVerification('{{ $updating_field }}')"
+                                                wire:loading.attr="disabled"
+                                                wire:target="requestVerification"
+                                                @if ($otpCooldown > 0) disabled @endif>
+                                            <span wire:loading
+                                                  wire:target="requestVerification">
                                                 <i class="fas fa-spinner fa-spin me-2"></i> Sending...
                                             </span>
-                                            <span wire:loading.remove wire:target="requestVerification">
+                                            <span wire:loading.remove
+                                                  wire:target="requestVerification"
+                                                  id="otpTimer"
+                                                  data-time="{{ $otpCooldown }}">
                                                 @if ($otpCooldown > 0)
                                                     Resend In
                                                     {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
@@ -174,9 +220,7 @@
                                     </div>
 
 
-                                    @if ($otpCooldown > 0)
-                                        <div wire:poll.1000ms="tick"></div>
-                                    @endif
+
 
                                     @error('new_mobile')
                                         <span class="text-danger">{{ $message }}</span>
@@ -190,10 +234,13 @@
                                     <label>Verification Code <span class="text-danger">*</span></label>
                                     <div class="d-flex gap-2">
                                         @for ($i = 0; $i < 6; $i++)
-                                            <input type="text" wire:model="otp.{{ $i }}"
-                                                class="form-control text-center otp-field" maxlength="1"
-                                                placeholder="-" oninput="handleOtpInput(this)"
-                                                onkeydown="handleOtpBackspace(event, this)">
+                                            <input type="text"
+                                                   wire:model="otp.{{ $i }}"
+                                                   class="form-control text-center otp-field"
+                                                   maxlength="1"
+                                                   placeholder="-"
+                                                   oninput="handleOtpInput(this)"
+                                                   onkeydown="handleOtpBackspace(event, this)">
                                         @endfor
                                     </div>
                                     @error('verification_code')
@@ -210,12 +257,16 @@
                     <!-- Modal Footer -->
                     <div class="modal-footer">
                         @if ($code_sent)
-                            <button type="submit" class="btn btn-success" wire:loading.attr="disabled"
-                                wire:target="verifyOtp">
-                                <span wire:loading wire:target="verifyOtp">
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    wire:loading.attr="disabled"
+                                    wire:target="verifyOtp">
+                                <span wire:loading
+                                      wire:target="verifyOtp">
                                     <i class="fas fa-spinner fa-spin me-2"></i> Verifying...
                                 </span>
-                                <span wire:loading.remove wire:target="verifyOtp">Verify</span>
+                                <span wire:loading.remove
+                                      wire:target="verifyOtp">Verify</span>
                             </button>
                         @endif
 
@@ -275,4 +326,35 @@
             icon.innerHTML = '<i class="fas fa-eye"></i>';
         }
     }
+</script>
+
+<script>
+    document.addEventListener('startOtpCountdown', function(e) {
+        let time = e.detail.time;
+
+        let timerElement = document.getElementById("otpTimer");
+        let resendBtn = document.getElementById("resendBtn");
+
+        function updateTimer() {
+            if (!timerElement) return;
+
+            if (time <= 0) {
+                timerElement.innerHTML = "Resend OTP";
+                if (resendBtn) resendBtn.disabled = false;
+                return;
+            }
+
+            let minutes = Math.floor(time / 60);
+            let seconds = time % 60;
+
+            timerElement.innerHTML =
+                "Resend In " + minutes + ":" + String(seconds).padStart(2, '0');
+
+            time--;
+
+            setTimeout(updateTimer, 1000);
+        }
+
+        updateTimer();
+    });
 </script>

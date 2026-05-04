@@ -248,38 +248,37 @@
 
 
 
-                                    @if ($otpCooldown > 0)
-                                        <div wire:poll.1000ms="tick"></div>
-                                    @endif
+
                                 </div>
 
                                 <!-- Modal Footer -->
                                 <div class="modal-footer justify-content-between">
 
 
-                                    <button type="button"
+                                    <button id="resendBtn"
+                                            type="button"
                                             class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                            wire:click.prevent.stop="login('{{ $updating_field }}')"
+                                            wire:click.prevent.stop="sendOtp"
                                             wire:loading.attr="disabled"
-                                            wire:target="login"
-                                            style="height: 38px; min-width: 120px;"
+                                            wire:target="sendOtp"
+                                            style="height: 38px; min-width: 140px;"
                                             @if ($otpCooldown > 0) disabled @endif>
+
+                                        <!-- Loading -->
                                         <span wire:loading
-                                              wire:target="login">
+                                              wire:target="sendOtp">
                                             <i class="fas fa-spinner fa-spin me-2"></i> Sending...
                                         </span>
 
+                                        <!-- Timer -->
                                         <span wire:loading.remove
-                                              wire:target="sendOtp">
-                                            @if ($otpCooldown > 0)
-                                                Resend In
-                                                {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
-                                            @elseif($code_sent)
-                                                Resend OTP
-                                            @else
-                                                Send OTP
-                                            @endif
+                                              wire:target="sendOtp"
+                                              id="otpTimer"
+                                              data-time="{{ $otpCooldown }}">
+                                            Resend In
+                                            {{ floor($otpCooldown / 60) }}:{{ str_pad($otpCooldown % 60, 2, '0', STR_PAD_LEFT) }}
                                         </span>
+
                                     </button>
 
                                     <!-- Verify Button -->
@@ -436,4 +435,36 @@
             inputs[index - 1].focus();
         }
     }
+</script>
+
+
+<script>
+    document.addEventListener('startOtpCountdown', function(e) {
+        let time = e.detail.time;
+
+        let timerElement = document.getElementById("otpTimer");
+        let resendBtn = document.getElementById("resendBtn");
+
+        function updateTimer() {
+            if (!timerElement) return;
+
+            if (time <= 0) {
+                timerElement.innerHTML = "Resend OTP";
+                if (resendBtn) resendBtn.disabled = false;
+                return;
+            }
+
+            let minutes = Math.floor(time / 60);
+            let seconds = time % 60;
+
+            timerElement.innerHTML =
+                "Resend In " + minutes + ":" + String(seconds).padStart(2, '0');
+
+            time--;
+
+            setTimeout(updateTimer, 1000);
+        }
+
+        updateTimer();
+    });
 </script>

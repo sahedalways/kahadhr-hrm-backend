@@ -183,13 +183,6 @@ class CompanyLogin extends BaseComponent
     {
         $this->reset();
     }
-    public function tickResetOtp()
-    {
-        if ($this->resetOtpCooldown > 0) {
-            $this->resetOtpCooldown--;
-        }
-    }
-
 
 
     protected $rules = [
@@ -342,22 +335,10 @@ class CompanyLogin extends BaseComponent
     public function startOtpCooldown()
     {
         $this->otpCooldown = 120;
-
-        $this->dispatch('start-otp-countdown');
+        $this->otp = [];
+        $this->dispatch('startOtpCountdown', time: $this->otpCooldown);
     }
 
-
-    public function canResendOtp()
-    {
-        return $this->otpCooldown <= 0;
-    }
-
-    public function tick()
-    {
-        if ($this->otpCooldown > 0) {
-            $this->otpCooldown--;
-        }
-    }
 
 
 

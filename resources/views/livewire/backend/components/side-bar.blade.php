@@ -1,4 +1,4 @@
-<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end me-4 rotate-caret fixed-start"
+<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 fixed-end rotate-caret fixed-start"
        id="sidenav-main"
        data-color="primary">
 
@@ -50,6 +50,19 @@
             .blink-me {
                 animation: blink-animation 0.5s ease-in-out 2;
 
+            }
+
+
+            @media (max-width: 768px) {
+                #sidenav-main {
+                    top: 65px !important;
+                    margin-top: 0 !important;
+                    transform: translateX(0) !important;
+                }
+
+                .navbar-vertical.navbar-expand-xs {
+                    top: 15px !important;
+                }
             }
         </style>
 

@@ -96,7 +96,7 @@
                              </div>
                          </div>
 
-                         {{-- Leave in Lieu Card --}}
+                         {{-- Carry Forward Card --}}
                          <div class="col-md-6">
                              <div class="card h-100 border-0 shadow-sm hover-shadow transition-all"
                                   style="transition: transform 0.3s ease-in-out;">
@@ -105,8 +105,7 @@
                                          <div>
                                              <h6 class="text-uppercase text-muted mb-1 fw-semibold"
                                                  style="letter-spacing: 0.5px;">
-                                                 <i class="fas fa-hourglass-half text-primary me-1"></i> Leave in
-                                                 Lieu
+                                                 <i class="fas fa-hourglass-half text-primary me-1"></i> Carry Forward
                                              </h6>
                                              <h3 class="mb-0 fw-bold text-primary">
                                                  {{ number_format($remainingLeaveInLiewHours, 2) }}

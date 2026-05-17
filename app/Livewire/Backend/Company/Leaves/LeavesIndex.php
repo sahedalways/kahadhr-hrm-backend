@@ -343,11 +343,12 @@ class LeavesIndex extends BaseComponent
         }
 
 
-
         $this->yearlyLeaves = LeaveRequest::where('user_id', $employeeId)
             ->where('status', 'approved')
-            ->whereBetween('start_date', [$startDate, $endDate])
-            ->orWhereBetween('end_date', [$startDate, $endDate])
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+            })
             ->with('leaveType')
             ->get()
             ->map(function ($leave) {

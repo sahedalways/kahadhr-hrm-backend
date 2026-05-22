@@ -37,16 +37,7 @@
                                     <i class="bi bi-chat-left-text me-2"></i> New Chat
                                 </a>
                             </li>
-                            {{-- @if (auth()->user()->user_type === 'company')
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="#"
-                                        data-bs-toggle="modal" data-bs-target="#newTeamModal"
-                                        wire:click="openNewTeamModal">
 
-                                        <i class="bi bi-people-fill me-2"></i> New Team
-                                    </a>
-                                </li>
-                            @endif --}}
 
                         </ul>
                     </div>
@@ -1247,108 +1238,13 @@
 
 
 
-        <!-- NEW CHAT MODAL -->
-        <div class="modal fade"
-             id="newChatModal"
-             tabindex="-1"
-             aria-hidden="true"
-             wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered"
-                 style="max-width: 420px;">
-                <div class="modal-content"
-                     style="border-radius: 15px;"
-                     data-bs-backdrop="static"
-                     data-bs-keyboard="false">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Start New Chat</h5>
-                        <button type="button"
-                                class="btn btn-light rounded-pill"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
 
-                    <div class="modal-body"
-                         style="max-height: 400px; overflow-y: auto;">
-
-                        <!-- 🔍 SEARCH FIELD -->
-                        <input type="text"
-                               class="form-control mb-3"
-                               placeholder="Search users..."
-                               wire:model="searchUser"
-                               wire:keyup="set('searchUser', $event.target.value)">
-
-                        <!-- USER LIST -->
-                        @foreach ($newChatUsers as $user)
-                            @php
-                                if ($user->user_type === 'company') {
-                                    $displayName = 'Company Admin';
-                                } else {
-                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                    if (!$displayName) {
-                                        $displayName = $user->email;
-                                    }
-                                }
-
-                                if ($user->user_type === 'employee') {
-                                    $avatar = null;
-                                    $showInitials = true;
-                                    $initials = strtoupper(
-                                        substr($user->employee->f_name ?? '', 0, 1) .
-                                            substr($user->employee->l_name ?? '', 0, 1),
-                                    );
-                                } elseif ($user->user_type === 'company') {
-                                    $avatar =
-                                        $user->company && $user->company->company_logo_url
-                                            ? asset($user->company->company_logo_url)
-                                            : asset('/assets/img/default-image.jpg');
-                                    $showInitials = false;
-                                } else {
-                                    $avatar = asset('/assets/img/default-image.jpg');
-                                    $showInitials = false;
-                                }
-
-                            @endphp
-
-
-                            <div class="d-flex align-items-center p-2 hover-bg-light rounded mb-2"
-                                 style="cursor:pointer;"
-                                 wire:click="startNewChat({{ $user->id }})"
-                                 data-bs-dismiss="modal">
-
-                                @if ($showInitials)
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                         style="width:45px; height:45px; background-color:#6c757d; color:#fff; font-weight:bold;">
-                                        {{ $initials }}
-                                    </div>
-                                @else
-                                    <img src="{{ $avatar }}"
-                                         class="rounded-circle me-3"
-                                         style="width:45px;height:45px;object-fit:cover;">
-                                @endif
-
-                                <div>
-                                    <div class="fw-bold">{{ $displayName }}</div>
-
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @if ($newChatUsers->isEmpty())
-                            <p class="text-center text-muted mt-3">No users found.</p>
-                        @endif
-
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
 
     </div>
 
-    {{-- will work after tablate --}}
+    {{-- will work after tablet --}}
     <div class="chat-app-container d-md-none d-block mobile-chat-container"
          wire:ignore.self>
         <div class="d-flex h-100">
@@ -1386,18 +1282,7 @@
                                     <i class="bi bi-chat-left-text me-2"></i> New Chat
                                 </a>
                             </li>
-                            @if (auth()->user()->user_type === 'company')
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center"
-                                       href="#"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#newTeamModal"
-                                       wire:click="openNewTeamModal">
 
-                                        <i class="bi bi-people-fill me-2"></i> New Team
-                                    </a>
-                                </li>
-                            @endif
 
                         </ul>
                     </div>
@@ -2299,104 +2184,6 @@
 
 
 
-        <!-- NEW CHAT MODAL -->
-        <div class="modal fade"
-             id="newChatModal"
-             tabindex="-1"
-             aria-hidden="true"
-             wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered"
-                 style="max-width: 420px;">
-                <div class="modal-content"
-                     style="border-radius: 15px;"
-                     data-bs-backdrop="static"
-                     data-bs-keyboard="false">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Start New Chat</h5>
-                        <button type="button"
-                                class="btn btn-light rounded-pill"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <div class="modal-body"
-                         style="max-height: 400px; overflow-y: auto;">
-
-                        <!-- 🔍 SEARCH FIELD -->
-                        <input type="text"
-                               class="form-control mb-3"
-                               placeholder="Search users..."
-                               wire:model="searchUser"
-                               wire:keyup="set('searchUser', $event.target.value)">
-
-                        <!-- USER LIST -->
-                        @foreach ($newChatUsers as $user)
-                            @php
-                                if ($user->user_type === 'company') {
-                                    $displayName = 'Company Admin';
-                                } else {
-                                    $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
-                                    if (!$displayName) {
-                                        $displayName = $user->email;
-                                    }
-                                }
-
-                                if ($user->user_type === 'employee') {
-                                    $avatar = null;
-                                    $showInitials = true;
-                                    $initials = strtoupper(
-                                        substr($user->employee->f_name ?? '', 0, 1) .
-                                            substr($user->employee->l_name ?? '', 0, 1),
-                                    );
-                                } elseif ($user->user_type === 'company') {
-                                    $avatar =
-                                        $user->company && $user->company->company_logo_url
-                                            ? asset($user->company->company_logo_url)
-                                            : asset('/assets/img/default-image.jpg');
-                                    $showInitials = false;
-                                } else {
-                                    $avatar = asset('/assets/img/default-image.jpg');
-                                    $showInitials = false;
-                                }
-
-                            @endphp
-
-
-                            <div class="d-flex align-items-center p-2 hover-bg-light rounded mb-2"
-                                 style="cursor:pointer;"
-                                 wire:click="startNewChat({{ $user->id }})"
-                                 data-bs-dismiss="modal">
-
-                                @if ($showInitials)
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                         style="width:45px; height:45px; background-color:#6c757d; color:#fff; font-weight:bold;">
-                                        {{ $initials }}
-                                    </div>
-                                @else
-                                    <img src="{{ $avatar }}"
-                                         class="rounded-circle me-3"
-                                         style="width:45px;height:45px;object-fit:cover;">
-                                @endif
-
-                                <div>
-                                    <div class="fw-bold">{{ $displayName }}</div>
-
-                                </div>
-                            </div>
-                        @endforeach
-
-                        @if ($newChatUsers->isEmpty())
-                            <p class="text-center text-muted mt-3">No users found.</p>
-                        @endif
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
         <style>
             .dropdown-toggle::after {
                 display: none;
@@ -2407,7 +2194,109 @@
             }
         </style>
     </div>
+
+
+    <!-- NEW CHAT MODAL -->
+    <div class="modal fade"
+         id="newChatModal"
+         tabindex="-1"
+         aria-hidden="true"
+         wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered"
+             style="max-width: 420px;">
+            <div class="modal-content"
+                 style="border-radius: 15px;"
+                 data-bs-backdrop="static"
+                 data-bs-keyboard="false">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Start New Chat</h5>
+                    <button type="button"
+                            class="btn btn-light rounded-pill"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body"
+                     style="max-height: 400px; overflow-y: auto;">
+
+                    <!-- 🔍 SEARCH FIELD -->
+                    <input type="text"
+                           class="form-control mb-3"
+                           placeholder="Search users..."
+                           wire:model="searchUser"
+                           wire:keyup="set('searchUser', $event.target.value)">
+
+                    <!-- USER LIST -->
+                    @foreach ($newChatUsers as $user)
+                        @php
+                            if ($user->user_type === 'company') {
+                                $displayName = 'Company Admin';
+                            } else {
+                                $displayName = trim(($user->f_name ?? '') . ' ' . ($user->l_name ?? ''));
+                                if (!$displayName) {
+                                    $displayName = $user->email;
+                                }
+                            }
+
+                            if ($user->user_type === 'employee') {
+                                $avatar = null;
+                                $showInitials = true;
+                                $initials = strtoupper(
+                                    substr($user->employee->f_name ?? '', 0, 1) .
+                                        substr($user->employee->l_name ?? '', 0, 1),
+                                );
+                            } elseif ($user->user_type === 'company') {
+                                $avatar =
+                                    $user->company && $user->company->company_logo_url
+                                        ? asset($user->company->company_logo_url)
+                                        : asset('/assets/img/default-image.jpg');
+                                $showInitials = false;
+                            } else {
+                                $avatar = asset('/assets/img/default-image.jpg');
+                                $showInitials = false;
+                            }
+
+                        @endphp
+
+
+                        <div class="d-flex align-items-center p-2 hover-bg-light rounded mb-2"
+                             style="cursor:pointer;"
+                             wire:click="startNewChat({{ $user->id }})"
+                             data-bs-dismiss="modal">
+
+                            @if ($showInitials)
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                     style="width:45px; height:45px; background-color:#6c757d; color:#fff; font-weight:bold;">
+                                    {{ $initials }}
+                                </div>
+                            @else
+                                <img src="{{ $avatar }}"
+                                     class="rounded-circle me-3"
+                                     style="width:45px;height:45px;object-fit:cover;">
+                            @endif
+
+                            <div>
+                                <div class="fw-bold">{{ $displayName }}</div>
+
+                            </div>
+                        </div>
+                    @endforeach
+
+                    @if ($newChatUsers->isEmpty())
+                        <p class="text-center text-muted mt-3">No users found.</p>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+
 
 
 <script src="https://js.pusher.com/7.2/pusher.min.js"></script>

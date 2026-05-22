@@ -1069,7 +1069,7 @@
                             <div class="fw-normal text-dark flex-grow-1">
                                 <div><strong>Time:</strong>
                                     {{ \Carbon\Carbon::parse($requestDetails->time)->format('h:i A') }}</div>
-                                @if ($requestDetails->type === 'late_clock_in')
+                                @if ($requestDetails->type === 'late_clock_in' || $requestDetails->type === 'early_clock_in')
                                     <div><strong>Location:</strong> {{ $requestDetails->clock_in_location }}</div>
                                 @else
                                     <div><strong>Location:</strong> {{ $requestDetails->clock_out_location }}</div>

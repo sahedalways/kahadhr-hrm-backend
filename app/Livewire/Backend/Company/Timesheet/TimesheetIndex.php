@@ -1287,7 +1287,6 @@ class TimesheetIndex extends BaseComponent
             $this->requestDetails->clock_in_location  = $attendance->clock_in_location ?? '-';
             $this->requestDetails->clock_out_location = $attendance->clock_out_location ?? '-';
 
-            // Status
             $this->requestDetails->status = $this->requestDetails->status;
 
             if ($this->requestDetails->type == 'late_clock_in') {

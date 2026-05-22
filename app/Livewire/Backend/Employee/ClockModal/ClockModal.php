@@ -101,6 +101,7 @@ class ClockModal extends BaseComponent
             'company_id' => Auth::user()->employee->company_id,
             'clock_in' => $ukTime,
             'clock_in_location' => $this->clockInLocation,
+            'clock_out_location' => null,
             'is_manual' => false,
             'clock_in_latitude' => $this->clockInLatitude,
             'clock_in_longitude' => $this->clockInLongitude,

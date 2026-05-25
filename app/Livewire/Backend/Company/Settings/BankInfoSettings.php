@@ -399,11 +399,12 @@ class BankInfoSettings extends BaseComponent
             return;
         }
 
-        $result = $this->gateway->charge(
+        $gateway = app(PaymentGateway::class);
+
+        $result = $gateway->charge(
             $card->stripe_payment_method_id,
             $amount
         );
-
 
         if ($result->success) {
             $company->subscription_start = now();

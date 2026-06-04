@@ -401,6 +401,9 @@ class BankInfoSettings extends BaseComponent
 
         $gateway = app(PaymentGateway::class);
 
+        $billingPeriodStart = Carbon::parse($company->subscription_start);
+        $billingPeriodEnd = Carbon::parse($company->subscription_end);
+
         $result = $gateway->charge(
             $card->stripe_payment_method_id,
             $amount
@@ -419,8 +422,8 @@ class BankInfoSettings extends BaseComponent
 
             $invoice = Invoice::create([
                 'company_id' => $company->id,
-                'billing_period_start' => now()->startOfMonth(),
-                'billing_period_end' => now()->endOfMonth(),
+                'billing_period_start' => $billingPeriodStart,
+                'billing_period_end' => $billingPeriodEnd,
                 'employee_fee' => $rate,
                 'total_employees_billed' => $employeeCount,
                 'subtotal' => $amount,

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Employee extends Model
 {
@@ -289,7 +290,46 @@ class Employee extends Model
                 $employee->share_code_status = 'pending';
             }
         });
+
+
+
+        static::deleting(function ($employee) {
+            foreach ($employee->documents as $document) {
+
+                if (
+                    $document->file_path &&
+                    Storage::disk('public')->exists($document->file_path)
+                ) {
+                    Storage::disk('public')->delete($document->file_path);
+                }
+
+                $document->forceDelete();
+            }
+
+
+            $employee->profile()?->delete();
+
+
+            $employee->emergencyContacts()->delete();
+
+
+            $employee->customFieldValues()->delete();
+
+
+            $employee->teams()->detach();
+
+
+            if ($employee->user_id) {
+                LeaveBalance::where('user_id', $employee->user_id)->delete();
+            }
+
+            if ($employee->user) {
+                $employee->user->delete();
+            }
+        });
     }
+
+
 
     public function profile()
     {

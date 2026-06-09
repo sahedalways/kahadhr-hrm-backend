@@ -370,6 +370,7 @@ class Dashboard extends Component
         $empExpiringDocs = EmpDocument::where('company_id', $companyId)
             ->whereNotNull('expires_at')
             ->whereBetween('expires_at', [$today, $today->copy()->addDays(60)])
+            ->whereHas('employee')
             ->with(['employee', 'documentType'])
             ->get();
 
@@ -410,8 +411,6 @@ class Dashboard extends Component
             'leave'   => $onLeave,
             'absent'  => $absentFilterWise,
         ];
-
-
 
 
 

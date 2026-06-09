@@ -171,7 +171,7 @@
                        class="btn-primary-custom">
                         Back to Home
                     </a>
-                    <a href="mailto:{{ getSiteEmail() ?? 'support@company.com' }}"
+                    <a href="mailto:{{ superAdminEmail() ?? 'support@company.com' }}"
                        class="btn-outline-custom">
                         Contact Support
                     </a>

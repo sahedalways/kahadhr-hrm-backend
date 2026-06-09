@@ -23,6 +23,15 @@ if (!function_exists('siteSetting')) {
   }
 }
 
+if (!function_exists('superAdminEmail')) {
+  function superAdminEmail()
+  {
+    return SiteSetting::withoutGlobalScopes()
+      ->whereNull('company_id')
+      ->value('site_email');
+  }
+}
+
 
 if (!function_exists('getSiteEmail')) {
   function getSiteEmail()

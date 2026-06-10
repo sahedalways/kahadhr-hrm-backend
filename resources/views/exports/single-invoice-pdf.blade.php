@@ -85,11 +85,13 @@
         }
 
         .details-table th {
-            background: #164f84;
-            color: white;
+            background: #e8f1fb;
+            color: #164f84;
             padding: 12px;
-            text-align: left;
-            font-size: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #d6e4f5;
         }
 
         .details-table td {
@@ -125,11 +127,13 @@
             border: none;
         }
 
-        .totals .total-row {
-            background: #164f84;
-            color: white;
+        .totals .total-row td {
+            background: #e8f1fb;
+            color: #164f84;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
+
+            vertical-align: middle;
         }
 
         .totals .border-row td {
@@ -284,7 +288,7 @@
                 </tr>
 
                 <tr class="border-row total-row">
-                    <td>Total Due</td>
+                    <td>Total</td>
                     <td class="text-right">
                         £{{ number_format($invoice->total, 2) }}
                     </td>
